@@ -1,0 +1,14 @@
+{
+  "name": "@ezpay/pageHook",
+  "main": "index.js",
+  "author": "HoangNong <hoang.nong.it@gmail.com>",
+  "private": true,
+  "version": "2.6.1",
+  "scripts": {
+    "build": "webpack --config ../../webpack.config.js --progress --colors -o ../../dist/pageHook.js",
+    "lint": "npx eslint . --fix"
+  },
+  "dependencies": {
+    "tronweb": "^2.6.4"
+  }
+}
