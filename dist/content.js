@@ -94,12 +94,12 @@
 /*! ModuleConcatenation bailout: Module is not an ECMAScript module */
 /***/ (function(module, exports) {
 
-var pageHook = {
+var content = {
   init: function init() {}
 };
-pageHook.init();
+content.init();
 
 /***/ })
 
 /******/ });
-//# sourceMappingURL=pageHook.js.map
+//# sourceMappingURL=content.js.map

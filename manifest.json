@@ -3,7 +3,7 @@
     "name": "EZpay",
     "version": "1.0.0",
     "version_name": "1.0.0",
-    "description": "EZpay Chrome Extenstion",
+    "description": "Easy Wallet for Ethereum Ecosystem",
     "author": "HoangNong <hoang.nong.it@gmail.com>",
     "content_security_policy": "script-src 'self' 'unsafe-eval' 'sha256-LayQc1iWBC+6WbHHvHZj3uSx3CxrGBHUJBR7si4qf8w=' 'sha256-POEO+wER89cezFVZ27JoP523HJNPMQxmh5Rcz/OZpr4=' 'sha256-IThiKMnsg0UHaLmP7sJxZpd/ohvINImwjxFJyxGFSlk=' https://*.sentry.io https://www.google-analytics.com https://www.googletagmanager.com https://cdnjs.cloudflare.com; object-src 'self'",
     "permissions": [
@@ -21,7 +21,7 @@
     },
     "background": {
         "scripts": [
-            "dist/backgroundScript.js"
+            "dist/background.js"
         ],
         "persistent": true
     },
@@ -33,7 +33,7 @@
                 "https://*/*"
             ],
             "js": [
-                "dist/contentScript.js"
+                "dist/content.js"
             ],
             "run_at": "document_start",
             "all_frames": true
