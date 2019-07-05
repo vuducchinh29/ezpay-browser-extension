@@ -38,5 +38,8 @@
     "PAGES.TRANSACTIONS": "Transactions",
     "PAGES.TOKENS": "Tokens",
     "PAGES.SEND": "Send",
-    "PAGES.SETTINGS": "Settings"
+    "PAGES.SETTINGS": "Settings",
+    "PASSWORD_TIP.NOT_FORGOT":"Remember the password, you can't retrieve it if you forget it.",
+    "INPUT.PASSWORD": "Local passcode",
+    "INPUT.REPEAT_PASSWORD": "Repeat local passcode"
 }
