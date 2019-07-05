@@ -85,21 +85,6 @@ html, body {
                     background-size:100%;
                     background-repeat: no-repeat;
                 }
-                &.en{
-                    &:before{
-                        background-image: url('../images/new/language/icon-english.svg');
-                    }
-                }
-                &.zh{
-                    &:before{
-                        background-image: url('../images/new/language/icon-chinese.svg');
-                    }
-                }
-                &.ja{
-                    &:before{
-                        background-image: url('../images/new/language/icon-japanese.svg');
-                    }
-                }
                 &:hover{
                     .drop{display: block}
                 }
@@ -127,21 +112,6 @@ html, body {
                             content: '';
                             margin-right: 10px;
                         }
-                        &.en{
-                            &:before{
-                                background-image: url('../images/new/language/icon-english.svg');
-                            }
-                        }
-                        &.zh{
-                            &:before{
-                                background-image: url('../images/new/language/icon-chinese.svg');
-                            }
-                        }
-                        &.ja{
-                            &:before{
-                                background-image: url('../images/new/language/icon-japanese.svg');
-                            }
-                        }
                     }
                 }
             }
@@ -154,7 +124,6 @@ html, body {
         top: 0;
         width: 40px;
         height: 56px;
-        background-image: url('../images/new/icon-back.svg');
         background-repeat: no-repeat;
         background-position: center center;
     }
@@ -187,7 +156,6 @@ html, body {
             .logo1{
                 width: 55px;
                 height: 25px;
-                background-image: url('../images/new/logo.png');
                 background-repeat: no-repeat;
                 background-size:100% auto;
             }
@@ -249,7 +217,6 @@ html, body {
                         .iconWrap{
                             width: 90px;
                             height: 72px;
-                            background-image: url('../images/new/icon-create-account.png');
                         }
                     }
                     &:last-child{
@@ -257,7 +224,6 @@ html, body {
                         .iconWrap{
                             width: 90px;
                             height: 70px;
-                            background-image: url('../images/new/icon-import-account.png');
                         }
                     }
                 }
@@ -290,7 +256,6 @@ html, body {
                     width: 40px;
                     height: 52px;
                     content: '';
-                    background-image: url('../images/new/icon-enter.svg');
                     background-repeat: no-repeat;
                     background-position:center;
                     transition: all .2s ease-in-out;
@@ -358,7 +323,6 @@ html, body {
                                 width: 52px;
                                 height: 52px;
                                 content: '';
-                                background-image: url('../images/new/icon-enter.svg');
                                 background-repeat: no-repeat;
                                 background-position:center;
                                 transition: all .2s ease-in-out;
@@ -397,7 +361,6 @@ html, body {
                                 &:before {
                                     width: 16px;
                                     height: 16px;
-                                    background-image: url('../images/new/icon-selected.svg');
                                     border: none;
                                 }
                             }
@@ -424,7 +387,6 @@ html, body {
                                             border: none;
                                             width: 16px;
                                             height: 16px;
-                                            background-image: url('../images/new/icon-selected.svg');
                                         }
                                     }
                                 }
@@ -491,41 +453,6 @@ html, body {
                         content: '';
                         background-repeat: no-repeat;
                         background-position:center;
-                    }
-                    &:first-child{
-                        &:before{
-                            background-image: url('../images/new/icon-whitelist.svg');
-                        }
-                    }
-                    &:nth-child(2){
-                        &:before{
-                            background-image: url('../images/new/icon-node.svg');
-                        }
-                    }
-                    &:nth-child(3){
-                        &:before{
-                            background-image: url('../images/new/icon-add-node.svg');
-                        }
-                    }
-                    &:nth-child(4){
-                        &:before{
-                            background-image: url('../images/new/icon-currency.svg');
-                        }
-                    }
-                    &:nth-child(5){
-                        &:before{
-                            background-image: url('../images/new/icon-language.svg');
-                        }
-                    }
-                    &:nth-child(6){
-                        &:before{
-                            background-image: url('../images/new/icon-auto-lock.svg');
-                        }
-                    }
-                    &:nth-child(7){
-                        &:before{
-                            background-image: url('../images/new/icon-lock.svg');
-                        }
                     }
                     &.active{
                         .txt{
@@ -664,7 +591,6 @@ html, body {
                                     content:'';
                                     width: 13px;
                                     height: 15px;
-                                    background-image: url('../images/new/dapp/icon-fire.svg');
                                 }
                             }
                             .delete{
@@ -673,7 +599,6 @@ html, body {
                                 cursor: pointer;
                                 width: 16px;
                                 height: 16px;
-                                background-image: url('../images/new/icon-close.svg');
                             }
                         }
                         .desc{
@@ -770,7 +695,6 @@ html, body {
                         .copy{
                             width: 11px;
                             height: 11px;
-                            background-image: url('../images/new/icon-copy3.svg');
                             cursor: pointer;
                             margin-left: 12px;
                             background-size:100%;
@@ -794,7 +718,6 @@ html, body {
                                 border-radius: 30px;
                                 overflow:hidden;
                                 background-position: center;
-                                background-image: url('../images/new/usdt/usdt_income_decorate1.svg');
                                 .cell {
                                     flex:1;
                                     margin-left: 14px;
@@ -812,12 +735,10 @@ html, body {
                                     }
                                     &:first-child {
                                         &:before {
-                                            background-image: url("../../assets/images/new/usdt/icon1.svg");
                                         }
                                     }
                                     &:last-child {
                                         &:before {
-                                            background-image: url("../../assets/images/new/usdt/icon2.svg");
                                         }
                                     }
                                     .income{
@@ -943,7 +864,6 @@ html, body {
                     .top_inner{
                         width: 100%;
                         height: 100%;
-                        background-image: url("../../assets/images/new/usdt/usdt_income_decorate2.svg");
                         display: flex;
                         flex-direction: column;
                         justify-content: space-between;
@@ -1066,7 +986,6 @@ html, body {
                     position: relative;
                     width: 100%;
                     height: 80px;
-                    background-image: url("../../assets/images/new/usdt/activity.svg");
                     .name{
                         position: absolute;
                         left: 85px;
@@ -1157,7 +1076,6 @@ html, body {
                         margin-top: 20px;
                         width: 50px;
                         height: 50px;
-                        background-image: url('../images/new/icon-success.svg');
                         background-size:100%;
                     }
                     .state{
@@ -1239,7 +1157,6 @@ html, body {
                     &:after{
                         width: 8px;
                         height: 13px;
-                        background-image: url('../images/new/icon-arrow-right.svg');
                         content:'';
                     }
 
@@ -1274,13 +1191,11 @@ html, body {
                 &.receive{
                     background-color: #76AB61;
                     &:before{
-                        background-image: url('../../assets/images/new/icon-receive.svg');
                     }
                 }
                 &.send{
                     background-color: #DB705C;
                     &:before{
-                        background-image: url('../../assets/images/new/icon-transfer.svg');
                     }
                 }
             }
@@ -1298,7 +1213,6 @@ html, body {
                     content:' ';
                     width: 13px;
                     height: 13px;
-                    background-image: url('../images/new/icon-add2.svg');
                 }
             }
             &>.desc{
@@ -1326,7 +1240,6 @@ html, body {
                 &:before{
                     height: 14px;
                     width: 14px;
-                    background-image: url('../images/new/icon-copy2.svg');
                     content: "";
                     margin-right: 4px;
                 }
@@ -1426,7 +1339,6 @@ html, body {
                             transition:all .2s ease-in-out;
                             width: 12px;
                             height: 8px;
-                            background-image: url('../../assets/images/new/icon-drop-down.svg');
                         }
                     }
                 }
@@ -1576,11 +1488,9 @@ html, body {
                     content: '';
                     width: 18px;
                     height: 17px;
-                    background-image: url('../images/new/ic_search.svg');
                 }
                 &.hasValue{
                     &:after {
-                        background-image: url('../images/new/ic_search2.svg');
                     }
                 }
             }
@@ -1669,7 +1579,6 @@ html, body {
                 width: 135px;
                 height: 65px;
                 margin: 50px 0px;
-                background-image: url('../images/new/logo.png');
                 background-repeat: no-repeat;
             }
         }
@@ -1692,7 +1601,6 @@ html, body {
             cursor: pointer;
             width: 16px;
             height: 16px;
-            background-image: url('../images/new/icon-share.svg');
         }
         .title{
             //font-size: 15px;

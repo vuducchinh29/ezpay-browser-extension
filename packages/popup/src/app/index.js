@@ -3,6 +3,8 @@ import { IntlProvider, FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 
 import { APP_STATE } from '@ezpay/lib/constants';
+import RegistrationController from '@ezpay/popup/src/controllers/RegistrationController';
+import 'assets/styles/global.scss';
 
 import enMessages from '@ezpay/popup/src/translations/en.json';
 class App extends React.Component {
@@ -12,7 +14,15 @@ class App extends React.Component {
 
     render() {
         const { appState,language } = this.props;
-        let dom = <h1>Ezpay Extension</h1>;
+        let dom = <RegistrationController language={language} />;
+
+        switch(appState) {
+            case APP_STATE.UNINITIALISED:
+                dom = <RegistrationController language={language} />;
+                break;
+            default:
+                dom = <RegistrationController language={language} />;
+        }
 
         return (
             <IntlProvider locale={ language } messages={ this.messages[ language ] }>

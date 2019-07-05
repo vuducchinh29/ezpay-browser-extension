@@ -53,6 +53,7 @@ const logger = new Logger('Popup');
 export const app = {
     async run() {
         this.createStore();
+        // await this.getAppState();
         this.render();
     },
 
