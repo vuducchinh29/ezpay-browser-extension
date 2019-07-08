@@ -79,17 +79,17 @@ export const app = {
         PopupAPI.init(this.duplex);
         const setting = await PopupAPI.getSetting();
 
-        // let [
-        //     appState,
-        //     // accounts,
-        //     selectedAccount,
-        //     language,
-        // ] = await Promise.all([
-        //     PopupAPI.requestState(),
-        //     // PopupAPI.getAccounts(),
-        //     PopupAPI.getSelectedAccount(),
-        //     PopupAPI.getLanguage()
-        // ]);
+        let [
+            appState,
+            // accounts,
+            // selectedAccount,
+            // language,
+        ] = await Promise.all([
+            PopupAPI.requestState(),
+            // PopupAPI.getAccounts(),
+            // PopupAPI.getSelectedAccount(),
+            // PopupAPI.getLanguage()
+        ]);
         // const lang = navigator.language || navigator.browserLanguage;
         // if ( lang.indexOf('zh') > -1 ) {
         //     language = language || 'zh';
@@ -98,9 +98,9 @@ export const app = {
         // } else {
         //     language = language || 'en';
         // }
-        // this.store.dispatch(setAppState(appState));
-        // // this.store.dispatch(setAccounts(accounts));
-        // // this.store.dispatch(setCurrency(prices.selected));
+        this.store.dispatch(setAppState(appState));
+        // this.store.dispatch(setAccounts(accounts));
+        // this.store.dispatch(setCurrency(prices.selected));
         // this.store.dispatch(setLanguage(language));
         // this.store.dispatch(setSetting(setting));
         // if(selectedAccount)
@@ -114,57 +114,17 @@ export const app = {
             setAppState(appState)
         ));
 
-        this.duplex.on('setConfirmations', confirmations => this.store.dispatch(
-            setConfirmations(confirmations)
-        ));
+        // this.duplex.on('setSelectedToken', token => this.store.dispatch(
+        //     setToken(token)
+        // ));
 
-        this.duplex.on('setAccount', account => this.store.dispatch(
-            setAccount(account)
-        ));
+        // this.duplex.on('setLanguage', language => this.store.dispatch(
+        //     setLanguage(language)
+        // ));
 
-        this.duplex.on('setAccounts', accounts => this.store.dispatch(
-            setAccounts(accounts)
-        ));
-
-        this.duplex.on('setPriceList', priceList => this.store.dispatch(
-            setPriceList(priceList)
-        ));
-
-        this.duplex.on('setCurrency', currency => this.store.dispatch(
-            setCurrency(currency)
-        ));
-
-        this.duplex.on('setSelectedToken', token => this.store.dispatch(
-            setToken(token)
-        ));
-
-        this.duplex.on('setLanguage', language => this.store.dispatch(
-            setLanguage(language)
-        ));
-
-        this.duplex.on('setSetting', setting => this.store.dispatch(
-            setSetting(setting)
-        ));
-
-        this.duplex.on('setSelectedBankRecordId', id => this.store.dispatch(
-            setSelectedBankRecordId(id)
-        ));
-
-        this.duplex.on('changeDealCurrencyPage', status => this.store.dispatch(
-            changeDealCurrencyPage(status)
-        ));
-
-        this.duplex.on('setAirdropInfo', airdropInfo => this.store.dispatch(
-            setAirdropInfo(airdropInfo)
-        ));
-
-        this.duplex.on('setDappList', dappList => this.store.dispatch(
-            setDappList(dappList)
-        ));
-
-        this.duplex.on('setAuthorizeDapps', authorizeDapps => this.store.dispatch(
-            setAuthorizeDapps(authorizeDapps)
-        ));
+        // this.duplex.on('setSetting', setting => this.store.dispatch(
+        //     setSetting(setting)
+        // ));
 
     },
 
