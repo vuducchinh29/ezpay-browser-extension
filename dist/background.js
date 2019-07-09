@@ -31743,6 +31743,3245 @@ module.exports = __webpack_require__(/*! ./lib/_stream_writable.js */ "../../nod
 
 /***/ }),
 
+/***/ "../../node_modules/redux-starter-kit/dist/redux-starter-kit.umd.js":
+/*!******************************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/redux-starter-kit/dist/redux-starter-kit.umd.js ***!
+  \******************************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(global, module, process) {(function (global, factory) {
+	 true ? factory(exports) :
+	undefined;
+}(this, (function (exports) { 'use strict';
+
+function symbolObservablePonyfill(root) {
+	var result;
+	var Symbol = root.Symbol;
+
+	if (typeof Symbol === 'function') {
+		if (Symbol.observable) {
+			result = Symbol.observable;
+		} else {
+			result = Symbol('observable');
+			Symbol.observable = result;
+		}
+	} else {
+		result = '@@observable';
+	}
+
+	return result;
+}
+
+/* global window */
+
+var root;
+
+if (typeof self !== 'undefined') {
+  root = self;
+} else if (typeof window !== 'undefined') {
+  root = window;
+} else if (typeof global !== 'undefined') {
+  root = global;
+} else if (true) {
+  root = module;
+} else {}
+
+var result = symbolObservablePonyfill(root);
+
+/**
+ * These are private action types reserved by Redux.
+ * For any unknown actions, you must return the current state.
+ * If the current state is undefined, you must return the initial state.
+ * Do not reference these action types directly in your code.
+ */
+var randomString = function randomString() {
+  return Math.random().toString(36).substring(7).split('').join('.');
+};
+
+var ActionTypes = {
+  INIT: "@@redux/INIT" + randomString(),
+  REPLACE: "@@redux/REPLACE" + randomString(),
+  PROBE_UNKNOWN_ACTION: function PROBE_UNKNOWN_ACTION() {
+    return "@@redux/PROBE_UNKNOWN_ACTION" + randomString();
+  }
+};
+
+/**
+ * @param {any} obj The object to inspect.
+ * @returns {boolean} True if the argument appears to be a plain object.
+ */
+function isPlainObject(obj) {
+  if (typeof obj !== 'object' || obj === null) return false;
+  var proto = obj;
+
+  while (Object.getPrototypeOf(proto) !== null) {
+    proto = Object.getPrototypeOf(proto);
+  }
+
+  return Object.getPrototypeOf(obj) === proto;
+}
+
+/**
+ * Creates a Redux store that holds the state tree.
+ * The only way to change the data in the store is to call `dispatch()` on it.
+ *
+ * There should only be a single store in your app. To specify how different
+ * parts of the state tree respond to actions, you may combine several reducers
+ * into a single reducer function by using `combineReducers`.
+ *
+ * @param {Function} reducer A function that returns the next state tree, given
+ * the current state tree and the action to handle.
+ *
+ * @param {any} [preloadedState] The initial state. You may optionally specify it
+ * to hydrate the state from the server in universal apps, or to restore a
+ * previously serialized user session.
+ * If you use `combineReducers` to produce the root reducer function, this must be
+ * an object with the same shape as `combineReducers` keys.
+ *
+ * @param {Function} [enhancer] The store enhancer. You may optionally specify it
+ * to enhance the store with third-party capabilities such as middleware,
+ * time travel, persistence, etc. The only store enhancer that ships with Redux
+ * is `applyMiddleware()`.
+ *
+ * @returns {Store} A Redux store that lets you read the state, dispatch actions
+ * and subscribe to changes.
+ */
+
+function createStore(reducer, preloadedState, enhancer) {
+  var _ref2;
+
+  if (typeof preloadedState === 'function' && typeof enhancer === 'function' || typeof enhancer === 'function' && typeof arguments[3] === 'function') {
+    throw new Error('It looks like you are passing several store enhancers to ' + 'createStore(). This is not supported. Instead, compose them ' + 'together to a single function');
+  }
+
+  if (typeof preloadedState === 'function' && typeof enhancer === 'undefined') {
+    enhancer = preloadedState;
+    preloadedState = undefined;
+  }
+
+  if (typeof enhancer !== 'undefined') {
+    if (typeof enhancer !== 'function') {
+      throw new Error('Expected the enhancer to be a function.');
+    }
+
+    return enhancer(createStore)(reducer, preloadedState);
+  }
+
+  if (typeof reducer !== 'function') {
+    throw new Error('Expected the reducer to be a function.');
+  }
+
+  var currentReducer = reducer;
+  var currentState = preloadedState;
+  var currentListeners = [];
+  var nextListeners = currentListeners;
+  var isDispatching = false;
+
+  function ensureCanMutateNextListeners() {
+    if (nextListeners === currentListeners) {
+      nextListeners = currentListeners.slice();
+    }
+  }
+  /**
+   * Reads the state tree managed by the store.
+   *
+   * @returns {any} The current state tree of your application.
+   */
+
+
+  function getState() {
+    if (isDispatching) {
+      throw new Error('You may not call store.getState() while the reducer is executing. ' + 'The reducer has already received the state as an argument. ' + 'Pass it down from the top reducer instead of reading it from the store.');
+    }
+
+    return currentState;
+  }
+  /**
+   * Adds a change listener. It will be called any time an action is dispatched,
+   * and some part of the state tree may potentially have changed. You may then
+   * call `getState()` to read the current state tree inside the callback.
+   *
+   * You may call `dispatch()` from a change listener, with the following
+   * caveats:
+   *
+   * 1. The subscriptions are snapshotted just before every `dispatch()` call.
+   * If you subscribe or unsubscribe while the listeners are being invoked, this
+   * will not have any effect on the `dispatch()` that is currently in progress.
+   * However, the next `dispatch()` call, whether nested or not, will use a more
+   * recent snapshot of the subscription list.
+   *
+   * 2. The listener should not expect to see all state changes, as the state
+   * might have been updated multiple times during a nested `dispatch()` before
+   * the listener is called. It is, however, guaranteed that all subscribers
+   * registered before the `dispatch()` started will be called with the latest
+   * state by the time it exits.
+   *
+   * @param {Function} listener A callback to be invoked on every dispatch.
+   * @returns {Function} A function to remove this change listener.
+   */
+
+
+  function subscribe(listener) {
+    if (typeof listener !== 'function') {
+      throw new Error('Expected the listener to be a function.');
+    }
+
+    if (isDispatching) {
+      throw new Error('You may not call store.subscribe() while the reducer is executing. ' + 'If you would like to be notified after the store has been updated, subscribe from a ' + 'component and invoke store.getState() in the callback to access the latest state. ' + 'See https://redux.js.org/api-reference/store#subscribe(listener) for more details.');
+    }
+
+    var isSubscribed = true;
+    ensureCanMutateNextListeners();
+    nextListeners.push(listener);
+    return function unsubscribe() {
+      if (!isSubscribed) {
+        return;
+      }
+
+      if (isDispatching) {
+        throw new Error('You may not unsubscribe from a store listener while the reducer is executing. ' + 'See https://redux.js.org/api-reference/store#subscribe(listener) for more details.');
+      }
+
+      isSubscribed = false;
+      ensureCanMutateNextListeners();
+      var index = nextListeners.indexOf(listener);
+      nextListeners.splice(index, 1);
+    };
+  }
+  /**
+   * Dispatches an action. It is the only way to trigger a state change.
+   *
+   * The `reducer` function, used to create the store, will be called with the
+   * current state tree and the given `action`. Its return value will
+   * be considered the **next** state of the tree, and the change listeners
+   * will be notified.
+   *
+   * The base implementation only supports plain object actions. If you want to
+   * dispatch a Promise, an Observable, a thunk, or something else, you need to
+   * wrap your store creating function into the corresponding middleware. For
+   * example, see the documentation for the `redux-thunk` package. Even the
+   * middleware will eventually dispatch plain object actions using this method.
+   *
+   * @param {Object} action A plain object representing “what changed”. It is
+   * a good idea to keep actions serializable so you can record and replay user
+   * sessions, or use the time travelling `redux-devtools`. An action must have
+   * a `type` property which may not be `undefined`. It is a good idea to use
+   * string constants for action types.
+   *
+   * @returns {Object} For convenience, the same action object you dispatched.
+   *
+   * Note that, if you use a custom middleware, it may wrap `dispatch()` to
+   * return something else (for example, a Promise you can await).
+   */
+
+
+  function dispatch(action) {
+    if (!isPlainObject(action)) {
+      throw new Error('Actions must be plain objects. ' + 'Use custom middleware for async actions.');
+    }
+
+    if (typeof action.type === 'undefined') {
+      throw new Error('Actions may not have an undefined "type" property. ' + 'Have you misspelled a constant?');
+    }
+
+    if (isDispatching) {
+      throw new Error('Reducers may not dispatch actions.');
+    }
+
+    try {
+      isDispatching = true;
+      currentState = currentReducer(currentState, action);
+    } finally {
+      isDispatching = false;
+    }
+
+    var listeners = currentListeners = nextListeners;
+
+    for (var i = 0; i < listeners.length; i++) {
+      var listener = listeners[i];
+      listener();
+    }
+
+    return action;
+  }
+  /**
+   * Replaces the reducer currently used by the store to calculate the state.
+   *
+   * You might need this if your app implements code splitting and you want to
+   * load some of the reducers dynamically. You might also need this if you
+   * implement a hot reloading mechanism for Redux.
+   *
+   * @param {Function} nextReducer The reducer for the store to use instead.
+   * @returns {void}
+   */
+
+
+  function replaceReducer(nextReducer) {
+    if (typeof nextReducer !== 'function') {
+      throw new Error('Expected the nextReducer to be a function.');
+    }
+
+    currentReducer = nextReducer;
+    dispatch({
+      type: ActionTypes.REPLACE
+    });
+  }
+  /**
+   * Interoperability point for observable/reactive libraries.
+   * @returns {observable} A minimal observable of state changes.
+   * For more information, see the observable proposal:
+   * https://github.com/tc39/proposal-observable
+   */
+
+
+  function observable() {
+    var _ref;
+
+    var outerSubscribe = subscribe;
+    return _ref = {
+      /**
+       * The minimal observable subscription method.
+       * @param {Object} observer Any object that can be used as an observer.
+       * The observer object should have a `next` method.
+       * @returns {subscription} An object with an `unsubscribe` method that can
+       * be used to unsubscribe the observable from the store, and prevent further
+       * emission of values from the observable.
+       */
+      subscribe: function subscribe(observer) {
+        if (typeof observer !== 'object' || observer === null) {
+          throw new TypeError('Expected the observer to be an object.');
+        }
+
+        function observeState() {
+          if (observer.next) {
+            observer.next(getState());
+          }
+        }
+
+        observeState();
+        var unsubscribe = outerSubscribe(observeState);
+        return {
+          unsubscribe: unsubscribe
+        };
+      }
+    }, _ref[result] = function () {
+      return this;
+    }, _ref;
+  } // When a store is created, an "INIT" action is dispatched so that every
+  // reducer returns their initial state. This effectively populates
+  // the initial state tree.
+
+
+  dispatch({
+    type: ActionTypes.INIT
+  });
+  return _ref2 = {
+    dispatch: dispatch,
+    subscribe: subscribe,
+    getState: getState,
+    replaceReducer: replaceReducer
+  }, _ref2[result] = observable, _ref2;
+}
+
+/**
+ * Prints a warning in the console if it exists.
+ *
+ * @param {String} message The warning message.
+ * @returns {void}
+ */
+function warning(message) {
+  /* eslint-disable no-console */
+  if (typeof console !== 'undefined' && typeof console.error === 'function') {
+    console.error(message);
+  }
+  /* eslint-enable no-console */
+
+
+  try {
+    // This error was thrown as a convenience so that if you enable
+    // "break on all exceptions" in your console,
+    // it would pause the execution at this line.
+    throw new Error(message);
+  } catch (e) {} // eslint-disable-line no-empty
+
+}
+
+function getUndefinedStateErrorMessage(key, action) {
+  var actionType = action && action.type;
+  var actionDescription = actionType && "action \"" + String(actionType) + "\"" || 'an action';
+  return "Given " + actionDescription + ", reducer \"" + key + "\" returned undefined. " + "To ignore an action, you must explicitly return the previous state. " + "If you want this reducer to hold no value, you can return null instead of undefined.";
+}
+
+function getUnexpectedStateShapeWarningMessage(inputState, reducers, action, unexpectedKeyCache) {
+  var reducerKeys = Object.keys(reducers);
+  var argumentName = action && action.type === ActionTypes.INIT ? 'preloadedState argument passed to createStore' : 'previous state received by the reducer';
+
+  if (reducerKeys.length === 0) {
+    return 'Store does not have a valid reducer. Make sure the argument passed ' + 'to combineReducers is an object whose values are reducers.';
+  }
+
+  if (!isPlainObject(inputState)) {
+    return "The " + argumentName + " has unexpected type of \"" + {}.toString.call(inputState).match(/\s([a-z|A-Z]+)/)[1] + "\". Expected argument to be an object with the following " + ("keys: \"" + reducerKeys.join('", "') + "\"");
+  }
+
+  var unexpectedKeys = Object.keys(inputState).filter(function (key) {
+    return !reducers.hasOwnProperty(key) && !unexpectedKeyCache[key];
+  });
+  unexpectedKeys.forEach(function (key) {
+    unexpectedKeyCache[key] = true;
+  });
+  if (action && action.type === ActionTypes.REPLACE) return;
+
+  if (unexpectedKeys.length > 0) {
+    return "Unexpected " + (unexpectedKeys.length > 1 ? 'keys' : 'key') + " " + ("\"" + unexpectedKeys.join('", "') + "\" found in " + argumentName + ". ") + "Expected to find one of the known reducer keys instead: " + ("\"" + reducerKeys.join('", "') + "\". Unexpected keys will be ignored.");
+  }
+}
+
+function assertReducerShape(reducers) {
+  Object.keys(reducers).forEach(function (key) {
+    var reducer = reducers[key];
+    var initialState = reducer(undefined, {
+      type: ActionTypes.INIT
+    });
+
+    if (typeof initialState === 'undefined') {
+      throw new Error("Reducer \"" + key + "\" returned undefined during initialization. " + "If the state passed to the reducer is undefined, you must " + "explicitly return the initial state. The initial state may " + "not be undefined. If you don't want to set a value for this reducer, " + "you can use null instead of undefined.");
+    }
+
+    if (typeof reducer(undefined, {
+      type: ActionTypes.PROBE_UNKNOWN_ACTION()
+    }) === 'undefined') {
+      throw new Error("Reducer \"" + key + "\" returned undefined when probed with a random type. " + ("Don't try to handle " + ActionTypes.INIT + " or other actions in \"redux/*\" ") + "namespace. They are considered private. Instead, you must return the " + "current state for any unknown actions, unless it is undefined, " + "in which case you must return the initial state, regardless of the " + "action type. The initial state may not be undefined, but can be null.");
+    }
+  });
+}
+/**
+ * Turns an object whose values are different reducer functions, into a single
+ * reducer function. It will call every child reducer, and gather their results
+ * into a single state object, whose keys correspond to the keys of the passed
+ * reducer functions.
+ *
+ * @param {Object} reducers An object whose values correspond to different
+ * reducer functions that need to be combined into one. One handy way to obtain
+ * it is to use ES6 `import * as reducers` syntax. The reducers may never return
+ * undefined for any action. Instead, they should return their initial state
+ * if the state passed to them was undefined, and the current state for any
+ * unrecognized action.
+ *
+ * @returns {Function} A reducer function that invokes every reducer inside the
+ * passed object, and builds a state object with the same shape.
+ */
+
+
+function combineReducers(reducers) {
+  var reducerKeys = Object.keys(reducers);
+  var finalReducers = {};
+
+  for (var i = 0; i < reducerKeys.length; i++) {
+    var key = reducerKeys[i];
+
+    if (true) {
+      if (typeof reducers[key] === 'undefined') {
+        warning("No reducer provided for key \"" + key + "\"");
+      }
+    }
+
+    if (typeof reducers[key] === 'function') {
+      finalReducers[key] = reducers[key];
+    }
+  }
+
+  var finalReducerKeys = Object.keys(finalReducers);
+  var unexpectedKeyCache;
+
+  if (true) {
+    unexpectedKeyCache = {};
+  }
+
+  var shapeAssertionError;
+
+  try {
+    assertReducerShape(finalReducers);
+  } catch (e) {
+    shapeAssertionError = e;
+  }
+
+  return function combination(state, action) {
+    if (state === void 0) {
+      state = {};
+    }
+
+    if (shapeAssertionError) {
+      throw shapeAssertionError;
+    }
+
+    if (true) {
+      var warningMessage = getUnexpectedStateShapeWarningMessage(state, finalReducers, action, unexpectedKeyCache);
+
+      if (warningMessage) {
+        warning(warningMessage);
+      }
+    }
+
+    var hasChanged = false;
+    var nextState = {};
+
+    for (var _i = 0; _i < finalReducerKeys.length; _i++) {
+      var _key = finalReducerKeys[_i];
+      var reducer = finalReducers[_key];
+      var previousStateForKey = state[_key];
+      var nextStateForKey = reducer(previousStateForKey, action);
+
+      if (typeof nextStateForKey === 'undefined') {
+        var errorMessage = getUndefinedStateErrorMessage(_key, action);
+        throw new Error(errorMessage);
+      }
+
+      nextState[_key] = nextStateForKey;
+      hasChanged = hasChanged || nextStateForKey !== previousStateForKey;
+    }
+
+    return hasChanged ? nextState : state;
+  };
+}
+
+function bindActionCreator(actionCreator, dispatch) {
+  return function () {
+    return dispatch(actionCreator.apply(this, arguments));
+  };
+}
+/**
+ * Turns an object whose values are action creators, into an object with the
+ * same keys, but with every function wrapped into a `dispatch` call so they
+ * may be invoked directly. This is just a convenience method, as you can call
+ * `store.dispatch(MyActionCreators.doSomething())` yourself just fine.
+ *
+ * For convenience, you can also pass a single function as the first argument,
+ * and get a function in return.
+ *
+ * @param {Function|Object} actionCreators An object whose values are action
+ * creator functions. One handy way to obtain it is to use ES6 `import * as`
+ * syntax. You may also pass a single function.
+ *
+ * @param {Function} dispatch The `dispatch` function available on your Redux
+ * store.
+ *
+ * @returns {Function|Object} The object mimicking the original object, but with
+ * every action creator wrapped into the `dispatch` call. If you passed a
+ * function as `actionCreators`, the return value will also be a single
+ * function.
+ */
+
+
+function bindActionCreators(actionCreators, dispatch) {
+  if (typeof actionCreators === 'function') {
+    return bindActionCreator(actionCreators, dispatch);
+  }
+
+  if (typeof actionCreators !== 'object' || actionCreators === null) {
+    throw new Error("bindActionCreators expected an object or a function, instead received " + (actionCreators === null ? 'null' : typeof actionCreators) + ". " + "Did you write \"import ActionCreators from\" instead of \"import * as ActionCreators from\"?");
+  }
+
+  var keys = Object.keys(actionCreators);
+  var boundActionCreators = {};
+
+  for (var i = 0; i < keys.length; i++) {
+    var key = keys[i];
+    var actionCreator = actionCreators[key];
+
+    if (typeof actionCreator === 'function') {
+      boundActionCreators[key] = bindActionCreator(actionCreator, dispatch);
+    }
+  }
+
+  return boundActionCreators;
+}
+
+function _defineProperty(obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+}
+
+function _objectSpread(target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i] != null ? arguments[i] : {};
+    var ownKeys = Object.keys(source);
+
+    if (typeof Object.getOwnPropertySymbols === 'function') {
+      ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
+        return Object.getOwnPropertyDescriptor(source, sym).enumerable;
+      }));
+    }
+
+    ownKeys.forEach(function (key) {
+      _defineProperty(target, key, source[key]);
+    });
+  }
+
+  return target;
+}
+
+/**
+ * Composes single-argument functions from right to left. The rightmost
+ * function can take multiple arguments as it provides the signature for
+ * the resulting composite function.
+ *
+ * @param {...Function} funcs The functions to compose.
+ * @returns {Function} A function obtained by composing the argument functions
+ * from right to left. For example, compose(f, g, h) is identical to doing
+ * (...args) => f(g(h(...args))).
+ */
+function compose() {
+  for (var _len = arguments.length, funcs = new Array(_len), _key = 0; _key < _len; _key++) {
+    funcs[_key] = arguments[_key];
+  }
+
+  if (funcs.length === 0) {
+    return function (arg) {
+      return arg;
+    };
+  }
+
+  if (funcs.length === 1) {
+    return funcs[0];
+  }
+
+  return funcs.reduce(function (a, b) {
+    return function () {
+      return a(b.apply(void 0, arguments));
+    };
+  });
+}
+
+/**
+ * Creates a store enhancer that applies middleware to the dispatch method
+ * of the Redux store. This is handy for a variety of tasks, such as expressing
+ * asynchronous actions in a concise manner, or logging every action payload.
+ *
+ * See `redux-thunk` package as an example of the Redux middleware.
+ *
+ * Because middleware is potentially asynchronous, this should be the first
+ * store enhancer in the composition chain.
+ *
+ * Note that each middleware will be given the `dispatch` and `getState` functions
+ * as named arguments.
+ *
+ * @param {...Function} middlewares The middleware chain to be applied.
+ * @returns {Function} A store enhancer applying the middleware.
+ */
+
+function applyMiddleware() {
+  for (var _len = arguments.length, middlewares = new Array(_len), _key = 0; _key < _len; _key++) {
+    middlewares[_key] = arguments[_key];
+  }
+
+  return function (createStore) {
+    return function () {
+      var store = createStore.apply(void 0, arguments);
+
+      var _dispatch = function dispatch() {
+        throw new Error("Dispatching while constructing your middleware is not allowed. " + "Other middleware would not be applied to this dispatch.");
+      };
+
+      var middlewareAPI = {
+        getState: store.getState,
+        dispatch: function dispatch() {
+          return _dispatch.apply(void 0, arguments);
+        }
+      };
+      var chain = middlewares.map(function (middleware) {
+        return middleware(middlewareAPI);
+      });
+      _dispatch = compose.apply(void 0, chain)(store.dispatch);
+      return _objectSpread({}, store, {
+        dispatch: _dispatch
+      });
+    };
+  };
+}
+
+/*
+ * This is a dummy function to check if the function name has been altered by minification.
+ * If the function has been minified and NODE_ENV !== 'production', warn the user.
+ */
+
+function isCrushed() {}
+
+if ("development" !== 'production' && typeof isCrushed.name === 'string' && isCrushed.name !== 'isCrushed') {
+  warning('You are currently using minified code outside of NODE_ENV === "production". ' + 'This means that you are running a slower development build of Redux. ' + 'You can use loose-envify (https://github.com/zertosh/loose-envify) for browserify ' + 'or setting mode to production in webpack (https://webpack.js.org/concepts/mode/) ' + 'to ensure you have the correct code for your production build.');
+}
+
+
+var redux = Object.freeze({
+	createStore: createStore,
+	combineReducers: combineReducers,
+	bindActionCreators: bindActionCreators,
+	applyMiddleware: applyMiddleware,
+	compose: compose,
+	__DO_NOT_USE__ActionTypes: ActionTypes
+});
+
+function unwrapExports (x) {
+	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
+}
+
+function createCommonjsModule(fn, module) {
+	return module = { exports: {} }, fn(module, module.exports), module.exports;
+}
+
+var reduxDevtoolsExtension = createCommonjsModule(function (module, exports) {
+
+var compose = redux.compose;
+
+exports.__esModule = true;
+exports.composeWithDevTools = (
+  typeof window !== 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ ?
+    window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ :
+    function() {
+      if (arguments.length === 0) return undefined;
+      if (typeof arguments[0] === 'object') return compose;
+      return compose.apply(null, arguments);
+    }
+);
+
+exports.devToolsEnhancer = (
+  typeof window !== 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION__ ?
+    window.__REDUX_DEVTOOLS_EXTENSION__ :
+    function() { return function(noop) { return noop; } }
+);
+});
+
+unwrapExports(reduxDevtoolsExtension);
+var reduxDevtoolsExtension_1 = reduxDevtoolsExtension.composeWithDevTools;
+var reduxDevtoolsExtension_2 = reduxDevtoolsExtension.devToolsEnhancer;
+
+function createThunkMiddleware(extraArgument) {
+  return function (_ref) {
+    var dispatch = _ref.dispatch,
+        getState = _ref.getState;
+    return function (next) {
+      return function (action) {
+        if (typeof action === 'function') {
+          return action(dispatch, getState, extraArgument);
+        }
+
+        return next(action);
+      };
+    };
+  };
+}
+
+var thunk = createThunkMiddleware();
+thunk.withExtraArgument = createThunkMiddleware;
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+  return typeof obj;
+} : function (obj) {
+  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+};
+
+var defineProperty = function (obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+};
+
+var toConsumableArray = function (arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+    return arr2;
+  } else {
+    return Array.from(arr);
+  }
+};
+
+/**
+ * @param {any} obj The object to inspect.
+ * @returns {boolean} True if the argument appears to be a plain object.
+ */
+function isPlainObject$1(obj) {
+  if ((typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) !== 'object' || obj === null) return false;
+
+  var proto = obj;
+  while (Object.getPrototypeOf(proto) !== null) {
+    proto = Object.getPrototypeOf(proto);
+  }
+
+  return Object.getPrototypeOf(obj) === proto;
+}
+
+function getDefaultMiddleware() {
+  return [thunk];
+}
+
+function configureStore() {
+  var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+  var reducer = options.reducer,
+      _options$middleware = options.middleware,
+      middleware = _options$middleware === undefined ? getDefaultMiddleware() : _options$middleware,
+      _options$devTools = options.devTools,
+      devTools = _options$devTools === undefined ? true : _options$devTools,
+      preloadedState = options.preloadedState,
+      _options$enhancers = options.enhancers,
+      enhancers = _options$enhancers === undefined ? [] : _options$enhancers;
+
+
+  var rootReducer = void 0;
+
+  if (typeof reducer === 'function') {
+    rootReducer = reducer;
+  } else if (isPlainObject$1(reducer)) {
+    rootReducer = combineReducers(reducer);
+  } else {
+    throw new Error('Reducer argument must be a function or an object of functions that can be passed to combineReducers');
+  }
+
+  var middlewareEnhancer = applyMiddleware.apply(undefined, toConsumableArray(middleware));
+
+  var storeEnhancers = [middlewareEnhancer].concat(toConsumableArray(enhancers));
+
+  var finalCompose = devTools ? reduxDevtoolsExtension_1 : compose;
+
+  var composedEnhancer = finalCompose.apply(undefined, toConsumableArray(storeEnhancers));
+
+  var store = createStore(rootReducer, preloadedState, composedEnhancer);
+
+  return store;
+}
+
+function generatePatches(state, basepath, patches, inversePatches, baseValue, resultValue) {
+    if (patches) if (Array.isArray(baseValue)) generateArrayPatches(state, basepath, patches, inversePatches, baseValue, resultValue);else generateObjectPatches(state, basepath, patches, inversePatches, baseValue, resultValue);
+}
+
+function generateArrayPatches(state, basepath, patches, inversePatches, baseValue, resultValue) {
+    var shared = Math.min(baseValue.length, resultValue.length);
+    for (var i = 0; i < shared; i++) {
+        if (state.assigned[i] && baseValue[i] !== resultValue[i]) {
+            var path = basepath.concat(i);
+            patches.push({ op: "replace", path: path, value: resultValue[i] });
+            inversePatches.push({ op: "replace", path: path, value: baseValue[i] });
+        }
+    }
+    if (shared < resultValue.length) {
+        // stuff was added
+        for (var _i = shared; _i < resultValue.length; _i++) {
+            var _path = basepath.concat(_i);
+            patches.push({ op: "add", path: _path, value: resultValue[_i] });
+        }
+        inversePatches.push({
+            op: "replace",
+            path: basepath.concat("length"),
+            value: baseValue.length
+        });
+    } else if (shared < baseValue.length) {
+        // stuff was removed
+        patches.push({
+            op: "replace",
+            path: basepath.concat("length"),
+            value: resultValue.length
+        });
+        for (var _i2 = shared; _i2 < baseValue.length; _i2++) {
+            var _path2 = basepath.concat(_i2);
+            inversePatches.push({ op: "add", path: _path2, value: baseValue[_i2] });
+        }
+    }
+}
+
+function generateObjectPatches(state, basepath, patches, inversePatches, baseValue, resultValue) {
+    each(state.assigned, function (key, assignedValue) {
+        var origValue = baseValue[key];
+        var value = resultValue[key];
+        var op = !assignedValue ? "remove" : key in baseValue ? "replace" : "add";
+        if (origValue === baseValue && op === "replace") return;
+        var path = basepath.concat(key);
+        patches.push(op === "remove" ? { op: op, path: path } : { op: op, path: path, value: value });
+        inversePatches.push(op === "add" ? { op: "remove", path: path } : op === "remove" ? { op: "add", path: path, value: origValue } : { op: "replace", path: path, value: origValue });
+    });
+}
+
+function applyPatches(draft, patches) {
+    var _loop = function _loop(i) {
+        var patch = patches[i];
+        if (patch.path.length === 0 && patch.op === "replace") {
+            draft = patch.value;
+        } else {
+            var path = patch.path.slice();
+            var key = path.pop();
+            var base = path.reduce(function (current, part) {
+                if (!current) throw new Error("Cannot apply patch, path doesn't resolve: " + patch.path.join("/"));
+                return current[part];
+            }, draft);
+            if (!base) throw new Error("Cannot apply patch, path doesn't resolve: " + patch.path.join("/"));
+            switch (patch.op) {
+                case "replace":
+                case "add":
+                    // TODO: add support is not extensive, it does not support insertion or `-` atm!
+                    base[key] = patch.value;
+                    break;
+                case "remove":
+                    if (Array.isArray(base)) {
+                        if (key === base.length - 1) base.length -= 1;else throw new Error("Remove can only remove the last key of an array, index: " + key + ", length: " + base.length);
+                    } else delete base[key];
+                    break;
+                default:
+                    throw new Error("Unsupported patch operation: " + patch.op);
+            }
+        }
+    };
+
+    for (var i = 0; i < patches.length; i++) {
+        _loop(i);
+    }
+    return draft;
+}
+
+var _typeof$1 = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+  return typeof obj;
+} : function (obj) {
+  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var defineProperty$1 = function (obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+};
+
+var NOTHING = typeof Symbol !== "undefined" ? Symbol("immer-nothing") : defineProperty$1({}, "immer-nothing", true);
+
+var PROXY_STATE = typeof Symbol !== "undefined" ? Symbol("immer-proxy-state") : "__$immer_state";
+
+var RETURNED_AND_MODIFIED_ERROR = "An immer producer returned a new value *and* modified its draft. Either return a new value *or* modify the draft.";
+
+function verifyMinified() {}
+
+var inProduction = typeof process !== "undefined" && "development" === "production" || verifyMinified.name !== "verifyMinified";
+
+var autoFreeze = !inProduction;
+var useProxies = typeof Proxy !== "undefined";
+
+function getUseProxies() {
+    return useProxies;
+}
+
+function isProxy(value) {
+    return !!value && !!value[PROXY_STATE];
+}
+
+function isProxyable(value) {
+    if (!value) return false;
+    if ((typeof value === "undefined" ? "undefined" : _typeof$1(value)) !== "object") return false;
+    if (Array.isArray(value)) return true;
+    var proto = Object.getPrototypeOf(value);
+    return proto === null || proto === Object.prototype;
+}
+
+function freeze(value) {
+    if (autoFreeze) {
+        Object.freeze(value);
+    }
+    return value;
+}
+
+var assign = Object.assign || function assign(target, value) {
+    for (var key in value) {
+        if (has(value, key)) {
+            target[key] = value[key];
+        }
+    }
+    return target;
+};
+
+function shallowCopy(value) {
+    if (Array.isArray(value)) return value.slice();
+    var target = value.__proto__ === undefined ? Object.create(null) : {};
+    return assign(target, value);
+}
+
+function each(value, cb) {
+    if (Array.isArray(value)) {
+        for (var i = 0; i < value.length; i++) {
+            cb(i, value[i]);
+        }
+    } else {
+        for (var key in value) {
+            cb(key, value[key]);
+        }
+    }
+}
+
+function has(thing, prop) {
+    return Object.prototype.hasOwnProperty.call(thing, prop);
+}
+
+// given a base object, returns it if unmodified, or return the changed cloned if modified
+function finalize(base, path, patches, inversePatches) {
+    if (isProxy(base)) {
+        var state = base[PROXY_STATE];
+        if (state.modified === true) {
+            if (state.finalized === true) return state.copy;
+            state.finalized = true;
+            var result = finalizeObject(useProxies ? state.copy : state.copy = shallowCopy(base), state, path, patches, inversePatches);
+            generatePatches(state, path, patches, inversePatches, state.base, result);
+            return result;
+        } else {
+            return state.base;
+        }
+    }
+    finalizeNonProxiedObject(base);
+    return base;
+}
+
+function finalizeObject(copy, state, path, patches, inversePatches) {
+    var base = state.base;
+    each(copy, function (prop, value) {
+        if (value !== base[prop]) {
+            // if there was an assignment on this property, we don't need to generate
+            // patches for the subtree
+            var _generatePatches = patches && !has(state.assigned, prop);
+            copy[prop] = finalize(value, _generatePatches && path.concat(prop), _generatePatches && patches, inversePatches);
+        }
+    });
+    return freeze(copy);
+}
+
+function finalizeNonProxiedObject(parent) {
+    // If finalize is called on an object that was not a proxy, it means that it is an object that was not there in the original
+    // tree and it could contain proxies at arbitrarily places. Let's find and finalize them as well
+    if (!isProxyable(parent)) return;
+    if (Object.isFrozen(parent)) return;
+    each(parent, function (i, child) {
+        if (isProxy(child)) {
+            parent[i] = finalize(child);
+        } else finalizeNonProxiedObject(child);
+    });
+    // always freeze completely new data
+    freeze(parent);
+}
+
+
+
+function is(x, y) {
+    // From: https://github.com/facebook/fbjs/blob/c69904a511b900266935168223063dd8772dfc40/packages/fbjs/src/core/shallowEqual.js
+    if (x === y) {
+        return x !== 0 || 1 / x === 1 / y;
+    } else {
+        return x !== x && y !== y;
+    }
+}
+
+// @ts-check
+
+var proxies = null;
+
+var objectTraps = {
+    get: get$1,
+    has: function has$$1(target, prop) {
+        return prop in source(target);
+    },
+    ownKeys: function ownKeys(target) {
+        return Reflect.ownKeys(source(target));
+    },
+
+    set: set$1,
+    deleteProperty: deleteProperty,
+    getOwnPropertyDescriptor: getOwnPropertyDescriptor,
+    defineProperty: defineProperty$1$1,
+    setPrototypeOf: function setPrototypeOf() {
+        throw new Error("Immer does not support `setPrototypeOf()`.");
+    }
+};
+
+var arrayTraps = {};
+each(objectTraps, function (key, fn) {
+    arrayTraps[key] = function () {
+        arguments[0] = arguments[0][0];
+        return fn.apply(this, arguments);
+    };
+});
+arrayTraps.deleteProperty = function (state, prop) {
+    if (isNaN(parseInt(prop))) throw new Error("Immer does not support deleting properties from arrays: " + prop);
+    return objectTraps.deleteProperty.call(this, state[0], prop);
+};
+arrayTraps.set = function (state, prop, value) {
+    if (prop !== "length" && isNaN(parseInt(prop))) throw new Error("Immer does not support setting non-numeric properties on arrays: " + prop);
+    return objectTraps.set.call(this, state[0], prop, value);
+};
+
+function createState(parent, base) {
+    return {
+        modified: false, // this tree is modified (either this object or one of it's children)
+        assigned: {}, // true: value was assigned to these props, false: was removed
+        finalized: false,
+        parent: parent,
+        base: base,
+        copy: undefined,
+        proxies: {}
+    };
+}
+
+function source(state) {
+    return state.modified === true ? state.copy : state.base;
+}
+
+function get$1(state, prop) {
+    if (prop === PROXY_STATE) return state;
+    if (state.modified) {
+        var value = state.copy[prop];
+        if (value === state.base[prop] && isProxyable(value))
+            // only create proxy if it is not yet a proxy, and not a new object
+            // (new objects don't need proxying, they will be processed in finalize anyway)
+            return state.copy[prop] = createProxy(state, value);
+        return value;
+    } else {
+        if (has(state.proxies, prop)) return state.proxies[prop];
+        var _value = state.base[prop];
+        if (!isProxy(_value) && isProxyable(_value)) return state.proxies[prop] = createProxy(state, _value);
+        return _value;
+    }
+}
+
+function set$1(state, prop, value) {
+    // TODO: optimize
+    state.assigned[prop] = true;
+    if (!state.modified) {
+        if (prop in state.base && is(state.base[prop], value) || has(state.proxies, prop) && state.proxies[prop] === value) return true;
+        markChanged(state);
+    }
+    state.copy[prop] = value;
+    return true;
+}
+
+function deleteProperty(state, prop) {
+    state.assigned[prop] = false;
+    markChanged(state);
+    delete state.copy[prop];
+    return true;
+}
+
+function getOwnPropertyDescriptor(state, prop) {
+    var owner = state.modified ? state.copy : has(state.proxies, prop) ? state.proxies : state.base;
+    var descriptor = Reflect.getOwnPropertyDescriptor(owner, prop);
+    if (descriptor && !(Array.isArray(owner) && prop === "length")) descriptor.configurable = true;
+    return descriptor;
+}
+
+function defineProperty$1$1() {
+    throw new Error("Immer does not support defining properties on draft objects.");
+}
+
+function markChanged(state) {
+    if (!state.modified) {
+        state.modified = true;
+        state.copy = shallowCopy(state.base);
+        // copy the proxies over the base-copy
+        Object.assign(state.copy, state.proxies); // yup that works for arrays as well
+        if (state.parent) markChanged(state.parent);
+    }
+}
+
+// creates a proxy for plain objects / arrays
+function createProxy(parentState, base, key) {
+    if (isProxy(base)) throw new Error("Immer bug. Plz report.");
+    var state = createState(parentState, base, key);
+    var proxy = Array.isArray(base) ? Proxy.revocable([state], arrayTraps) : Proxy.revocable(state, objectTraps);
+    proxies.push(proxy);
+    return proxy.proxy;
+}
+
+function produceProxy(baseState, producer, patchListener) {
+    if (isProxy(baseState)) {
+        // See #100, don't nest producers
+        var returnValue = producer.call(baseState, baseState);
+        return returnValue === undefined ? baseState : returnValue;
+    }
+    var previousProxies = proxies;
+    proxies = [];
+    var patches = patchListener && [];
+    var inversePatches = patchListener && [];
+    try {
+        // create proxy for root
+        var rootProxy = createProxy(undefined, baseState);
+        // execute the thunk
+        var _returnValue = producer.call(rootProxy, rootProxy);
+        // and finalize the modified proxy
+        var result = void 0;
+        // check whether the draft was modified and/or a value was returned
+        if (_returnValue !== undefined && _returnValue !== rootProxy) {
+            // something was returned, and it wasn't the proxy itself
+            if (rootProxy[PROXY_STATE].modified) throw new Error(RETURNED_AND_MODIFIED_ERROR);
+
+            // See #117
+            // Should we just throw when returning a proxy which is not the root, but a subset of the original state?
+            // Looks like a wrongly modeled reducer
+            result = finalize(_returnValue);
+            if (patches) {
+                patches.push({ op: "replace", path: [], value: result });
+                inversePatches.push({ op: "replace", path: [], value: baseState });
+            }
+        } else {
+            result = finalize(rootProxy, [], patches, inversePatches);
+        }
+        // revoke all proxies
+        each(proxies, function (_, p) {
+            return p.revoke();
+        });
+        patchListener && patchListener(patches, inversePatches);
+        return result;
+    } finally {
+        proxies = previousProxies;
+    }
+}
+
+// @ts-check
+
+var descriptors = {};
+var states = null;
+
+function createState$1(parent, proxy, base) {
+    return {
+        modified: false,
+        assigned: {}, // true: value was assigned to these props, false: was removed
+        hasCopy: false,
+        parent: parent,
+        base: base,
+        proxy: proxy,
+        copy: undefined,
+        finished: false,
+        finalizing: false,
+        finalized: false
+    };
+}
+
+function source$1(state) {
+    return state.hasCopy ? state.copy : state.base;
+}
+
+function _get(state, prop) {
+    assertUnfinished(state);
+    var value = source$1(state)[prop];
+    if (!state.finalizing && value === state.base[prop] && isProxyable(value)) {
+        // only create a proxy if the value is proxyable, and the value was in the base state
+        // if it wasn't in the base state, the object is already modified and we will process it in finalize
+        prepareCopy(state);
+        return state.copy[prop] = createProxy$1(state, value);
+    }
+    return value;
+}
+
+function _set(state, prop, value) {
+    assertUnfinished(state);
+    state.assigned[prop] = true; // optimization; skip this if there is no listener
+    if (!state.modified) {
+        if (is(source$1(state)[prop], value)) return;
+        markChanged$1(state);
+        prepareCopy(state);
+    }
+    state.copy[prop] = value;
+}
+
+function markChanged$1(state) {
+    if (!state.modified) {
+        state.modified = true;
+        if (state.parent) markChanged$1(state.parent);
+    }
+}
+
+function prepareCopy(state) {
+    if (state.hasCopy) return;
+    state.hasCopy = true;
+    state.copy = shallowCopy(state.base);
+}
+
+// creates a proxy for plain objects / arrays
+function createProxy$1(parent, base) {
+    var proxy = shallowCopy(base);
+    each(base, function (i) {
+        Object.defineProperty(proxy, "" + i, createPropertyProxy("" + i));
+    });
+    var state = createState$1(parent, proxy, base);
+    createHiddenProperty(proxy, PROXY_STATE, state);
+    states.push(state);
+    return proxy;
+}
+
+function createPropertyProxy(prop) {
+    return descriptors[prop] || (descriptors[prop] = {
+        configurable: true,
+        enumerable: true,
+        get: function get$$1() {
+            return _get(this[PROXY_STATE], prop);
+        },
+        set: function set$$1(value) {
+            _set(this[PROXY_STATE], prop, value);
+        }
+    });
+}
+
+function assertUnfinished(state) {
+    if (state.finished === true) throw new Error("Cannot use a proxy that has been revoked. Did you pass an object from inside an immer function to an async process? " + JSON.stringify(state.copy || state.base));
+}
+
+// this sounds very expensive, but actually it is not that expensive in practice
+// as it will only visit proxies, and only do key-based change detection for objects for
+// which it is not already know that they are changed (that is, only object for which no known key was changed)
+function markChangesSweep() {
+    // intentionally we process the proxies in reverse order;
+    // ideally we start by processing leafs in the tree, because if a child has changed, we don't have to check the parent anymore
+    // reverse order of proxy creation approximates this
+    for (var i = states.length - 1; i >= 0; i--) {
+        var state = states[i];
+        if (state.modified === false) {
+            if (Array.isArray(state.base)) {
+                if (hasArrayChanges(state)) markChanged$1(state);
+            } else if (hasObjectChanges(state)) markChanged$1(state);
+        }
+    }
+}
+
+function markChangesRecursively(object) {
+    if (!object || (typeof object === "undefined" ? "undefined" : _typeof$1(object)) !== "object") return;
+    var state = object[PROXY_STATE];
+    if (!state) return;
+    var proxy = state.proxy,
+        base = state.base;
+
+    if (Array.isArray(object)) {
+        if (hasArrayChanges(state)) {
+            markChanged$1(state);
+            state.assigned.length = true;
+            if (proxy.length < base.length) for (var i = proxy.length; i < base.length; i++) {
+                state.assigned[i] = false;
+            } else for (var _i = base.length; _i < proxy.length; _i++) {
+                state.assigned[_i] = true;
+            }each(proxy, function (index, child) {
+                if (!state.assigned[index]) markChangesRecursively(child);
+            });
+        }
+    } else {
+        var _diffKeys = diffKeys(base, proxy),
+            added = _diffKeys.added,
+            removed = _diffKeys.removed;
+
+        if (added.length > 0 || removed.length > 0) markChanged$1(state);
+        each(added, function (_, key) {
+            state.assigned[key] = true;
+        });
+        each(removed, function (_, key) {
+            state.assigned[key] = false;
+        });
+        each(proxy, function (key, child) {
+            if (!state.assigned[key]) markChangesRecursively(child);
+        });
+    }
+}
+
+function diffKeys(from, to) {
+    // TODO: optimize
+    var a = Object.keys(from);
+    var b = Object.keys(to);
+    return {
+        added: b.filter(function (key) {
+            return a.indexOf(key) === -1;
+        }),
+        removed: a.filter(function (key) {
+            return b.indexOf(key) === -1;
+        })
+    };
+}
+
+function hasObjectChanges(state) {
+    var baseKeys = Object.keys(state.base);
+    var keys = Object.keys(state.proxy);
+    return !shallowEqual(baseKeys, keys);
+}
+
+function hasArrayChanges(state) {
+    var proxy = state.proxy;
+
+    if (proxy.length !== state.base.length) return true;
+    // See #116
+    // If we first shorten the length, our array interceptors will be removed.
+    // If after that new items are added, result in the same original length,
+    // those last items will have no intercepting property.
+    // So if there is no own descriptor on the last position, we know that items were removed and added
+    // N.B.: splice, unshift, etc only shift values around, but not prop descriptors, so we only have to check
+    // the last one
+    var descriptor = Object.getOwnPropertyDescriptor(proxy, proxy.length - 1);
+    // descriptor can be null, but only for newly created sparse arrays, eg. new Array(10)
+    if (descriptor && !descriptor.get) return true;
+    // For all other cases, we don't have to compare, as they would have been picked up by the index setters
+    return false;
+}
+
+function produceEs5(baseState, producer, patchListener) {
+    if (isProxy(baseState)) {
+        // See #100, don't nest producers
+        var returnValue = producer.call(baseState, baseState);
+        return returnValue === undefined ? baseState : returnValue;
+    }
+    var prevStates = states;
+    states = [];
+    var patches = patchListener && [];
+    var inversePatches = patchListener && [];
+    try {
+        // create proxy for root
+        var rootProxy = createProxy$1(undefined, baseState);
+        // execute the thunk
+        var _returnValue = producer.call(rootProxy, rootProxy);
+        // and finalize the modified proxy
+        each(states, function (_, state) {
+            state.finalizing = true;
+        });
+        var result = void 0;
+        // check whether the draft was modified and/or a value was returned
+        if (_returnValue !== undefined && _returnValue !== rootProxy) {
+            // something was returned, and it wasn't the proxy itself
+            if (rootProxy[PROXY_STATE].modified) throw new Error(RETURNED_AND_MODIFIED_ERROR);
+            result = finalize(_returnValue);
+            if (patches) {
+                patches.push({ op: "replace", path: [], value: result });
+                inversePatches.push({ op: "replace", path: [], value: baseState });
+            }
+        } else {
+            if (patchListener) markChangesRecursively(rootProxy);
+            markChangesSweep(); // this one is more efficient if we don't need to know which attributes have changed
+            result = finalize(rootProxy, [], patches, inversePatches);
+        }
+        // make sure all proxies become unusable
+        each(states, function (_, state) {
+            state.finished = true;
+        });
+        patchListener && patchListener(patches, inversePatches);
+        return result;
+    } finally {
+        states = prevStates;
+    }
+}
+
+function shallowEqual(objA, objB) {
+    //From: https://github.com/facebook/fbjs/blob/c69904a511b900266935168223063dd8772dfc40/packages/fbjs/src/core/shallowEqual.js
+    if (is(objA, objB)) return true;
+    if ((typeof objA === "undefined" ? "undefined" : _typeof$1(objA)) !== "object" || objA === null || (typeof objB === "undefined" ? "undefined" : _typeof$1(objB)) !== "object" || objB === null) {
+        return false;
+    }
+    var keysA = Object.keys(objA);
+    var keysB = Object.keys(objB);
+    if (keysA.length !== keysB.length) return false;
+    for (var i = 0; i < keysA.length; i++) {
+        if (!hasOwnProperty.call(objB, keysA[i]) || !is(objA[keysA[i]], objB[keysA[i]])) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function createHiddenProperty(target, prop, value) {
+    Object.defineProperty(target, prop, {
+        value: value,
+        enumerable: false,
+        writable: true
+    });
+}
+
+/**
+ * produce takes a state, and runs a function against it.
+ * That function can freely mutate the state, as it will create copies-on-write.
+ * This means that the original state will stay unchanged, and once the function finishes, the modified state is returned
+ *
+ * @export
+ * @param {any} baseState - the state to start with
+ * @param {Function} producer - function that receives a proxy of the base state as first argument and which can be freely modified
+ * @param {Function} patchListener - optional function that will be called with all the patches produced here
+ * @returns {any} a new state, or the base state if nothing was modified
+ */
+function produce(baseState, producer, patchListener) {
+    // prettier-ignore
+    if (arguments.length < 1 || arguments.length > 3) throw new Error("produce expects 1 to 3 arguments, got " + arguments.length);
+
+    // curried invocation
+    if (typeof baseState === "function") {
+        // prettier-ignore
+        if (typeof producer === "function") throw new Error("if first argument is a function (curried invocation), the second argument to produce cannot be a function");
+
+        var initialState = producer;
+        var recipe = baseState;
+
+        return function () {
+            var args = arguments;
+
+            var currentState = args[0] === undefined && initialState !== undefined ? initialState : args[0];
+
+            return produce(currentState, function (draft) {
+                args[0] = draft; // blegh!
+                return recipe.apply(draft, args);
+            });
+        };
+    }
+
+    // prettier-ignore
+    {
+        if (typeof producer !== "function") throw new Error("if first argument is not a function, the second argument to produce should be a function");
+        if (patchListener !== undefined && typeof patchListener !== "function") throw new Error("the third argument of a producer should not be set or a function");
+    }
+
+    // if state is a primitive, don't bother proxying at all
+    if ((typeof baseState === "undefined" ? "undefined" : _typeof$1(baseState)) !== "object" || baseState === null) {
+        var returnValue = producer(baseState);
+        return returnValue === undefined ? baseState : normalizeResult(returnValue);
+    }
+
+    if (!isProxyable(baseState)) throw new Error("the first argument to an immer producer should be a primitive, plain object or array, got " + (typeof baseState === "undefined" ? "undefined" : _typeof$1(baseState)) + ": \"" + baseState + "\"");
+    return normalizeResult(getUseProxies() ? produceProxy(baseState, producer, patchListener) : produceEs5(baseState, producer, patchListener));
+}
+
+function normalizeResult(result) {
+    return result === NOTHING ? undefined : result;
+}
+
+var applyPatches$1 = produce(applyPatches);
+
+function createReducer(initialState, actionsMap) {
+  return function () {
+    var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
+    var action = arguments[1];
+
+    return produce(state, function (draft) {
+      var caseReducer = actionsMap[action.type];
+
+      if (caseReducer) {
+        return caseReducer(draft, action);
+      }
+
+      return draft;
+    });
+  };
+}
+
+function createAction(type) {
+  var action = function action(payload) {
+    return {
+      type: type,
+      payload: payload
+    };
+  };
+  action.toString = function () {
+    return "" + type;
+  };
+  return action;
+}
+
+var getType = function getType(action) {
+  return "" + action;
+};
+
+function createSliceSelector(slice) {
+  if (!slice) {
+    return function (state) {
+      return state;
+    };
+  }
+  return function (state) {
+    return state[slice];
+  };
+}
+
+function createSelectorName(slice) {
+  if (!slice) {
+    return 'getState';
+  }
+  return camelize('get ' + slice);
+}
+
+function camelize(str) {
+  return str.replace(/(?:^\w|[A-Z]|\b\w)/g, function (letter, index) {
+    return index == 0 ? letter.toLowerCase() : letter.toUpperCase();
+  }).replace(/\s+/g, '').replace(/[-_]/g, '');
+}
+
+var getType$1 = function getType$$1(slice, action) {
+  return slice ? slice + '/' + action : action;
+};
+
+function createSlice(_ref) {
+  var _ref$slice = _ref.slice,
+      slice = _ref$slice === undefined ? '' : _ref$slice,
+      _ref$reducers = _ref.reducers,
+      reducers = _ref$reducers === undefined ? {} : _ref$reducers,
+      initialState = _ref.initialState;
+
+  var actionKeys = Object.keys(reducers);
+
+  var reducerMap = actionKeys.reduce(function (map, action) {
+    map[getType$1(slice, action)] = reducers[action];
+    return map;
+  }, {});
+
+  var reducer = createReducer(initialState, reducerMap);
+
+  var actionMap = actionKeys.reduce(function (map, action) {
+    var type = getType$1(slice, action);
+    map[action] = createAction(type);
+    return map;
+  }, {});
+
+  var selectors = defineProperty({}, createSelectorName(slice), createSliceSelector(slice));
+
+  return {
+    actions: actionMap,
+    reducer: reducer,
+    slice: slice,
+    selectors: selectors
+  };
+}
+
+/**
+ * @constant {Object} CACHE
+ *
+ * @property {function} clear clear the cache results
+ * @property {Object} results the map of path => array results
+ * @property {number} size the size of the cache
+ */
+var CACHE = {
+  clear: function clear() {
+    CACHE.results = {};
+    CACHE.size = 0;
+  },
+
+  results: {},
+  size: 0
+};
+
+/**
+ * @constant {RegExp} DOTTY_WITH_BRACKETS_SYNTAX
+ */
+var DOTTY_WITH_BRACKETS_SYNTAX = /"[^"]+"|`[^`]+`|'[^']+'|[^.[\]]+/g;
+
+/**
+ * @constant {number} MAX_CACHE_SIZE
+ */
+var MAX_CACHE_SIZE = 500;
+
+/**
+ * @constant {RegExp} NUMBER
+ */
+var NUMBER = /^\d+$/i;
+
+/**
+ * @constant {RegExp} QUOTED_KEY
+ */
+var QUOTED_KEY = /^"[^"]+"|`[^`]+`|'[^']+'$/;
+
+// constants
+
+/**
+ * @function isNumericKey
+ *
+ * @description
+ * is the key passed a numeric string
+ *
+ * @param {string} key the key to test
+ * @returns {boolean} is the key passed a numeric string
+ */
+var isNumericKey = function isNumericKey(key) {
+  return !!key.length && NUMBER.test(key);
+};
+
+/**
+ * @function isQuotedKey
+ *
+ * @description
+ * is the key passed a quoted key
+ *
+ * @param {string} key the key to test
+ * @returns {boolean} is the key a quoted key
+ */
+var isQuotedKey = function isQuotedKey(key) {
+  return QUOTED_KEY.test(key);
+};
+
+/**
+ * @function getNormalizedParseKey
+ *
+ * @description
+ * get the key as a number if parseable, or as a quoted string if applicable
+ *
+ * @param {string} key the key to try to parse
+ * @returns {number|string} the parsed key
+ */
+var getNormalizedParseKey = function getNormalizedParseKey(key) {
+  var cleanKey = isQuotedKey(key) ? key.substring(1, key.length - 1) : key;
+
+  return isNumericKey(cleanKey) ? +cleanKey : cleanKey;
+};
+
+/**
+ * @function parsePath
+ *
+ * @description
+ * parse the path, memoizing the results
+ *
+ * @param {string} path the path to parse
+ * @returns {Array<number|string>} the parsed path
+ */
+var parseStringPath = function parseStringPath(path) {
+  if (CACHE.results[path]) {
+    return CACHE.results[path];
+  }
+
+  if (CACHE.size > MAX_CACHE_SIZE) {
+    CACHE.clear();
+  }
+
+  CACHE.results[path] = path ? path.match(DOTTY_WITH_BRACKETS_SYNTAX).map(getNormalizedParseKey) : [path];
+  CACHE.size++;
+
+  return CACHE.results[path];
+};
+
+// constants
+
+/**
+ * @function parse
+ *
+ * @description
+ * the path parsed into a valid array of keys / indices
+ *
+ * @param {Array<number|string>|number|string} path the path to parse
+ * @returns {Array<number|string>} the parsed path
+ */
+var parse = function parse(path) {
+  if (typeof path === 'string') {
+    return parseStringPath(path);
+  }
+
+  if (Array.isArray(path)) {
+    return path.map(getNormalizedParseKey);
+  }
+
+  return [typeof path === 'number' ? path : '' + path];
+};
+
+/**
+ * @function getNestedProperty
+ *
+ * @description
+ * recursive function to get the nested property at path
+ *
+ * @param {Array<number|string>} path the path to retrieve values from the object
+ * @param {*} object the object to get values from
+ * @returns {*} the retrieved values
+ */
+var getNestedProperty = function getNestedProperty(path, object) {
+  if (path.length === 1) {
+    return object ? object[path[0]] : undefined;
+  }
+
+  var property = path.shift();
+
+  return object && object.hasOwnProperty(property) ? getNestedProperty(path, object[property]) : undefined;
+};
+
+// external dependencies
+
+/**
+ * @function createIdentity
+ *
+ * @description
+ * create an identity method for a specific argument index
+ *
+ * @param {number} argIndex the index of the argument to get
+ * @param {Array<number|string>|number|string} path the nested path to retrieve the value from
+ * @returns {function(...Array<*>): *} the identity method for the given argument
+ */
+var createIdentity = function createIdentity(argIndex, path) {
+  var shouldGetNestedValue = path !== void 0;
+
+  return function () {
+    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+
+    var value = args[argIndex < 0 ? args.length + argIndex : argIndex];
+
+    return shouldGetNestedValue ? getNestedProperty(parse(path), value) : value;
+  };
+};
+
+var identity = createIdentity(0);
+
+/**
+ * @constant {boolean} HAS_MAP_SUPPORT
+ */
+var HAS_MAP_SUPPORT = typeof Map === 'function';
+/**
+ * @constant {boolean} HAS_SET_SUPPORT
+ */
+
+var HAS_SET_SUPPORT = typeof Set === 'function';
+/**
+ * @constant {boolean} HAS_WEAKSET_SUPPORT
+ */
+
+var HAS_WEAKSET_SUPPORT = typeof WeakSet === 'function';
+
+// constants
+var keys = Object.keys;
+/**
+ * @function addObjectToCache
+ *
+ * @description
+ * add object to cache if it is indeed an object
+ *
+ * @param {any} object the object to potentially add to the cache
+ * @param {Object|WeakSet} cache the cache to add to
+ * @returns {void}
+ */
+
+var addObjectToCache = function addObjectToCache(object, cache) {
+  return object && typeof object === 'object' && cache.add(object);
+};
+/**
+ * @function hasItem
+ *
+ * @description
+ * does the array include the item passed
+ *
+ * @param {Array<any>} array the array to check in
+ * @param {any} item the item to locate
+ * @param {function} isEqual the equality comparator
+ * @param {any} meta the meta item to pass through
+ * @returns {boolean} does the item exist in the array
+ */
+
+var hasItem = function hasItem(array, item, isEqual, meta) {
+  for (var index = 0; index < array.length; index++) {
+    if (isEqual(array[index], item, meta)) {
+      return true;
+    }
+  }
+
+  return false;
+};
+/**
+ * @function hasItems
+ *
+ * @description
+ * are the arrays equal in value, despite being in different order
+ *
+ * @param {Array<any>} arrayA the first array to test
+ * @param {Array<any>} arrayB the second array to test
+ * @param {function} isEqual the equality comparator
+ * @param {any} meta the meta item to pass through
+ * @returns {boolean} are the arrays equal absent order
+ */
+
+var hasItems = function hasItems(arrayA, arrayB, isEqual, meta) {
+  if (arrayA.length !== arrayB.length) {
+    return false;
+  }
+
+  for (var index = 0; index < arrayA.length; index++) {
+    if (!hasItem(arrayB, arrayA[index], isEqual, meta)) {
+      return false;
+    }
+  }
+
+  return true;
+};
+/**
+ * @function sameValueZeroEqual
+ *
+ * @description
+ * are the objects passed strictly equal or both NaN
+ *
+ * @param {any} objectA the object to compare against
+ * @param {any} objectB the object to test
+ * @returns {boolean} are the objects equal by the SameValueZero principle
+ */
+
+var sameValueZeroEqual = function sameValueZeroEqual(objectA, objectB) {
+  return objectA === objectB || objectA !== objectA && objectB !== objectB;
+};
+/**
+ * @function isPlainObject
+ *
+ * @description
+ * is the object a plain object
+ *
+ * @param {any} object the object to test
+ * @returns {boolean} is the object a plain object
+ */
+
+var isPlainObject$2 = function isPlainObject(object) {
+  return object.constructor === Object;
+};
+/**
+ * @function isPromiseLike
+ *
+ * @description
+ * is the object promise-like (thenable)
+ *
+ * @param {any} object the object to test
+ * @returns {boolean} is the object promise-like
+ */
+
+var isPromiseLike = function isPromiseLike(object) {
+  return typeof object.then === 'function';
+};
+/**
+ * @function isReactElement
+ *
+ * @description
+ * is the object passed a react element
+ *
+ * @param {any} object the object to test
+ * @returns {boolean} is the object a react element
+ */
+
+var isReactElement = function isReactElement(object) {
+  return !!(object.$$typeof && object._store);
+};
+/**
+ * @function getNewCache
+ *
+ * @description
+ * get a new cache object to prevent circular references
+ *
+ * @returns {Object|Weakset} the new cache object
+ */
+
+var getNewCache = function getNewCache() {
+  return HAS_WEAKSET_SUPPORT ? new WeakSet() : Object.create({
+    _values: [],
+    add: function add(value) {
+      this._values.push(value);
+    },
+    has: function has(value) {
+      return !!~this._values.indexOf(value);
+    }
+  });
+};
+/**
+ * @function createCircularEqual
+ *
+ * @description
+ * create a custom isEqual handler specific to circular objects
+ *
+ * @param {funtion} [isEqual] the isEqual comparator to use instead of isDeepEqual
+ * @returns {function(any, any): boolean}
+ */
+
+var createCircularEqual = function createCircularEqual(isEqual) {
+  return function (isDeepEqual) {
+    var comparator = isEqual || isDeepEqual;
+    return function (objectA, objectB, cache) {
+      if (cache === void 0) {
+        cache = getNewCache();
+      }
+
+      var cacheHasA = cache.has(objectA);
+      var cacheHasB = cache.has(objectB);
+
+      if (cacheHasA || cacheHasB) {
+        return cacheHasA && cacheHasB;
+      }
+
+      addObjectToCache(objectA, cache);
+      addObjectToCache(objectB, cache);
+      return comparator(objectA, objectB, cache);
+    };
+  };
+};
+/**
+ * @function toPairs
+ *
+ * @param {Map|Set} iterable the iterable to convert to [key, value] pairs (entries)
+ * @returns {{keys: Array<*>, values: Array<*>}} the [key, value] pairs
+ */
+
+var toPairs = function toPairs(iterable) {
+  var pairs = {
+    keys: [],
+    values: []
+  };
+  iterable.forEach(function (value, key) {
+    return pairs.keys.push(key) && pairs.values.push(value);
+  });
+  return pairs;
+};
+/**
+ * @function areArraysEqual
+ *
+ * @description
+ * are the arrays equal in value
+ *
+ * @param {Array<any>} arrayA the array to test
+ * @param {Array<any>} arrayB the array to test against
+ * @param {function} isEqual the comparator to determine equality
+ * @param {any} meta the meta object to pass through
+ * @returns {boolean} are the arrays equal
+ */
+
+var areArraysEqual = function areArraysEqual(arrayA, arrayB, isEqual, meta) {
+  if (arrayA.length !== arrayB.length) {
+    return false;
+  }
+
+  for (var index = 0; index < arrayA.length; index++) {
+    if (!isEqual(arrayA[index], arrayB[index], meta)) {
+      return false;
+    }
+  }
+
+  return true;
+};
+var createAreIterablesEqual = function createAreIterablesEqual(shouldCompareKeys) {
+  /**
+   * @function areIterablesEqual
+   *
+   * @description
+   * determine if the iterables are equivalent in value
+   *
+   * @param {Array<Array<any>>} pairsA the pairs to test
+   * @param {Array<Array<any>>} pairsB the pairs to test against
+   * @param {function} isEqual the comparator to determine equality
+   * @param {any} meta the cache possibly being used
+   * @returns {boolean} are the objects equal in value
+   */
+  var areIterablesEqual = shouldCompareKeys ? function (pairsA, pairsB, isEqual, meta) {
+    return hasItems(pairsA.keys, pairsB.keys, isEqual, meta) && hasItems(pairsA.values, pairsB.values, isEqual, meta);
+  } : function (pairsA, pairsB, isEqual, meta) {
+    return hasItems(pairsA.values, pairsB.values, isEqual, meta);
+  };
+  return function (iterableA, iterableB, isEqual, meta) {
+    return areIterablesEqual(toPairs(iterableA), toPairs(iterableB), isEqual, meta);
+  };
+};
+/**
+ * @function areArraysEqual
+ *
+ * @description
+ * are the objects equal in value
+ *
+ * @param {Array<any>} objectA the object to test
+ * @param {Array<any>} objectB the object to test against
+ * @param {function} isEqual the comparator to determine equality
+ * @param {any} meta the meta object to pass through
+ * @returns {boolean} are the objects equal
+ */
+
+var areObjectsEqual = function areObjectsEqual(objectA, objectB, isEqual, meta) {
+  var keysA = keys(objectA);
+  var keysB = keys(objectB);
+
+  if (keysA.length !== keysB.length) {
+    return false;
+  }
+
+  var key;
+
+  for (var index = 0; index < keysA.length; index++) {
+    key = keysA[index];
+
+    if (!hasItem(keysB, key, sameValueZeroEqual)) {
+      return false;
+    } // if a react element, ignore the "_owner" key because its not necessary for equality comparisons
+
+
+    if (key === '_owner' && isReactElement(objectA) && isReactElement(objectB)) {
+      continue;
+    }
+
+    if (!isEqual(objectA[key], objectB[key], meta)) {
+      return false;
+    }
+  }
+
+  return true;
+};
+/**
+ * @function areRegExpsEqual
+ *
+ * @description
+ * are the regExps equal in value
+ *
+ * @param {RegExp} regExpA the regExp to test
+ * @param {RegExp} regExpB the regExp to test agains
+ * @returns {boolean} are the regExps equal
+ */
+
+var areRegExpsEqual = function areRegExpsEqual(regExpA, regExpB) {
+  return regExpA.source === regExpB.source && regExpA.global === regExpB.global && regExpA.ignoreCase === regExpB.ignoreCase && regExpA.multiline === regExpB.multiline && regExpA.unicode === regExpB.unicode && regExpA.sticky === regExpB.sticky && regExpA.lastIndex === regExpB.lastIndex;
+};
+
+// constants
+var isArray = Array.isArray;
+var areMapsEqual = createAreIterablesEqual(true);
+var areSetsEqual = createAreIterablesEqual(false);
+
+var createComparator = function createComparator(createIsEqual) {
+  // eslint-disable-next-line no-use-before-define
+  var isEqual = typeof createIsEqual === 'function' ? createIsEqual(comparator) : comparator;
+  /**
+   * @function comparator
+   *
+   * @description
+   * compare the value of the two objects and return true if they are equivalent in values
+   *
+   * @param {any} objectA the object to test against
+   * @param {any} objectB the object to test
+   * @param {any} [meta] an optional meta object that is passed through to all equality test calls
+   * @returns {boolean} are objectA and objectB equivalent in value
+   */
+
+  function comparator(objectA, objectB, meta) {
+    if (sameValueZeroEqual(objectA, objectB)) {
+      return true;
+    }
+
+    var typeOfA = typeof objectA;
+
+    if (typeOfA !== typeof objectB || typeOfA !== 'object' || !objectA || !objectB) {
+      return false;
+    }
+
+    if (isPlainObject$2(objectA) && isPlainObject$2(objectB)) {
+      return areObjectsEqual(objectA, objectB, isEqual, meta);
+    }
+
+    var arrayA = isArray(objectA);
+    var arrayB = isArray(objectB);
+
+    if (arrayA || arrayB) {
+      return arrayA === arrayB && areArraysEqual(objectA, objectB, isEqual, meta);
+    }
+
+    var dateA = objectA instanceof Date;
+    var dateB = objectB instanceof Date;
+
+    if (dateA || dateB) {
+      return dateA === dateB && sameValueZeroEqual(objectA.getTime(), objectB.getTime());
+    }
+
+    var regexpA = objectA instanceof RegExp;
+    var regexpB = objectB instanceof RegExp;
+
+    if (regexpA || regexpB) {
+      return regexpA === regexpB && areRegExpsEqual(objectA, objectB);
+    }
+
+    if (isPromiseLike(objectA) || isPromiseLike(objectB)) {
+      return objectA === objectB;
+    }
+
+    if (HAS_MAP_SUPPORT) {
+      var mapA = objectA instanceof Map;
+      var mapB = objectB instanceof Map;
+
+      if (mapA || mapB) {
+        return mapA === mapB && areMapsEqual(objectA, objectB, isEqual, meta);
+      }
+    }
+
+    if (HAS_SET_SUPPORT) {
+      var setA = objectA instanceof Set;
+      var setB = objectB instanceof Set;
+
+      if (setA || setB) {
+        return setA === setB && areSetsEqual(objectA, objectB, isEqual, meta);
+      }
+    }
+
+    return areObjectsEqual(objectA, objectB, isEqual, meta);
+  }
+
+  return comparator;
+};
+
+// comparator
+var circularDeepEqual = createComparator(createCircularEqual());
+var circularShallowEqual = createComparator(createCircularEqual(sameValueZeroEqual));
+var deepEqual = createComparator();
+var shallowEqual$1 = createComparator(function () {
+  return sameValueZeroEqual;
+});
+
+var lib = createCommonjsModule(function (module, exports) {
+
+exports.__esModule = true;
+exports.defaultMemoize = defaultMemoize;
+exports.createSelectorCreator = createSelectorCreator;
+exports.createStructuredSelector = createStructuredSelector;
+function defaultEqualityCheck(a, b) {
+  return a === b;
+}
+
+function areArgumentsShallowlyEqual(equalityCheck, prev, next) {
+  if (prev === null || next === null || prev.length !== next.length) {
+    return false;
+  }
+
+  // Do this in a for loop (and not a `forEach` or an `every`) so we can determine equality as fast as possible.
+  var length = prev.length;
+  for (var i = 0; i < length; i++) {
+    if (!equalityCheck(prev[i], next[i])) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function defaultMemoize(func) {
+  var equalityCheck = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : defaultEqualityCheck;
+
+  var lastArgs = null;
+  var lastResult = null;
+  // we reference arguments instead of spreading them for performance reasons
+  return function () {
+    if (!areArgumentsShallowlyEqual(equalityCheck, lastArgs, arguments)) {
+      // apply arguments instead of spreading for performance.
+      lastResult = func.apply(null, arguments);
+    }
+
+    lastArgs = arguments;
+    return lastResult;
+  };
+}
+
+function getDependencies(funcs) {
+  var dependencies = Array.isArray(funcs[0]) ? funcs[0] : funcs;
+
+  if (!dependencies.every(function (dep) {
+    return typeof dep === 'function';
+  })) {
+    var dependencyTypes = dependencies.map(function (dep) {
+      return typeof dep;
+    }).join(', ');
+    throw new Error('Selector creators expect all input-selectors to be functions, ' + ('instead received the following types: [' + dependencyTypes + ']'));
+  }
+
+  return dependencies;
+}
+
+function createSelectorCreator(memoize) {
+  for (var _len = arguments.length, memoizeOptions = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    memoizeOptions[_key - 1] = arguments[_key];
+  }
+
+  return function () {
+    for (var _len2 = arguments.length, funcs = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+      funcs[_key2] = arguments[_key2];
+    }
+
+    var recomputations = 0;
+    var resultFunc = funcs.pop();
+    var dependencies = getDependencies(funcs);
+
+    var memoizedResultFunc = memoize.apply(undefined, [function () {
+      recomputations++;
+      // apply arguments instead of spreading for performance.
+      return resultFunc.apply(null, arguments);
+    }].concat(memoizeOptions));
+
+    // If a selector is called with the exact same arguments we don't need to traverse our dependencies again.
+    var selector = defaultMemoize(function () {
+      var params = [];
+      var length = dependencies.length;
+
+      for (var i = 0; i < length; i++) {
+        // apply arguments instead of spreading and mutate a local list of params for performance.
+        params.push(dependencies[i].apply(null, arguments));
+      }
+
+      // apply arguments instead of spreading for performance.
+      return memoizedResultFunc.apply(null, params);
+    });
+
+    selector.resultFunc = resultFunc;
+    selector.recomputations = function () {
+      return recomputations;
+    };
+    selector.resetRecomputations = function () {
+      return recomputations = 0;
+    };
+    return selector;
+  };
+}
+
+var createSelector = exports.createSelector = createSelectorCreator(defaultMemoize);
+
+function createStructuredSelector(selectors) {
+  var selectorCreator = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : createSelector;
+
+  if (typeof selectors !== 'object') {
+    throw new Error('createStructuredSelector expects first argument to be an object ' + ('where each property is a selector, instead received a ' + typeof selectors));
+  }
+  var objectKeys = Object.keys(selectors);
+  return selectorCreator(objectKeys.map(function (key) {
+    return selectors[key];
+  }), function () {
+    for (var _len3 = arguments.length, values = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+      values[_key3] = arguments[_key3];
+    }
+
+    return values.reduce(function (composition, value, index) {
+      composition[objectKeys[index]] = value;
+      return composition;
+    }, {});
+  });
+}
+});
+
+unwrapExports(lib);
+var lib_1 = lib.defaultMemoize;
+var lib_2 = lib.createSelectorCreator;
+var lib_3 = lib.createStructuredSelector;
+var lib_4 = lib.createSelector;
+
+/**
+ * @constant {Symbol} __ the value to be used as a placeholder
+ */
+var __ = typeof Symbol === 'function' ? Symbol('curriable placeholder') : 0xedd1;
+
+/**
+ * @function getArgs
+ *
+ * @description
+ * get the complete args with previous placeholders being filled in
+ *
+ * @param {Arguments} originalArgs the arguments from the previous run
+ * @param {Arguments} nextArgs the arguments from the next run
+ * @returns {Array<*>} the complete list of args
+ */
+var getArgs = function getArgs(originalArgs, nextArgs) {
+  var args = new Array(originalArgs.length);
+
+  var nextArgsIndex = 0;
+
+  for (var index = 0; index < originalArgs.length; index++) {
+    args[index] = originalArgs[index] === __ && nextArgsIndex < nextArgs.length ? nextArgs[nextArgsIndex++] : originalArgs[index];
+  }
+
+  if (nextArgsIndex < nextArgs.length) {
+    for (; nextArgsIndex < nextArgs.length; nextArgsIndex++) {
+      args.push(nextArgs[nextArgsIndex]);
+    }
+  }
+
+  return args;
+};
+
+/**
+ * @function hasPlaceholder
+ *
+ * @description
+ * determine if any of the arguments are placeholders
+ *
+ * @param {Arguments} args the args passed to the function
+ * @param {number} arity the arity of the function
+ * @returns {boolean} are any of the args placeholders
+ */
+var hasPlaceholder = function hasPlaceholder(args, arity) {
+  for (var index = 0; index < arity; index++) {
+    if (args[index] === __) {
+      return true;
+    }
+  }
+
+  return false;
+};
+
+// utils
+
+/**
+ * @function curry
+ *
+ * @description
+ * get the method passed as a curriable method based on its parameters
+ *
+ * @param {function} fn the method to make curriable
+ * @param {number} [arity=fn.length] the arity of the curried method
+ * @returns {function(...Array<any>): any} the fn passed as a curried function
+ */
+function curry(fn) {
+  var arity = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : fn.length;
+
+  function curried() {
+    var args = arguments;
+
+    return args.length >= arity && !hasPlaceholder(args, arity) ? fn.apply(this, args) : function () {
+      return curried.apply(this, getArgs(args, arguments));
+    };
+  }
+
+  curried.arity = arity;
+  curried.fn = fn;
+
+  return curried;
+}
+
+curry.__ = __;
+
+/**
+ * @function uncurry
+ *
+ * @description
+ * return a function that is the non-curried version of the fn passed
+ *
+ * @param {function} curried the curried function to uncurry
+ * @returns {function} the original fn
+ */
+function uncurry(curried) {
+  return curried.fn;
+}
+
+curry.uncurry = uncurry;
+
+// external dependencies
+var O = Object;
+var create$1 = O.create,
+    getPrototypeOf = O.getPrototypeOf,
+    keys$1 = O.keys;
+/**
+ * @constant {Symbol} REACT_ELEMENT
+ */
+// eslint-disable-next-line no-magic-numbers
+
+var REACT_ELEMENT = typeof Symbol === 'function' && Symbol.for ? Symbol.for('react.element') : 0xeac7;
+/**
+ * @constant {RegExp} FUNCTION_NAME
+ */
+
+var FUNCTION_NAME = /^\s*function\s*([^\(]*)/i;
+/**
+ * @function isArray
+ */
+
+var isArray$1 = Array.isArray;
+var cloneArray = function cloneArray(array) {
+  var cloned = new array.constructor();
+
+  for (var index = 0; index < array.length; index++) {
+    cloned[index] = array[index];
+  }
+
+  return cloned;
+};
+/**
+ * @function reduce
+ *
+ * @description
+ * a slimmer, simpler reduce than native (for performance)
+ *
+ * @param {Array<any>} array the array to reduce
+ * @param {function} fn the function to reduce each iteration of the array with
+ * @param {any} initialValue the initial value of the reduction
+ * @returns {any} the reduced array value
+ */
+
+var reduce = function reduce(array, fn, initialValue) {
+  var value = initialValue;
+
+  for (var index = 0; index < array.length; index++) {
+    value = fn(value, array[index]);
+  }
+
+  return value;
+};
+/**
+ * @function assign
+ *
+ * @description
+ * a slimmer, faster version of Object.assign
+ *
+ * @param {Object} target the target object
+ * @param {Array<Object>} sources the objects to merge into target
+ * @returns {Object} the shallowly-merged object
+ */
+
+var assign$1 = function assign(target) {
+  for (var _len = arguments.length, sources = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    sources[_key - 1] = arguments[_key];
+  }
+
+  return reduce(sources, function (assigned, object) {
+    return object ? reduce(keys$1(object), function (assignedTarget, key) {
+      assignedTarget[key] = object[key];
+      return assignedTarget;
+    }, assigned) : assigned;
+  }, target);
+};
+/**
+ * @function isCloneable
+ *
+ * @description
+ * can the object be merged
+ *
+ * @param {*} object the object to test
+ * @returns {boolean} can the object be merged
+ */
+
+var isCloneable = function isCloneable(object) {
+  return !!object && typeof object === 'object' && !(object instanceof Date || object instanceof RegExp) && object.$$typeof !== REACT_ELEMENT;
+};
+/**
+ * @function isGlobalConstructor
+ *
+ * @description
+ * is the function passed a global constructor function
+ *
+ * @param {function} fn the function to test
+ * @returns {boolean} is the function a global constructor
+ */
+
+var isGlobalConstructor = function isGlobalConstructor(fn) {
+  return typeof fn === 'function' && global[fn.name || Function.prototype.toString.call(fn).split(FUNCTION_NAME)[1]] === fn;
+};
+/**
+ * @function callIfFunction
+ *
+ * @description
+ * call the object passed if it is a function and return its return, else return undefined
+ *
+ * @param {*} object the object to conditionally call if a function
+ * @param {*} context the context to apply to the call
+ * @param {Array<*>} parameters the parametesr to apply the function with
+ * @returns {*} the restulf of the call or undefined
+ */
+
+var callIfFunction = function callIfFunction(object, context, parameters) {
+  return typeof object === 'function' ? object.apply(context, parameters) : void 0;
+};
+/**
+ * @function getShallowClone
+ *
+ * @description
+ * get a shallow clone of the value passed based on the type requested (maintaining prototype if possible)
+ *
+ * @param {Array<*>|Object} object the object to clone
+ * @param {number|string} key the key to base the object type fromisReactElement(object) ||
+ * @returns {Array<*>|Object} a shallow clone of the value
+ */
+
+var getShallowClone = function getShallowClone(object) {
+  return object.constructor === O ? assign$1({}, object) : isArray$1(object) ? cloneArray(object) : isGlobalConstructor(object.constructor) ? {} : reduce(keys$1(object), function (clone, key) {
+    clone[key] = object[key];
+    return clone;
+  }, create$1(getPrototypeOf(object)));
+};
+/**
+ * @function getNewEmptyChild
+ *
+ * @description
+ * get a new empty child for the type of key provided
+ *
+ * @param {number|string} key the key to test
+ * @returns {Array|Object} the empty child
+ */
+
+var getNewEmptyChild = function getNewEmptyChild(key) {
+  return typeof key === 'number' ? [] : {};
+};
+/**
+ * @function getNewEmptyObject
+ *
+ * @description
+ * get a new empty object for the type of key provided
+ *
+ * @param {Array|Object} object the object to get an empty value of
+ * @returns {Array|Object} the empty object
+ */
+
+var getNewEmptyObject = function getNewEmptyObject(object) {
+  return isArray$1(object) ? [] : {};
+};
+/**
+ * @function cloneIfPossible
+ *
+ * @description
+ * clone the object passed if it is mergeable, else return itself
+ *
+ * @param {*} object he object to clone
+ * @returns {*} the cloned object
+ */
+
+var cloneIfPossible = function cloneIfPossible(object) {
+  return isCloneable(object) ? getShallowClone(object) : object;
+};
+/**
+ * @function getNewChildClone
+ *
+ * @description
+ * get the shallow clone of the child when it is the correct type
+ *
+ * @param {Array<*>|Object} object the object to clone
+ * @param {number|string} nextKey the key that the next object will be based from
+ * @returns {Array<*>|Object} the clone of the key at object
+ */
+
+var getNewChildClone = function getNewChildClone(object, nextKey) {
+  return isCloneable(object) ? getShallowClone(object) : getNewEmptyChild(nextKey);
+};
+/**
+ * @function getCoalescedValue
+ *
+ * @description
+ * get the value if it is not undefined, else get the fallback
+ *
+ * @param {any} value the main value to return
+ * @param {any} fallbackValue the value to return if main is undefined
+ * @returns {any} the coalesced value
+ */
+
+var getCoalescedValue = function getCoalescedValue(value, fallbackValue) {
+  return value === void 0 ? fallbackValue : value;
+};
+/**
+ * @function onMatchAtPath
+ *
+ * @description
+ * when there is a match for the path requested, call onMatch, else return the noMatchValue
+ *
+ * @param {Array<number|string>} path the path to find a match at
+ * @param {Array<*>|Object} object the object to find the path in
+ * @param {function} onMatch when a match is found, call this method
+ * @param {boolean} shouldClone should the object be cloned
+ * @param {*} noMatchValue when no match is found, return this value
+ * @param {number} [index=0] the index of the key to process
+ * @returns {*} either the return from onMatch or the noMatchValue
+ */
+
+var onMatchAtPath = function onMatchAtPath(path, object, onMatch, shouldClone, noMatchValue, index) {
+  if (index === void 0) {
+    index = 0;
+  }
+
+  var key = path[index];
+  var nextIndex = index + 1;
+
+  if (nextIndex === path.length) {
+    var result = object || shouldClone ? onMatch(object, key) : noMatchValue;
+    return shouldClone ? object : result;
+  }
+
+  if (shouldClone) {
+    object[key] = onMatchAtPath(path, getNewChildClone(object[key], path[nextIndex]), onMatch, shouldClone, noMatchValue, nextIndex);
+    return object;
+  }
+
+  return object && object[key] ? onMatchAtPath(path, object[key], onMatch, shouldClone, noMatchValue, nextIndex) : noMatchValue;
+};
+/**
+ * @function getMergedObject
+ *
+ * @description
+ * get the objects merged into a new object
+ *
+ * @param {Array<*>|Object} object1 the object to merge into
+ * @param {Array<*>|Object} object2 the object to merge
+ * @param {boolean} isDeep is the object deeply merged
+ * @returns {Array<*>|Object} the merged object
+ */
+
+var getMergedObject = function getMergedObject(object1, object2, isDeep) {
+  var isObject1Array = isArray$1(object1);
+  return isObject1Array !== isArray$1(object2) || !isCloneable(object1) ? cloneIfPossible(object2) : isObject1Array ? object1.concat(object2.map(cloneIfPossible)) : reduce(keys$1(object2), function (clone, key) {
+    clone[key] = isDeep && isCloneable(object2[key]) ? getMergedObject(object1[key], object2[key], isDeep) : object2[key];
+    return clone;
+  }, reduce(keys$1(object1), function (clone, key) {
+    clone[key] = cloneIfPossible(object1[key]);
+    return clone;
+  }, object1.constructor === O ? {} : create$1(getPrototypeOf(object1))));
+};
+/**
+ * @function getParsedPath
+ *
+ * @description
+ * get the path array, either as-is if already an array, or parsed by pathington
+ *
+ * @param {Array<number|string>|number|string} path the path to parse
+ * @returns {Array<number|string>} the parsed path
+ */
+
+var getParsedPath = function getParsedPath(path) {
+  return isArray$1(path) ? path : parse(path);
+};
+/**
+ * @function callNestedProperty
+ *
+ * @description
+ * parse the path passed and call the nested method at that path
+ *
+ * @param {Array<number|string>|number|string} path the path to retrieve values from the object
+ * @param {*} context the context that the method is called with
+ * @param {Array<*>} parameters the parameters to call the method with
+ * @param {*} object the object to get values from
+ * @returns {*} the retrieved values
+ */
+
+var callNestedProperty = function callNestedProperty(path, context, parameters, object) {
+  var parsedPath = getParsedPath(path);
+  return parsedPath.length === 1 ? object ? callIfFunction(object[parsedPath[0]], context, parameters) : void 0 : onMatchAtPath(parsedPath, object, function (ref, key) {
+    return callIfFunction(ref[key], context, parameters);
+  });
+};
+/**
+ * @function getNestedProperty
+ *
+ * @description
+ * parse the path passed and get the nested property at that path
+ *
+ * @param {Array<number|string>|number|string} path the path to retrieve values from the object
+ * @param {*} object the object to get values from
+ * @param {*} noMatchValue an optional fallback value to be returned when the nested property isn't found
+ * @returns {*} the retrieved values
+ */
+
+var getNestedProperty$1 = function getNestedProperty(path, object, noMatchValue) {
+  var parsedPath = getParsedPath(path);
+  return parsedPath.length === 1 ? object ? getCoalescedValue(object[parsedPath[0]], noMatchValue) : noMatchValue : onMatchAtPath(parsedPath, object, function (ref, key) {
+    return getCoalescedValue(ref[key], noMatchValue);
+  }, false, noMatchValue);
+};
+/**
+ * @function getDeepClone
+ *
+ * @description
+ * parse the path passed and clone the object at that path
+ *
+ * @param {Array<number|string>|number|string} path the path to deeply modify the object on
+ * @param {Array<*>|Object} object the objeisCurrentKeyArrayct to modify
+ * @param {function} onMatch the callback to execute
+ * @returns {Array<*>|Object} the clone object
+ */
+
+var getDeepClone = function getDeepClone(path, object, onMatch) {
+  var parsedPath = getParsedPath(path);
+  var topLevelClone = isCloneable(object) ? getShallowClone(object) : getNewEmptyChild(parsedPath[0]);
+
+  if (parsedPath.length === 1) {
+    onMatch(topLevelClone, parsedPath[0]);
+    return topLevelClone;
+  }
+
+  return onMatchAtPath(parsedPath, topLevelClone, onMatch, true);
+};
+/**
+ * @function hasNestedProperty
+ *
+ * @description
+ * parse the path passed and determine if a value at the path exists
+ *
+ * @param {Array<number|string>|number|string} path the path to retrieve values from the object
+ * @param {*} object the object to get values from
+ * @returns {boolean} does the nested path exist
+ */
+
+var hasNestedProperty = function hasNestedProperty(path, object) {
+  return getNestedProperty$1(path, object) !== void 0;
+};
+/* eslint-disable eqeqeq */
+
+/**
+ * @function isEmptyPath
+ *
+ * @description
+ * is the object passed an empty key value
+ *
+ * @param {*} object the object to test
+ * @returns {boolean} is the object an empty key value
+ */
+
+var isEmptyPath = function isEmptyPath(object) {
+  return object == null || isArray$1(object) && !object.length;
+};
+/* eslint-enable */
+
+/**
+ * @function splice
+ *
+ * @description
+ * splice a single item from the array
+ *
+ * @param {Array<*>} array array to splice from
+ * @param {number} splicedIndex index to splice at
+ */
+
+var splice = function splice(array, splicedIndex) {
+  if (array.length) {
+    var length = array.length;
+    var index = splicedIndex;
+
+    while (index < length) {
+      array[index] = array[index + 1];
+      index++;
+    }
+
+    array.length--;
+  }
+};
+
+// external dependencies
+/**
+ * @function assign
+ *
+ * @description
+ * get the shallowly-merged object at path
+ *
+ * @param {Array<number|string>|null|number|string} path the path to match on the object
+ * @param {Array<*>|Object} objectToAssign the object to merge
+ * @param {Array<*>|Object} object the object to merge with
+ * @returns {Array<*>|Object} the new merged object
+ */
+
+var assign$2 = curry(function (path, objectToAssign, object) {
+  if (!isCloneable(object)) {
+    return objectToAssign;
+  }
+
+  return isEmptyPath(path) ? getMergedObject(object, objectToAssign, false) : getDeepClone(path, object, function (ref, key) {
+    ref[key] = getMergedObject(ref[key], objectToAssign, false);
+  });
+});
+/**
+ * @function call
+ *
+ * @description
+ * call a nested method at the path requested with the parameters provided
+ *
+ * @param {Array<number|string>|null|number|string} path the path to get the value at
+ * @param {Array<*>} parameters the parameters to call the method with
+ * @param {Array<*>|Object} object the object to call the method from
+ * @param {*} context the context to set as "this" in the function call
+ */
+
+var call = curry(function (path, parameters, object, context) {
+  if (context === void 0) {
+    context = object;
+  }
+
+  return isEmptyPath(path) ? callIfFunction(object, context, parameters) : callNestedProperty(path, context, parameters, object);
+}, // eslint-disable-next-line no-magic-numbers
+3);
+/**
+ * @function get
+ *
+ * @description
+ * get the value to the object at the path requested
+ *
+ * @param {Array<number|string>|null|number|string} path the path to get the value at
+ * @param {Array<*>|Object} object the object to get the value from
+ * @returns {*} the value requested
+ */
+
+var get$2 = curry(function (path, object) {
+  return isEmptyPath(path) ? object : getNestedProperty$1(path, object);
+});
+/**
+ * @function getOr
+ *
+ * @description
+ * get the value to the object at the path requested, or noMatchValue if nothing
+ * is there.
+ *
+ * @param {*} noMatchValue the fallback value if nothing is found at the given path
+ * @param {Array<number|string>|null|number|string} path the path to get the value at
+ * @param {Array<*>|Object} object the object to get the value from
+ * @returns {*} the value requested
+ */
+
+var getOr = curry(function (noMatchValue, path, object) {
+  return isEmptyPath(path) ? object : getNestedProperty$1(path, object, noMatchValue);
+});
+/**
+ * @function has
+ *
+ * @description
+ * does the nested path exist on the object
+ *
+ * @param {Array<number|string>|null|number|string} path the path to match on the object
+ * @param {Array<*>|Object} object the object to get the value from
+ * @returns {boolean} does the path exist
+ */
+
+/* eslint-disable eqeqeq */
+
+var has$1 = curry(function (path, object) {
+  return isEmptyPath(path) ? object != null : hasNestedProperty(path, object);
+});
+/* eslint-enable */
+
+/**
+ * @function merge
+ *
+ * @description
+ * get the deeply-merged object at path
+ *
+ * @param {Array<number|string>|null|number|string} path the path to match on the object
+ * @param {Array<*>|Object} objectToMerge the object to merge
+ * @param {Array<*>|Object} object the object to merge with
+ * @returns {Array<*>|Object} the new merged object
+ */
+
+var merge = curry(function (path, objectToMerge, object) {
+  if (!isCloneable(object)) {
+    return objectToMerge;
+  }
+
+  return isEmptyPath(path) ? getMergedObject(object, objectToMerge, true) : getDeepClone(path, object, function (ref, key) {
+    ref[key] = getMergedObject(ref[key], objectToMerge, true);
+  });
+});
+/**
+ * @function removeobject with quoted keys
+ *
+ * @description
+ * remove the value in the object at the path requested
+ *
+ * @param {Array<number|string>|number|string} path the path to remove the value at
+ * @param {Array<*>|Object} object the object to remove the value from
+ * @returns {Array<*>|Object} a new object with the same structure and the value removed
+ */
+
+var remove = curry(function (path, object) {
+  if (isEmptyPath(path)) {
+    return getNewEmptyObject(object);
+  }
+
+  return hasNestedProperty(path, object) ? getDeepClone(path, object, function (ref, key) {
+    if (isArray$1(ref)) {
+      splice(ref, key);
+    } else {
+      delete ref[key];
+    }
+  }) : object;
+});
+/**
+ * @function set
+ *
+ * @description
+ * set the value in the object at the path requested
+ *
+ * @param {Array<number|string>|number|string} path the path to set the value at
+ * @param {*} value the value to set
+ * @param {Array<*>|Object} object the object to set the value in
+ * @returns {Array<*>|Object} a new object with the same structure and the value assigned
+ */
+
+var set$2 = curry(function (path, value, object) {
+  return isEmptyPath(path) ? value : getDeepClone(path, object, function (ref, key) {
+    ref[key] = value;
+  });
+});
+/**
+ * @function transform
+ *
+ * @description
+ * perform same operation as set, but using a callback function that receives
+ * the value (and additional parameters, if provided) to get the value to set
+ *
+ * @param {Array<number|string>|number|string} path the path to set the value at
+ * @param {function} fn the function to transform the retrieved value with
+ * @param {Array<*>|Object} object the object to set the value in
+ * @param {...Array<any>} extraArgs additional arguments to pass to the transform function
+ * @returns {Array<*>|Object} a new object with the same structure and the value assigned
+ */
+
+var transform = curry(function (path, fn, object) {
+  for (var _len = arguments.length, extraArgs = new Array(_len > 3 ? _len - 3 : 0), _key = 3; _key < _len; _key++) {
+    extraArgs[_key - 3] = arguments[_key];
+  }
+
+  return isEmptyPath(path) ? fn.apply(void 0, [object].concat(extraArgs)) : getDeepClone(path, object, function (ref, key) {
+    return ref[key] = fn.apply(void 0, [ref[key]].concat(extraArgs));
+  });
+}, // eslint-disable-next-line no-magic-numbers
+3);
+/**
+ * @function add
+ *
+ * @description
+ * add the value to the object at the path requested
+ *
+ * @param {Array<number|string>|null|number|string} path the path to assign the value at
+ * @param {*} value the value to assign
+ * @param {Array<*>|Object} object the object to assignobject the value in
+ * @returns {Array<*>|Object} a new object with the same structure and the value added
+ */
+
+var add = curry(function (path, value, object) {
+  var nestedValue = get$2(path, object);
+  var fullPath = isArray$1(nestedValue) ? isArray$1(path) ? path.concat([nestedValue.length]) : (isEmptyPath(path) ? '' : path) + "[" + nestedValue.length + "]" : path;
+  return set$2(fullPath, value, object);
+});
+
+// external dependencies
+
+var hasOwnProperty$1 = Object.prototype.hasOwnProperty;
+
+/**
+ * @private
+ *
+ * @function createIdentitySelector
+ *
+ * @description
+ * based on the path passed, create the identity function for it or return the function itself
+ *
+ * @param {function(Object): *|string} path nested path to retrieve from the state object
+ * @returns {function(Object): *} identity function to retrive value from state for given property
+ */
+var createIdentitySelector = function createIdentitySelector(path) {
+  var type = typeof path;
+
+  if (type === 'function') {
+    return path;
+  }
+
+  if (type === 'string' || type === 'number' || Array.isArray(path)) {
+    return function (state) {
+      return get$2(path, state);
+    };
+  }
+
+  if (path && typeof path === 'object') {
+    if (!hasOwnProperty$1.call(path, 'path') || !hasOwnProperty$1.call(path, 'argIndex')) {
+      throw new ReferenceError('When providing an object path, you must provide the following properties:\n' + '  * path: the path to retrieve, e.g. "foo.bar."\n' + '  * argIndex: the index of the argument to retrieve the path from');
+    }
+
+    var selectorIdentity = createIdentity(path.argIndex);
+
+    return function () {
+      return get$2(path.path, selectorIdentity.apply(null, arguments)); // eslint-disable-line prefer-spread
+    };
+  }
+
+  throw new TypeError('Path provided is of invalid type. It can be any one of the following values:\n' + '  * Dot-bracket notation, e.g. "foo.bar" or "bar[0].baz"\n' + '  * Number index, e.g. 0\n' + '  * Object {path, argIndex}, e.g. {path: "foo.bar", argIndex: 1}\n' + '  * Selector function');
+};
+
+/**
+ * @private
+ *
+ * @function getSelectorCreator
+ *
+ * @description
+ * get the creator function to use when generating the selector
+ *
+ * @param {boolean} [deepEqual=false] should the memoizer be based on strict equality
+ * @param {function(*, *): boolean} [isEqual=sameValueZeroEqual] the custom equality method to use when comparing values
+ * @param {function(function, function(*, *): boolean, ...Array<*>)} [memoizer=defaultMemoize] custom selector memoizer
+ * @param {Array<*>} [memoizerParams=[]] custom parameters to pass to the memoizer function
+ * @returns {function} function to create selector with
+ */
+var getSelectorCreator = function getSelectorCreator(_ref) {
+  var _ref$deepEqual = _ref.deepEqual,
+      deepEqual$$1 = _ref$deepEqual === undefined ? false : _ref$deepEqual,
+      _ref$isEqual = _ref.isEqual,
+      isEqual = _ref$isEqual === undefined ? sameValueZeroEqual : _ref$isEqual,
+      memoizer = _ref.memoizer,
+      _ref$memoizerParams = _ref.memoizerParams,
+      memoizerParams = _ref$memoizerParams === undefined ? [] : _ref$memoizerParams;
+
+  var memoizerFn = memoizer || lib_1;
+
+  return lib_2.apply(undefined, [memoizerFn, deepEqual$$1 ? deepEqual : isEqual].concat(memoizerParams));
+};
+
+/**
+ * @private
+ *
+ * @function getStandardSelector
+ *
+ * @description
+ * get a standard selector based on the paths and getComputedValue provided
+ *
+ * @param {Array<function(Object): *|string>} paths paths to retrieve values from state from
+ * @param {function(Array<function(Object): *>, function): function} selectorCreator function to create selector with
+ * @param {function} getComputedValue function to compute values with, receiving properties in state based
+ * on paths and returning computed values from them (defaults to pass-through identity function)
+ * @returns {function} selector to return computed value from state
+ */
+var getStandardSelector = function getStandardSelector(paths, selectorCreator, getComputedValue) {
+  return selectorCreator(paths.map(createIdentitySelector), getComputedValue);
+};
+
+/**
+ * @private
+ *
+ * @function getStructuredObject
+ *
+ * @description
+ * get the structured object based on the computed selector values
+ *
+ * @param {Array<string>} properties properties to assign values from state to
+ * @returns {function(...Array<*>): Object} object of property => selected value pairs
+ */
+var getStructuredObject = function getStructuredObject(properties) {
+  return function () {
+    for (var _len = arguments.length, values = Array(_len), _key = 0; _key < _len; _key++) {
+      values[_key] = arguments[_key];
+    }
+
+    return properties.reduce(function (structuredObject, property, index) {
+      structuredObject[property] = values[index];
+
+      return structuredObject;
+    }, {});
+  };
+};
+
+/**
+ * @private
+ *
+ * @function getStructuredSelector
+ *
+ * @description
+ * get an object of property => selected value pairs bsaed on paths
+ *
+ * @param {Object} paths property => path pairs, where path is state value to retrieve and assign to property
+ * @param {function(Array<function(Object): *>, function): function} selectorCreator function to create selector with
+ * @returns {function} selector to return structured values from state
+ */
+var getStructuredSelector = function getStructuredSelector(paths, selectorCreator) {
+  var destinationKeys = Object.keys(paths);
+  var selectors = destinationKeys.map(function (key) {
+    return createIdentitySelector(paths[key]);
+  });
+
+  return selectorCreator(selectors, getStructuredObject(destinationKeys));
+};
+
+// external dependencies
+
+/**
+ * @module selectorator
+ */
+
+/**
+ * @function createSelector
+ *
+ * @description
+ * create a selector without any boilerplate code
+ *
+ * @example
+ * import createSelector from 'selectorator';
+ *
+ * const getFilteredItems = createSelector(['items', 'filter.value'], (items, filterValue) => {
+ *   return items.filter((item) => {
+ *     return item.indexOf(filterValue) !== -1;
+ *   });
+ * });
+ *
+ * const state = {
+ *   items: ['foo', 'bar', 'foo-bar'],
+ *   filter: {
+ *     value: 'foo'
+ *   }
+ * };
+ *
+ * console.log(getFilteredItems(state)); // ['foo', 'foo-bar'];
+ * console.log(getFilteredItems(state)); // ['foo', 'foo-bar'], pulled from cache;
+ *
+ * @param {Array<function|string>|Object} paths paths to retrieve from state as parameters in getComputedValue, or
+ * an object of key => path pairs that will assign path at state to key in structured selector
+ * @param {function} [getComputedValue=identity] function that will accept the values at paths in state as parameters
+ * and compute the next result
+ * @param {Object} [options={}] additional options available for selector creation
+ * @param {boolean} [options.deepEqual=false] should strict equality be used for memoization
+ * @param {function} [options.memoizer=defaultMemoize] custom memoize function for creating selectors with
+ * @param {Array<*>} [options.memoizerParams=[]] additional parameters to pass to the selectorCreator function
+ * @returns {function} selector for state object passed
+ */
+var createSelector = function createSelector(paths) {
+  var getComputedValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : identity;
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+  var selectorCreator = getSelectorCreator(options);
+
+  if (Array.isArray(paths)) {
+    if (!paths.length) {
+      throw new ReferenceError('You have not provided any values for paths, so no values can be retrieved from state.');
+    }
+
+    return getStandardSelector(paths, selectorCreator, getComputedValue);
+  }
+
+  if (paths && typeof paths === 'object') {
+    return getStructuredSelector(paths, selectorCreator);
+  }
+
+  throw new TypeError('First parameter passed must be either an array or a plain object. If you are creating a ' + 'standard selector, pass an array of either properties on the state to retrieve, or custom selector functions. ' + 'If creating a structured selector, pass a plain object with source and destination properties, where source ' + 'is an array of properties or custom selector functions, and destination is an array of property names to ' + 'assign the values from source to.');
+};
+
+exports.configureStore = configureStore;
+exports.getDefaultMiddleware = getDefaultMiddleware;
+exports.createReducer = createReducer;
+exports.createAction = createAction;
+exports.getType = getType;
+exports.createSlice = createSlice;
+exports.createNextState = produce;
+exports.combineReducers = combineReducers;
+exports.compose = compose;
+exports.createSelector = createSelector;
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+})));
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../webpack/buildin/global.js */ "../../node_modules/webpack/buildin/global.js"), __webpack_require__(/*! ./../../webpack/buildin/module.js */ "../../node_modules/webpack/buildin/module.js")(module), __webpack_require__(/*! ./../../process/browser.js */ "../../node_modules/process/browser.js")))
+
+/***/ }),
+
 /***/ "../../node_modules/regenerator-runtime/runtime.js":
 /*!*************************************************************************************!*\
   !*** /home/dev/ezpay-browser-extension/node_modules/regenerator-runtime/runtime.js ***!
@@ -41772,10 +45011,11 @@ module.exports = {
 /***/ }),
 
 /***/ "./index.js":
-/*!******************************!*\
-  !*** ./index.js + 5 modules ***!
-  \******************************/
+/*!*******************************!*\
+  !*** ./index.js + 10 modules ***!
+  \*******************************/
 /*! no exports provided */
+/*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/asyncToGenerator.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/classCallCheck.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/createClass.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/defineProperty.js (<- Module is not an ECMAScript module) */
@@ -41784,6 +45024,7 @@ module.exports = {
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/possibleConstructorReturn.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/toConsumableArray.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/typeof.js (<- Module is not an ECMAScript module) */
+/*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/regenerator/index.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@tronscan/client/src/utils/crypto.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/aes-js/index.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/bip32/index.js (<- Module is not an ECMAScript module) */
@@ -41793,11 +45034,21 @@ module.exports = {
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/eventemitter3/index.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/extensionizer/index.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/pbkdf2/browser.js (<- Module is not an ECMAScript module) */
+/*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/redux-starter-kit/dist/redux-starter-kit.umd.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/tronweb/dist/TronWeb.node.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/uuid/v4.js (<- Module is not an ECMAScript module) */
+/*! ModuleConcatenation bailout: Cannot concat with ./package.json (<- Module is not an ECMAScript module) */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+
+// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/regenerator/index.js
+var regenerator = __webpack_require__("../../node_modules/@babel/runtime/regenerator/index.js");
+var regenerator_default = /*#__PURE__*/__webpack_require__.n(regenerator);
+
+// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/asyncToGenerator.js
+var asyncToGenerator = __webpack_require__("../../node_modules/@babel/runtime/helpers/asyncToGenerator.js");
+var asyncToGenerator_default = /*#__PURE__*/__webpack_require__.n(asyncToGenerator);
 
 // EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/toConsumableArray.js
 var toConsumableArray = __webpack_require__("../../node_modules/@babel/runtime/helpers/toConsumableArray.js");
@@ -42596,21 +45847,447 @@ var Utils = {
   }
 };
 /* harmony default export */ var utils = (Utils);
+// CONCATENATED MODULE: ../lib/constants.js
+var APP_STATE = {
+  // Wallet is migrating / not unlocked
+  UNINITIALISED: 0,
+  // [x] First user creates password
+  PASSWORD_SET: 1,
+  // [x] Password is set, but the wallet is locked. Next step is UNLOCKED
+  // Wallet is unlocked
+  UNLOCKED: 2,
+  // [x] User is given two options - restore account or create new account
+  CREATING: 3,
+  // [x] Shown if a user is creating a new account (startup or in general). Next step is READY
+  RESTORING: 4,
+  // [x] Shown when the user is restoring (or in general importing) an account. Next step is READY
+  // Wallet is functional
+  READY: 5,
+  // [x] User is logged in (and at least 1 account exists)
+  REQUESTING_CONFIRMATION: 6,
+  // [x] Shown if confirmations are queued
+  RECEIVE: 7,
+  //[x] Show if need to accept trx or tokens
+  SEND: 8,
+  //[x] Show if need to send trx or tokens
+  TRANSACTIONS: 9,
+  //[x] Show transactions record
+  SETTING: 10,
+  //[x] Show setting
+  ADD_TRC20_TOKEN: 11,
+  //[x] Show setting
+  TRONBANK: 12,
+  // [x] show TronBank page
+  TRONBANK_RECORD: 13,
+  //[x] show TronBankRecord page
+  TRONBANK_DETAIL: 14,
+  //[X] show TronBankDetail page
+  TRONBANK_HELP: 15,
+  USDT_INCOME_RECORD: 16,
+  //[X] income record for usdt
+  USDT_ACTIVITY_DETAIL: 17,
+  DAPP_LIST: 18,
+  // [X]show dapp list
+  ASSET_MANAGE: 19,
+  // [X]asset manage
+  TRANSACTION_DETAIL: 20,
+  // [X] transaction detail
+  DAPP_WHITELIST: 21 // [X] transaction detail
+
+}; // User can delete *all* accounts. This will set the appState to UNLOCKED.
+
+var ACCOUNT_TYPE = {
+  MNEMONIC: 0,
+  PRIVATE_KEY: 1
+};
+var VALIDATION_STATE = {
+  NONE: 'no-state',
+  INVALID: 'is-invalid',
+  VALID: 'is-valid'
+};
+var BANK_STATE = {
+  INVALID: false,
+  VALID: true
+};
+var CREATION_STAGE = {
+  SETTING_NAME: 0,
+  WRITING_PHRASE: 1,
+  CONFIRMING_PHRASE: 2,
+  SUCCESS: 3
+};
+var RESTORATION_STAGE = {
+  SETTING_NAME: 0,
+  CHOOSING_TYPE: 1,
+  IMPORT_PRIVATE_KEY: 2,
+  IMPORT_TRONWATCH_LEGACY: 3,
+  IMPORT_TRONSCAN: 4,
+  IMPORT_MNEMONIC: 5,
+  IMPORT_KEY_STORE: 7,
+  SUCCESS: 6
+};
+var BUTTON_TYPE = {
+  PRIMARY: 'primary',
+  SECONDARY: 'secondary',
+  SUCCESS: 'success',
+  DANGER: 'danger',
+  WHITE: 'white'
+};
+var PAGES = {
+  ACCOUNTS: 0,
+  TRANSACTIONS: 1,
+  TOKENS: 2,
+  SEND: 3,
+  SETTINGS: 4
+};
+var SUPPORTED_CONTRACTS = ['TransferContract', 'TransferAssetContract', 'FreezeBalanceContract', 'UnfreezeBalanceContract', 'TriggerSmartContract'];
+var CONFIRMATION_TYPE = {
+  STRING: 0,
+  TRANSACTION: 1
+};
+var CONTRACT_ADDRESS = {
+  USDT: "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t" //USDT:"TWGZ7HnAhZkvxiT89vCBSd6Pzwin5vt3ZA"
+
+};
+var USDT_ACTIVITY_STAGE = {
+  1: {
+    rate: 20,
+    start: '4.30',
+    end: '5.4',
+    days: 5,
+    stage: 1
+  },
+  2: {
+    rate: 12,
+    start: '5.5',
+    end: '5.9',
+    days: 5,
+    stage: 2
+  },
+  3: {
+    rate: 10,
+    start: '5.10',
+    end: '5.14',
+    days: 5,
+    stage: 3
+  },
+  4: {
+    rate: 8,
+    start: '5.15',
+    end: '5.21',
+    days: 7,
+    stage: 4
+  },
+  5: {
+    rate: 5,
+    start: '5.22',
+    end: '5.31',
+    days: 10,
+    stage: 5
+  },
+  6: {
+    rate: 3,
+    start: '6.1',
+    end: '6.14',
+    days: 14,
+    stage: 6
+  },
+  7: {
+    rate: 1,
+    start: '6.15',
+    end: '8.7',
+    days: 54,
+    stage: 7
+  }
+};
+// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/redux-starter-kit/dist/redux-starter-kit.umd.js
+var redux_starter_kit_umd = __webpack_require__("../../node_modules/redux-starter-kit/dist/redux-starter-kit.umd.js");
+
+// CONCATENATED MODULE: ../popup/src/reducers/appReducer.js
+
+
+var _createReducer;
+
+
+
+var setAppState = Object(redux_starter_kit_umd["createAction"])('setAppState');
+var setNodes = Object(redux_starter_kit_umd["createAction"])('setNodes');
+var setPage = Object(redux_starter_kit_umd["createAction"])('setPage');
+var setPriceList = Object(redux_starter_kit_umd["createAction"])('setPriceList');
+var setCurrency = Object(redux_starter_kit_umd["createAction"])('setCurrency');
+var setLanguage = Object(redux_starter_kit_umd["createAction"])('setLanguage');
+var setSetting = Object(redux_starter_kit_umd["createAction"])('setSetting');
+var setVersion = Object(redux_starter_kit_umd["createAction"])('setVersion');
+var setDappList = Object(redux_starter_kit_umd["createAction"])('setDappList');
+var setAuthorizeDapps = Object(redux_starter_kit_umd["createAction"])('setAuthorizeDapps');
+var appReducer = Object(redux_starter_kit_umd["createReducer"])({
+  appState: APP_STATE.UNINITIALISED,
+  currentPage: PAGES.ACCOUNTS,
+  nodes: {
+    nodes: {},
+    selected: false
+  },
+  prices: {
+    priceList: {},
+    usdtPriceList: {},
+    selected: false
+  },
+  language: 'en',
+  setting: {
+    developmentMode: false
+  },
+  version: '',
+  dappList: {
+    recommend: [],
+    used: []
+  },
+  authorizeDapps: {}
+}, (_createReducer = {}, defineProperty_default()(_createReducer, setAppState, function (state, _ref) {
+  var payload = _ref.payload;
+  state.appState = payload;
+}), defineProperty_default()(_createReducer, setPriceList, function (state, _ref2) {
+  var payload = _ref2.payload;
+  state.prices.priceList = payload[0];
+  state.prices.usdtPriceList = payload[1];
+}), defineProperty_default()(_createReducer, setCurrency, function (state, _ref3) {
+  var payload = _ref3.payload;
+  state.prices.selected = payload;
+}), defineProperty_default()(_createReducer, setNodes, function (state, _ref4) {
+  var payload = _ref4.payload;
+  state.nodes = payload;
+}), defineProperty_default()(_createReducer, setPage, function (state, _ref5) {
+  var payload = _ref5.payload;
+  state.currentPage = payload;
+}), defineProperty_default()(_createReducer, setLanguage, function (state, _ref6) {
+  var payload = _ref6.payload;
+  state.language = payload;
+}), defineProperty_default()(_createReducer, setSetting, function (state, _ref7) {
+  var payload = _ref7.payload;
+  state.setting = payload;
+}), defineProperty_default()(_createReducer, setVersion, function (state, _ref8) {
+  var payload = _ref8.payload;
+  state.version = payload;
+}), defineProperty_default()(_createReducer, setDappList, function (state, _ref9) {
+  var payload = _ref9.payload;
+  state.dappList = payload;
+}), defineProperty_default()(_createReducer, setAuthorizeDapps, function (state, _ref10) {
+  var payload = _ref10.payload;
+  state.authorizeDapps = payload;
+}), _createReducer));
+// CONCATENATED MODULE: ../lib/api/handlers/PopupAPI.js
+
+/* harmony default export */ var PopupAPI = ({
+  init: function init(duplex) {
+    this.duplex = duplex;
+  },
+  //Data refresh
+  refresh: function refresh() {
+    return this.duplex.send('refresh');
+  },
+  // Data requesting
+  requestState: function requestState() {
+    return this.duplex.send('requestState');
+  },
+  changeState: function changeState(appState) {
+    return this.duplex.send('changeState', appState, false);
+  },
+  resetState: function resetState() {
+    return this.duplex.send('resetState', {}, false);
+  },
+  getPrices: function getPrices() {
+    return this.duplex.send('getPrices');
+  },
+  getConfirmations: function getConfirmations() {
+    return this.duplex.send('getConfirmations');
+  },
+  // Confirmation actions
+  acceptConfirmation: function acceptConfirmation(whitelistDuration) {
+    return this.duplex.send('acceptConfirmation', whitelistDuration, false);
+  },
+  rejectConfirmation: function rejectConfirmation() {
+    return this.duplex.send('rejectConfirmation', {}, false);
+  },
+  // Account control
+  importAccount: function importAccount(privateKey, name) {
+    return this.duplex.send('importAccount', {
+      privateKey: privateKey,
+      name: name
+    });
+  },
+  addAccount: function addAccount(mnemonic, name) {
+    return this.duplex.send('addAccount', {
+      mnemonic: mnemonic,
+      name: name
+    });
+  },
+  selectAccount: function selectAccount(address) {
+    this.duplex.send('selectAccount', address, false);
+  },
+  deleteAccount: function deleteAccount() {
+    this.duplex.send('deleteAccount', {}, false);
+  },
+  getAccounts: function getAccounts() {
+    return this.duplex.send('getAccounts');
+  },
+  exportAccount: function exportAccount() {
+    return this.duplex.send('exportAccount');
+  },
+  getSelectedAccount: function getSelectedAccount() {
+    return this.duplex.send('getSelectedAccount');
+  },
+  getAccountDetails: function getAccountDetails(address) {
+    return this.duplex.send('getAccountDetails', address);
+  },
+  getSetting: function getSetting() {
+    return this.duplex.send('getSetting');
+  },
+  setSetting: function setSetting(setting) {
+    this.duplex.send('setSetting', setting, false);
+  }
+});
+// CONCATENATED MODULE: ../lib/api/handlers/BackgroundAPI.js
+/* harmony default export */ var BackgroundAPI = ({
+  currentAccount: false,
+  init: function init(duplex) {
+    this.duplex = duplex;
+  },
+  setState: function setState(appState) {
+    this.duplex.send('popup', 'setState', appState, false);
+  },
+  setAccount: function setAccount(account) {
+    this.duplex.send('popup', 'setAccount', account, false);
+    if (this.currentAccount === account) return;
+    this.duplex.send('tab', 'tunnel', {
+      action: 'setAccount',
+      data: account.address
+    }, false);
+    this.currentAccount = account;
+  },
+  setNode: function setNode(node) {
+    this.duplex.send('tab', 'tunnel', {
+      action: 'setNode',
+      data: node
+    }, false);
+  },
+  setAccounts: function setAccounts(accounts) {
+    this.duplex.send('popup', 'setAccounts', accounts, false);
+  },
+  setPriceList: function setPriceList(priceList) {
+    this.duplex.send('popup', 'setPriceList', priceList, false);
+  },
+  setConfirmations: function setConfirmations(confirmationList) {
+    this.duplex.send('popup', 'setConfirmations', confirmationList, false);
+  },
+  setCurrency: function setCurrency(currency) {
+    this.duplex.send('popup', 'setCurrency', currency, false);
+  },
+  setSelectedToken: function setSelectedToken(token) {
+    this.duplex.send('popup', 'setSelectedToken', token, false);
+  },
+  setLanguage: function setLanguage(language) {
+    this.duplex.send('popup', 'setLanguage', language, false);
+  },
+  setSetting: function setSetting(setting) {
+    this.duplex.send('popup', 'setSetting', setting, false);
+  },
+  setSelectedBankRecordId: function setSelectedBankRecordId(id) {
+    this.duplex.send('popup', 'setSelectedBankRecordId', id, false);
+  },
+  changeDealCurrencyPage: function changeDealCurrencyPage(status) {
+    this.duplex.send('popup', 'changeDealCurrencyPage', status, false);
+  },
+  setAirdropInfo: function setAirdropInfo(airdropInfo) {
+    this.duplex.send('popup', 'setAirdropInfo', airdropInfo, false);
+  },
+  setDappList: function setDappList(dappList) {
+    this.duplex.send('popup', 'setDappList', dappList, false);
+  },
+  setAuthorizeDapps: function setAuthorizeDapps(dappList) {
+    this.duplex.send('popup', 'setAuthorizeDapps', dappList, false);
+  }
+});
+// CONCATENATED MODULE: ../lib/api/index.js
+
+
+var api_PopupAPI = PopupAPI;
+var api_BackgroundAPI = BackgroundAPI;
+// EXTERNAL MODULE: ./package.json
+var package_0 = __webpack_require__("./package.json");
+
 // CONCATENATED MODULE: ./index.js
 
 
- // import { BackgroundAPI } from '@tronlink/lib/api';
-// import { version } from './package.json';
+
+
+
+
 
 var duplex = new MessageDuplex.Host();
 var index_logger = new logger_Logger('background');
 var background = {
   run: function run() {
-    BackgroundAPI.init(duplex); // this.bindPopupDuplex();
-    // this.bindTabDuplex();
+    api_BackgroundAPI.init(duplex);
+    this.bindPopupDuplex();
+    this.bindTabDuplex();
+  },
+  bindPopupDuplex: function bindPopupDuplex() {
+    duplex.on('getSetting', function (_ref) {
+      var resolve = _ref.resolve;
+      return resolve(11);
+    });
+  },
+  bindTabDuplex: function bindTabDuplex() {
+    duplex.on('tabRequest',
+    /*#__PURE__*/
+    function () {
+      var _ref3 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee(_ref2) {
+        var hostname, resolve, _ref2$data, action, data, uuid;
+
+        return regenerator_default.a.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                hostname = _ref2.hostname, resolve = _ref2.resolve, _ref2$data = _ref2.data, action = _ref2$data.action, data = _ref2$data.data, uuid = _ref2$data.uuid;
+                _context.t0 = action;
+                _context.next = _context.t0 === 'init' ? 4 : _context.t0 === 'sign' ? 6 : 8;
+                break;
+
+              case 4:
+                console.log('initxxx');
+                return _context.abrupt("break", 8);
+
+              case 6:
+                console.log('signxxx');
+                return _context.abrupt("break", 8);
+
+              case 8:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee);
+      }));
+
+      return function (_x) {
+        return _ref3.apply(this, arguments);
+      };
+    }());
   }
 };
 background.run();
+
+/***/ }),
+
+/***/ "./package.json":
+/*!**********************!*\
+  !*** ./package.json ***!
+  \**********************/
+/*! exports provided: name, main, author, private, version, dependencies, scripts, devDependencies, default */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module) {
+
+module.exports = {"name":"@ezpay/background","main":"index.js","author":"HoangNong <hoang.nong.it@gmail.com>","private":true,"version":"2.6.1","dependencies":{"@sentry/browser":"^4.3.4","axios":"^0.18.0","bip32":"^1.0.2","bip39":"^2.5.0","buffer":"^5.2.1","eventemitter3":"^3.1.0","tronweb":"^2.6.4"},"scripts":{"build":"webpack --config ../../webpack.config.js --progress --colors -o ../../dist/background.js","lint":"npx eslint . --fix"},"devDependencies":{"@babel/core":"^7.1.2","@babel/preset-env":"^7.1.0","babel-loader":"^8.0.4","babel-minify-webpack-plugin":"^0.3.1","babel-plugin-transform-runtime":"^6.23.0","babel-preset-es2015":"^6.24.1","webpack-cli":"^3.1.2"}};
 
 /***/ }),
 

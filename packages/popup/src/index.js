@@ -57,7 +57,7 @@ export const app = {
     async run() {
         this.createStore();
         await this.getAppState();
-        this.bindDuplexRequests();
+        // this.bindDuplexRequests();
         this.render();
     },
 
@@ -77,19 +77,19 @@ export const app = {
 
     async getAppState() {
         PopupAPI.init(this.duplex);
+        console.log('settingxxxxx', this.duplex)
         const setting = await PopupAPI.getSetting();
-
-        let [
-            appState,
-            // accounts,
-            // selectedAccount,
-            // language,
-        ] = await Promise.all([
-            PopupAPI.requestState(),
-            // PopupAPI.getAccounts(),
-            // PopupAPI.getSelectedAccount(),
-            // PopupAPI.getLanguage()
-        ]);
+        // let [
+        //     appState,
+        //     // accounts,
+        //     // selectedAccount,
+        //     // language,
+        // ] = await Promise.all([
+        //     PopupAPI.requestState(),
+        //     // PopupAPI.getAccounts(),
+        //     // PopupAPI.getSelectedAccount(),
+        //     // PopupAPI.getLanguage()
+        // ]);
         // const lang = navigator.language || navigator.browserLanguage;
         // if ( lang.indexOf('zh') > -1 ) {
         //     language = language || 'zh';
@@ -98,7 +98,8 @@ export const app = {
         // } else {
         //     language = language || 'en';
         // }
-        this.store.dispatch(setAppState(appState));
+        // console.log('appState', appState)
+        // this.store.dispatch(setAppState(appState));
         // this.store.dispatch(setAccounts(accounts));
         // this.store.dispatch(setCurrency(prices.selected));
         // this.store.dispatch(setLanguage(language));
