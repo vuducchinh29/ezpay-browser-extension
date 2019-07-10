@@ -1,5 +1,7 @@
 import Logger from '@ezpay/lib/logger';
 import MessageDuplex from '@ezpay/lib/MessageDuplex';
+import WalletService from './services/WalletService';
+import NodeService from './services/NodeService';
 import Utils from '@ezpay/lib/utils';
 
 import { BackgroundAPI } from '@ezpay/lib/api';
@@ -9,17 +11,22 @@ const duplex = new MessageDuplex.Host();
 const logger = new Logger('background');
 
 const background = {
+    walletService: Utils.requestHandler(
+        new WalletService()
+    ),
+    nodeService: Utils.requestHandler(NodeService),
     run() {
         BackgroundAPI.init(duplex);
-
         this.bindPopupDuplex();
         this.bindTabDuplex();
     },
 
     bindPopupDuplex() {
-        duplex.on('getSetting', ({ resolve }) => resolve(
-            11
+        duplex.on('getSetting', this.walletService.getSetting);
+        duplex.on('requestState', ({ resolve }) => resolve(
+            this.walletService.state
         ));
+        duplex.on('getNodes', this.nodeService.getNodes);
     },
 
     bindTabDuplex() {

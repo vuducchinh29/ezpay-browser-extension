@@ -15,18 +15,6 @@ export const APP_STATE = {
     SEND: 8, //[x] Show if need to send trx or tokens
     TRANSACTIONS: 9, //[x] Show transactions record
     SETTING: 10, //[x] Show setting
-    ADD_TRC20_TOKEN: 11, //[x] Show setting
-    TRONBANK: 12, // [x] show TronBank page
-    TRONBANK_RECORD: 13, //[x] show TronBankRecord page
-    TRONBANK_DETAIL: 14, //[X] show TronBankDetail page
-    TRONBANK_HELP: 15,
-    USDT_INCOME_RECORD: 16, //[X] income record for usdt
-    USDT_ACTIVITY_DETAIL: 17,
-    DAPP_LIST: 18, // [X]show dapp list
-    ASSET_MANAGE: 19, // [X]asset manage
-    TRANSACTION_DETAIL: 20, // [X] transaction detail
-    DAPP_WHITELIST: 21 // [X] transaction detail
-
 }; // User can delete *all* accounts. This will set the appState to UNLOCKED.
 
 export const ACCOUNT_TYPE = {

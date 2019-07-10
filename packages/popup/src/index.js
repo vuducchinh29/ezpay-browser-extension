@@ -6,7 +6,6 @@ import Logger from '@ezpay/lib/logger';
 import reducer from 'reducers';
 import { addLocaleData } from 'react-intl';
 import en from 'react-intl/locale-data/en';
-import * as Sentry from '@sentry/browser';
 import { Provider } from 'react-redux';
 import { configureStore, getDefaultMiddleware } from 'redux-starter-kit';
 import { setConfirmations } from 'reducers/confirmationsReducer';
@@ -45,10 +44,6 @@ import {
     faDotCircle
 } from '@fortawesome/free-solid-svg-icons';
 addLocaleData([...en]);
-Sentry.init({
-    dsn: 'https://a52a6098294d4c1c8397e22c8b9a1c0f@sentry.io/1455110',
-    release: `EZpay@${ process.env.REACT_APP_VERSION }`
-});
 
 const logger = new Logger('Popup');
 
@@ -77,19 +72,21 @@ export const app = {
 
     async getAppState() {
         PopupAPI.init(this.duplex);
-        console.log('settingxxxxx', this.duplex)
         const setting = await PopupAPI.getSetting();
-        // let [
-        //     appState,
-        //     // accounts,
-        //     // selectedAccount,
-        //     // language,
-        // ] = await Promise.all([
-        //     PopupAPI.requestState(),
-        //     // PopupAPI.getAccounts(),
-        //     // PopupAPI.getSelectedAccount(),
-        //     // PopupAPI.getLanguage()
-        // ]);
+
+        let [
+            appState,
+            nodes,
+            // accounts,
+            // selectedAccount,
+            // language,
+        ] = await Promise.all([
+            PopupAPI.requestState(),
+            PopupAPI.getNodes(),
+            // PopupAPI.getAccounts(),
+            // PopupAPI.getSelectedAccount(),
+            // PopupAPI.getLanguage()
+        ]);
         // const lang = navigator.language || navigator.browserLanguage;
         // if ( lang.indexOf('zh') > -1 ) {
         //     language = language || 'zh';
@@ -98,8 +95,9 @@ export const app = {
         // } else {
         //     language = language || 'en';
         // }
-        // console.log('appState', appState)
-        // this.store.dispatch(setAppState(appState));
+        console.log('nodes', nodes)
+        this.store.dispatch(setAppState(appState));
+        this.store.dispatch(setNodes(nodes));
         // this.store.dispatch(setAccounts(accounts));
         // this.store.dispatch(setCurrency(prices.selected));
         // this.store.dispatch(setLanguage(language));

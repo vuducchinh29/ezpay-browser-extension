@@ -432,6 +432,66 @@ module.exports = _objectSpread;
 
 /***/ }),
 
+/***/ "../../node_modules/@babel/runtime/helpers/objectWithoutProperties.js":
+/*!********************************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/objectWithoutProperties.js ***!
+  \********************************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+var objectWithoutPropertiesLoose = __webpack_require__(/*! ./objectWithoutPropertiesLoose */ "../../node_modules/@babel/runtime/helpers/objectWithoutPropertiesLoose.js");
+
+function _objectWithoutProperties(source, excluded) {
+  if (source == null) return {};
+  var target = objectWithoutPropertiesLoose(source, excluded);
+  var key, i;
+
+  if (Object.getOwnPropertySymbols) {
+    var sourceSymbolKeys = Object.getOwnPropertySymbols(source);
+
+    for (i = 0; i < sourceSymbolKeys.length; i++) {
+      key = sourceSymbolKeys[i];
+      if (excluded.indexOf(key) >= 0) continue;
+      if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue;
+      target[key] = source[key];
+    }
+  }
+
+  return target;
+}
+
+module.exports = _objectWithoutProperties;
+
+/***/ }),
+
+/***/ "../../node_modules/@babel/runtime/helpers/objectWithoutPropertiesLoose.js":
+/*!*************************************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/objectWithoutPropertiesLoose.js ***!
+  \*************************************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports) {
+
+function _objectWithoutPropertiesLoose(source, excluded) {
+  if (source == null) return {};
+  var target = {};
+  var sourceKeys = Object.keys(source);
+  var key, i;
+
+  for (i = 0; i < sourceKeys.length; i++) {
+    key = sourceKeys[i];
+    if (excluded.indexOf(key) >= 0) continue;
+    target[key] = source[key];
+  }
+
+  return target;
+}
+
+module.exports = _objectWithoutPropertiesLoose;
+
+/***/ }),
+
 /***/ "../../node_modules/@babel/runtime/helpers/possibleConstructorReturn.js":
 /*!**********************************************************************************************************!*\
   !*** /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/possibleConstructorReturn.js ***!
@@ -45012,7 +45072,7 @@ module.exports = {
 
 /***/ "./index.js":
 /*!*******************************!*\
-  !*** ./index.js + 10 modules ***!
+  !*** ./index.js + 14 modules ***!
   \*******************************/
 /*! no exports provided */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/asyncToGenerator.js (<- Module is not an ECMAScript module) */
@@ -45021,6 +45081,7 @@ module.exports = {
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/defineProperty.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/getPrototypeOf.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/inherits.js (<- Module is not an ECMAScript module) */
+/*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/objectWithoutProperties.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/possibleConstructorReturn.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/toConsumableArray.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/typeof.js (<- Module is not an ECMAScript module) */
@@ -45851,6 +45912,184 @@ var Utils = {
   }
 };
 /* harmony default export */ var utils = (Utils);
+// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/axios/index.js
+var axios = __webpack_require__("../../node_modules/axios/index.js");
+
+// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/bignumber.js/bignumber.js
+var bignumber = __webpack_require__("../../node_modules/bignumber.js/bignumber.js");
+
+// CONCATENATED MODULE: ./services/WalletService/Account.js
+
+
+
+
+
+var Account_logger = new logger_Logger('WalletService/Account');
+
+var Account_Account = function Account(type, importData) {
+  var accountIndex = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+
+  classCallCheck_default()(this, Account);
+
+  this.type = type;
+  this.accountIndex = accountIndex;
+  this.address = false;
+  this.name = false;
+  this.transactions = {};
+  this.ignoredTransactions = [];
+  this.tokens = {};
+};
+
+/* harmony default export */ var WalletService_Account = (Account_Account);
+// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/objectWithoutProperties.js
+var objectWithoutProperties = __webpack_require__("../../node_modules/@babel/runtime/helpers/objectWithoutProperties.js");
+var objectWithoutProperties_default = /*#__PURE__*/__webpack_require__.n(objectWithoutProperties);
+
+// CONCATENATED MODULE: ./services/StorageService/index.js
+
+
+
+function StorageService_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { keys.push.apply(keys, Object.getOwnPropertySymbols(object)); } if (enumerableOnly) keys = keys.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); return keys; }
+
+function StorageService_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { StorageService_ownKeys(source, true).forEach(function (key) { defineProperty_default()(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { StorageService_ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+
+
+
+
+var StorageService_logger = new logger_Logger('StorageService');
+var StorageService_StorageService = {
+  storage: extensionizer_default.a.storage.local,
+  prices: {
+    priceList: {
+      CNY: 0,
+      USD: 0,
+      GBP: 0,
+      EUR: 0,
+      BTC: 0,
+      ETH: 0
+    },
+    usdtPriceList: {
+      CNY: 0,
+      USD: 0,
+      GBP: 0,
+      EUR: 0,
+      BTC: 0,
+      ETH: 0
+    },
+    selected: 'USD'
+  },
+  nodes: {
+    nodeList: {},
+    selectedNode: false
+  },
+  pendingTransactions: {},
+  accounts: {},
+  transactions: {},
+  tokenCache: {},
+  selectedAccount: false,
+  selectedToken: {},
+  language: '',
+  ready: false,
+  password: false,
+  setting: {
+    lock: {
+      lockTime: 0,
+      duration: 0
+    },
+    openAccountsMenu: false,
+    advertising: {},
+    developmentMode: location.hostname !== 'ibnejdfjmmkpcnlpebklmnkoeoihofec'
+  },
+  hasAccount: function hasAccount(address) {
+    // This is the most disgusting piece of code I've ever written.
+    return address in this.accounts;
+  },
+  selectAccount: function selectAccount(address) {
+    StorageService_logger.info("Storing selected account: ".concat(address));
+    this.selectedAccount = address;
+    this.save('selectedAccount');
+  },
+  getAccounts: function getAccounts() {
+    var _this = this;
+
+    var accounts = {};
+    Object.keys(this.accounts).forEach(function (address) {
+      accounts[address] = StorageService_objectSpread({
+        transactions: _this.transactions[address] || []
+      }, _this.accounts[address]);
+    });
+    return accounts;
+  },
+  getAccount: function getAccount(address) {
+    var account = this.accounts[address];
+    var transactions = this.transactions[address] || [];
+    return StorageService_objectSpread({
+      transactions: transactions
+    }, account);
+  },
+  deleteAccount: function deleteAccount(address) {
+    StorageService_logger.info('Deleting account', address);
+    delete this.accounts[address];
+    delete this.transactions[address];
+    this.save('accounts', 'transactions');
+  },
+  deleteNode: function deleteNode(nodeID) {
+    StorageService_logger.info('Deleting node', nodeID);
+    delete this.nodes.nodeList[nodeID];
+    this.save('nodes');
+  },
+  saveNode: function saveNode(nodeID, node) {
+    StorageService_logger.info('Saving node', node);
+    this.nodes.nodeList[nodeID] = node;
+    this.save('nodes');
+  },
+  selectNode: function selectNode(nodeID) {
+    StorageService_logger.info('Saving selected node', nodeID);
+    this.nodes.selectedNode = nodeID;
+    this.save('nodes');
+  },
+  saveAccount: function saveAccount(account) {
+    StorageService_logger.info('Saving account', account);
+
+    var transactions = account.transactions,
+        remaining = objectWithoutProperties_default()(account, ["transactions"]);
+
+    this.transactions[account.address] = transactions;
+    this.accounts[account.address] = remaining;
+    this.save('transactions', 'accounts');
+  },
+  setSelectedToken: function setSelectedToken(token) {
+    StorageService_logger.info('Saving selectedToken', token);
+    this.selectedToken = token;
+    this.save('selectedToken');
+  },
+  setLanguage: function setLanguage(language) {
+    StorageService_logger.info('Saving language', language);
+    this.language = language;
+    this.save('language');
+  },
+  setSetting: function setSetting(setting) {
+    StorageService_logger.info('Saving setting', setting);
+    this.setting = setting;
+    this.save('setting');
+  },
+  getSetting: function getSetting() {
+    if (!this.setting.hasOwnProperty('advertising')) {
+      this.setting.advertising = {};
+    }
+
+    return StorageService_objectSpread({}, this.setting, {
+      developmentMode: location.hostname !== 'ibnejdfjmmkpcnlpebklmnkoeoihofec'
+    });
+  },
+  authenticate: function authenticate(password) {
+    this.password = password;
+    this.ready = true;
+    StorageService_logger.info('Set storage password');
+  }
+};
+/* harmony default export */ var services_StorageService = (StorageService_StorageService);
 // CONCATENATED MODULE: ../lib/constants.js
 var APP_STATE = {
   // Wallet is migrating / not unlocked
@@ -45876,27 +46115,7 @@ var APP_STATE = {
   //[x] Show if need to send trx or tokens
   TRANSACTIONS: 9,
   //[x] Show transactions record
-  SETTING: 10,
-  //[x] Show setting
-  ADD_TRC20_TOKEN: 11,
-  //[x] Show setting
-  TRONBANK: 12,
-  // [x] show TronBank page
-  TRONBANK_RECORD: 13,
-  //[x] show TronBankRecord page
-  TRONBANK_DETAIL: 14,
-  //[X] show TronBankDetail page
-  TRONBANK_HELP: 15,
-  USDT_INCOME_RECORD: 16,
-  //[X] income record for usdt
-  USDT_ACTIVITY_DETAIL: 17,
-  DAPP_LIST: 18,
-  // [X]show dapp list
-  ASSET_MANAGE: 19,
-  // [X]asset manage
-  TRANSACTION_DETAIL: 20,
-  // [X] transaction detail
-  DAPP_WHITELIST: 21 // [X] transaction detail
+  SETTING: 10 //[x] Show setting
 
 }; // User can delete *all* accounts. This will set the appState to UNLOCKED.
 
@@ -46003,6 +46222,133 @@ var USDT_ACTIVITY_STAGE = {
     stage: 7
   }
 };
+// CONCATENATED MODULE: ./services/WalletService/index.js
+
+
+
+
+
+
+
+
+
+
+
+
+
+var WalletService_logger = new logger_Logger('WalletService');
+
+var WalletService_Wallet =
+/*#__PURE__*/
+function (_EventEmitter) {
+  inherits_default()(Wallet, _EventEmitter);
+
+  function Wallet() {
+    var _this;
+
+    classCallCheck_default()(this, Wallet);
+
+    _this = possibleConstructorReturn_default()(this, getPrototypeOf_default()(Wallet).call(this));
+    _this.state = APP_STATE.UNINITIALISED;
+    _this.selectedChain = false;
+    _this.chains = {};
+    return _this;
+  }
+
+  createClass_default()(Wallet, [{
+    key: "loadChains",
+    value: function loadChains() {}
+  }, {
+    key: "getSetting",
+    value: function getSetting() {
+      return services_StorageService.getSetting();
+    }
+  }]);
+
+  return Wallet;
+}(eventemitter3_default.a);
+
+/* harmony default export */ var WalletService = (WalletService_Wallet);
+// CONCATENATED MODULE: ./services/NodeService/index.js
+
+
+function NodeService_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { keys.push.apply(keys, Object.getOwnPropertySymbols(object)); } if (enumerableOnly) keys = keys.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); return keys; }
+
+function NodeService_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { NodeService_ownKeys(source, true).forEach(function (key) { defineProperty_default()(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { NodeService_ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+
+var NodeService = {
+  _nodes: {
+    'f0b1e38e-7bee-485e-9d3f-69410bf30681': {
+      type: 'TRON',
+      name: 'Mainnet',
+      decimal: 6,
+      logo: '',
+      apiUrl: '',
+      apiKey: '',
+      endPoint: 'https://api.trongrid.io',
+      "default": true // false
+
+    },
+    '6739be94-ee43-46af-9a62-690cf0947269': {
+      type: 'TRON',
+      name: 'Shasta Testnet',
+      decimal: 6,
+      logo: '',
+      apiUrl: '',
+      apiKey: '',
+      endPoint: 'https://api.shasta.trongrid.io',
+      "default": true
+    },
+    '6739be94-ee43-46af-9a62-690cf0947280': {
+      type: 'ETH',
+      name: 'Ethereum',
+      decimal: 18,
+      logo: '',
+      apiUrl: '',
+      apiKey: 'BGEU4V19ZPHVJSHUM3UDFXZ9BSBQM2FM88',
+      endPoint: 'https://mainnet.infura.io/v3/9a150d3a322645268224160ebf5b8599',
+      "default": true
+    },
+    '6739be94-ee43-46af-9a62-690cf0947281': {
+      type: 'ETH_RINKEBY',
+      name: 'Rinkeby',
+      decimal: 18,
+      logo: '',
+      apiUrl: '',
+      apiKey: 'BGEU4V19ZPHVJSHUM3UDFXZ9BSBQM2FM88',
+      endPoint: 'https://rinkeby.infura.io/v3/9a150d3a322645268224160ebf5b8599',
+      "default": true
+    }
+  },
+  _selectedNode: '6739be94-ee43-46af-9a62-690cf0947269',
+  _read: function _read() {
+    var _StorageService$nodes = StorageService.nodes,
+        _StorageService$nodes2 = _StorageService$nodes.nodeList,
+        nodeList = _StorageService$nodes2 === void 0 ? {} : _StorageService$nodes2,
+        _StorageService$nodes3 = _StorageService$nodes.selectedNode,
+        selectedNode = _StorageService$nodes3 === void 0 ? false : _StorageService$nodes3;
+    this._nodes = NodeService_objectSpread({}, this._nodes, {}, nodeList);
+    if (selectedNode) this._selectedNode = selectedNode;
+  },
+  init: function init() {
+    this._read();
+  },
+  getNodes: function getNodes() {
+    return {
+      nodes: this._nodes,
+      selected: this._selectedNode
+    };
+  },
+  addNode: function addNode(node) {
+    var nodeID = v4_default()();
+    this._nodes[nodeID] = NodeService_objectSpread({}, node, {
+      "default": false
+    });
+    return nodeID;
+  }
+};
+/* harmony default export */ var services_NodeService = (NodeService);
 // EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/redux-starter-kit/dist/redux-starter-kit.umd.js
 var redux_starter_kit_umd = __webpack_require__("../../node_modules/redux-starter-kit/dist/redux-starter-kit.umd.js");
 
@@ -46090,6 +46436,9 @@ var appReducer = Object(redux_starter_kit_umd["createReducer"])({
   // Data requesting
   requestState: function requestState() {
     return this.duplex.send('requestState');
+  },
+  getNodes: function getNodes() {
+    return this.duplex.send('getNodes');
   },
   changeState: function changeState(appState) {
     return this.duplex.send('changeState', appState, false);
@@ -46225,19 +46574,27 @@ var package_0 = __webpack_require__("./package.json");
 
 
 
+
+
 var duplex = new MessageDuplex.Host();
 var index_logger = new logger_Logger('background');
 var background = {
+  walletService: utils.requestHandler(new WalletService()),
+  nodeService: utils.requestHandler(services_NodeService),
   run: function run() {
     api_BackgroundAPI.init(duplex);
     this.bindPopupDuplex();
     this.bindTabDuplex();
   },
   bindPopupDuplex: function bindPopupDuplex() {
-    duplex.on('getSetting', function (_ref) {
+    var _this = this;
+
+    duplex.on('getSetting', this.walletService.getSetting);
+    duplex.on('requestState', function (_ref) {
       var resolve = _ref.resolve;
-      return resolve(11);
+      return resolve(_this.walletService.state);
     });
+    duplex.on('getNodes', this.nodeService.getNodes);
   },
   bindTabDuplex: function bindTabDuplex() {
     duplex.on('tabRequest',

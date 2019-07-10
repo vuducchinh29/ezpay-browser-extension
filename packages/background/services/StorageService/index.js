@@ -39,6 +39,15 @@ const StorageService = {
     language: '',
     ready: false,
     password: false,
+    setting: {
+        lock: {
+            lockTime: 0,
+            duration: 0
+        },
+        openAccountsMenu:false,
+        advertising: {},
+        developmentMode: location.hostname !== 'ibnejdfjmmkpcnlpebklmnkoeoihofec'
+    },
 
     hasAccount(address) {
         // This is the most disgusting piece of code I've ever written.

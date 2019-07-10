@@ -15,6 +15,10 @@ export default {
         return this.duplex.send('requestState');
     },
 
+    getNodes() {
+        return this.duplex.send('getNodes');
+    },
+
     changeState(appState) {
         return this.duplex.send('changeState', appState, false);
     },

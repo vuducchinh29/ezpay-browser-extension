@@ -44,7 +44,7 @@ const NodeService = {
         }
     },
 
-    _selectedNode: '6739be94-ee43-46af-9a62-690cf0947281',
+    _selectedNode: '6739be94-ee43-46af-9a62-690cf0947269',
 
     _read() {
         const {

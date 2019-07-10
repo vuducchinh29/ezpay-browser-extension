@@ -14,7 +14,7 @@ class App extends React.Component {
 
     render() {
         const { appState,language } = this.props;
-        let dom = <RegistrationController language={language} />;
+        let dom = null;
 
         switch(appState) {
             case APP_STATE.UNINITIALISED:
