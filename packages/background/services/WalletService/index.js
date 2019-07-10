@@ -5,11 +5,19 @@ import axios from 'axios';
 import extensionizer from 'extensionizer';
 import Utils from '@ezpay/lib/utils';
 
+const logger = new Logger('WalletService');
+
 class Wallet extends EventEmitter {
     constructor() {
         super();
 
-        this.state = 'APP_STATE.UNINITIALISED';
+        this.state = 'UNINITIALISED';
+        this.selectedChain = false;
+        this.chains = {};
+    }
+
+    loadChains() {
+
     }
 }
 

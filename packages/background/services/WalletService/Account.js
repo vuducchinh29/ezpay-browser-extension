@@ -6,8 +6,15 @@ import { BigNumber } from 'bignumber.js';
 const logger = new Logger('WalletService/Account');
 
 class Account {
-    constructor(accountType, importData, accountIndex = 0) {
+    constructor(type, importData, accountIndex = 0) {
+        this.type = type;
+        this.accountIndex = accountIndex;
 
+        this.address = false;
+        this.name = false;
+        this.transactions = {};
+        this.ignoredTransactions = [];
+        this.tokens = {};
     }
 }
 
