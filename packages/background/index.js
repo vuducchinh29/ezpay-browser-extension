@@ -33,14 +33,14 @@ const background = {
         duplex.on('tabRequest', async ({ hostname, resolve, data: { action, data, uuid } }) => {
             switch(action) {
                 case 'init': {
-                    console.log('initxxx')
+                    console.log('initxxx');
                     break;
                 } case 'sign': {
-                    console.log('signxxx')
+                    console.log('signxxx');
                     break;
                 }
             }
-        })
+        });
     }
 };
 

@@ -22,6 +22,13 @@ export const ACCOUNT_TYPE = {
     PRIVATE_KEY: 1
 };
 
+export const CHAIN_TYPE = {
+    TRON: 'TRON',
+    ETH: 'ETH',
+    BTC: 'BTC',
+    LTC: 'LTC'
+};
+
 export const VALIDATION_STATE = {
     NONE: 'no-state',
     INVALID: 'is-invalid',

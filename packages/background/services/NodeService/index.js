@@ -7,8 +7,6 @@ const NodeService = {
             name: 'Mainnet',
             decimal: 6,
             logo: '',
-            apiUrl: '',
-            apiKey: '',
             endPoint: 'https://api.trongrid.io',
             default: true // false
         },
@@ -17,8 +15,6 @@ const NodeService = {
             name: 'Shasta Testnet',
             decimal: 6,
             logo: '',
-            apiUrl: '',
-            apiKey: '',
             endPoint: 'https://api.shasta.trongrid.io',
             default: true
         },
@@ -27,18 +23,14 @@ const NodeService = {
             name: 'Ethereum',
             decimal: 18,
             logo: '',
-            apiUrl: '',
-            apiKey: 'BGEU4V19ZPHVJSHUM3UDFXZ9BSBQM2FM88',
             endPoint: 'https://mainnet.infura.io/v3/9a150d3a322645268224160ebf5b8599',
             default: true
         },
         '6739be94-ee43-46af-9a62-690cf0947281': {
-            type: 'ETH_RINKEBY',
+            type: 'ETH',
             name: 'Rinkeby',
             decimal: 18,
             logo: '',
-            apiUrl: '',
-            apiKey: 'BGEU4V19ZPHVJSHUM3UDFXZ9BSBQM2FM88',
             endPoint: 'https://rinkeby.infura.io/v3/9a150d3a322645268224160ebf5b8599',
             default: true
         }
@@ -66,10 +58,11 @@ const NodeService = {
     },
 
     getNodes() {
-        return {
-            nodes: this._nodes,
-            selected: this._selectedNode
-        };
+        return this._nodes;
+    },
+
+    getSelectedNode() {
+        return this._selectedNode;
     },
 
     addNode(node) {
@@ -82,6 +75,6 @@ const NodeService = {
 
         return nodeID;
     }
-}
+};
 
 export default NodeService;

@@ -1,16 +1,15 @@
-import Utils from '@tronlink/lib/utils';
+import Utils from '@ezpay/lib/utils';
 
 class Chain {
-    constructor(type, endPoint, decimal, apiUrl, apiKey) {
-        this.type = type;
-        this.endPoint = endPoint;
-        this.decimal = decimal;
-        this.apiUrl = apiUrl;
-        this.apiKey = apiKey;
+    constructor(params) {
+        this.type = params.type;
+        this.endPoint = params.endPoint;
+        this.decimal = params.decimal;
+        this.ezWeb = params.ezWeb;
 
         this.accounts = {};
         this.selectedAccount = false;
     }
 }
 
-export default Chain
+export default Chain;
