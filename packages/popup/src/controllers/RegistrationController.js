@@ -104,10 +104,12 @@ class RegistrationController extends React.Component {
                                 null
                         }
                     </div>
-                    <Button
-                        id='BUTTON.CONTINUE'
-                        tabIndex={ 3 }
-                    />
+                    <div className="div-button">
+                        <Button
+                            id='BUTTON.CONTINUE'
+                            tabIndex={ 3 }
+                        />
+                    </div>
                     <div className="passwordNotForgot">
                         <FormattedMessage id='PASSWORD_TIP.NOT_FORGOT' />
                     </div>
