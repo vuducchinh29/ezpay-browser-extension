@@ -71331,7 +71331,7 @@ var StorageService_StorageService = {
   tokenCache: {},
   selectedAccount: false,
   selectedToken: {},
-  language: '',
+  language: 'en',
   ready: false,
   password: false,
   setting: {
@@ -71731,9 +71731,20 @@ function (_EventEmitter) {
       });
     }
   }, {
+    key: "setLanguage",
+    value: function setLanguage(language) {
+      services_StorageService.setLanguage(language);
+      this.emit('setLanguage', language);
+    }
+  }, {
     key: "getSetting",
     value: function getSetting() {
       return services_StorageService.getSetting();
+    }
+  }, {
+    key: "getLanguage",
+    value: function getLanguage() {
+      return services_StorageService.language;
     }
   }]);
 
@@ -71756,7 +71767,7 @@ var setNodes = Object(redux_starter_kit_umd["createAction"])('setNodes');
 var setPage = Object(redux_starter_kit_umd["createAction"])('setPage');
 var setPriceList = Object(redux_starter_kit_umd["createAction"])('setPriceList');
 var setCurrency = Object(redux_starter_kit_umd["createAction"])('setCurrency');
-var setLanguage = Object(redux_starter_kit_umd["createAction"])('setLanguage');
+var appReducer_setLanguage = Object(redux_starter_kit_umd["createAction"])('setLanguage');
 var setSetting = Object(redux_starter_kit_umd["createAction"])('setSetting');
 var setVersion = Object(redux_starter_kit_umd["createAction"])('setVersion');
 var setDappList = Object(redux_starter_kit_umd["createAction"])('setDappList');
@@ -71799,7 +71810,7 @@ var appReducer = Object(redux_starter_kit_umd["createReducer"])({
 }), defineProperty_default()(_createReducer, setPage, function (state, _ref5) {
   var payload = _ref5.payload;
   state.currentPage = payload;
-}), defineProperty_default()(_createReducer, setLanguage, function (state, _ref6) {
+}), defineProperty_default()(_createReducer, appReducer_setLanguage, function (state, _ref6) {
   var payload = _ref6.payload;
   state.language = payload;
 }), defineProperty_default()(_createReducer, setSetting, function (state, _ref7) {
@@ -71887,6 +71898,12 @@ var appReducer = Object(redux_starter_kit_umd["createReducer"])({
   },
   setSetting: function setSetting(setting) {
     this.duplex.send('setSetting', setting, false);
+  },
+  getLanguage: function getLanguage() {
+    return this.duplex.send('getLanguage');
+  },
+  setLanguage: function setLanguage(language) {
+    this.duplex.send('setLanguage', language, false);
   }
 });
 // CONCATENATED MODULE: ../lib/api/handlers/BackgroundAPI.js
@@ -71986,7 +72003,10 @@ var background = {
       var resolve = _ref.resolve;
       return resolve(_this.walletService.state);
     });
-    duplex.on('getNodes', this.nodeService.getNodes);
+    duplex.on('getNodes', this.nodeService.getNodes); // language
+
+    duplex.on('getLanguage', this.walletService.getLanguage);
+    duplex.on('setLanguage', this.walletService.setLanguage);
   },
   bindTabDuplex: function bindTabDuplex() {
     duplex.on('tabRequest',

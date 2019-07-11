@@ -58,8 +58,17 @@ class Wallet extends EventEmitter {
         });
     }
 
+    setLanguage(language) {
+        StorageService.setLanguage(language);
+        this.emit('setLanguage', language);
+    }
+
     getSetting() {
         return StorageService.getSetting();
+    }
+
+    getLanguage() {
+        return StorageService.language;
     }
 }
 

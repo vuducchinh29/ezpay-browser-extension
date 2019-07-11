@@ -27,6 +27,10 @@ const background = {
             this.walletService.state
         ));
         duplex.on('getNodes', this.nodeService.getNodes);
+
+        // language
+        duplex.on('getLanguage', this.walletService.getLanguage);
+        duplex.on('setLanguage', this.walletService.setLanguage);
     },
 
     bindTabDuplex() {

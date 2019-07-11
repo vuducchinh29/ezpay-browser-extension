@@ -85,5 +85,13 @@ export default {
 
     setSetting(setting) {
         this.duplex.send('setSetting', setting, false);
-    }
+    },
+
+    getLanguage() {
+        return this.duplex.send('getLanguage');
+    },
+
+    setLanguage(language) {
+        this.duplex.send('setLanguage', language, false);
+    },
 }

@@ -36,7 +36,7 @@ const StorageService = {
     tokenCache: {},
     selectedAccount: false,
     selectedToken: {},
-    language: '',
+    language: 'en',
     ready: false,
     password: false,
     setting: {

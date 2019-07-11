@@ -77,15 +77,15 @@ export const app = {
         let [
             appState,
             nodes,
+            language,
             // accounts,
             // selectedAccount,
-            // language,
         ] = await Promise.all([
             PopupAPI.requestState(),
             PopupAPI.getNodes(),
+            PopupAPI.getLanguage(),
             // PopupAPI.getAccounts(),
             // PopupAPI.getSelectedAccount(),
-            // PopupAPI.getLanguage()
         ]);
         // const lang = navigator.language || navigator.browserLanguage;
         // if ( lang.indexOf('zh') > -1 ) {
@@ -97,9 +97,9 @@ export const app = {
         // }
         this.store.dispatch(setAppState(appState));
         this.store.dispatch(setNodes(nodes));
+        this.store.dispatch(setLanguage(language));
         // this.store.dispatch(setAccounts(accounts));
         // this.store.dispatch(setCurrency(prices.selected));
-        // this.store.dispatch(setLanguage(language));
         // this.store.dispatch(setSetting(setting));
         // if(selectedAccount)
         //     this.store.dispatch(setAccount(selectedAccount));
