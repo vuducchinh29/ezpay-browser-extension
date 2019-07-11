@@ -87,14 +87,15 @@ export const app = {
             // PopupAPI.getAccounts(),
             // PopupAPI.getSelectedAccount(),
         ]);
-        // const lang = navigator.language || navigator.browserLanguage;
-        // if ( lang.indexOf('zh') > -1 ) {
-        //     language = language || 'zh';
-        // } else if ( lang.indexOf('ja') > -1 ) {
-        //     language = language || 'ja';
-        // } else {
-        //     language = language || 'en';
-        // }
+        const lang = navigator.language || navigator.browserLanguage;
+        if ( lang.indexOf('zh') > -1 ) {
+            language = language || 'zh';
+        } else if ( lang.indexOf('ja') > -1 ) {
+            language = language || 'ja';
+        } else {
+            language = language || 'en';
+        }
+
         this.store.dispatch(setAppState(appState));
         this.store.dispatch(setNodes(nodes));
         this.store.dispatch(setLanguage(language));
@@ -116,13 +117,13 @@ export const app = {
         //     setToken(token)
         // ));
 
-        // this.duplex.on('setLanguage', language => this.store.dispatch(
-        //     setLanguage(language)
-        // ));
+        this.duplex.on('setLanguage', language => this.store.dispatch(
+            setLanguage(language)
+        ));
 
-        // this.duplex.on('setSetting', setting => this.store.dispatch(
-        //     setSetting(setting)
-        // ));
+        this.duplex.on('setSetting', setting => this.store.dispatch(
+            setSetting(setting)
+        ));
 
     },
 

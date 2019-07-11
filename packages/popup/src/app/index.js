@@ -3,6 +3,7 @@ import { IntlProvider, FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 
 import { APP_STATE } from '@ezpay/lib/constants';
+import { PopupAPI } from '@ezpay/lib/api';
 import RegistrationController from '@ezpay/popup/src/controllers/RegistrationController';
 import 'assets/styles/global.scss';
 
@@ -21,7 +22,9 @@ class App extends React.Component {
                 dom = <RegistrationController language={language} />;
                 break;
             default:
-                dom = <RegistrationController language={language} />;
+                dom = <div className='unsupportedState' onClick={ () => PopupAPI.resetState(APP_STATE.USDT_INCOME_RECORD) }>
+                        <FormattedMessage id='ERRORS.UNSUPPORTED_STATE' values={{ appState }} />
+                    </div>;
         }
 
         return (

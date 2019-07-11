@@ -15,6 +15,7 @@ export const APP_STATE = {
     SEND: 8, //[x] Show if need to send trx or tokens
     TRANSACTIONS: 9, //[x] Show transactions record
     SETTING: 10, //[x] Show setting
+    USDT_INCOME_RECORD: 11, //[X] income record for usdt
 }; // User can delete *all* accounts. This will set the appState to UNLOCKED.
 
 export const ACCOUNT_TYPE = {

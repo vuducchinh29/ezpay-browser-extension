@@ -71546,7 +71546,9 @@ var APP_STATE = {
   //[x] Show if need to send trx or tokens
   TRANSACTIONS: 9,
   //[x] Show transactions record
-  SETTING: 10 //[x] Show setting
+  SETTING: 10,
+  //[x] Show setting
+  USDT_INCOME_RECORD: 11 //[X] income record for usdt
 
 }; // User can delete *all* accounts. This will set the appState to UNLOCKED.
 
@@ -71678,6 +71680,8 @@ var USDT_ACTIVITY_STAGE = {
 
 
 
+
+
 var WalletService_logger = new logger_Logger('WalletService');
 
 var WalletService_Wallet =
@@ -71745,6 +71749,42 @@ function (_EventEmitter) {
     key: "getLanguage",
     value: function getLanguage() {
       return services_StorageService.language;
+    }
+  }, {
+    key: "resetState",
+    value: function () {
+      var _resetState = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee() {
+        return regenerator_default.a.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                WalletService_logger.info('Resetting app state');
+                return _context.abrupt("return", this._setState(APP_STATE.UNINITIALISED));
+
+              case 2:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function resetState() {
+        return _resetState.apply(this, arguments);
+      }
+
+      return resetState;
+    }()
+  }, {
+    key: "_setState",
+    value: function _setState(appState) {
+      if (this.state === appState) return;
+      WalletService_logger.info("Setting app state to ".concat(appState));
+      this.state = appState;
+      this.emit('newState', appState);
+      return appState;
     }
   }]);
 
@@ -71846,7 +71886,7 @@ var appReducer = Object(redux_starter_kit_umd["createReducer"])({
   changeState: function changeState(appState) {
     return this.duplex.send('changeState', appState, false);
   },
-  resetState: function resetState() {
+  resetState: function resetState(state) {
     return this.duplex.send('resetState', {}, false);
   },
   getPrices: function getPrices() {
@@ -72007,6 +72047,7 @@ var background = {
 
     duplex.on('getLanguage', this.walletService.getLanguage);
     duplex.on('setLanguage', this.walletService.setLanguage);
+    duplex.on('resetState', this.walletService.resetState);
   },
   bindTabDuplex: function bindTabDuplex() {
     duplex.on('tabRequest',

@@ -23,7 +23,7 @@ export default {
         return this.duplex.send('changeState', appState, false);
     },
 
-    resetState() {
+    resetState(state) {
         return this.duplex.send('resetState', {}, false);
     },
 

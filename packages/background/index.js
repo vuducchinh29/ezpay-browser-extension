@@ -31,6 +31,7 @@ const background = {
         // language
         duplex.on('getLanguage', this.walletService.getLanguage);
         duplex.on('setLanguage', this.walletService.setLanguage);
+        duplex.on('resetState', this.walletService.resetState);
     },
 
     bindTabDuplex() {

@@ -70,6 +70,24 @@ class Wallet extends EventEmitter {
     getLanguage() {
         return StorageService.language;
     }
+
+    async resetState() {
+        logger.info('Resetting app state');
+
+        return this._setState(APP_STATE.UNINITIALISED);
+    }
+
+    _setState(appState) {
+        if(this.state === appState)
+            return;
+
+        logger.info(`Setting app state to ${ appState }`);
+
+        this.state = appState;
+        this.emit('newState', appState);
+
+        return appState;
+    }
 }
 
 export default Wallet;
