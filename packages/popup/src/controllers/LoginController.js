@@ -63,7 +63,7 @@ class LoginController extends React.Component {
                         <div className='logo2'></div>
                     </div>
                     <div className='pageHeaderText'>
-                        <FormattedMessage id='LOGIN.PASSWORD.BACK' />
+
                     </div>
                 </div>
                 { error ? (
