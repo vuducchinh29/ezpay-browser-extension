@@ -35,6 +35,11 @@ export default {
         return this.duplex.send('getConfirmations');
     },
 
+    // Wallet authentication
+    setPassword(password) {
+        return this.duplex.send('setPassword', password);
+    },
+
     // Confirmation actions
 
     acceptConfirmation(whitelistDuration) {
@@ -93,5 +98,9 @@ export default {
 
     setLanguage(language) {
         this.duplex.send('setLanguage', language, false);
+    },
+
+    unlockWallet(password) {
+        return this.duplex.send('unlockWallet', password);
     },
 }

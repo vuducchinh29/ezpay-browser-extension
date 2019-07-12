@@ -70425,6 +70425,7 @@ function extend() {
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/regenerator/index.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@tronscan/client/src/utils/crypto.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/aes-js/index.js (<- Module is not an ECMAScript module) */
+/*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/axios/index.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/bip32/index.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/bip39/index.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/crypto-browserify/index.js (<- Module is not an ECMAScript module) */
@@ -71256,6 +71257,7 @@ var Utils = {
 /* harmony default export */ var utils = (Utils);
 // EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/axios/index.js
 var axios = __webpack_require__("../../node_modules/axios/index.js");
+var axios_default = /*#__PURE__*/__webpack_require__.n(axios);
 
 // EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/bignumber.js/bignumber.js
 var bignumber = __webpack_require__("../../node_modules/bignumber.js/bignumber.js");
@@ -71287,148 +71289,6 @@ var Account_Account = function Account(type, importData) {
 var objectWithoutProperties = __webpack_require__("../../node_modules/@babel/runtime/helpers/objectWithoutProperties.js");
 var objectWithoutProperties_default = /*#__PURE__*/__webpack_require__.n(objectWithoutProperties);
 
-// CONCATENATED MODULE: ./services/StorageService/index.js
-
-
-
-function StorageService_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { keys.push.apply(keys, Object.getOwnPropertySymbols(object)); } if (enumerableOnly) keys = keys.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); return keys; }
-
-function StorageService_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { StorageService_ownKeys(source, true).forEach(function (key) { defineProperty_default()(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { StorageService_ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-
-
-
-
-var StorageService_logger = new logger_Logger('StorageService');
-var StorageService_StorageService = {
-  storage: extensionizer_default.a.storage.local,
-  prices: {
-    priceList: {
-      CNY: 0,
-      USD: 0,
-      GBP: 0,
-      EUR: 0,
-      BTC: 0,
-      ETH: 0
-    },
-    usdtPriceList: {
-      CNY: 0,
-      USD: 0,
-      GBP: 0,
-      EUR: 0,
-      BTC: 0,
-      ETH: 0
-    },
-    selected: 'USD'
-  },
-  nodes: {
-    nodeList: {},
-    selectedNode: false
-  },
-  pendingTransactions: {},
-  accounts: {},
-  transactions: {},
-  tokenCache: {},
-  selectedAccount: false,
-  selectedToken: {},
-  language: 'en',
-  ready: false,
-  password: false,
-  setting: {
-    lock: {
-      lockTime: 0,
-      duration: 0
-    },
-    openAccountsMenu: false,
-    advertising: {},
-    developmentMode: location.hostname !== 'ibnejdfjmmkpcnlpebklmnkoeoihofec'
-  },
-  hasAccount: function hasAccount(address) {
-    // This is the most disgusting piece of code I've ever written.
-    return address in this.accounts;
-  },
-  selectAccount: function selectAccount(address) {
-    StorageService_logger.info("Storing selected account: ".concat(address));
-    this.selectedAccount = address;
-    this.save('selectedAccount');
-  },
-  getAccounts: function getAccounts() {
-    var _this = this;
-
-    var accounts = {};
-    Object.keys(this.accounts).forEach(function (address) {
-      accounts[address] = StorageService_objectSpread({
-        transactions: _this.transactions[address] || []
-      }, _this.accounts[address]);
-    });
-    return accounts;
-  },
-  getAccount: function getAccount(address) {
-    var account = this.accounts[address];
-    var transactions = this.transactions[address] || [];
-    return StorageService_objectSpread({
-      transactions: transactions
-    }, account);
-  },
-  deleteAccount: function deleteAccount(address) {
-    StorageService_logger.info('Deleting account', address);
-    delete this.accounts[address];
-    delete this.transactions[address];
-    this.save('accounts', 'transactions');
-  },
-  deleteNode: function deleteNode(nodeID) {
-    StorageService_logger.info('Deleting node', nodeID);
-    delete this.nodes.nodeList[nodeID];
-    this.save('nodes');
-  },
-  saveNode: function saveNode(nodeID, node) {
-    StorageService_logger.info('Saving node', node);
-    this.nodes.nodeList[nodeID] = node;
-    this.save('nodes');
-  },
-  selectNode: function selectNode(nodeID) {
-    StorageService_logger.info('Saving selected node', nodeID);
-    this.nodes.selectedNode = nodeID;
-    this.save('nodes');
-  },
-  saveAccount: function saveAccount(account) {
-    StorageService_logger.info('Saving account', account);
-
-    var transactions = account.transactions,
-        remaining = objectWithoutProperties_default()(account, ["transactions"]);
-
-    this.transactions[account.address] = transactions;
-    this.accounts[account.address] = remaining;
-    this.save('transactions', 'accounts');
-  },
-  setSelectedToken: function setSelectedToken(token) {
-    StorageService_logger.info('Saving selectedToken', token);
-    this.selectedToken = token;
-    this.save('selectedToken');
-  },
-  setLanguage: function setLanguage(language) {
-    StorageService_logger.info('Saving language', language);
-    this.language = language;
-    this.save('language');
-  },
-  setSetting: function setSetting(setting) {
-    StorageService_logger.info('Saving setting', setting);
-    this.setting = setting;
-    this.save('setting');
-  },
-  getSetting: function getSetting() {
-    if (!this.setting.hasOwnProperty('advertising')) this.setting.advertising = {};
-    return StorageService_objectSpread({}, this.setting, {
-      developmentMode: location.hostname !== 'ibnejdfjmmkpcnlpebklmnkoeoihofec'
-    });
-  },
-  authenticate: function authenticate(password) {
-    this.password = password;
-    this.ready = true;
-    StorageService_logger.info('Set storage password');
-  }
-};
-/* harmony default export */ var services_StorageService = (StorageService_StorageService);
 // CONCATENATED MODULE: ./services/NodeService/index.js
 
 
@@ -71501,6 +71361,515 @@ var NodeService = {
   }
 };
 /* harmony default export */ var services_NodeService = (NodeService);
+// CONCATENATED MODULE: ./services/StorageService/index.js
+
+
+
+
+
+
+function StorageService_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { keys.push.apply(keys, Object.getOwnPropertySymbols(object)); } if (enumerableOnly) keys = keys.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); return keys; }
+
+function StorageService_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { StorageService_ownKeys(source, true).forEach(function (key) { defineProperty_default()(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { StorageService_ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+
+
+
+
+
+var StorageService_logger = new logger_Logger('StorageService');
+var StorageService_StorageService = {
+  // We could instead scope the data so we don't need this array
+  storageKeys: ['accounts', 'nodes', 'transactions', 'selectedAccount', 'prices', 'pendingTransactions', 'tokenCache', 'setting', 'language', 'dappList', 'allDapps', 'allTokens', 'authorizeDapps'],
+  storage: extensionizer_default.a.storage.local,
+  prices: {
+    priceList: {
+      CNY: 0,
+      USD: 0,
+      GBP: 0,
+      EUR: 0,
+      BTC: 0,
+      ETH: 0
+    },
+    usdtPriceList: {
+      CNY: 0,
+      USD: 0,
+      GBP: 0,
+      EUR: 0,
+      BTC: 0,
+      ETH: 0
+    },
+    selected: 'USD'
+  },
+  nodes: {
+    nodeList: {},
+    selectedNode: false
+  },
+  pendingTransactions: {},
+  accounts: {},
+  transactions: {},
+  tokenCache: {},
+  selectedAccount: false,
+  selectedToken: {},
+  setting: {
+    lock: {
+      lockTime: 0,
+      duration: 0
+    },
+    openAccountsMenu: false,
+    advertising: {},
+    developmentMode: location.hostname !== 'ibnejdfjmmkpcnlpebklmnkoeoihofec'
+  },
+  language: '',
+  ready: false,
+  password: false,
+  dappList: {
+    recommend: [],
+    used: []
+  },
+  allDapps: [],
+  allTokens: [],
+  authorizeDapps: {},
+
+  get needsMigrating() {
+    return localStorage.hasOwnProperty('EZPAY_WALLET');
+  },
+
+  get hasAccounts() {
+    return Object.keys(this.accounts).length;
+  },
+
+  getStorage: function getStorage(key) {
+    var _this = this;
+
+    return new Promise(function (resolve) {
+      return _this.storage.get(key, function (data) {
+        if (key in data) return resolve(data[key]);
+        resolve(false);
+      });
+    });
+  },
+  dataExists: function () {
+    var _dataExists = asyncToGenerator_default()(
+    /*#__PURE__*/
+    regenerator_default.a.mark(function _callee() {
+      return regenerator_default.a.wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              _context.next = 2;
+              return this.getStorage('accounts');
+
+            case 2:
+              return _context.abrupt("return", !!_context.sent);
+
+            case 3:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, _callee, this);
+    }));
+
+    function dataExists() {
+      return _dataExists.apply(this, arguments);
+    }
+
+    return dataExists;
+  }(),
+  lock: function lock() {
+    this.ready = false;
+  },
+  unlock: function () {
+    var _unlock = asyncToGenerator_default()(
+    /*#__PURE__*/
+    regenerator_default.a.mark(function _callee2(password) {
+      var i, key, encrypted;
+      return regenerator_default.a.wrap(function _callee2$(_context2) {
+        while (1) {
+          switch (_context2.prev = _context2.next) {
+            case 0:
+              if (!this.ready) {
+                _context2.next = 3;
+                break;
+              }
+
+              StorageService_logger.error('Attempted to decrypt data whilst already unencrypted');
+              return _context2.abrupt("return", 'ERRORS.ALREADY_UNLOCKED');
+
+            case 3:
+              _context2.next = 5;
+              return this.dataExists();
+
+            case 5:
+              if (_context2.sent) {
+                _context2.next = 7;
+                break;
+              }
+
+              return _context2.abrupt("return", 'ERRORS.NOT_SETUP');
+
+            case 7:
+              _context2.prev = 7;
+              i = 0;
+
+            case 9:
+              if (!(i < this.storageKeys.length)) {
+                _context2.next = 20;
+                break;
+              }
+
+              key = this.storageKeys[i];
+              _context2.next = 13;
+              return this.getStorage(key);
+
+            case 13:
+              encrypted = _context2.sent;
+
+              if (encrypted) {
+                _context2.next = 16;
+                break;
+              }
+
+              return _context2.abrupt("continue", 17);
+
+            case 16:
+              this[key] = utils.decrypt(encrypted, password);
+
+            case 17:
+              i++;
+              _context2.next = 9;
+              break;
+
+            case 20:
+              _context2.next = 26;
+              break;
+
+            case 22:
+              _context2.prev = 22;
+              _context2.t0 = _context2["catch"](7);
+              StorageService_logger.warn('Failed to decrypt wallet (wrong password?):', _context2.t0);
+              return _context2.abrupt("return", 'ERRORS.INVALID_PASSWORD');
+
+            case 26:
+              StorageService_logger.info('Decrypted wallet data');
+              this.password = password;
+              this.ready = true;
+              return _context2.abrupt("return", false);
+
+            case 30:
+            case "end":
+              return _context2.stop();
+          }
+        }
+      }, _callee2, this, [[7, 22]]);
+    }));
+
+    function unlock(_x) {
+      return _unlock.apply(this, arguments);
+    }
+
+    return unlock;
+  }(),
+  hasAccount: function hasAccount(address) {
+    // This is the most disgusting piece of code I've ever written.
+    return address in this.accounts;
+  },
+  selectAccount: function selectAccount(address) {
+    StorageService_logger.info("Storing selected account: ".concat(address));
+    this.selectedAccount = address;
+    this.save('selectedAccount');
+  },
+  getAccounts: function getAccounts() {
+    var _this2 = this;
+
+    var accounts = {};
+    Object.keys(this.accounts).forEach(function (address) {
+      accounts[address] = StorageService_objectSpread({
+        transactions: _this2.transactions[address] || []
+      }, _this2.accounts[address]);
+    });
+    return accounts;
+  },
+  getAccount: function getAccount(address) {
+    var account = this.accounts[address];
+    var transactions = this.transactions[address] || [];
+    return StorageService_objectSpread({
+      transactions: transactions
+    }, account);
+  },
+  deleteAccount: function deleteAccount(address) {
+    StorageService_logger.info('Deleting account', address);
+    delete this.accounts[address];
+    delete this.transactions[address];
+    this.save('accounts', 'transactions');
+  },
+  deleteNode: function deleteNode(nodeID) {
+    StorageService_logger.info('Deleting node', nodeID);
+    delete this.nodes.nodeList[nodeID];
+    this.save('nodes');
+  },
+  saveNode: function saveNode(nodeID, node) {
+    StorageService_logger.info('Saving node', node);
+    this.nodes.nodeList[nodeID] = node;
+    this.save('nodes');
+  },
+  selectNode: function selectNode(nodeID) {
+    StorageService_logger.info('Saving selected node', nodeID);
+    this.nodes.selectedNode = nodeID;
+    this.save('nodes');
+  },
+  saveAccount: function saveAccount(account) {
+    StorageService_logger.info('Saving account', account);
+
+    var transactions = account.transactions,
+        remaining = objectWithoutProperties_default()(account, ["transactions"]);
+
+    this.transactions[account.address] = transactions;
+    this.accounts[account.address] = remaining;
+    this.save('transactions', 'accounts');
+  },
+  setSelectedToken: function setSelectedToken(token) {
+    StorageService_logger.info('Saving selectedToken', token);
+    this.selectedToken = token;
+    this.save('selectedToken');
+  },
+  setLanguage: function setLanguage(language) {
+    StorageService_logger.info('Saving language', language);
+    this.language = language;
+    this.save('language');
+  },
+  setSetting: function setSetting(setting) {
+    StorageService_logger.info('Saving setting', setting);
+    this.setting = setting;
+    this.save('setting');
+  },
+  getSetting: function getSetting() {
+    if (!this.setting.hasOwnProperty('advertising')) {
+      this.setting.advertising = {};
+    }
+
+    return StorageService_objectSpread({}, this.setting, {
+      developmentMode: location.hostname !== 'ibnejdfjmmkpcnlpebklmnkoeoihofec'
+    });
+  },
+  migrate: function migrate() {
+    try {
+      var storage = localStorage.getItem('EZPAY_WALLET');
+      var decrypted = utils.decrypt(JSON.parse(storage), this.password);
+      var accounts = decrypted.accounts,
+          currentAccount = decrypted.currentAccount;
+      return {
+        accounts: Object.values(accounts).map(function (_ref) {
+          var privateKey = _ref.privateKey,
+              name = _ref.name;
+          return {
+            privateKey: privateKey,
+            name: name
+          };
+        }),
+        selectedAccount: currentAccount
+      };
+    } catch (ex) {
+      StorageService_logger.info('Failed to migrate (wrong password?):', ex);
+      return {
+        error: true
+      };
+    }
+  },
+  authenticate: function authenticate(password) {
+    this.password = password;
+    this.ready = true;
+    StorageService_logger.info('Set storage password');
+  },
+  addPendingTransaction: function addPendingTransaction(address, txID) {
+    if (!(address in this.pendingTransactions)) this.pendingTransactions[address] = [];
+    if (this.pendingTransactions[address].some(function (tx) {
+      return tx.txID === txID;
+    })) return;
+    StorageService_logger.info('Adding pending transaction:', {
+      address: address,
+      txID: txID
+    });
+    this.pendingTransactions[address].push({
+      nextCheck: Date.now() + 5000,
+      txID: txID
+    });
+    this.save('pendingTransactions');
+  },
+  removePendingTransaction: function removePendingTransaction(address, txID) {
+    if (!(address in this.pendingTransactions)) return;
+    StorageService_logger.info('Removing pending transaction:', {
+      address: address,
+      txID: txID
+    });
+    this.pendingTransactions[address] = this.pendingTransactions[address].filter(function (transaction) {
+      return transaction.txID !== txID;
+    });
+    if (!this.pendingTransactions[address].length) delete this.pendingTransactions[address];
+    this.save('pendingTransactions');
+  },
+  getNextPendingTransaction: function getNextPendingTransaction(address) {
+    if (!(address in this.pendingTransactions)) return false;
+
+    var _this$pendingTransact = slicedToArray_default()(this.pendingTransactions[address], 1),
+        transaction = _this$pendingTransact[0];
+
+    if (!transaction) return false;
+    if (transaction.nextCheck < Date.now()) return false;
+    return transaction.txID;
+  },
+  setPrices: function setPrices(priceList, usdtPriceList) {
+    this.prices.priceList = priceList;
+    this.prices.usdtPriceList = usdtPriceList;
+    this.save('prices');
+  },
+  selectCurrency: function selectCurrency(currency) {
+    this.prices.selected = currency;
+    this.save('prices');
+  },
+  save: function save() {
+    var _this3 = this;
+
+    for (var _len = arguments.length, keys = new Array(_len), _key = 0; _key < _len; _key++) {
+      keys[_key] = arguments[_key];
+    }
+
+    if (!this.ready) return StorageService_logger.error('Attempted to write storage when not ready');
+    if (!keys.length) keys = this.storageKeys;
+    StorageService_logger.info("Writing storage for keys ".concat(keys.join(', ')));
+    keys.forEach(function (key) {
+      return _this3.storage.set(defineProperty_default()({}, key, utils.encrypt(_this3[key], _this3.password)));
+    });
+    StorageService_logger.info('Storage saved');
+  },
+  cacheToken: function () {
+    var _cacheToken = asyncToGenerator_default()(
+    /*#__PURE__*/
+    regenerator_default.a.mark(function _callee3(tokenID) {
+      var _ref2, data, _data$data$, name, abbr, _data$data$$precision, decimals, _data$data$$imgUrl, imgUrl, contract_address, _decimals, _name, _abbr, _ref3, _ref3$data$trc20_toke, _ref3$data$trc20_toke2, icon_url, _ref4, _name2, _abbr2, _ref4$precision, _decimals2;
+
+      return regenerator_default.a.wrap(function _callee3$(_context3) {
+        while (1) {
+          switch (_context3.prev = _context3.next) {
+            case 0:
+              if (!(services_NodeService.getNodes().selected === 'f0b1e38e-7bee-485e-9d3f-69410bf30681')) {
+                _context3.next = 24;
+                break;
+              }
+
+              if (!(typeof tokenID === 'string')) {
+                _context3.next = 14;
+                break;
+              }
+
+              if (!(tokenID === '_')) {
+                _context3.next = 6;
+                break;
+              }
+
+              this.tokenCache[tokenID] = {
+                name: 'TRX',
+                abbr: 'TRX',
+                decimals: 6
+              };
+              _context3.next = 12;
+              break;
+
+            case 6:
+              _context3.next = 8;
+              return axios_default.a.get('https://apilist.tronscan.org/api/token', {
+                params: {
+                  id: tokenID,
+                  showAll: 1
+                }
+              });
+
+            case 8:
+              _ref2 = _context3.sent;
+              data = _ref2.data;
+              _data$data$ = data.data[0], name = _data$data$.name, abbr = _data$data$.abbr, _data$data$$precision = _data$data$.precision, decimals = _data$data$$precision === void 0 ? 0 : _data$data$$precision, _data$data$$imgUrl = _data$data$.imgUrl, imgUrl = _data$data$$imgUrl === void 0 ? false : _data$data$$imgUrl;
+              this.tokenCache[tokenID] = {
+                name: name,
+                abbr: abbr,
+                decimals: decimals,
+                imgUrl: imgUrl
+              };
+
+            case 12:
+              _context3.next = 22;
+              break;
+
+            case 14:
+              contract_address = tokenID.contract_address, _decimals = tokenID.decimals, _name = tokenID.name, _abbr = tokenID.abbr;
+              _context3.next = 17;
+              return axios_default.a.get('https://apilist.tronscan.org/api/token_trc20?contract=' + contract_address);
+
+            case 17:
+              _ref3 = _context3.sent;
+              _ref3$data$trc20_toke = slicedToArray_default()(_ref3.data.trc20_tokens, 1);
+              _ref3$data$trc20_toke2 = _ref3$data$trc20_toke[0].icon_url;
+              icon_url = _ref3$data$trc20_toke2 === void 0 ? false : _ref3$data$trc20_toke2;
+              this.tokenCache[contract_address] = {
+                name: _name,
+                abbr: _abbr,
+                decimals: _decimals,
+                imgUrl: icon_url
+              };
+
+            case 22:
+              _context3.next = 32;
+              break;
+
+            case 24:
+              _context3.next = 26;
+              return services_NodeService.tronWeb.trx.getTokenFromID(tokenID);
+
+            case 26:
+              _ref4 = _context3.sent;
+              _name2 = _ref4.name;
+              _abbr2 = _ref4.abbr;
+              _ref4$precision = _ref4.precision;
+              _decimals2 = _ref4$precision === void 0 ? 0 : _ref4$precision;
+              this.tokenCache[tokenID] = {
+                name: _name2,
+                abbr: _abbr2,
+                decimals: _decimals2
+              };
+
+            case 32:
+              StorageService_logger.info("Cached token ".concat(tokenID, ":"), this.tokenCache[tokenID]);
+              this.save('tokenCache');
+
+            case 34:
+            case "end":
+              return _context3.stop();
+          }
+        }
+      }, _callee3, this);
+    }));
+
+    function cacheToken(_x2) {
+      return _cacheToken.apply(this, arguments);
+    }
+
+    return cacheToken;
+  }(),
+  saveAllTokens: function saveAllTokens(tokens) {
+    this.allTokens = tokens;
+    this.save('allTokens');
+  },
+  setAuthorizeDapps: function setAuthorizeDapps(authorizeDapps) {
+    this.authorizeDapps = authorizeDapps;
+    this.save('authorizeDapps');
+  },
+  purge: function purge() {
+    this.storage.set({
+      transactions: utils.encrypt({}, this.password)
+    });
+  }
+};
+/* harmony default export */ var services_StorageService = (StorageService_StorageService);
 // CONCATENATED MODULE: ./services/WalletService/Chain.js
 
 
@@ -71700,12 +72069,59 @@ function (_EventEmitter) {
     _this.chains = {};
     _this.nodeService = utils.requestHandler(services_NodeService);
 
+    _this._checkStorage();
+
     _this._initChains();
 
     return _this;
   }
 
   createClass_default()(Wallet, [{
+    key: "_checkStorage",
+    value: function () {
+      var _checkStorage2 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee() {
+        return regenerator_default.a.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.next = 2;
+                return services_StorageService.dataExists();
+
+              case 2:
+                _context.t0 = _context.sent;
+
+                if (_context.t0) {
+                  _context.next = 5;
+                  break;
+                }
+
+                _context.t0 = services_StorageService.needsMigrating;
+
+              case 5:
+                if (!_context.t0) {
+                  _context.next = 7;
+                  break;
+                }
+
+                this._setState(APP_STATE.PASSWORD_SET);
+
+              case 7:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function _checkStorage() {
+        return _checkStorage2.apply(this, arguments);
+      }
+
+      return _checkStorage;
+    }()
+  }, {
     key: "_initChains",
     value: function _initChains() {
       var _this2 = this;
@@ -71755,20 +72171,20 @@ function (_EventEmitter) {
     value: function () {
       var _resetState = asyncToGenerator_default()(
       /*#__PURE__*/
-      regenerator_default.a.mark(function _callee() {
-        return regenerator_default.a.wrap(function _callee$(_context) {
+      regenerator_default.a.mark(function _callee2() {
+        return regenerator_default.a.wrap(function _callee2$(_context2) {
           while (1) {
-            switch (_context.prev = _context.next) {
+            switch (_context2.prev = _context2.next) {
               case 0:
                 WalletService_logger.info('Resetting app state');
-                return _context.abrupt("return", this._setState(APP_STATE.UNINITIALISED));
+                return _context2.abrupt("return", this._setState(APP_STATE.UNINITIALISED));
 
               case 2:
               case "end":
-                return _context.stop();
+                return _context2.stop();
             }
           }
-        }, _callee, this);
+        }, _callee2, this);
       }));
 
       function resetState() {
@@ -71786,6 +72202,94 @@ function (_EventEmitter) {
       this.emit('newState', appState);
       return appState;
     }
+  }, {
+    key: "setPassword",
+    value: function setPassword(password) {
+      if (this.state !== APP_STATE.UNINITIALISED) return Promise.reject('ERRORS.ALREADY_INITIALISED');
+      services_StorageService.authenticate(password);
+      services_StorageService.save();
+      WalletService_logger.info('User has set a password');
+
+      this._setState(APP_STATE.READY);
+    }
+  }, {
+    key: "unlockWallet",
+    value: function () {
+      var _unlockWallet = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee3(password) {
+        var success, unlockFailed;
+        return regenerator_default.a.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                if (!(this.state !== APP_STATE.PASSWORD_SET)) {
+                  _context3.next = 3;
+                  break;
+                }
+
+                WalletService_logger.error('Attempted to unlock wallet whilst not in PASSWORD_SET state');
+                return _context3.abrupt("return", Promise.reject('ERRORS.NOT_LOCKED'));
+
+              case 3:
+                if (!services_StorageService.needsMigrating) {
+                  _context3.next = 8;
+                  break;
+                }
+
+                success = this.migrate(password);
+
+                if (success) {
+                  _context3.next = 7;
+                  break;
+                }
+
+                return _context3.abrupt("return", Promise.reject('ERRORS.INVALID_PASSWORD'));
+
+              case 7:
+                return _context3.abrupt("return");
+
+              case 8:
+                _context3.next = 10;
+                return services_StorageService.unlock(password);
+
+              case 10:
+                unlockFailed = _context3.sent;
+
+                if (!unlockFailed) {
+                  _context3.next = 14;
+                  break;
+                }
+
+                WalletService_logger.error("Failed to unlock wallet: ".concat(unlockFailed));
+                return _context3.abrupt("return", Promise.reject(unlockFailed));
+
+              case 14:
+                if (services_StorageService.hasAccounts) {
+                  _context3.next = 17;
+                  break;
+                }
+
+                WalletService_logger.info('Wallet does not have any accounts');
+                return _context3.abrupt("return", this._setState(APP_STATE.READY));
+
+              case 17:
+                this._setState(APP_STATE.READY);
+
+              case 18:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function unlockWallet(_x) {
+        return _unlockWallet.apply(this, arguments);
+      }
+
+      return unlockWallet;
+    }()
   }]);
 
   return Wallet;
@@ -71895,6 +72399,10 @@ var appReducer = Object(redux_starter_kit_umd["createReducer"])({
   getConfirmations: function getConfirmations() {
     return this.duplex.send('getConfirmations');
   },
+  // Wallet authentication
+  setPassword: function setPassword(password) {
+    return this.duplex.send('setPassword', password);
+  },
   // Confirmation actions
   acceptConfirmation: function acceptConfirmation(whitelistDuration) {
     return this.duplex.send('acceptConfirmation', whitelistDuration, false);
@@ -71944,6 +72452,9 @@ var appReducer = Object(redux_starter_kit_umd["createReducer"])({
   },
   setLanguage: function setLanguage(language) {
     this.duplex.send('setLanguage', language, false);
+  },
+  unlockWallet: function unlockWallet(password) {
+    return this.duplex.send('unlockWallet', password);
   }
 });
 // CONCATENATED MODULE: ../lib/api/handlers/BackgroundAPI.js
@@ -72034,6 +72545,7 @@ var background = {
     api_BackgroundAPI.init(duplex);
     this.bindPopupDuplex();
     this.bindTabDuplex();
+    this.bindWalletEvents();
   },
   bindPopupDuplex: function bindPopupDuplex() {
     var _this = this;
@@ -72048,6 +72560,15 @@ var background = {
     duplex.on('getLanguage', this.walletService.getLanguage);
     duplex.on('setLanguage', this.walletService.setLanguage);
     duplex.on('resetState', this.walletService.resetState);
+    duplex.on('setPassword', this.walletService.setPassword);
+    duplex.on('unlockWallet', this.walletService.unlockWallet);
+  },
+  bindWalletEvents: function bindWalletEvents() {
+    this.walletService.on('newState', function (appState) {
+      return api_BackgroundAPI.setState(appState);
+    }); // this.walletService.on('setAccount', address => BackgroundAPI.setAccount(
+    //     this.walletService.getAccountDetails(address)
+    // ));
   },
   bindTabDuplex: function bindTabDuplex() {
     duplex.on('tabRequest',

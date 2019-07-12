@@ -5,6 +5,9 @@ import { connect } from 'react-redux';
 import { APP_STATE } from '@ezpay/lib/constants';
 import { PopupAPI } from '@ezpay/lib/api';
 import RegistrationController from '@ezpay/popup/src/controllers/RegistrationController';
+import HomeController from '@ezpay/popup/src/controllers/HomeController';
+import LoginController from '@ezpay/popup/src/controllers/LoginController';
+
 import 'assets/styles/global.scss';
 
 import enMessages from '@ezpay/popup/src/translations/en.json';
@@ -20,6 +23,12 @@ class App extends React.Component {
         switch(appState) {
             case APP_STATE.UNINITIALISED:
                 dom = <RegistrationController language={language} />;
+                break;
+            case APP_STATE.PASSWORD_SET:
+                dom = <LoginController />;
+                break;
+            case APP_STATE.READY:
+                dom = <HomeController />;
                 break;
             default:
                 dom = <div className='unsupportedState' onClick={ () => PopupAPI.resetState(APP_STATE.USDT_INCOME_RECORD) }>

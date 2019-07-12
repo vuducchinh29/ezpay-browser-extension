@@ -13,6 +13,7 @@
 
     "BUTTON.UNKNOWN": "Unknown button type",
     "BUTTON.CONTINUE": "Register",
+    "BUTTON.LOGIN": "Login",
     "BUTTON.CREATE_WALLET": "Create Account",
     "BUTTON.CANCEL": "Cancel",
     "BUTTON.GO_BACK": "Go back",
@@ -39,7 +40,13 @@
     "PAGES.TOKENS": "Tokens",
     "PAGES.SEND": "Send",
     "PAGES.SETTINGS": "Settings",
+
+    "PASSWORD_CRITERIA.HAS_LENGTH": "Contains at least <strong>six</strong> characters",
+    "PASSWORD_CRITERIA.HAS_SPECIAL": "Contains either a <strong>symbol</strong> or <strong>number</strong>",
+    "PASSWORD_CRITERIA.NO_REPEAT": "The two <strong>passwords</strong> you entered did not <strong>match</strong>",
     "PASSWORD_TIP.NOT_FORGOT":"Remember the password, you can't retrieve it if you forget it.",
     "INPUT.PASSWORD": "Local passcode",
-    "INPUT.REPEAT_PASSWORD": "Repeat local passcode"
+    "INPUT.REPEAT_PASSWORD": "Repeat local passcode",
+
+    "LOGIN.PASSWORD.BACK":"Welcome back"
 }

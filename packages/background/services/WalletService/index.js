@@ -27,7 +27,13 @@ class Wallet extends EventEmitter {
         this.chains = {};
         this.nodeService = Utils.requestHandler(NodeService);
 
+        this._checkStorage();
         this._initChains();
+    }
+
+    async _checkStorage() {
+        if(await StorageService.dataExists() || StorageService.needsMigrating)
+            this._setState(APP_STATE.PASSWORD_SET); // initstatus APP_STATE.PASSWORD_SET
     }
 
     _initChains() {
@@ -87,6 +93,46 @@ class Wallet extends EventEmitter {
         this.emit('newState', appState);
 
         return appState;
+    }
+
+    setPassword(password) {
+        if(this.state !== APP_STATE.UNINITIALISED)
+            return Promise.reject('ERRORS.ALREADY_INITIALISED');
+
+        StorageService.authenticate(password);
+        StorageService.save();
+
+        logger.info('User has set a password');
+        this._setState(APP_STATE.READY);
+    }
+
+    async unlockWallet(password) {
+        if(this.state !== APP_STATE.PASSWORD_SET) {
+            logger.error('Attempted to unlock wallet whilst not in PASSWORD_SET state');
+            return Promise.reject('ERRORS.NOT_LOCKED');
+        }
+
+        if(StorageService.needsMigrating) {
+            const success = this.migrate(password);
+
+            if(!success)
+                return Promise.reject('ERRORS.INVALID_PASSWORD');
+
+            return;
+        }
+
+        const unlockFailed = await StorageService.unlock(password);
+        if(unlockFailed) {
+            logger.error(`Failed to unlock wallet: ${ unlockFailed }`);
+            return Promise.reject(unlockFailed);
+        }
+
+        if(!StorageService.hasAccounts) {
+            logger.info('Wallet does not have any accounts');
+            return this._setState(APP_STATE.READY);
+        }
+
+        this._setState(APP_STATE.READY);
     }
 }
 

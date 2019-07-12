@@ -19,6 +19,7 @@ const background = {
         BackgroundAPI.init(duplex);
         this.bindPopupDuplex();
         this.bindTabDuplex();
+        this.bindWalletEvents();
     },
 
     bindPopupDuplex() {
@@ -32,6 +33,18 @@ const background = {
         duplex.on('getLanguage', this.walletService.getLanguage);
         duplex.on('setLanguage', this.walletService.setLanguage);
         duplex.on('resetState', this.walletService.resetState);
+        duplex.on('setPassword', this.walletService.setPassword);
+        duplex.on('unlockWallet', this.walletService.unlockWallet);
+    },
+
+    bindWalletEvents() {
+        this.walletService.on('newState', appState => (
+            BackgroundAPI.setState(appState)
+        ));
+
+        // this.walletService.on('setAccount', address => BackgroundAPI.setAccount(
+        //     this.walletService.getAccountDetails(address)
+        // ));
     },
 
     bindTabDuplex() {

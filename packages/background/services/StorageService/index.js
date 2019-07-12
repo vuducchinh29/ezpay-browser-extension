@@ -1,10 +1,28 @@
 import extensionizer from 'extensionizer';
 import Logger from '@ezpay/lib/logger';
 import Utils from '@ezpay/lib/utils';
+import NodeService from '../NodeService';
 import axios from 'axios';
 const logger = new Logger('StorageService');
 
 const StorageService = {
+    // We could instead scope the data so we don't need this array
+    storageKeys: [
+        'accounts',
+        'nodes',
+        'transactions',
+        'selectedAccount',
+        'prices',
+        'pendingTransactions',
+        'tokenCache',
+        'setting',
+        'language',
+        'dappList',
+        'allDapps',
+        'allTokens',
+        'authorizeDapps'
+    ],
+
     storage: extensionizer.storage.local,
 
     prices: {
@@ -36,17 +54,85 @@ const StorageService = {
     tokenCache: {},
     selectedAccount: false,
     selectedToken: {},
-    language: 'en',
-    ready: false,
-    password: false,
     setting: {
         lock: {
             lockTime: 0,
             duration: 0
         },
-        openAccountsMenu: false,
+        openAccountsMenu:false,
         advertising: {},
         developmentMode: location.hostname !== 'ibnejdfjmmkpcnlpebklmnkoeoihofec'
+    },
+    language: '',
+    ready: false,
+    password: false,
+    dappList: {
+        recommend: [],
+        used: []
+    },
+    allDapps: [],
+    allTokens : [],
+    authorizeDapps: {},
+    get needsMigrating() {
+        return localStorage.hasOwnProperty('EZPAY_WALLET');
+    },
+
+    get hasAccounts() {
+        return Object.keys(this.accounts).length;
+    },
+
+    getStorage(key) {
+        return new Promise(resolve => (
+            this.storage.get(key, data => {
+                if(key in data)
+                    return resolve(data[ key ]);
+
+                resolve(false);
+            })
+        ));
+    },
+
+    async dataExists() {
+        return !!(await this.getStorage('accounts'));
+    },
+
+    lock() {
+        this.ready = false;
+    },
+
+    async unlock(password) {
+        if(this.ready) {
+            logger.error('Attempted to decrypt data whilst already unencrypted');
+            return 'ERRORS.ALREADY_UNLOCKED';
+        }
+
+        if(!await this.dataExists())
+            return 'ERRORS.NOT_SETUP';
+
+        try {
+            for(let i = 0; i < this.storageKeys.length; i++) {
+                const key = this.storageKeys[ i ];
+                const encrypted = await this.getStorage(key);
+
+                if(!encrypted)
+                    continue;
+
+                this[ key ] = Utils.decrypt(
+                    encrypted,
+                    password
+                );
+            }
+        } catch(ex) {
+            logger.warn('Failed to decrypt wallet (wrong password?):', ex);
+            return 'ERRORS.INVALID_PASSWORD';
+        }
+
+        logger.info('Decrypted wallet data');
+
+        this.password = password;
+        this.ready = true;
+
+        return false;
     },
 
     hasAccount(address) {
@@ -134,23 +220,52 @@ const StorageService = {
         this.save('selectedToken');
     },
 
-    setLanguage(language) {
+    setLanguage(language){
         logger.info('Saving language', language);
         this.language = language;
         this.save('language');
     },
 
-    setSetting(setting) {
+    setSetting(setting){
         logger.info('Saving setting', setting);
         this.setting = setting;
         this.save('setting');
     },
 
-    getSetting() {
-        if(!this.setting.hasOwnProperty('advertising'))
+    getSetting(){
+        if(!this.setting.hasOwnProperty('advertising')){
             this.setting.advertising = {};
+        }
+        return {...this.setting,developmentMode:location.hostname !== 'ibnejdfjmmkpcnlpebklmnkoeoihofec'};
+    },
 
-        return { ...this.setting, developmentMode: location.hostname !== 'ibnejdfjmmkpcnlpebklmnkoeoihofec' };
+    migrate() {
+        try {
+            const storage = localStorage.getItem('EZPAY_WALLET');
+            const decrypted = Utils.decrypt(
+                JSON.parse(storage),
+                this.password
+            );
+
+            const {
+                accounts,
+                currentAccount
+            } = decrypted;
+
+            return {
+                accounts: Object.values(accounts).map(({ privateKey, name }) => ({
+                    privateKey,
+                    name
+                })),
+                selectedAccount: currentAccount
+            };
+        } catch(ex) {
+            logger.info('Failed to migrate (wrong password?):', ex);
+
+            return {
+                error: true
+            };
+        }
     },
 
     authenticate(password) {
@@ -158,6 +273,154 @@ const StorageService = {
         this.ready = true;
 
         logger.info('Set storage password');
+    },
+
+    addPendingTransaction(address, txID) {
+        if(!(address in this.pendingTransactions))
+            this.pendingTransactions[ address ] = [];
+
+        if(this.pendingTransactions[ address ].some(tx => tx.txID === txID))
+            return;
+
+        logger.info('Adding pending transaction:', { address, txID });
+
+        this.pendingTransactions[ address ].push({
+            nextCheck: Date.now() + 5000,
+            txID
+        });
+
+        this.save('pendingTransactions');
+    },
+
+    removePendingTransaction(address, txID) {
+        if(!(address in this.pendingTransactions))
+            return;
+
+        logger.info('Removing pending transaction:', { address, txID });
+
+        this.pendingTransactions[ address ] = this.pendingTransactions[ address ].filter(transaction => (
+            transaction.txID !== txID
+        ));
+
+        if(!this.pendingTransactions[ address ].length)
+            delete this.pendingTransactions[ address ];
+
+        this.save('pendingTransactions');
+    },
+
+    getNextPendingTransaction(address) {
+        if(!(address in this.pendingTransactions))
+            return false;
+
+        const [ transaction ] = this.pendingTransactions[ address ];
+
+        if(!transaction)
+            return false;
+
+        if(transaction.nextCheck < Date.now())
+            return false;
+
+        return transaction.txID;
+    },
+
+    setPrices(priceList,usdtPriceList) {
+        this.prices.priceList = priceList;
+        this.prices.usdtPriceList = usdtPriceList;
+        this.save('prices');
+    },
+
+    selectCurrency(currency) {
+        this.prices.selected = currency;
+        this.save('prices');
+    },
+
+    save(...keys) {
+        if(!this.ready)
+            return logger.error('Attempted to write storage when not ready');
+
+        if(!keys.length)
+            keys = this.storageKeys;
+
+        logger.info(`Writing storage for keys ${ keys.join(', ') }`);
+
+        keys.forEach(key => (
+            this.storage.set({
+                [ key ]: Utils.encrypt(this[ key ], this.password)
+            })
+        ));
+
+        logger.info('Storage saved');
+    },
+
+    async cacheToken(tokenID) {
+
+        if(NodeService.getNodes().selected === 'f0b1e38e-7bee-485e-9d3f-69410bf30681') {
+            if(typeof tokenID === 'string' ) {
+                if(tokenID === '_'){
+                   this.tokenCache[ tokenID ] = {
+                        name:'TRX',
+                        abbr:'TRX',
+                        decimals:6
+                    };
+                }else{
+                    const {data} = await axios.get('https://apilist.tronscan.org/api/token', {params:{id:tokenID,showAll:1}});
+                    const {
+                        name,
+                        abbr,
+                        precision: decimals = 0,
+                        imgUrl = false
+                    } = data.data[0];
+                    this.tokenCache[ tokenID ] = {
+                        name,
+                        abbr,
+                        decimals,
+                        imgUrl
+                    };
+                }
+            } else {
+                const { contract_address, decimals, name, abbr } = tokenID;
+                const { data: { trc20_tokens: [{ icon_url = false }] } } = await axios.get('https://apilist.tronscan.org/api/token_trc20?contract=' + contract_address);
+                this.tokenCache[ contract_address ] = {
+                    name,
+                    abbr,
+                    decimals,
+                    imgUrl:icon_url
+                };
+            }
+
+        } else {
+            const {
+                name,
+                abbr,
+                precision: decimals = 0
+            } = await NodeService.tronWeb.trx.getTokenFromID(tokenID);
+            this.tokenCache[ tokenID ] = {
+                name,
+                abbr,
+                decimals
+            };
+        }
+
+
+        logger.info(`Cached token ${ tokenID }:`, this.tokenCache[ tokenID ]);
+
+        this.save('tokenCache');
+    },
+
+    saveAllTokens(tokens) {
+        this.allTokens = tokens;
+        this.save('allTokens');
+    },
+
+    setAuthorizeDapps(authorizeDapps) {
+        this.authorizeDapps = authorizeDapps;
+        this.save('authorizeDapps');
+    },
+
+    purge() {
+        this.storage.set({
+            transactions: Utils.encrypt({}, this.password)
+        });
     }
 };
 

@@ -52,7 +52,7 @@ export const app = {
     async run() {
         this.createStore();
         await this.getAppState();
-        // this.bindDuplexRequests();
+        this.bindDuplexRequests();
         this.render();
     },
 
@@ -109,9 +109,11 @@ export const app = {
     },
 
     bindDuplexRequests() {
-        this.duplex.on('setState', appState => this.store.dispatch(
-            setAppState(appState)
-        ));
+        this.duplex.on('setState', appState => {
+            this.store.dispatch(
+                setAppState(appState)
+            )
+        });
 
         // this.duplex.on('setSelectedToken', token => this.store.dispatch(
         //     setToken(token)

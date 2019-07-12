@@ -5,6 +5,7 @@ import InputCriteria from 'components/InputCriteria';
 
 import { FormattedMessage } from 'react-intl';
 import { VALIDATION_STATE } from '@ezpay/lib/constants';
+import { PopupAPI } from '@ezpay/lib/api';
 
 class RegistrationController extends React.Component {
     state = {
@@ -31,6 +32,67 @@ class RegistrationController extends React.Component {
 
     constructor() {
         super();
+    }
+
+    onPasswordChange(value) {
+        const trimmed = value.trim();
+        const hasLength = trimmed.length >= 6;
+        const hasSpecial = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?\d]+/.test(trimmed);
+        const showCriteria = trimmed.length ? true : false;
+        let isValid = trimmed.length ? VALIDATION_STATE.INVALID : VALIDATION_STATE.NONE;
+
+        if(hasLength && hasSpecial)
+            isValid = VALIDATION_STATE.VALID;
+
+        this.setState({
+            password: {
+                value: trimmed,
+                hasLength,
+                hasSpecial,
+                isValid,
+                showCriteria
+            }
+        });
+    }
+
+    onRepeatPasswordChange(value) {
+        let showCriteria;
+        const trimmed = value.trim();
+        const { password } = this.state;
+
+        let isValid = trimmed.length ? VALIDATION_STATE.INVALID : VALIDATION_STATE.NONE;
+
+        if(trimmed.length && trimmed === password.value){
+            isValid = VALIDATION_STATE.VALID;
+            showCriteria = false;
+        }else{
+            showCriteria = true;
+        }
+
+        this.setState({
+            repeatPassword: {
+                value: trimmed,
+                isValid,
+                showCriteria
+            }
+        });
+    }
+
+    onButtonClick() {
+        const { password } = this.state;
+
+        this.setState({
+            loading: true
+        });
+
+        PopupAPI
+            .setPassword(password.value)
+            .catch(error => this.setState({
+                error
+            }))
+            .then(() => this.setState({
+                loading: false
+            }));
     }
 
     render() {
@@ -77,6 +139,10 @@ class RegistrationController extends React.Component {
                         <Input
                             type='password'
                             placeholder='INPUT.PASSWORD'
+                            status={ password.isValid }
+                            value={ password.value }
+                            isDisabled={ loading }
+                            onChange={ this.onPasswordChange.bind(this) }
                             tabIndex={ 1 }
                         />
                         {
@@ -93,6 +159,11 @@ class RegistrationController extends React.Component {
                         <Input
                             type='password'
                             placeholder='INPUT.REPEAT_PASSWORD'
+                            status={ repeatPassword.isValid }
+                            value={ repeatPassword.value }
+                            isDisabled={ loading }
+                            onChange={ this.onRepeatPasswordChange.bind(this) }
+                            onEnter={ this.onButtonClick.bind(this) }
                             tabIndex={ 2 }
                         />
                         {
@@ -107,6 +178,9 @@ class RegistrationController extends React.Component {
                     <div className="div-button">
                         <Button
                             id='BUTTON.CONTINUE'
+                            isValid={ arePasswordsValid }
+                            isLoading={ loading }
+                            onClick={ this.onButtonClick.bind(this) }
                             tabIndex={ 3 }
                         />
                     </div>
