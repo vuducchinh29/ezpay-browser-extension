@@ -130,6 +130,7 @@ class Wallet extends EventEmitter {
 
             this.accounts[ address ] = accountObj;
         });
+        console.log('xxx', this.accounts)
     }
 
     async unlockWallet(password) {
@@ -153,20 +154,22 @@ class Wallet extends EventEmitter {
             return Promise.reject(unlockFailed);
         }
 
-        // this.addAccount({
-        //     chain: 'f0b1e38e-7bee-485e-9d3f-69410bf30681',
-        //     mnemonic: Utils.generateMnemonic(),
-        //     name: 'Account 2'
-        // })
-
-        this._loadAccounts()
-
         if(!StorageService.hasAccounts) {
+            this._createDefaultAccount()
             logger.info('Wallet does not have any accounts');
             return this._setState(APP_STATE.READY);
         }
 
+        this._loadAccounts()
         this._setState(APP_STATE.READY);
+    }
+
+    _createDefaultAccount() {
+        this.addAccount({
+            chain: 'f0b1e38e-7bee-485e-9d3f-69410bf30681',
+            mnemonic: Utils.generateMnemonic(),
+            name: 'Account 1'
+        })
     }
 
     async addAccount({chain, mnemonic, name}) {

@@ -73783,11 +73783,11 @@ function (_EventEmitter) {
           accountObj = new WalletService_TronAccount(account.chain, account.type, account.mnemonic || account.privateKey, account.symbol, account.accountIndex);
           accountObj.loadCache();
           accountObj.update([], [], 0);
-          console.log('accounts', _this3.accounts);
         }
 
         _this3.accounts[address] = accountObj;
       });
+      console.log('xxx', this.accounts);
     }
   }, {
     key: "unlockWallet",
@@ -73842,25 +73842,22 @@ function (_EventEmitter) {
                 return _context3.abrupt("return", Promise.reject(unlockFailed));
 
               case 14:
-                // this.addAccount({
-                //     chain: 'f0b1e38e-7bee-485e-9d3f-69410bf30681',
-                //     mnemonic: Utils.generateMnemonic(),
-                //     name: 'Account 2'
-                // })
-                this._loadAccounts();
-
                 if (services_StorageService.hasAccounts) {
                   _context3.next = 18;
                   break;
                 }
 
+                this._createDefaultAccount();
+
                 WalletService_logger.info('Wallet does not have any accounts');
                 return _context3.abrupt("return", this._setState(APP_STATE.READY));
 
               case 18:
+                this._loadAccounts();
+
                 this._setState(APP_STATE.READY);
 
-              case 19:
+              case 20:
               case "end":
                 return _context3.stop();
             }
@@ -73874,6 +73871,15 @@ function (_EventEmitter) {
 
       return unlockWallet;
     }()
+  }, {
+    key: "_createDefaultAccount",
+    value: function _createDefaultAccount() {
+      this.addAccount({
+        chain: 'f0b1e38e-7bee-485e-9d3f-69410bf30681',
+        mnemonic: utils.generateMnemonic(),
+        name: 'Account 1'
+      });
+    }
   }, {
     key: "addAccount",
     value: function () {
