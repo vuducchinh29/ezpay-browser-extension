@@ -70426,6 +70426,7 @@ function extend() {
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@tronscan/client/src/utils/crypto.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/aes-js/index.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/axios/index.js (<- Module is not an ECMAScript module) */
+/*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/bignumber.js/bignumber.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/bip32/index.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/bip39/index.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/crypto-browserify/index.js (<- Module is not an ECMAScript module) */
@@ -70954,6 +70955,10 @@ var slicedToArray_default = /*#__PURE__*/__webpack_require__.n(slicedToArray);
 var helpers_typeof = __webpack_require__("../../node_modules/@babel/runtime/helpers/typeof.js");
 var typeof_default = /*#__PURE__*/__webpack_require__.n(helpers_typeof);
 
+// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/objectWithoutProperties.js
+var objectWithoutProperties = __webpack_require__("../../node_modules/@babel/runtime/helpers/objectWithoutProperties.js");
+var objectWithoutProperties_default = /*#__PURE__*/__webpack_require__.n(objectWithoutProperties);
+
 // EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/crypto-browserify/index.js
 var crypto_browserify = __webpack_require__("../../node_modules/crypto-browserify/index.js");
 var crypto_browserify_default = /*#__PURE__*/__webpack_require__.n(crypto_browserify);
@@ -71255,41 +71260,14 @@ var Utils = {
   }
 };
 /* harmony default export */ var utils = (Utils);
-// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/axios/index.js
-var axios = __webpack_require__("../../node_modules/axios/index.js");
-var axios_default = /*#__PURE__*/__webpack_require__.n(axios);
-
 // EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/bignumber.js/bignumber.js
 var bignumber = __webpack_require__("../../node_modules/bignumber.js/bignumber.js");
 
-// CONCATENATED MODULE: ./services/WalletService/Account.js
-
-
-
-
-
-var Account_logger = new logger_Logger('WalletService/Account');
-
-var Account_Account = function Account(type, importData) {
-  var accountIndex = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
-
-  classCallCheck_default()(this, Account);
-
-  this.type = type;
-  this.accountIndex = accountIndex;
-  this.address = false;
-  this.name = false;
-  this.transactions = {};
-  this.ignoredTransactions = [];
-  this.tokens = {};
-};
-
-/* harmony default export */ var WalletService_Account = (Account_Account);
-// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/objectWithoutProperties.js
-var objectWithoutProperties = __webpack_require__("../../node_modules/@babel/runtime/helpers/objectWithoutProperties.js");
-var objectWithoutProperties_default = /*#__PURE__*/__webpack_require__.n(objectWithoutProperties);
-
 // CONCATENATED MODULE: ./services/NodeService/index.js
+
+
+
+
 
 
 function NodeService_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { keys.push.apply(keys, Object.getOwnPropertySymbols(object)); } if (enumerableOnly) keys = keys.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); return keys; }
@@ -71297,6 +71275,11 @@ function NodeService_ownKeys(object, enumerableOnly) { var keys = Object.keys(ob
 function NodeService_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { NodeService_ownKeys(source, true).forEach(function (key) { defineProperty_default()(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { NodeService_ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 
+
+
+
+
+var NodeService_logger = new logger_Logger('NodeService');
 var NodeService = {
   _nodes: {
     'f0b1e38e-7bee-485e-9d3f-69410bf30681': {
@@ -71335,7 +71318,8 @@ var NodeService = {
   },
   _selectedNode: '6739be94-ee43-46af-9a62-690cf0947269',
   _read: function _read() {
-    var _StorageService$nodes = StorageService.nodes,
+    NodeService_logger.info('Reading nodes from storage');
+    var _StorageService$nodes = services_StorageService.nodes,
         _StorageService$nodes2 = _StorageService$nodes.nodeList,
         nodeList = _StorageService$nodes2 === void 0 ? {} : _StorageService$nodes2,
         _StorageService$nodes3 = _StorageService$nodes.selectedNode,
@@ -71345,22 +71329,145 @@ var NodeService = {
   },
   init: function init() {
     this._read();
+
+    this._updateTronWeb();
+  },
+  _updateTronWeb: function _updateTronWeb() {
+    var skipAddress = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+    var _this$getCurrentNode = this.getCurrentNode(),
+        fullNode = _this$getCurrentNode.fullNode,
+        solidityNode = _this$getCurrentNode.solidityNode,
+        eventServer = _this$getCurrentNode.eventServer;
+
+    this.tronWeb = new TronWeb_node_default.a(fullNode, solidityNode, eventServer);
+    if (!skipAddress) this.setAddress();
+  },
+  setAddress: function setAddress() {
+    if (!this.tronWeb) this._updateTronWeb();
+    if (!services_StorageService.selectedAccount) return this._updateTronWeb(true);
+    this.tronWeb.setAddress(services_StorageService.selectedAccount);
+  },
+  save: function save() {
+    Object.entries(this._nodes).forEach(function (_ref) {
+      var _ref2 = slicedToArray_default()(_ref, 2),
+          nodeID = _ref2[0],
+          node = _ref2[1];
+
+      return services_StorageService.saveNode(nodeID, node);
+    });
+    services_StorageService.selectNode(this._selectedNode);
+
+    this._updateTronWeb();
   },
   getNodes: function getNodes() {
-    return this._nodes;
+    return {
+      nodes: this._nodes,
+      selected: this._selectedNode
+    };
   },
-  getSelectedNode: function getSelectedNode() {
-    return this._selectedNode;
+  getCurrentNode: function getCurrentNode() {
+    return this._nodes[this._selectedNode];
+  },
+  selectNode: function selectNode(nodeID) {
+    services_StorageService.selectNode(nodeID);
+    this._selectedNode = nodeID;
+
+    this._updateTronWeb();
   },
   addNode: function addNode(node) {
     var nodeID = v4_default()();
     this._nodes[nodeID] = NodeService_objectSpread({}, node, {
       "default": false
     });
+    this.save();
     return nodeID;
-  }
+  },
+  getSmartToken: function () {
+    var _getSmartToken = asyncToGenerator_default()(
+    /*#__PURE__*/
+    regenerator_default.a.mark(function _callee(address) {
+      var balance, contract, d, name, symbol, decimals, number;
+      return regenerator_default.a.wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              _context.prev = 0;
+              _context.next = 3;
+              return this.tronWeb.contract().at(address);
+
+            case 3:
+              contract = _context.sent;
+
+              if (!(!contract.name && !contract.symbol && !contract.decimals)) {
+                _context.next = 6;
+                break;
+              }
+
+              return _context.abrupt("return", false);
+
+            case 6:
+              _context.next = 8;
+              return contract.decimals().call();
+
+            case 8:
+              d = _context.sent;
+              _context.next = 11;
+              return contract.name().call();
+
+            case 11:
+              name = _context.sent;
+              _context.next = 14;
+              return contract.symbol().call();
+
+            case 14:
+              symbol = _context.sent;
+              decimals = typeof_default()(d) === 'object' && d._decimals ? d : new bignumber["BigNumber"](d).toNumber();
+              _context.next = 18;
+              return contract.balanceOf(address).call();
+
+            case 18:
+              number = _context.sent;
+
+              if (number.balance) {
+                balance = new bignumber["BigNumber"](number.balance).toString();
+              } else {
+                balance = new bignumber["BigNumber"](number).toString();
+              }
+
+              return _context.abrupt("return", {
+                name: typeof_default()(name) === 'object' ? name._name : name,
+                symbol: typeof_default()(symbol) === 'object' ? symbol._symbol : symbol,
+                decimals: typeof_default()(decimals) === 'object' ? decimals._decimals : decimals,
+                balance: balance
+              });
+
+            case 23:
+              _context.prev = 23;
+              _context.t0 = _context["catch"](0);
+              NodeService_logger.error("Failed to fetch token ".concat(address, ":"), _context.t0);
+              return _context.abrupt("return", false);
+
+            case 27:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, _callee, this, [[0, 23]]);
+    }));
+
+    function getSmartToken(_x) {
+      return _getSmartToken.apply(this, arguments);
+    }
+
+    return getSmartToken;
+  }()
 };
 /* harmony default export */ var services_NodeService = (NodeService);
+// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/axios/index.js
+var axios = __webpack_require__("../../node_modules/axios/index.js");
+var axios_default = /*#__PURE__*/__webpack_require__.n(axios);
+
 // CONCATENATED MODULE: ./services/StorageService/index.js
 
 
@@ -71378,7 +71485,7 @@ function StorageService_objectSpread(target) { for (var i = 1; i < arguments.len
 
 
 var StorageService_logger = new logger_Logger('StorageService');
-var StorageService_StorageService = {
+var StorageService = {
   // We could instead scope the data so we don't need this array
   storageKeys: ['accounts', 'nodes', 'transactions', 'selectedAccount', 'prices', 'pendingTransactions', 'tokenCache', 'setting', 'language', 'dappList', 'allDapps', 'allTokens', 'authorizeDapps'],
   storage: extensionizer_default.a.storage.local,
@@ -71869,27 +71976,7 @@ var StorageService_StorageService = {
     });
   }
 };
-/* harmony default export */ var services_StorageService = (StorageService_StorageService);
-// CONCATENATED MODULE: ./services/WalletService/Chain.js
-
-
-
-var Chain_Chain = function Chain(params) {
-  classCallCheck_default()(this, Chain);
-
-  this.type = params.type;
-  this.endPoint = params.endPoint;
-  this.decimal = params.decimal;
-  this.ezWeb = params.ezWeb;
-  this.accounts = {};
-  this.selectedAccount = false;
-};
-
-/* harmony default export */ var WalletService_Chain = (Chain_Chain);
-// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/web3/src/index.js
-var src = __webpack_require__("../../node_modules/web3/src/index.js");
-var src_default = /*#__PURE__*/__webpack_require__.n(src);
-
+/* harmony default export */ var services_StorageService = (StorageService);
 // CONCATENATED MODULE: ../lib/constants.js
 var APP_STATE = {
   // Wallet is migrating / not unlocked
@@ -71975,7 +72062,7 @@ var CONFIRMATION_TYPE = {
   STRING: 0,
   TRANSACTION: 1
 };
-var CONTRACT_ADDRESS = {
+var constants_CONTRACT_ADDRESS = {
   USDT: "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t" //USDT:"TWGZ7HnAhZkvxiT89vCBSd6Pzwin5vt3ZA"
 
 };
@@ -72030,6 +72117,1461 @@ var USDT_ACTIVITY_STAGE = {
     stage: 7
   }
 };
+// CONCATENATED MODULE: ./services/WalletService/TronAccount.js
+
+
+
+
+
+
+
+
+function TronAccount_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { keys.push.apply(keys, Object.getOwnPropertySymbols(object)); } if (enumerableOnly) keys = keys.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); return keys; }
+
+function TronAccount_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { TronAccount_ownKeys(source, true).forEach(function (key) { defineProperty_default()(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { TronAccount_ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+
+
+
+
+
+
+
+
+bignumber["BigNumber"].config({
+  EXPONENTIAL_AT: [-20, 30]
+});
+var TronAccount_logger = new logger_Logger('WalletService/TronAccount');
+
+var TronAccount_TronAccount =
+/*#__PURE__*/
+function () {
+  function TronAccount(chain, accountType, importData) {
+    var accountIndex = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+
+    classCallCheck_default()(this, TronAccount);
+
+    this.chain = chain;
+    this.type = accountType;
+    this.accountIndex = accountIndex;
+    this.address = false;
+    this.name = false;
+    this.updatingTransactions = false;
+    this.selectedBankRecordId = 0;
+    this.dealCurrencyPage = 0;
+    this.energy = 0;
+    this.energyUsed = 0;
+    this.balance = 0;
+    this.frozenBalance = 0;
+    this.netUsed = 0;
+    this.netLimit = 0;
+    this.totalEnergyWeight = 0; //totalEnergyWeight
+
+    this.TotalEnergyLimit = 0; //TotalEnergyLimit
+
+    this.lastUpdated = 0;
+    this.asset = 0;
+    this.ignoredTransactions = [];
+    this.transactions = {};
+    this.airdropInfo = {};
+    this.tokens = {
+      basic: {},
+      smart: {}
+    };
+    this.tokens.smart[constants_CONTRACT_ADDRESS.USDT] = {
+      symbol: 'USDT',
+      name: 'Tether USD',
+      decimal: 6,
+      tokenId: constants_CONTRACT_ADDRESS.USDT,
+      balance: 0,
+      price: 0
+    };
+    if (accountType == ACCOUNT_TYPE.MNEMONIC) this._importMnemonic(importData);else this._importPrivateKey(importData);
+    this.loadCache(); //this._cacheTransactions();
+  }
+
+  createClass_default()(TronAccount, [{
+    key: "_cacheTransactions",
+    value: function () {
+      var _cacheTransactions2 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee() {
+        var _this = this;
+
+        var address, txID, txData, transaction;
+        return regenerator_default.a.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                address = this.address;
+                txID = services_StorageService.getNextPendingTransaction(address);
+
+                if (txID) {
+                  _context.next = 4;
+                  break;
+                }
+
+                return _context.abrupt("return", setTimeout(function () {
+                  return _this._cacheTransactions();
+                }, 3000));
+
+              case 4:
+                TronAccount_logger.info("Caching transaction ".concat(txID));
+                services_StorageService.removePendingTransaction(address, txID);
+                _context.next = 8;
+                return services_NodeService.tronWeb.trx.getTransactionInfo(txID);
+
+              case 8:
+                txData = _context.sent;
+
+                if (txData.id) {
+                  _context.next = 13;
+                  break;
+                }
+
+                TronAccount_logger.info("Transaction ".concat(txID, " is still missing"));
+                services_StorageService.addPendingTransaction(address, txID);
+                return _context.abrupt("return", setTimeout(function () {
+                  return _this._cacheTransactions();
+                }, 3000));
+
+              case 13:
+                TronAccount_logger.info("Transaction ".concat(txID, " has been cached"));
+                transaction = this.transactions[txID];
+                transaction.cached = true;
+                transaction.timestamp = txData.blockTimeStamp;
+                transaction.receipt = txData.receipt || false;
+                transaction.result = txData.contractResult || false;
+                this.transactions[txID] = transaction;
+                this.save();
+
+                this._cacheTransactions();
+
+              case 22:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function _cacheTransactions() {
+        return _cacheTransactions2.apply(this, arguments);
+      }
+
+      return _cacheTransactions;
+    }()
+  }, {
+    key: "_importMnemonic",
+    value: function _importMnemonic(mnemonic) {
+      if (!utils.validateMnemonic(mnemonic)) throw new Error('INVALID_MNEMONIC');
+      this.mnemonic = mnemonic;
+
+      var _this$getAccountAtInd = this.getAccountAtIndex(this.accountIndex),
+          privateKey = _this$getAccountAtInd.privateKey,
+          address = _this$getAccountAtInd.address;
+
+      this.privateKey = privateKey;
+      this.address = address;
+    }
+  }, {
+    key: "_importPrivateKey",
+    value: function _importPrivateKey(privateKey) {
+      try {
+        this.privateKey = privateKey;
+        this.address = TronWeb_node_default.a.address.fromPrivateKey(privateKey);
+      } catch (ex) {
+        // eslint-disable-line
+        throw new Error('INVALID_PRIVATE_KEY');
+      }
+    }
+  }, {
+    key: "getAccountAtIndex",
+    value: function getAccountAtIndex() {
+      var index = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+      if (this.type !== ACCOUNT_TYPE.MNEMONIC) throw new Error('Deriving account keys at a specific index requires a mnemonic account');
+      return utils.getAccountAtIndex(this.mnemonic, index);
+    }
+  }, {
+    key: "loadCache",
+    value: function loadCache() {
+      var _this2 = this;
+
+      if (!services_StorageService.hasAccount(this.address)) return TronAccount_logger.warn('Attempted to load cache for an account that does not exist');
+
+      var _StorageService$getAc = services_StorageService.getAccount(this.address),
+          type = _StorageService$getAc.type,
+          name = _StorageService$getAc.name,
+          balance = _StorageService$getAc.balance,
+          frozenBalance = _StorageService$getAc.frozenBalance,
+          totalEnergyWeight = _StorageService$getAc.totalEnergyWeight,
+          TotalEnergyLimit = _StorageService$getAc.TotalEnergyLimit,
+          transactions = _StorageService$getAc.transactions,
+          tokens = _StorageService$getAc.tokens,
+          netLimit = _StorageService$getAc.netLimit,
+          netUsed = _StorageService$getAc.netUsed,
+          energy = _StorageService$getAc.energy,
+          energyUsed = _StorageService$getAc.energyUsed,
+          lastUpdated = _StorageService$getAc.lastUpdated,
+          asset = _StorageService$getAc.asset; // Old TRC10 structure are no longer compatible
+      //tokens.basic = {};
+      // Remove old token transfers so they can be fetched again
+
+
+      Object.keys(this.transactions).forEach(function (txID) {
+        var transaction = _this2.transactions[txID];
+        if (transaction.type !== 'TransferAssetContract') return;
+        if (transaction.tokenID) return;
+        delete _this2.transactions[txID];
+      });
+      this.type = type;
+      this.name = name;
+      this.balance = balance;
+      this.frozenBalance = frozenBalance;
+      this.totalEnergyWeight = totalEnergyWeight;
+      this.TotalEnergyLimit = TotalEnergyLimit;
+      this.transactions = transactions;
+      this.tokens = tokens;
+      this.energy = energy;
+      this.energyUsed = energyUsed;
+      this.netLimit = netLimit;
+      this.netUsed = netUsed;
+      this.lastUpdated = lastUpdated;
+      this.asset = asset;
+      this.hash = '';
+
+      if (!this.tokens.smart.hasOwnProperty(constants_CONTRACT_ADDRESS.USDT)) {
+        this.tokens.smart[constants_CONTRACT_ADDRESS.USDT] = {
+          symbol: 'USDT',
+          name: 'Tether USD',
+          decimal: 6,
+          tokenId: constants_CONTRACT_ADDRESS.USDT,
+          balance: 0,
+          price: 0
+        };
+      }
+    }
+  }, {
+    key: "matches",
+    value: function matches(accountType, importData) {
+      if (this.type !== accountType) return false;
+      if (accountType == ACCOUNT_TYPE.MNEMONIC && this.mnemonic === importData) return true;
+      if (accountType == ACCOUNT_TYPE.PRIVATE_KEY && this.privateKey === importData) return true;
+      return false;
+    }
+  }, {
+    key: "reset",
+    value: function reset() {
+      var _this3 = this;
+
+      this.balance = 0;
+      this.energy = 0;
+      this.energyUsed = 0;
+      this.netUsed = 0;
+      this.transactions = {};
+      this.ignoredTransactions = [];
+      this.netLimit = 0;
+      this.asset = 0;
+      Object.keys(this.tokens.smart).forEach(function (address) {
+        return _this3.tokens.smart[address].balance = 0;
+      });
+      this.tokens.basic = {};
+    }
+    /** update data of an account
+     * basicTokenPriceList  trc10token price list(source from trxmarket)
+     * smartTokenPriceList  trc20token price list(source from trxmarket)
+     * usdtPrice            price of usdt
+    */
+
+  }, {
+    key: "update",
+    value: function () {
+      var _update = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee2() {
+        var _this4 = this;
+
+        var basicTokenPriceList,
+            smartTokenPriceList,
+            usdtPrice,
+            address,
+            node,
+            _ref,
+            account,
+            account2,
+            addSmartTokens,
+            _iteratorNormalCompletion,
+            _didIteratorError,
+            _iteratorError,
+            _iterator,
+            _step,
+            _step$value,
+            tokenId,
+            token,
+            contract,
+            balance,
+            number,
+            token2,
+            sentDelegateBandwidth,
+            delegated,
+            i,
+            frozenBandwidth,
+            sentDelegateResource,
+            _i,
+            frozenEnergy,
+            filteredTokens,
+            _iteratorNormalCompletion2,
+            _didIteratorError2,
+            _iteratorError2,
+            _loop,
+            _iterator2,
+            _step2,
+            smartTokens,
+            _iteratorNormalCompletion3,
+            _didIteratorError3,
+            _iteratorError3,
+            _loop2,
+            _iterator3,
+            _step3,
+            _account,
+            _filteredTokens,
+            _iteratorNormalCompletion4,
+            _didIteratorError4,
+            _iteratorError4,
+            _loop3,
+            _iterator4,
+            _step4,
+            _addSmartTokens,
+            _iteratorNormalCompletion5,
+            _didIteratorError5,
+            _iteratorError5,
+            _iterator5,
+            _step5,
+            _step5$value,
+            _contract,
+            _balance,
+            _number2,
+            _token,
+            totalOwnTrxCount,
+            _args4 = arguments;
+
+        return regenerator_default.a.wrap(function _callee2$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                basicTokenPriceList = _args4.length > 0 && _args4[0] !== undefined ? _args4[0] : [];
+                smartTokenPriceList = _args4.length > 1 && _args4[1] !== undefined ? _args4[1] : [];
+                usdtPrice = _args4.length > 2 && _args4[2] !== undefined ? _args4[2] : 0;
+
+                if (services_StorageService.allTokens.length) {
+                  _context4.next = 5;
+                  break;
+                }
+
+                return _context4.abrupt("return");
+
+              case 5:
+                address = this.address;
+                TronAccount_logger.info("Requested update for ".concat(address));
+                _context4.prev = 7;
+                node = services_NodeService.getNodes().selected;
+
+                if (!(node === 'f0b1e38e-7bee-485e-9d3f-69410bf30681' || node === '0f22e40f-a004-4c5a-99ef-004c8e6769bf')) {
+                  _context4.next = 128;
+                  break;
+                }
+
+                _context4.next = 12;
+                return axios_default.a.get('https://apilist.tronscan.org/api/account?address=' + address)["catch"](function (e) {
+                  return {
+                    data: {}
+                  };
+                });
+
+              case 12:
+                _ref = _context4.sent;
+                account = _ref.data;
+                _context4.next = 16;
+                return services_NodeService.tronWeb.trx.getUnconfirmedAccount(address);
+
+              case 16:
+                account2 = _context4.sent;
+
+                if (account2.address) {
+                  _context4.next = 21;
+                  break;
+                }
+
+                TronAccount_logger.info("Account ".concat(address, " does not exist on the network"));
+                this.reset();
+                return _context4.abrupt("return", true);
+
+              case 21:
+                addSmartTokens = Object.entries(this.tokens.smart).filter(function (_ref2) {
+                  var _ref3 = slicedToArray_default()(_ref2, 2),
+                      tokenId = _ref3[0],
+                      token = _ref3[1];
+
+                  return !token.hasOwnProperty('abbr');
+                });
+                _iteratorNormalCompletion = true;
+                _didIteratorError = false;
+                _iteratorError = undefined;
+                _context4.prev = 25;
+                _iterator = addSmartTokens[Symbol.iterator]();
+
+              case 27:
+                if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
+                  _context4.next = 53;
+                  break;
+                }
+
+                _step$value = slicedToArray_default()(_step.value, 2), tokenId = _step$value[0], token = _step$value[1];
+                _context4.next = 31;
+                return services_NodeService.tronWeb.contract().at(tokenId)["catch"](function (e) {
+                  return false;
+                });
+
+              case 31:
+                contract = _context4.sent;
+
+                if (!contract) {
+                  _context4.next = 47;
+                  break;
+                }
+
+                balance = void 0;
+                _context4.next = 36;
+                return contract.balanceOf(address).call();
+
+              case 36:
+                number = _context4.sent;
+
+                if (number.balance) {
+                  balance = new bignumber["BigNumber"](number.balance).toString();
+                } else {
+                  balance = new bignumber["BigNumber"](number).toString();
+                }
+
+                if (!(typeof_default()(token.name) === 'object' || !token.decimals)) {
+                  _context4.next = 43;
+                  break;
+                }
+
+                _context4.next = 41;
+                return services_NodeService.getSmartToken(tokenId);
+
+              case 41:
+                token2 = _context4.sent;
+                this.tokens.smart[tokenId] = token2;
+
+              case 43:
+                //this.tokens.smart[ tokenId ].imgUrl = false;
+                this.tokens.smart[tokenId].balance = balance;
+                this.tokens.smart[tokenId].price = 0;
+                _context4.next = 49;
+                break;
+
+              case 47:
+                this.tokens.smart[tokenId].balance = 0;
+                this.tokens.smart[tokenId].price = 0;
+
+              case 49:
+                this.tokens.smart[tokenId].isLocked = token.hasOwnProperty('isLocked') ? token.isLocked : false;
+
+              case 50:
+                _iteratorNormalCompletion = true;
+                _context4.next = 27;
+                break;
+
+              case 53:
+                _context4.next = 59;
+                break;
+
+              case 55:
+                _context4.prev = 55;
+                _context4.t0 = _context4["catch"](25);
+                _didIteratorError = true;
+                _iteratorError = _context4.t0;
+
+              case 59:
+                _context4.prev = 59;
+                _context4.prev = 60;
+
+                if (!_iteratorNormalCompletion && _iterator["return"] != null) {
+                  _iterator["return"]();
+                }
+
+              case 62:
+                _context4.prev = 62;
+
+                if (!_didIteratorError) {
+                  _context4.next = 65;
+                  break;
+                }
+
+                throw _iteratorError;
+
+              case 65:
+                return _context4.finish(62);
+
+              case 66:
+                return _context4.finish(59);
+
+              case 67:
+                this.tokens.smart[constants_CONTRACT_ADDRESS.USDT].price = usdtPrice;
+                sentDelegateBandwidth = 0;
+                delegated = account.delegated;
+
+                if (delegated && delegated.sentDelegatedBandwidth) {
+                  for (i = 0; i < delegated.sentDelegatedBandwidth.length; i++) {
+                    sentDelegateBandwidth = sentDelegateBandwidth + delegated.sentDelegatedBandwidth[i]['frozen_balance_for_bandwidth'];
+                  }
+                }
+
+                frozenBandwidth = 0;
+
+                if (account.frozen && account.frozen.balances.length > 0) {
+                  frozenBandwidth = account.frozen.balances[0].amount;
+                }
+
+                sentDelegateResource = 0;
+
+                if (delegated && delegated.sentDelegatedResource) {
+                  for (_i = 0; _i < delegated.sentDelegatedResource.length; _i++) {
+                    sentDelegateResource = sentDelegateResource + delegated.sentDelegatedResource[_i]['frozen_balance_for_energy'];
+                  }
+                }
+
+                frozenEnergy = 0;
+
+                if (account.accountResource && account.accountResource.frozen_balance_for_energy && account.accountResource.frozen_balance_for_energy.frozen_balance > 0) {
+                  frozenEnergy = account.accountResource.frozen_balance_for_energy.frozen_balance;
+                }
+
+                this.frozenBalance = sentDelegateBandwidth + frozenBandwidth + sentDelegateResource + frozenEnergy;
+                this.balance = account2.balance || 0;
+                filteredTokens = (account2.assetV2 || []).filter(function (_ref4) {
+                  var value = _ref4.value;
+                  return value >= 0;
+                });
+                _iteratorNormalCompletion2 = true;
+                _didIteratorError2 = false;
+                _iteratorError2 = undefined;
+                _context4.prev = 83;
+
+                _loop = function _loop() {
+                  var _step2$value = _step2.value,
+                      key = _step2$value.key,
+                      value = _step2$value.value;
+                  var token = _this4.tokens.basic[key] || false;
+                  var filter = basicTokenPriceList.length ? basicTokenPriceList.filter(function (_ref5) {
+                    var first_token_id = _ref5.first_token_id;
+                    return first_token_id === key;
+                  }) : [];
+                  var trc20Filter = smartTokenPriceList.length ? smartTokenPriceList.filter(function (_ref6) {
+                    var fTokenAddr = _ref6.fTokenAddr;
+                    return key === fTokenAddr;
+                  }) : [];
+
+                  var _ref7 = filter.length ? filter[0] : trc20Filter.length ? {
+                    price: trc20Filter[0].price,
+                    precision: trc20Filter[0].sPrecision
+                  } : {
+                    price: 0,
+                    precision: 0
+                  },
+                      _ref7$precision = _ref7.precision,
+                      precision = _ref7$precision === void 0 ? 0 : _ref7$precision,
+                      price = _ref7.price;
+
+                  price = price / Math.pow(10, precision);
+                  var _StorageService$allTo = services_StorageService.allTokens.filter(function (_ref8) {
+                    var tokenId = _ref8.tokenId;
+                    return tokenId === key;
+                  })[0],
+                      _StorageService$allTo2 = _StorageService$allTo.name,
+                      name = _StorageService$allTo2 === void 0 ? 'TRX' : _StorageService$allTo2,
+                      _StorageService$allTo3 = _StorageService$allTo.abbr,
+                      abbr = _StorageService$allTo3 === void 0 ? 'TRX' : _StorageService$allTo3,
+                      _StorageService$allTo4 = _StorageService$allTo.decimals,
+                      decimals = _StorageService$allTo4 === void 0 ? 6 : _StorageService$allTo4,
+                      _StorageService$allTo5 = _StorageService$allTo.imgUrl,
+                      imgUrl = _StorageService$allTo5 === void 0 ? false : _StorageService$allTo5;
+                  token = {
+                    balance: 0,
+                    name: name,
+                    abbr: abbr,
+                    decimals: decimals,
+                    imgUrl: imgUrl,
+                    isLocked: token.hasOwnProperty('isLocked') ? token.isLocked : false
+                  };
+                  _this4.tokens.basic[key] = TronAccount_objectSpread({}, token, {
+                    balance: value,
+                    price: price
+                  });
+                };
+
+                for (_iterator2 = filteredTokens[Symbol.iterator](); !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                  _loop();
+                }
+
+                _context4.next = 92;
+                break;
+
+              case 88:
+                _context4.prev = 88;
+                _context4.t1 = _context4["catch"](83);
+                _didIteratorError2 = true;
+                _iteratorError2 = _context4.t1;
+
+              case 92:
+                _context4.prev = 92;
+                _context4.prev = 93;
+
+                if (!_iteratorNormalCompletion2 && _iterator2["return"] != null) {
+                  _iterator2["return"]();
+                }
+
+              case 95:
+                _context4.prev = 95;
+
+                if (!_didIteratorError2) {
+                  _context4.next = 98;
+                  break;
+                }
+
+                throw _iteratorError2;
+
+              case 98:
+                return _context4.finish(95);
+
+              case 99:
+                return _context4.finish(92);
+
+              case 100:
+                smartTokens = account.trc20token_balances.filter(function (v) {
+                  return v.balance >= 0 && v.contract_address !== constants_CONTRACT_ADDRESS.USDT;
+                });
+                _iteratorNormalCompletion3 = true;
+                _didIteratorError3 = false;
+                _iteratorError3 = undefined;
+                _context4.prev = 104;
+                _loop2 =
+                /*#__PURE__*/
+                regenerator_default.a.mark(function _loop2() {
+                  var _step3$value, contract_address, precision, token, filter, price, contract, balance, _number, _StorageService$allTo6, name, abbr, decimals, _StorageService$allTo7, imgUrl;
+
+                  return regenerator_default.a.wrap(function _loop2$(_context2) {
+                    while (1) {
+                      switch (_context2.prev = _context2.next) {
+                        case 0:
+                          _step3$value = _step3.value, contract_address = _step3$value.contract_address, precision = _step3$value.decimals;
+                          token = _this4.tokens.smart[contract_address] || false;
+                          filter = smartTokenPriceList.filter(function (_ref9) {
+                            var fTokenAddr = _ref9.fTokenAddr;
+                            return fTokenAddr === contract_address;
+                          });
+                          price = filter.length ? new bignumber["BigNumber"](filter[0].price).shiftedBy(-precision).toString() : 0;
+                          _context2.next = 6;
+                          return services_NodeService.tronWeb.contract().at(contract_address)["catch"](function (e) {
+                            return false;
+                          });
+
+                        case 6:
+                          contract = _context2.sent;
+                          balance = void 0;
+
+                          if (!contract) {
+                            _context2.next = 15;
+                            break;
+                          }
+
+                          _context2.next = 11;
+                          return contract.balanceOf(address).call();
+
+                        case 11:
+                          _number = _context2.sent;
+
+                          if (_number.balance) {
+                            balance = new bignumber["BigNumber"](_number.balance).toString();
+                          } else {
+                            balance = new bignumber["BigNumber"](_number).toString();
+                          }
+
+                          _context2.next = 16;
+                          break;
+
+                        case 15:
+                          balance = 0;
+
+                        case 16:
+                          _StorageService$allTo6 = services_StorageService.allTokens.filter(function (_ref10) {
+                            var tokenId = _ref10.tokenId;
+                            return tokenId === contract_address;
+                          })[0], name = _StorageService$allTo6.name, abbr = _StorageService$allTo6.abbr, decimals = _StorageService$allTo6.decimals, _StorageService$allTo7 = _StorageService$allTo6.imgUrl, imgUrl = _StorageService$allTo7 === void 0 ? false : _StorageService$allTo7;
+                          token = {
+                            price: 0,
+                            balance: 0,
+                            name: name,
+                            abbr: abbr,
+                            decimals: decimals,
+                            imgUrl: imgUrl,
+                            isLocked: token.hasOwnProperty('isLocked') ? token.isLocked : false
+                          };
+                          _this4.tokens.smart[contract_address] = TronAccount_objectSpread({}, token, {
+                            price: price,
+                            balance: balance
+                          });
+
+                        case 19:
+                        case "end":
+                          return _context2.stop();
+                      }
+                    }
+                  }, _loop2);
+                });
+                _iterator3 = smartTokens[Symbol.iterator]();
+
+              case 107:
+                if (_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done) {
+                  _context4.next = 112;
+                  break;
+                }
+
+                return _context4.delegateYield(_loop2(), "t2", 109);
+
+              case 109:
+                _iteratorNormalCompletion3 = true;
+                _context4.next = 107;
+                break;
+
+              case 112:
+                _context4.next = 118;
+                break;
+
+              case 114:
+                _context4.prev = 114;
+                _context4.t3 = _context4["catch"](104);
+                _didIteratorError3 = true;
+                _iteratorError3 = _context4.t3;
+
+              case 118:
+                _context4.prev = 118;
+                _context4.prev = 119;
+
+                if (!_iteratorNormalCompletion3 && _iterator3["return"] != null) {
+                  _iterator3["return"]();
+                }
+
+              case 121:
+                _context4.prev = 121;
+
+                if (!_didIteratorError3) {
+                  _context4.next = 124;
+                  break;
+                }
+
+                throw _iteratorError3;
+
+              case 124:
+                return _context4.finish(121);
+
+              case 125:
+                return _context4.finish(118);
+
+              case 126:
+                _context4.next = 216;
+                break;
+
+              case 128:
+                _context4.next = 130;
+                return services_NodeService.tronWeb.trx.getUnconfirmedAccount(address);
+
+              case 130:
+                _account = _context4.sent;
+
+                if (_account.address) {
+                  _context4.next = 135;
+                  break;
+                }
+
+                TronAccount_logger.info("Account ".concat(address, " does not exist on the network"));
+                this.reset();
+                return _context4.abrupt("return", true);
+
+              case 135:
+                _filteredTokens = (_account.assetV2 || []).filter(function (_ref11) {
+                  var value = _ref11.value;
+                  return value > 0;
+                });
+
+                if (!(_filteredTokens.length > 0)) {
+                  _context4.next = 164;
+                  break;
+                }
+
+                _iteratorNormalCompletion4 = true;
+                _didIteratorError4 = false;
+                _iteratorError4 = undefined;
+                _context4.prev = 140;
+                _loop3 =
+                /*#__PURE__*/
+                regenerator_default.a.mark(function _loop3() {
+                  var _step4$value, key, value, token, filter, trc20Filter, _ref14, _ref14$precision, precision, price, _StorageService$token, name, abbr, decimals, imgUrl;
+
+                  return regenerator_default.a.wrap(function _loop3$(_context3) {
+                    while (1) {
+                      switch (_context3.prev = _context3.next) {
+                        case 0:
+                          _step4$value = _step4.value, key = _step4$value.key, value = _step4$value.value;
+                          token = _this4.tokens.basic[key] || false;
+                          filter = basicTokenPriceList.length ? basicTokenPriceList.filter(function (_ref12) {
+                            var first_token_id = _ref12.first_token_id;
+                            return first_token_id === key;
+                          }) : [];
+                          trc20Filter = smartTokenPriceList.length ? smartTokenPriceList.filter(function (_ref13) {
+                            var fTokenAddr = _ref13.fTokenAddr;
+                            return key === fTokenAddr;
+                          }) : [];
+                          _ref14 = filter.length ? filter[0] : trc20Filter.length ? {
+                            price: trc20Filter[0].price,
+                            precision: trc20Filter[0].sPrecision
+                          } : {
+                            price: 0,
+                            precision: 0
+                          }, _ref14$precision = _ref14.precision, precision = _ref14$precision === void 0 ? 0 : _ref14$precision, price = _ref14.price;
+                          price = price / Math.pow(10, precision);
+
+                          if (!(!token && !services_StorageService.tokenCache.hasOwnProperty(key) || token && token.imgUrl == undefined)) {
+                            _context3.next = 9;
+                            break;
+                          }
+
+                          _context3.next = 9;
+                          return services_StorageService.cacheToken(key);
+
+                        case 9:
+                          if (services_StorageService.tokenCache.hasOwnProperty(key)) {
+                            _StorageService$token = services_StorageService.tokenCache[key], name = _StorageService$token.name, abbr = _StorageService$token.abbr, decimals = _StorageService$token.decimals, imgUrl = _StorageService$token.imgUrl;
+                            token = {
+                              balance: 0,
+                              name: name,
+                              abbr: abbr,
+                              decimals: decimals,
+                              imgUrl: imgUrl
+                            };
+                          }
+
+                          _this4.tokens.basic[key] = TronAccount_objectSpread({}, token, {
+                            balance: value,
+                            price: price
+                          });
+
+                        case 11:
+                        case "end":
+                          return _context3.stop();
+                      }
+                    }
+                  }, _loop3);
+                });
+                _iterator4 = _filteredTokens[Symbol.iterator]();
+
+              case 143:
+                if (_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done) {
+                  _context4.next = 148;
+                  break;
+                }
+
+                return _context4.delegateYield(_loop3(), "t4", 145);
+
+              case 145:
+                _iteratorNormalCompletion4 = true;
+                _context4.next = 143;
+                break;
+
+              case 148:
+                _context4.next = 154;
+                break;
+
+              case 150:
+                _context4.prev = 150;
+                _context4.t5 = _context4["catch"](140);
+                _didIteratorError4 = true;
+                _iteratorError4 = _context4.t5;
+
+              case 154:
+                _context4.prev = 154;
+                _context4.prev = 155;
+
+                if (!_iteratorNormalCompletion4 && _iterator4["return"] != null) {
+                  _iterator4["return"]();
+                }
+
+              case 157:
+                _context4.prev = 157;
+
+                if (!_didIteratorError4) {
+                  _context4.next = 160;
+                  break;
+                }
+
+                throw _iteratorError4;
+
+              case 160:
+                return _context4.finish(157);
+
+              case 161:
+                return _context4.finish(154);
+
+              case 162:
+                _context4.next = 165;
+                break;
+
+              case 164:
+                this.tokens.basic = {};
+
+              case 165:
+                //this.tokens.smart = {};
+                _addSmartTokens = Object.entries(this.tokens.smart).filter(function (_ref15) {
+                  var _ref16 = slicedToArray_default()(_ref15, 2),
+                      tokenId = _ref16[0],
+                      token = _ref16[1];
+
+                  return !token.hasOwnProperty('abbr');
+                });
+                _iteratorNormalCompletion5 = true;
+                _didIteratorError5 = false;
+                _iteratorError5 = undefined;
+                _context4.prev = 169;
+                _iterator5 = _addSmartTokens[Symbol.iterator]();
+
+              case 171:
+                if (_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done) {
+                  _context4.next = 200;
+                  break;
+                }
+
+                _step5$value = slicedToArray_default()(_step5.value, 2), tokenId = _step5$value[0], token = _step5$value[1];
+                _context4.next = 175;
+                return services_NodeService.tronWeb.contract().at(tokenId)["catch"](function (e) {
+                  return false;
+                });
+
+              case 175:
+                _contract = _context4.sent;
+
+                if (!_contract) {
+                  _context4.next = 195;
+                  break;
+                }
+
+                _balance = void 0;
+                _context4.next = 180;
+                return _contract.balanceOf(address).call();
+
+              case 180:
+                _number2 = _context4.sent;
+
+                if (_number2.balance) {
+                  _balance = new bignumber["BigNumber"](_number2.balance).toString();
+                } else {
+                  _balance = new bignumber["BigNumber"](_number2).toString();
+                }
+
+                if (!(typeof_default()(token.name) === 'object')) {
+                  _context4.next = 189;
+                  break;
+                }
+
+                _context4.next = 185;
+                return services_NodeService.getSmartToken(tokenId);
+
+              case 185:
+                _token = _context4.sent;
+                this.tokens.smart[tokenId] = _token;
+                _context4.next = 190;
+                break;
+
+              case 189:
+                this.tokens.smart[tokenId] = token;
+
+              case 190:
+                this.tokens.smart[tokenId].imgUrl = false;
+                this.tokens.smart[tokenId].balance = _balance;
+                this.tokens.smart[tokenId].price = 0;
+                _context4.next = 197;
+                break;
+
+              case 195:
+                this.tokens.smart[tokenId].balance = 0;
+                this.tokens.smart[tokenId].price = 0;
+
+              case 197:
+                _iteratorNormalCompletion5 = true;
+                _context4.next = 171;
+                break;
+
+              case 200:
+                _context4.next = 206;
+                break;
+
+              case 202:
+                _context4.prev = 202;
+                _context4.t6 = _context4["catch"](169);
+                _didIteratorError5 = true;
+                _iteratorError5 = _context4.t6;
+
+              case 206:
+                _context4.prev = 206;
+                _context4.prev = 207;
+
+                if (!_iteratorNormalCompletion5 && _iterator5["return"] != null) {
+                  _iterator5["return"]();
+                }
+
+              case 209:
+                _context4.prev = 209;
+
+                if (!_didIteratorError5) {
+                  _context4.next = 212;
+                  break;
+                }
+
+                throw _iteratorError5;
+
+              case 212:
+                return _context4.finish(209);
+
+              case 213:
+                return _context4.finish(206);
+
+              case 214:
+                this.frozenBalance = (_account.account_resource && _account.account_resource.frozen_balance_for_energy ? _account.account_resource.frozen_balance_for_energy.frozen_balance : 0) + (_account.frozen ? _account.frozen[0].frozen_balance : 0);
+                this.balance = _account.balance || 0;
+
+              case 216:
+                totalOwnTrxCount = new bignumber["BigNumber"](this.balance + this.frozenBalance).shiftedBy(-6);
+                Object.entries(TronAccount_objectSpread({}, this.tokens.basic, {}, this.tokens.smart)).map(function (_ref17) {
+                  var _ref18 = slicedToArray_default()(_ref17, 2),
+                      tokenId = _ref18[0],
+                      token = _ref18[1];
+
+                  if (token.price !== 0 && !token.isLocked) {
+                    var prices = services_StorageService.prices;
+                    var price = tokenId === constants_CONTRACT_ADDRESS.USDT ? token.price / prices.priceList[prices.selected] : token.price;
+                    totalOwnTrxCount = totalOwnTrxCount.plus(new bignumber["BigNumber"](token.balance).shiftedBy(-token.decimals).multipliedBy(price));
+                  }
+                });
+                this.asset = totalOwnTrxCount.toNumber();
+                this.lastUpdated = Date.now();
+                _context4.next = 222;
+                return Promise.all([this.updateBalance()]);
+
+              case 222:
+                TronAccount_logger.info("Account ".concat(address, " successfully updated"));
+                this.save();
+                console.log(this.address, '@@@@@@@@@@@@@@@@@@');
+                _context4.next = 230;
+                break;
+
+              case 227:
+                _context4.prev = 227;
+                _context4.t7 = _context4["catch"](7);
+                console.log(_context4.t7);
+
+              case 230:
+                return _context4.abrupt("return", true);
+
+              case 231:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee2, this, [[7, 227], [25, 55, 59, 67], [60,, 62, 66], [83, 88, 92, 100], [93,, 95, 99], [104, 114, 118, 126], [119,, 121, 125], [140, 150, 154, 162], [155,, 157, 161], [169, 202, 206, 214], [207,, 209, 213]]);
+      }));
+
+      function update() {
+        return _update.apply(this, arguments);
+      }
+
+      return update;
+    }()
+  }, {
+    key: "updateBalance",
+    value: function () {
+      var _updateBalance = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee3() {
+        var address, _ref19, _ref19$EnergyLimit, EnergyLimit, _ref19$EnergyUsed, EnergyUsed, freeNetLimit, _ref19$NetLimit, NetLimit, _ref19$freeNetUsed, freeNetUsed, _ref19$NetUsed, NetUsed, TotalEnergyWeight, TotalEnergyLimit;
+
+        return regenerator_default.a.wrap(function _callee3$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                address = this.address; // await NodeService.tronWeb.trx.getBandwidth(address)
+                //     .then((bandwidth = 0) => (
+                //         this.bandwidth = bandwidth
+                //     ));
+
+                _context5.next = 3;
+                return services_NodeService.tronWeb.trx.getAccountResources(address);
+
+              case 3:
+                _ref19 = _context5.sent;
+                _ref19$EnergyLimit = _ref19.EnergyLimit;
+                EnergyLimit = _ref19$EnergyLimit === void 0 ? 0 : _ref19$EnergyLimit;
+                _ref19$EnergyUsed = _ref19.EnergyUsed;
+                EnergyUsed = _ref19$EnergyUsed === void 0 ? 0 : _ref19$EnergyUsed;
+                freeNetLimit = _ref19.freeNetLimit;
+                _ref19$NetLimit = _ref19.NetLimit;
+                NetLimit = _ref19$NetLimit === void 0 ? 0 : _ref19$NetLimit;
+                _ref19$freeNetUsed = _ref19.freeNetUsed;
+                freeNetUsed = _ref19$freeNetUsed === void 0 ? 0 : _ref19$freeNetUsed;
+                _ref19$NetUsed = _ref19.NetUsed;
+                NetUsed = _ref19$NetUsed === void 0 ? 0 : _ref19$NetUsed;
+                TotalEnergyWeight = _ref19.TotalEnergyWeight;
+                TotalEnergyLimit = _ref19.TotalEnergyLimit;
+                this.energy = EnergyLimit;
+                this.energyUsed = EnergyUsed;
+                this.netLimit = freeNetLimit + NetLimit;
+                this.netUsed = NetUsed + freeNetUsed;
+                this.totalEnergyWeight = TotalEnergyWeight;
+                this.TotalEnergyLimit = TotalEnergyLimit;
+
+              case 23:
+              case "end":
+                return _context5.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function updateBalance() {
+        return _updateBalance.apply(this, arguments);
+      }
+
+      return updateBalance;
+    }()
+  }, {
+    key: "addSmartToken",
+    value: function () {
+      var _addSmartToken = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee4(_ref20) {
+        var address, name, decimals, symbol, balance, contract, balanceObj, bn;
+        return regenerator_default.a.wrap(function _callee4$(_context6) {
+          while (1) {
+            switch (_context6.prev = _context6.next) {
+              case 0:
+                address = _ref20.address, name = _ref20.name, decimals = _ref20.decimals, symbol = _ref20.symbol;
+                TronAccount_logger.info("Adding TRC20 token '".concat(address, "' ").concat(name, " (").concat(symbol, ") to account '").concat(this.address, "'"));
+                balance = 0;
+                _context6.prev = 3;
+                _context6.next = 6;
+                return services_NodeService.tronWeb.contract().at(address);
+
+              case 6:
+                contract = _context6.sent;
+                _context6.next = 9;
+                return contract.balanceOf(this.address).call();
+
+              case 9:
+                balanceObj = _context6.sent;
+                bn = new bignumber["BigNumber"](balanceObj.balance || balanceObj);
+                if (bn.isNaN()) balance = '0';else balance = bn.toString();
+                _context6.next = 16;
+                break;
+
+              case 14:
+                _context6.prev = 14;
+                _context6.t0 = _context6["catch"](3);
+
+              case 16:
+                this.tokens.smart[address] = {
+                  balance: balance,
+                  decimals: decimals,
+                  symbol: symbol,
+                  name: name
+                };
+                return _context6.abrupt("return", this.save());
+
+              case 18:
+              case "end":
+                return _context6.stop();
+            }
+          }
+        }, _callee4, this, [[3, 14]]);
+      }));
+
+      function addSmartToken(_x) {
+        return _addSmartToken.apply(this, arguments);
+      }
+
+      return addSmartToken;
+    }()
+  }, {
+    key: "getDetails",
+    value: function getDetails() {
+      return {
+        tokens: this.tokens,
+        type: this.type,
+        name: this.name,
+        address: this.address,
+        balance: this.balance,
+        frozenBalance: this.frozenBalance,
+        totalEnergyWeight: this.totalEnergyWeight,
+        TotalEnergyLimit: this.TotalEnergyLimit,
+        energy: this.energy,
+        energyUsed: this.energyUsed,
+        netLimit: this.netLimit,
+        netUsed: this.netUsed,
+        transactions: this.transactions,
+        lastUpdated: this.lastUpdated,
+        selectedBankRecordId: this.selectedBankRecordId,
+        dealCurrencyPage: this.dealCurrencyPage,
+        airdropInfo: this.airdropInfo,
+        transactionDetail: this.transactionDetail
+      };
+    }
+  }, {
+    key: "export",
+    value: function _export() {
+      return JSON.stringify(this);
+    }
+  }, {
+    key: "save",
+    value: function save() {
+      services_StorageService.saveAccount(this);
+    }
+  }, {
+    key: "sign",
+    value: function () {
+      var _sign = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee5(transaction) {
+        var tronWeb, signedTransaction;
+        return regenerator_default.a.wrap(function _callee5$(_context7) {
+          while (1) {
+            switch (_context7.prev = _context7.next) {
+              case 0:
+                tronWeb = services_NodeService.tronWeb;
+                signedTransaction = tronWeb.trx.sign(transaction, this.privateKey);
+                _context7.next = 4;
+                return signedTransaction;
+
+              case 4:
+                return _context7.abrupt("return", _context7.sent);
+
+              case 5:
+              case "end":
+                return _context7.stop();
+            }
+          }
+        }, _callee5, this);
+      }));
+
+      function sign(_x2) {
+        return _sign.apply(this, arguments);
+      }
+
+      return sign;
+    }()
+  }, {
+    key: "sendTrx",
+    value: function () {
+      var _sendTrx = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee6(recipient, amount) {
+        var transaction;
+        return regenerator_default.a.wrap(function _callee6$(_context8) {
+          while (1) {
+            switch (_context8.prev = _context8.next) {
+              case 0:
+                _context8.prev = 0;
+                _context8.next = 3;
+                return services_NodeService.tronWeb.transactionBuilder.sendTrx(recipient, amount);
+
+              case 3:
+                transaction = _context8.sent;
+                _context8.t0 = services_NodeService.tronWeb.trx;
+                _context8.next = 7;
+                return this.sign(transaction);
+
+              case 7:
+                _context8.t1 = _context8.sent;
+
+                _context8.t2 = function () {
+                  return true;
+                };
+
+                _context8.t3 = function (err) {
+                  return Promise.reject('Failed to broadcast transaction');
+                };
+
+                _context8.next = 12;
+                return _context8.t0.sendRawTransaction.call(_context8.t0, _context8.t1).then(_context8.t2)["catch"](_context8.t3);
+
+              case 12:
+                _context8.next = 18;
+                break;
+
+              case 14:
+                _context8.prev = 14;
+                _context8.t4 = _context8["catch"](0);
+                TronAccount_logger.error('Failed to send TRX:', _context8.t4);
+                return _context8.abrupt("return", Promise.reject(_context8.t4));
+
+              case 18:
+              case "end":
+                return _context8.stop();
+            }
+          }
+        }, _callee6, this, [[0, 14]]);
+      }));
+
+      function sendTrx(_x3, _x4) {
+        return _sendTrx.apply(this, arguments);
+      }
+
+      return sendTrx;
+    }()
+  }, {
+    key: "sendBasicToken",
+    value: function () {
+      var _sendBasicToken = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee7(recipient, amount, token) {
+        var transaction;
+        return regenerator_default.a.wrap(function _callee7$(_context9) {
+          while (1) {
+            switch (_context9.prev = _context9.next) {
+              case 0:
+                _context9.prev = 0;
+                _context9.next = 3;
+                return services_NodeService.tronWeb.transactionBuilder.sendToken(recipient, amount, token);
+
+              case 3:
+                transaction = _context9.sent;
+                _context9.t0 = services_NodeService.tronWeb.trx;
+                _context9.next = 7;
+                return this.sign(transaction);
+
+              case 7:
+                _context9.t1 = _context9.sent;
+
+                _context9.t2 = function () {
+                  return true;
+                };
+
+                _context9.t3 = function (err) {
+                  return Promise.reject('Failed to broadcast transaction');
+                };
+
+                _context9.next = 12;
+                return _context9.t0.sendRawTransaction.call(_context9.t0, _context9.t1).then(_context9.t2)["catch"](_context9.t3);
+
+              case 12:
+                _context9.next = 18;
+                break;
+
+              case 14:
+                _context9.prev = 14;
+                _context9.t4 = _context9["catch"](0);
+                TronAccount_logger.error('Failed to send basic token:', _context9.t4);
+                return _context9.abrupt("return", Promise.reject(_context9.t4));
+
+              case 18:
+              case "end":
+                return _context9.stop();
+            }
+          }
+        }, _callee7, this, [[0, 14]]);
+      }));
+
+      function sendBasicToken(_x5, _x6, _x7) {
+        return _sendBasicToken.apply(this, arguments);
+      }
+
+      return sendBasicToken;
+    }()
+  }, {
+    key: "sendSmartToken",
+    value: function () {
+      var _sendSmartToken = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee8(recipient, amount, token) {
+        var contract;
+        return regenerator_default.a.wrap(function _callee8$(_context10) {
+          while (1) {
+            switch (_context10.prev = _context10.next) {
+              case 0:
+                _context10.prev = 0;
+                _context10.next = 3;
+                return services_NodeService.tronWeb.contract().at(token);
+
+              case 3:
+                contract = _context10.sent;
+                _context10.next = 6;
+                return contract.transfer(recipient, amount).send({
+                  feeLimit: 10 * Math.pow(10, 6)
+                }, this.privateKey);
+
+              case 6:
+                return _context10.abrupt("return", true);
+
+              case 9:
+                _context10.prev = 9;
+                _context10.t0 = _context10["catch"](0);
+                TronAccount_logger.error('Failed to send smart token:', _context10.t0);
+                return _context10.abrupt("return", Promise.reject(_context10.t0));
+
+              case 13:
+              case "end":
+                return _context10.stop();
+            }
+          }
+        }, _callee8, this, [[0, 9]]);
+      }));
+
+      function sendSmartToken(_x8, _x9, _x10) {
+        return _sendSmartToken.apply(this, arguments);
+      }
+
+      return sendSmartToken;
+    }()
+  }], [{
+    key: "generateAccount",
+    value: function generateAccount() {
+      var mnemonic = utils.generateMnemonic();
+      return new Account(ACCOUNT_TYPE.MNEMONIC, mnemonic);
+    }
+  }]);
+
+  return TronAccount;
+}();
+
+/* harmony default export */ var WalletService_TronAccount = (TronAccount_TronAccount);
+// CONCATENATED MODULE: ./services/WalletService/Chain.js
+
+
+
+var Chain_Chain = function Chain(params) {
+  classCallCheck_default()(this, Chain);
+
+  this.type = params.type;
+  this.endPoint = params.endPoint;
+  this.decimal = params.decimal;
+  this.ezWeb = params.ezWeb;
+  this.accounts = {};
+  this.selectedAccount = false;
+};
+
+/* harmony default export */ var WalletService_Chain = (Chain_Chain);
+// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/web3/src/index.js
+var src = __webpack_require__("../../node_modules/web3/src/index.js");
+var src_default = /*#__PURE__*/__webpack_require__.n(src);
+
 // CONCATENATED MODULE: ./services/WalletService/index.js
 
 
@@ -72289,6 +73831,112 @@ function (_EventEmitter) {
       }
 
       return unlockWallet;
+    }()
+  }, {
+    key: "addAccount",
+    value: function () {
+      var _addAccount = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee4(_ref3) {
+        var chain, mnemonic, name, chainObj;
+        return regenerator_default.a.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                chain = _ref3.chain, mnemonic = _ref3.mnemonic, name = _ref3.name;
+                chainObj = this.chains[chain];
+
+                if (chainObj.type === CHAIN_TYPE.TRON) {
+                  this.addTronAccount({
+                    chain: chain,
+                    mnemonic: mnemonic,
+                    name: name
+                  });
+                }
+
+              case 3:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee4, this);
+      }));
+
+      function addAccount(_x2) {
+        return _addAccount.apply(this, arguments);
+      }
+
+      return addAccount;
+    }()
+  }, {
+    key: "addTronAccount",
+    value: function () {
+      var _addTronAccount = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee5(_ref4) {
+        var chain, mnemonic, name, trc10tokens, trc20tokens, account, address;
+        return regenerator_default.a.wrap(function _callee5$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                chain = _ref4.chain, mnemonic = _ref4.mnemonic, name = _ref4.name;
+                WalletService_logger.info("Adding Tron account '".concat(name, "' from popup"));
+                trc10tokens = axios_default.a.get('https://apilist.tronscan.org/api/token?showAll=1&limit=4000', {
+                  timeout: 10000
+                });
+                trc20tokens = axios_default.a.get('https://apilist.tronscan.org/api/tokens/overview?start=0&limit=1000&filter=trc20', {
+                  timeout: 10000
+                });
+                _context5.next = 6;
+                return Promise.all([trc10tokens, trc20tokens]).then(function (res) {
+                  var t = [];
+                  res[0].data.data.concat(res[1].data.tokens).forEach(function (_ref5) {
+                    var abbr = _ref5.abbr,
+                        name = _ref5.name,
+                        _ref5$imgUrl = _ref5.imgUrl,
+                        imgUrl = _ref5$imgUrl === void 0 ? false : _ref5$imgUrl,
+                        _ref5$tokenID = _ref5.tokenID,
+                        tokenID = _ref5$tokenID === void 0 ? false : _ref5$tokenID,
+                        _ref5$contractAddress = _ref5.contractAddress,
+                        contractAddress = _ref5$contractAddress === void 0 ? false : _ref5$contractAddress,
+                        _ref5$decimal = _ref5.decimal,
+                        decimal = _ref5$decimal === void 0 ? false : _ref5$decimal,
+                        _ref5$precision = _ref5.precision,
+                        precision = _ref5$precision === void 0 ? false : _ref5$precision;
+                    if (contractAddress && contractAddress === CONTRACT_ADDRESS.USDT) return;
+                    t.push({
+                      tokenId: tokenID ? tokenID.toString() : contractAddress,
+                      abbr: abbr,
+                      name: name,
+                      imgUrl: imgUrl,
+                      decimals: precision || decimal || 0
+                    });
+                  });
+                  services_StorageService.saveAllTokens(t);
+                });
+
+              case 6:
+                account = new WalletService_TronAccount(chain, ACCOUNT_TYPE.MNEMONIC, mnemonic);
+                address = account.address;
+                account.name = name;
+                this.accounts[address] = account;
+                services_StorageService.saveAccount(account); // this.emit('setAccounts', this.getAccounts());
+
+                return _context5.abrupt("return", true);
+
+              case 12:
+              case "end":
+                return _context5.stop();
+            }
+          }
+        }, _callee5, this);
+      }));
+
+      function addTronAccount(_x3) {
+        return _addTronAccount.apply(this, arguments);
+      }
+
+      return addTronAccount;
     }()
   }]);
 

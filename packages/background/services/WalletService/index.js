@@ -1,6 +1,6 @@
 import Logger from '@ezpay/lib/logger';
 import EventEmitter from 'eventemitter3';
-import Account from './Account';
+import TronAccount from './TronAccount';
 import axios from 'axios';
 import extensionizer from 'extensionizer';
 import Utils from '@ezpay/lib/utils';
@@ -133,6 +133,46 @@ class Wallet extends EventEmitter {
         }
 
         this._setState(APP_STATE.READY);
+    }
+
+    async addAccount({chain, mnemonic, name}) {
+        const chainObj = this.chains[chain]
+        if (chainObj.type === CHAIN_TYPE.TRON) {
+            this.addTronAccount({chain, mnemonic, name})
+        }
+    }
+
+    async addTronAccount({chain, mnemonic, name }) {
+        logger.info(`Adding Tron account '${ name }' from popup`);
+
+        const trc10tokens = axios.get('https://apilist.tronscan.org/api/token?showAll=1&limit=4000',{ timeout: 10000 });
+        const trc20tokens = axios.get('https://apilist.tronscan.org/api/tokens/overview?start=0&limit=1000&filter=trc20',{ timeout: 10000 });
+        await Promise.all([trc10tokens, trc20tokens]).then(res => {
+            let t = [];
+            res[ 0 ].data.data.concat( res[ 1 ].data.tokens).forEach(({ abbr, name, imgUrl = false, tokenID = false, contractAddress = false, decimal = false, precision = false }) => {
+                if(contractAddress && contractAddress === CONTRACT_ADDRESS.USDT)return;
+                t.push({ tokenId: tokenID ? tokenID.toString() : contractAddress, abbr, name, imgUrl, decimals: precision || decimal || 0 });
+            });
+            StorageService.saveAllTokens(t);
+        });
+
+        const account = new TronAccount(
+            chain,
+            ACCOUNT_TYPE.MNEMONIC,
+            mnemonic
+        );
+
+        const {
+            address
+        } = account;
+
+        account.name = name;
+
+        this.accounts[ address ] = account;
+        StorageService.saveAccount(account);
+
+        // this.emit('setAccounts', this.getAccounts());
+        return true;
     }
 }
 
