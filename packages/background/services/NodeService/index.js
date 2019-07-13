@@ -12,14 +12,16 @@ const NodeService = {
         'f0b1e38e-7bee-485e-9d3f-69410bf30681': {
             type: 'TRON',
             name: 'Mainnet',
+            symbol: 'TRX',
             decimal: 6,
             logo: '',
             endPoint: 'https://api.trongrid.io',
             default: true // false
         },
-        '6739be94-ee43-46af-9a62-690cf0947269': {
+        '0f22e40f-a004-4c5a-99ef-004c8e6769bf': {
             type: 'TRON',
             name: 'Shasta Testnet',
+            symbol: 'STRX',
             decimal: 6,
             logo: '',
             endPoint: 'https://api.shasta.trongrid.io',
@@ -28,6 +30,7 @@ const NodeService = {
         '6739be94-ee43-46af-9a62-690cf0947280': {
             type: 'ETH',
             name: 'Ethereum',
+            symbol: 'ETH',
             decimal: 18,
             logo: '',
             endPoint: 'https://mainnet.infura.io/v3/9a150d3a322645268224160ebf5b8599',
@@ -36,6 +39,7 @@ const NodeService = {
         '6739be94-ee43-46af-9a62-690cf0947281': {
             type: 'ETH',
             name: 'Rinkeby',
+            symbol: 'RETH',
             decimal: 18,
             logo: '',
             endPoint: 'https://rinkeby.infura.io/v3/9a150d3a322645268224160ebf5b8599',
@@ -43,7 +47,7 @@ const NodeService = {
         }
     },
 
-    _selectedNode: '6739be94-ee43-46af-9a62-690cf0947269',
+    _selectedNode: 'f0b1e38e-7bee-485e-9d3f-69410bf30681',
 
     _read() {
         logger.info('Reading nodes from storage');

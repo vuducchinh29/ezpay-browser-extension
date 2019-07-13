@@ -14,9 +14,10 @@ import axios from 'axios';
 BigNumber.config({ EXPONENTIAL_AT: [-20, 30] });
 const logger = new Logger('WalletService/TronAccount');
 class TronAccount {
-    constructor(chain, accountType, importData, accountIndex = 0) {
+    constructor(chain, accountType, importData, symbol, accountIndex = 0) {
         this.chain = chain;
         this.type = accountType;
+        this.symbol = symbol;
         this.accountIndex = accountIndex;
 
         this.address = false;
@@ -53,8 +54,16 @@ class TronAccount {
             this._importMnemonic(importData);
         else this._importPrivateKey(importData);
 
+        const nodes = NodeService.getNodes().nodes
+        const node = nodes[chain]
+
+        this.tronWeb = new TronWeb(
+            node.endPoint,
+            node.endPoint,
+            node.endPoint
+        );
+
         this.loadCache();
-        //this._cacheTransactions();
     }
 
     static generateAccount() {
@@ -77,7 +86,7 @@ class TronAccount {
 
         StorageService.removePendingTransaction(address, txID);
 
-        const txData = await NodeService.tronWeb.trx.getTransactionInfo(txID);
+        const txData = await this.tronWeb.trx.getTransactionInfo(txID);
 
         if(!txData.id) {
             logger.info(`Transaction ${ txID } is still missing`);
@@ -241,7 +250,7 @@ class TronAccount {
             const node = NodeService.getNodes().selected;
             if (node === 'f0b1e38e-7bee-485e-9d3f-69410bf30681' || node === '0f22e40f-a004-4c5a-99ef-004c8e6769bf') {
                 const { data: account } = await axios.get('https://apilist.tronscan.org/api/account?address=' + address).catch(e => ( { data: {} } ));
-                const account2 = await NodeService.tronWeb.trx.getUnconfirmedAccount(address);
+                const account2 = await this.tronWeb.trx.getUnconfirmedAccount(address);
                 if (!account2.address) {
                     logger.info(`Account ${address} does not exist on the network`);
                     this.reset();
@@ -249,7 +258,7 @@ class TronAccount {
                 }
                 const addSmartTokens = Object.entries(this.tokens.smart).filter(([tokenId, token]) => !token.hasOwnProperty('abbr'));
                 for (const [tokenId, token] of addSmartTokens) {
-                    const contract = await NodeService.tronWeb.contract().at(tokenId).catch(e => false);
+                    const contract = await this.tronWeb.contract().at(tokenId).catch(e => false);
                     if (contract) {
                         let balance;
                         const number = await contract.balanceOf(address).call();
@@ -333,7 +342,7 @@ class TronAccount {
                     let token = this.tokens.smart[ contract_address ] || false;
                     const filter = smartTokenPriceList.filter(({ fTokenAddr }) => fTokenAddr === contract_address);
                     const price = filter.length ? new BigNumber(filter[ 0 ].price).shiftedBy(-precision).toString() : 0;
-                    const contract = await NodeService.tronWeb.contract().at(contract_address).catch(e => false);
+                    const contract = await this.tronWeb.contract().at(contract_address).catch(e => false);
                     let balance;
                     if (contract) {
                         const number = await contract.balanceOf(address).call();
@@ -369,7 +378,7 @@ class TronAccount {
                     };
                 }
             } else {
-                const account = await NodeService.tronWeb.trx.getUnconfirmedAccount(address);
+                const account = await this.tronWeb.trx.getUnconfirmedAccount(address);
                 if (!account.address) {
                     logger.info(`Account ${address} does not exist on the network`);
                     this.reset();
@@ -419,7 +428,7 @@ class TronAccount {
                 //this.tokens.smart = {};
                 const addSmartTokens = Object.entries(this.tokens.smart).filter(([tokenId, token]) => !token.hasOwnProperty('abbr') );
                 for (const [tokenId, token] of addSmartTokens) {
-                    const contract = await NodeService.tronWeb.contract().at(tokenId).catch(e => false);
+                    const contract = await this.tronWeb.contract().at(tokenId).catch(e => false);
                     if (contract) {
                         let balance;
                         const number = await contract.balanceOf(address).call();
@@ -470,11 +479,11 @@ class TronAccount {
 
     async updateBalance() {
         const { address } = this;
-        // await NodeService.tronWeb.trx.getBandwidth(address)
+        // await this.tronWeb.trx.getBandwidth(address)
         //     .then((bandwidth = 0) => (
         //         this.bandwidth = bandwidth
         //     ));
-        const { EnergyLimit = 0, EnergyUsed = 0, freeNetLimit, NetLimit = 0, freeNetUsed = 0, NetUsed = 0, TotalEnergyWeight, TotalEnergyLimit } = await NodeService.tronWeb.trx.getAccountResources(address);
+        const { EnergyLimit = 0, EnergyUsed = 0, freeNetLimit, NetLimit = 0, freeNetUsed = 0, NetUsed = 0, TotalEnergyWeight, TotalEnergyLimit } = await this.tronWeb.trx.getAccountResources(address);
         this.energy = EnergyLimit;
         this.energyUsed = EnergyUsed;
         this.netLimit = freeNetLimit + NetLimit;
@@ -489,7 +498,7 @@ class TronAccount {
         let balance = 0;
 
         try {
-            const contract = await NodeService.tronWeb.contract().at(address);
+            const contract = await this.tronWeb.contract().at(address);
             const balanceObj = await contract.balanceOf(this.address).call();
 
             const bn = new BigNumber(balanceObj.balance || balanceObj);
@@ -541,7 +550,7 @@ class TronAccount {
     }
 
     async sign(transaction) {
-        const tronWeb = NodeService.tronWeb;
+        const tronWeb = this.tronWeb;
         const signedTransaction = tronWeb.trx.sign(
             transaction,
             this.privateKey
@@ -552,12 +561,12 @@ class TronAccount {
 
     async sendTrx(recipient, amount) {
         try {
-            const transaction = await NodeService.tronWeb.transactionBuilder.sendTrx(
+            const transaction = await this.tronWeb.transactionBuilder.sendTrx(
                 recipient,
                 amount
             );
 
-            await NodeService.tronWeb.trx.sendRawTransaction(
+            await this.tronWeb.trx.sendRawTransaction(
                 await this.sign(transaction)
             ).then(() => true).catch(err => Promise.reject(
                 'Failed to broadcast transaction'
@@ -570,13 +579,13 @@ class TronAccount {
 
     async sendBasicToken(recipient, amount, token) {
         try {
-            const transaction = await NodeService.tronWeb.transactionBuilder.sendToken(
+            const transaction = await this.tronWeb.transactionBuilder.sendToken(
                 recipient,
                 amount,
                 token
             );
 
-            await NodeService.tronWeb.trx.sendRawTransaction(
+            await this.tronWeb.trx.sendRawTransaction(
                 await this.sign(transaction)
             ).then(() => true).catch(err => Promise.reject(
                 'Failed to broadcast transaction'
@@ -589,7 +598,7 @@ class TronAccount {
 
     async sendSmartToken(recipient, amount, token) {
         try {
-            const contract = await NodeService.tronWeb.contract().at(token);
+            const contract = await this.tronWeb.contract().at(token);
 
             await contract.transfer(recipient, amount).send(
                 { feeLimit: 10 * Math.pow(10, 6) },

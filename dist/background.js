@@ -71285,15 +71285,17 @@ var NodeService = {
     'f0b1e38e-7bee-485e-9d3f-69410bf30681': {
       type: 'TRON',
       name: 'Mainnet',
+      symbol: 'TRX',
       decimal: 6,
       logo: '',
       endPoint: 'https://api.trongrid.io',
       "default": true // false
 
     },
-    '6739be94-ee43-46af-9a62-690cf0947269': {
+    '0f22e40f-a004-4c5a-99ef-004c8e6769bf': {
       type: 'TRON',
       name: 'Shasta Testnet',
+      symbol: 'STRX',
       decimal: 6,
       logo: '',
       endPoint: 'https://api.shasta.trongrid.io',
@@ -71302,6 +71304,7 @@ var NodeService = {
     '6739be94-ee43-46af-9a62-690cf0947280': {
       type: 'ETH',
       name: 'Ethereum',
+      symbol: 'ETH',
       decimal: 18,
       logo: '',
       endPoint: 'https://mainnet.infura.io/v3/9a150d3a322645268224160ebf5b8599',
@@ -71310,13 +71313,14 @@ var NodeService = {
     '6739be94-ee43-46af-9a62-690cf0947281': {
       type: 'ETH',
       name: 'Rinkeby',
+      symbol: 'RETH',
       decimal: 18,
       logo: '',
       endPoint: 'https://rinkeby.infura.io/v3/9a150d3a322645268224160ebf5b8599',
       "default": true
     }
   },
-  _selectedNode: '6739be94-ee43-46af-9a62-690cf0947269',
+  _selectedNode: 'f0b1e38e-7bee-485e-9d3f-69410bf30681',
   _read: function _read() {
     NodeService_logger.info('Reading nodes from storage');
     var _StorageService$nodes = services_StorageService.nodes,
@@ -71727,6 +71731,8 @@ var StorageService = {
     this.save('nodes');
   },
   saveAccount: function saveAccount(account) {
+    delete account.tronWeb;
+    delete account.web3;
     StorageService_logger.info('Saving account', account);
 
     var transactions = account.transactions,
@@ -72062,7 +72068,7 @@ var CONFIRMATION_TYPE = {
   STRING: 0,
   TRANSACTION: 1
 };
-var constants_CONTRACT_ADDRESS = {
+var CONTRACT_ADDRESS = {
   USDT: "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t" //USDT:"TWGZ7HnAhZkvxiT89vCBSd6Pzwin5vt3ZA"
 
 };
@@ -72146,13 +72152,14 @@ var TronAccount_logger = new logger_Logger('WalletService/TronAccount');
 var TronAccount_TronAccount =
 /*#__PURE__*/
 function () {
-  function TronAccount(chain, accountType, importData) {
-    var accountIndex = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+  function TronAccount(chain, accountType, importData, symbol) {
+    var accountIndex = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 0;
 
     classCallCheck_default()(this, TronAccount);
 
     this.chain = chain;
     this.type = accountType;
+    this.symbol = symbol;
     this.accountIndex = accountIndex;
     this.address = false;
     this.name = false;
@@ -72178,16 +72185,19 @@ function () {
       basic: {},
       smart: {}
     };
-    this.tokens.smart[constants_CONTRACT_ADDRESS.USDT] = {
+    this.tokens.smart[CONTRACT_ADDRESS.USDT] = {
       symbol: 'USDT',
       name: 'Tether USD',
       decimal: 6,
-      tokenId: constants_CONTRACT_ADDRESS.USDT,
+      tokenId: CONTRACT_ADDRESS.USDT,
       balance: 0,
       price: 0
     };
     if (accountType == ACCOUNT_TYPE.MNEMONIC) this._importMnemonic(importData);else this._importPrivateKey(importData);
-    this.loadCache(); //this._cacheTransactions();
+    var nodes = services_NodeService.getNodes().nodes;
+    var node = nodes[chain];
+    this.tronWeb = new TronWeb_node_default.a(node.endPoint, node.endPoint, node.endPoint);
+    this.loadCache();
   }
 
   createClass_default()(TronAccount, [{
@@ -72219,7 +72229,7 @@ function () {
                 TronAccount_logger.info("Caching transaction ".concat(txID));
                 services_StorageService.removePendingTransaction(address, txID);
                 _context.next = 8;
-                return services_NodeService.tronWeb.trx.getTransactionInfo(txID);
+                return this.tronWeb.trx.getTransactionInfo(txID);
 
               case 8:
                 txData = _context.sent;
@@ -72340,12 +72350,12 @@ function () {
       this.asset = asset;
       this.hash = '';
 
-      if (!this.tokens.smart.hasOwnProperty(constants_CONTRACT_ADDRESS.USDT)) {
-        this.tokens.smart[constants_CONTRACT_ADDRESS.USDT] = {
+      if (!this.tokens.smart.hasOwnProperty(CONTRACT_ADDRESS.USDT)) {
+        this.tokens.smart[CONTRACT_ADDRESS.USDT] = {
           symbol: 'USDT',
           name: 'Tether USD',
           decimal: 6,
-          tokenId: constants_CONTRACT_ADDRESS.USDT,
+          tokenId: CONTRACT_ADDRESS.USDT,
           balance: 0,
           price: 0
         };
@@ -72492,7 +72502,7 @@ function () {
                 _ref = _context4.sent;
                 account = _ref.data;
                 _context4.next = 16;
-                return services_NodeService.tronWeb.trx.getUnconfirmedAccount(address);
+                return this.tronWeb.trx.getUnconfirmedAccount(address);
 
               case 16:
                 account2 = _context4.sent;
@@ -72528,7 +72538,7 @@ function () {
 
                 _step$value = slicedToArray_default()(_step.value, 2), tokenId = _step$value[0], token = _step$value[1];
                 _context4.next = 31;
-                return services_NodeService.tronWeb.contract().at(tokenId)["catch"](function (e) {
+                return this.tronWeb.contract().at(tokenId)["catch"](function (e) {
                   return false;
                 });
 
@@ -72619,7 +72629,7 @@ function () {
                 return _context4.finish(59);
 
               case 67:
-                this.tokens.smart[constants_CONTRACT_ADDRESS.USDT].price = usdtPrice;
+                this.tokens.smart[CONTRACT_ADDRESS.USDT].price = usdtPrice;
                 sentDelegateBandwidth = 0;
                 delegated = account.delegated;
 
@@ -72751,7 +72761,7 @@ function () {
 
               case 100:
                 smartTokens = account.trc20token_balances.filter(function (v) {
-                  return v.balance >= 0 && v.contract_address !== constants_CONTRACT_ADDRESS.USDT;
+                  return v.balance >= 0 && v.contract_address !== CONTRACT_ADDRESS.USDT;
                 });
                 _iteratorNormalCompletion3 = true;
                 _didIteratorError3 = false;
@@ -72774,7 +72784,7 @@ function () {
                           });
                           price = filter.length ? new bignumber["BigNumber"](filter[0].price).shiftedBy(-precision).toString() : 0;
                           _context2.next = 6;
-                          return services_NodeService.tronWeb.contract().at(contract_address)["catch"](function (e) {
+                          return _this4.tronWeb.contract().at(contract_address)["catch"](function (e) {
                             return false;
                           });
 
@@ -72886,7 +72896,7 @@ function () {
 
               case 128:
                 _context4.next = 130;
-                return services_NodeService.tronWeb.trx.getUnconfirmedAccount(address);
+                return this.tronWeb.trx.getUnconfirmedAccount(address);
 
               case 130:
                 _account = _context4.sent;
@@ -73054,7 +73064,7 @@ function () {
 
                 _step5$value = slicedToArray_default()(_step5.value, 2), tokenId = _step5$value[0], token = _step5$value[1];
                 _context4.next = 175;
-                return services_NodeService.tronWeb.contract().at(tokenId)["catch"](function (e) {
+                return this.tronWeb.contract().at(tokenId)["catch"](function (e) {
                   return false;
                 });
 
@@ -73159,7 +73169,7 @@ function () {
 
                   if (token.price !== 0 && !token.isLocked) {
                     var prices = services_StorageService.prices;
-                    var price = tokenId === constants_CONTRACT_ADDRESS.USDT ? token.price / prices.priceList[prices.selected] : token.price;
+                    var price = tokenId === CONTRACT_ADDRESS.USDT ? token.price / prices.priceList[prices.selected] : token.price;
                     totalOwnTrxCount = totalOwnTrxCount.plus(new bignumber["BigNumber"](token.balance).shiftedBy(-token.decimals).multipliedBy(price));
                   }
                 });
@@ -73209,13 +73219,13 @@ function () {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                address = this.address; // await NodeService.tronWeb.trx.getBandwidth(address)
+                address = this.address; // await this.tronWeb.trx.getBandwidth(address)
                 //     .then((bandwidth = 0) => (
                 //         this.bandwidth = bandwidth
                 //     ));
 
                 _context5.next = 3;
-                return services_NodeService.tronWeb.trx.getAccountResources(address);
+                return this.tronWeb.trx.getAccountResources(address);
 
               case 3:
                 _ref19 = _context5.sent;
@@ -73269,7 +73279,7 @@ function () {
                 balance = 0;
                 _context6.prev = 3;
                 _context6.next = 6;
-                return services_NodeService.tronWeb.contract().at(address);
+                return this.tronWeb.contract().at(address);
 
               case 6:
                 contract = _context6.sent;
@@ -73355,7 +73365,7 @@ function () {
           while (1) {
             switch (_context7.prev = _context7.next) {
               case 0:
-                tronWeb = services_NodeService.tronWeb;
+                tronWeb = this.tronWeb;
                 signedTransaction = tronWeb.trx.sign(transaction, this.privateKey);
                 _context7.next = 4;
                 return signedTransaction;
@@ -73390,11 +73400,11 @@ function () {
               case 0:
                 _context8.prev = 0;
                 _context8.next = 3;
-                return services_NodeService.tronWeb.transactionBuilder.sendTrx(recipient, amount);
+                return this.tronWeb.transactionBuilder.sendTrx(recipient, amount);
 
               case 3:
                 transaction = _context8.sent;
-                _context8.t0 = services_NodeService.tronWeb.trx;
+                _context8.t0 = this.tronWeb.trx;
                 _context8.next = 7;
                 return this.sign(transaction);
 
@@ -73449,11 +73459,11 @@ function () {
               case 0:
                 _context9.prev = 0;
                 _context9.next = 3;
-                return services_NodeService.tronWeb.transactionBuilder.sendToken(recipient, amount, token);
+                return this.tronWeb.transactionBuilder.sendToken(recipient, amount, token);
 
               case 3:
                 transaction = _context9.sent;
-                _context9.t0 = services_NodeService.tronWeb.trx;
+                _context9.t0 = this.tronWeb.trx;
                 _context9.next = 7;
                 return this.sign(transaction);
 
@@ -73508,7 +73518,7 @@ function () {
               case 0:
                 _context10.prev = 0;
                 _context10.next = 3;
-                return services_NodeService.tronWeb.contract().at(token);
+                return this.tronWeb.contract().at(token);
 
               case 3:
                 contract = _context10.sent;
@@ -73609,7 +73619,7 @@ function (_EventEmitter) {
     _this.state = APP_STATE.UNINITIALISED;
     _this.selectedChain = false;
     _this.chains = {};
-    _this.nodeService = utils.requestHandler(services_NodeService);
+    _this.accounts = {};
 
     _this._checkStorage();
 
@@ -73668,7 +73678,7 @@ function (_EventEmitter) {
     value: function _initChains() {
       var _this2 = this;
 
-      var nodes = this.nodeService.getNodes();
+      var nodes = services_NodeService.getNodes().nodes;
       Object.entries(nodes).forEach(function (_ref) {
         var _ref2 = slicedToArray_default()(_ref, 2),
             key = _ref2[0],
@@ -73755,6 +73765,31 @@ function (_EventEmitter) {
       this._setState(APP_STATE.READY);
     }
   }, {
+    key: "_loadAccounts",
+    value: function _loadAccounts() {
+      var _this3 = this;
+
+      var accounts = services_StorageService.getAccounts();
+      var nodes = services_NodeService.getNodes().nodes;
+      Object.entries(accounts).forEach(function (_ref3) {
+        var _ref4 = slicedToArray_default()(_ref3, 2),
+            address = _ref4[0],
+            account = _ref4[1];
+
+        var node = nodes[account.chain];
+        var accountObj;
+
+        if (node.type === CHAIN_TYPE.TRON) {
+          accountObj = new WalletService_TronAccount(account.chain, account.type, account.mnemonic || account.privateKey, account.symbol, account.accountIndex);
+          accountObj.loadCache();
+          accountObj.update([], [], 0);
+          console.log('accounts', _this3.accounts);
+        }
+
+        _this3.accounts[address] = accountObj;
+      });
+    }
+  }, {
     key: "unlockWallet",
     value: function () {
       var _unlockWallet = asyncToGenerator_default()(
@@ -73807,18 +73842,25 @@ function (_EventEmitter) {
                 return _context3.abrupt("return", Promise.reject(unlockFailed));
 
               case 14:
+                // this.addAccount({
+                //     chain: 'f0b1e38e-7bee-485e-9d3f-69410bf30681',
+                //     mnemonic: Utils.generateMnemonic(),
+                //     name: 'Account 2'
+                // })
+                this._loadAccounts();
+
                 if (services_StorageService.hasAccounts) {
-                  _context3.next = 17;
+                  _context3.next = 18;
                   break;
                 }
 
                 WalletService_logger.info('Wallet does not have any accounts');
                 return _context3.abrupt("return", this._setState(APP_STATE.READY));
 
-              case 17:
+              case 18:
                 this._setState(APP_STATE.READY);
 
-              case 18:
+              case 19:
               case "end":
                 return _context3.stop();
             }
@@ -73837,24 +73879,21 @@ function (_EventEmitter) {
     value: function () {
       var _addAccount = asyncToGenerator_default()(
       /*#__PURE__*/
-      regenerator_default.a.mark(function _callee4(_ref3) {
-        var chain, mnemonic, name, chainObj;
+      regenerator_default.a.mark(function _callee4(_ref5) {
+        var chain, mnemonic, name, nodes, node;
         return regenerator_default.a.wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                chain = _ref3.chain, mnemonic = _ref3.mnemonic, name = _ref3.name;
-                chainObj = this.chains[chain];
+                chain = _ref5.chain, mnemonic = _ref5.mnemonic, name = _ref5.name;
+                nodes = services_NodeService.getNodes().nodes;
+                node = nodes[chain];
 
-                if (chainObj.type === CHAIN_TYPE.TRON) {
-                  this.addTronAccount({
-                    chain: chain,
-                    mnemonic: mnemonic,
-                    name: name
-                  });
+                if (node.type === CHAIN_TYPE.TRON) {
+                  this.addTronAccount(chain, mnemonic, name, node.symbol);
                 }
 
-              case 3:
+              case 4:
               case "end":
                 return _context4.stop();
             }
@@ -73873,13 +73912,12 @@ function (_EventEmitter) {
     value: function () {
       var _addTronAccount = asyncToGenerator_default()(
       /*#__PURE__*/
-      regenerator_default.a.mark(function _callee5(_ref4) {
-        var chain, mnemonic, name, trc10tokens, trc20tokens, account, address;
+      regenerator_default.a.mark(function _callee5(chain, mnemonic, name, symbol) {
+        var trc10tokens, trc20tokens, account, address;
         return regenerator_default.a.wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                chain = _ref4.chain, mnemonic = _ref4.mnemonic, name = _ref4.name;
                 WalletService_logger.info("Adding Tron account '".concat(name, "' from popup"));
                 trc10tokens = axios_default.a.get('https://apilist.tronscan.org/api/token?showAll=1&limit=4000', {
                   timeout: 10000
@@ -73887,22 +73925,22 @@ function (_EventEmitter) {
                 trc20tokens = axios_default.a.get('https://apilist.tronscan.org/api/tokens/overview?start=0&limit=1000&filter=trc20', {
                   timeout: 10000
                 });
-                _context5.next = 6;
+                _context5.next = 5;
                 return Promise.all([trc10tokens, trc20tokens]).then(function (res) {
                   var t = [];
-                  res[0].data.data.concat(res[1].data.tokens).forEach(function (_ref5) {
-                    var abbr = _ref5.abbr,
-                        name = _ref5.name,
-                        _ref5$imgUrl = _ref5.imgUrl,
-                        imgUrl = _ref5$imgUrl === void 0 ? false : _ref5$imgUrl,
-                        _ref5$tokenID = _ref5.tokenID,
-                        tokenID = _ref5$tokenID === void 0 ? false : _ref5$tokenID,
-                        _ref5$contractAddress = _ref5.contractAddress,
-                        contractAddress = _ref5$contractAddress === void 0 ? false : _ref5$contractAddress,
-                        _ref5$decimal = _ref5.decimal,
-                        decimal = _ref5$decimal === void 0 ? false : _ref5$decimal,
-                        _ref5$precision = _ref5.precision,
-                        precision = _ref5$precision === void 0 ? false : _ref5$precision;
+                  res[0].data.data.concat(res[1].data.tokens).forEach(function (_ref6) {
+                    var abbr = _ref6.abbr,
+                        name = _ref6.name,
+                        _ref6$imgUrl = _ref6.imgUrl,
+                        imgUrl = _ref6$imgUrl === void 0 ? false : _ref6$imgUrl,
+                        _ref6$tokenID = _ref6.tokenID,
+                        tokenID = _ref6$tokenID === void 0 ? false : _ref6$tokenID,
+                        _ref6$contractAddress = _ref6.contractAddress,
+                        contractAddress = _ref6$contractAddress === void 0 ? false : _ref6$contractAddress,
+                        _ref6$decimal = _ref6.decimal,
+                        decimal = _ref6$decimal === void 0 ? false : _ref6$decimal,
+                        _ref6$precision = _ref6.precision,
+                        precision = _ref6$precision === void 0 ? false : _ref6$precision;
                     if (contractAddress && contractAddress === CONTRACT_ADDRESS.USDT) return;
                     t.push({
                       tokenId: tokenID ? tokenID.toString() : contractAddress,
@@ -73915,8 +73953,9 @@ function (_EventEmitter) {
                   services_StorageService.saveAllTokens(t);
                 });
 
-              case 6:
-                account = new WalletService_TronAccount(chain, ACCOUNT_TYPE.MNEMONIC, mnemonic);
+              case 5:
+                account = new WalletService_TronAccount(chain, ACCOUNT_TYPE.MNEMONIC, mnemonic, symbol);
+                WalletService_logger.info("Add account '".concat(account, "'"));
                 address = account.address;
                 account.name = name;
                 this.accounts[address] = account;
@@ -73932,7 +73971,7 @@ function (_EventEmitter) {
         }, _callee5, this);
       }));
 
-      function addTronAccount(_x3) {
+      function addTronAccount(_x3, _x4, _x5, _x6) {
         return _addTronAccount.apply(this, arguments);
       }
 

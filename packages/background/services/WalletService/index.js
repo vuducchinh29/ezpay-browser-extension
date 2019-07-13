@@ -13,7 +13,8 @@ import Web3 from 'web3';
 import {
     APP_STATE,
     ACCOUNT_TYPE,
-    CHAIN_TYPE
+    CHAIN_TYPE,
+    CONTRACT_ADDRESS
 } from '@ezpay/lib/constants';
 
 const logger = new Logger('WalletService');
@@ -25,7 +26,7 @@ class Wallet extends EventEmitter {
         this.state = APP_STATE.UNINITIALISED;
         this.selectedChain = false;
         this.chains = {};
-        this.nodeService = Utils.requestHandler(NodeService);
+        this.accounts = {};
 
         this._checkStorage();
         this._initChains();
@@ -37,7 +38,7 @@ class Wallet extends EventEmitter {
     }
 
     _initChains() {
-        const nodes = this.nodeService.getNodes();
+        const nodes = NodeService.getNodes().nodes;
 
         Object.entries(nodes).forEach(([key, node]) => {
             let ezWeb;
@@ -106,6 +107,31 @@ class Wallet extends EventEmitter {
         this._setState(APP_STATE.READY);
     }
 
+    _loadAccounts() {
+        const accounts = StorageService.getAccounts();
+        const nodes = NodeService.getNodes().nodes;
+
+        Object.entries(accounts).forEach(([ address, account ]) => {
+            let node = nodes[account.chain]
+            let accountObj
+
+            if (node.type === CHAIN_TYPE.TRON) {
+                accountObj = new TronAccount(
+                    account.chain,
+                    account.type,
+                    account.mnemonic || account.privateKey,
+                    account.symbol,
+                    account.accountIndex
+                );
+
+                accountObj.loadCache();
+                accountObj.update([], [], 0);
+            }
+
+            this.accounts[ address ] = accountObj;
+        });
+    }
+
     async unlockWallet(password) {
         if(this.state !== APP_STATE.PASSWORD_SET) {
             logger.error('Attempted to unlock wallet whilst not in PASSWORD_SET state');
@@ -127,6 +153,14 @@ class Wallet extends EventEmitter {
             return Promise.reject(unlockFailed);
         }
 
+        // this.addAccount({
+        //     chain: 'f0b1e38e-7bee-485e-9d3f-69410bf30681',
+        //     mnemonic: Utils.generateMnemonic(),
+        //     name: 'Account 2'
+        // })
+
+        this._loadAccounts()
+
         if(!StorageService.hasAccounts) {
             logger.info('Wallet does not have any accounts');
             return this._setState(APP_STATE.READY);
@@ -136,13 +170,15 @@ class Wallet extends EventEmitter {
     }
 
     async addAccount({chain, mnemonic, name}) {
-        const chainObj = this.chains[chain]
-        if (chainObj.type === CHAIN_TYPE.TRON) {
-            this.addTronAccount({chain, mnemonic, name})
+        const nodes = NodeService.getNodes().nodes;
+        const node = nodes[chain]
+
+        if (node.type === CHAIN_TYPE.TRON) {
+            this.addTronAccount(chain, mnemonic, name, node.symbol)
         }
     }
 
-    async addTronAccount({chain, mnemonic, name }) {
+    async addTronAccount(chain, mnemonic, name, symbol) {
         logger.info(`Adding Tron account '${ name }' from popup`);
 
         const trc10tokens = axios.get('https://apilist.tronscan.org/api/token?showAll=1&limit=4000',{ timeout: 10000 });
@@ -159,15 +195,15 @@ class Wallet extends EventEmitter {
         const account = new TronAccount(
             chain,
             ACCOUNT_TYPE.MNEMONIC,
-            mnemonic
+            mnemonic,
+            symbol
         );
+        logger.info(`Add account '${ account }'`);
 
         const {
             address
         } = account;
-
         account.name = name;
-
         this.accounts[ address ] = account;
         StorageService.saveAccount(account);
 

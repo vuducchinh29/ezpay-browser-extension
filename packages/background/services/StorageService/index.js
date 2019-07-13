@@ -201,6 +201,9 @@ const StorageService = {
     },
 
     saveAccount(account) {
+        delete account.tronWeb
+        delete account.web3
+
         logger.info('Saving account', account);
 
         const {
