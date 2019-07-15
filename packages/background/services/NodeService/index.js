@@ -30,36 +30,32 @@ const NodeService = {
             endPoint: 'https://rpc.nexty.io'
         }
     },
-    _tokens = {
+    _tokens: {
         'f0b1e38e-7bee-485e-9d3f-69410bf30683': {
             node: 'f0b1e38e-7bee-485e-9d3f-69410bf30681',
-            name: 'Tron',
             symbol: 'TRX',
             decimal: 6,
             logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1958.png'
         },
         'f0b1e38e-7bee-485e-9d3f-69410bf30684': {
             node: '0f22e40f-a004-4c5a-99ef-004c8e6769bf',
-            name: 'Tron Test',
             symbol: 'TRX',
             decimal: 6,
             logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1958.png'
         },
         'f0b1e38e-7bee-485e-9d3f-69410bf30685': {
             node: '6739be94-ee43-46af-9a62-690cf0947280',
-            name: 'Ethereum',
             symbol: 'ETH',
             decimal: 18,
             logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png'
         },
         'f0b1e38e-7bee-485e-9d3f-69410bf30686': {
             node: '6739be94-ee43-46af-9a62-690cf0947282',
-            name: 'Nexty',
             symbol: 'NTY',
             decimal: 18,
             logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/2714.png'
         },
-    }
+    },
 
     _selectedNode: 'f0b1e38e-7bee-485e-9d3f-69410bf30681',
 
@@ -132,7 +128,7 @@ const NodeService = {
 
     getTokens() {
         return this._tokens
-    }
+    },
 
     getCurrentNode() {
         return this._nodes[ this._selectedNode ];

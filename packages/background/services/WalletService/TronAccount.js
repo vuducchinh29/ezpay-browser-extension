@@ -3,6 +3,7 @@ import TronWeb from 'tronweb';
 import Logger from '@ezpay/lib/logger';
 import Utils from '@ezpay/lib/utils';
 import NodeService from '../NodeService';
+import Account from './Account';
 
 import { BigNumber } from 'bignumber.js';
 
@@ -13,20 +14,14 @@ import {
 import axios from 'axios';
 BigNumber.config({ EXPONENTIAL_AT: [-20, 30] });
 const logger = new Logger('WalletService/TronAccount');
-class TronAccount {
-    constructor(chain, accountType, importData, accountIndex = 0) {
-        this.chain = chain;
-        this.type = accountType;
-        this.accountIndex = accountIndex;
+class TronAccount extends Account {
+    constructor(chain, accountType, importData, name, symbol, decimal, logo, accountIndex = 0) {
+        super(chain, accountType, importData, name, symbol, decimal, logo, accountIndex = 0);
 
-        this.address = false;
-        this.name = false;
-        this.updatingTransactions = false;
         this.selectedBankRecordId = 0;
         this.dealCurrencyPage = 0;
         this.energy = 0;
         this.energyUsed = 0;
-        this.balance = 0;
         this.frozenBalance = 0;
         this.netUsed = 0;
         this.netLimit = 0;
@@ -137,7 +132,7 @@ class TronAccount {
         if(this.type !== ACCOUNT_TYPE.MNEMONIC)
             throw new Error('Deriving account keys at a specific index requires a mnemonic account');
 
-        return Utils.getAccountAtIndex(
+        return Utils.getTronAccountAtIndex(
             this.mnemonic,
             index
         );

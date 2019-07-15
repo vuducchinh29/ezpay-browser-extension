@@ -27,7 +27,8 @@ export const CHAIN_TYPE = {
     TRON: 'TRON',
     ETH: 'ETH',
     BTC: 'BTC',
-    LTC: 'LTC'
+    LTC: 'LTC',
+    NTY: 'NTY'
 };
 
 export const VALIDATION_STATE = {

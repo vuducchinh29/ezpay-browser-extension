@@ -31,10 +31,10 @@ class Controller extends React.Component {
                     {
                         Object.entries(accounts).map(([ address, account ]) => (
                             <div className='item'>
-                                <img src={account.chain.logo} />
+                                <img src={account.logo} />
                                 <div className='content'>
                                     <div className={'title'}>{account.name}</div>
-                                    <div className='desc'>{account.balance} {account.chain.symbol}</div>
+                                    <div className='desc'>{account.balance} {account.symbol}</div>
                                 </div>
                             </div>
                         ))

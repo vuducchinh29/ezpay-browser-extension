@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import bip39 from 'bip39';
 import bip32 from 'bip32';
 import TronWeb from 'tronweb';
+import Web3 from 'web3'
 import pbkdf2 from 'pbkdf2';
 import aesjs from "aes-js";
 import { isAddressValid,pkToAddress } from "@tronscan/client/src/utils/crypto";
@@ -10,6 +11,8 @@ import { isAddressValid,pkToAddress } from "@tronscan/client/src/utils/crypto";
 const encryptKey = (password, salt) => {
     return pbkdf2.pbkdf2Sync(password, salt, 1, 256 / 8, 'sha512');
 };
+
+const web3 = new Web3()
 
 const Utils = {
     encryptionAlgorithm: 'aes-256-ctr',
@@ -133,7 +136,7 @@ const Utils = {
         return bip39.generateMnemonic(128);
     },
 
-    getAccountAtIndex(mnemonic, index = 0) {
+    getTronAccountAtIndex(mnemonic, index = 0) {
         const seed = bip39.mnemonicToSeed(mnemonic);
         const node = bip32.fromSeed(seed);
         const child = node.derivePath(`m/44'/195'/${ index }'/0/0`);
@@ -143,6 +146,20 @@ const Utils = {
         return {
             privateKey,
             address
+        };
+    },
+
+    getEthereumAccountAtIndex(mnemonic, index = 0) {
+        const seed = bip39.mnemonicToSeed(mnemonic);
+        const node = bip32.fromSeed(seed);
+        const child = node.derivePath(`m/44'/195'/${ index }'/0/0`);
+        const privateKey = child.privateKey.toString('hex');
+
+        const account = web3.eth.accounts.privateKeyToAccount(privateKey);
+
+        return {
+            privateKey: account.privateKey,
+            address: account.address
         };
     },
 

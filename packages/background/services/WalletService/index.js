@@ -1,6 +1,7 @@
 import Logger from '@ezpay/lib/logger';
 import EventEmitter from 'eventemitter3';
 import TronAccount from './TronAccount';
+import EthereumAccount from './EthereumAccount';
 import axios from 'axios';
 import extensionizer from 'extensionizer';
 import Utils from '@ezpay/lib/utils';
@@ -125,12 +126,26 @@ class Wallet extends EventEmitter {
                     account.chain,
                     account.type,
                     account.mnemonic || account.privateKey,
+                    account.name,
                     account.symbol,
+                    account.decimal,
+                    account.logo,
                     account.accountIndex
                 );
 
                 accountObj.loadCache();
                 accountObj.update([], [], 0);
+            } else if (node.type === CHAIN_TYPE.NTY) {
+                accountObj = new EthereumAccount(
+                    account.chain,
+                    account.type,
+                    account.mnemonic || account.privateKey,
+                    account.name,
+                    account.symbol,
+                    account.decimal,
+                    account.logo,
+                    account.accountIndex
+                );
             }
 
             this.accounts[ address ] = accountObj;
@@ -158,6 +173,8 @@ class Wallet extends EventEmitter {
             return Promise.reject(unlockFailed);
         }
 
+        // this._createDefaultAccount()
+
         if(!StorageService.hasAccounts) {
             this._createDefaultAccount()
             logger.info('Wallet does not have any accounts');
@@ -169,24 +186,35 @@ class Wallet extends EventEmitter {
     }
 
     _createDefaultAccount() {
+        const tokens = NodeService.getTokens()
+        const token = tokens['f0b1e38e-7bee-485e-9d3f-69410bf30686']
+        const token2 = tokens['f0b1e38e-7bee-485e-9d3f-69410bf30683']
+
         this.addAccount({
-            chain: 'f0b1e38e-7bee-485e-9d3f-69410bf30681',
+            ...token,
             mnemonic: Utils.generateMnemonic(),
-            name: 'Account 1'
+            name: 'Nexty Account 2'
+        })
+        this.addAccount({
+            ...token2,
+            mnemonic: Utils.generateMnemonic(),
+            name: 'Tron Account 2'
         })
     }
 
-    async addAccount({chain, mnemonic, name}) {
+    async addAccount(params) {
         const nodes = NodeService.getNodes().nodes;
-        const node = nodes[chain]
+        const node = nodes[params.node]
 
         if (node.type === CHAIN_TYPE.TRON) {
-            this.addTronAccount(chain, mnemonic, name)
+            this.addTronAccount(params)
+        } else if (node.type === CHAIN_TYPE.NTY) {
+            this.addEthereumAccount(params)
         }
     }
 
-    async addTronAccount(chain, mnemonic, name, symbol) {
-        logger.info(`Adding Tron account '${ name }' from popup`);
+    async addTronAccount(params) {
+        logger.info(`Adding Tron account '${ params.name }' from popup`);
 
         const trc10tokens = axios.get('https://apilist.tronscan.org/api/token?showAll=1&limit=4000',{ timeout: 10000 });
         const trc20tokens = axios.get('https://apilist.tronscan.org/api/tokens/overview?start=0&limit=1000&filter=trc20',{ timeout: 10000 });
@@ -200,16 +228,45 @@ class Wallet extends EventEmitter {
         });
 
         const account = new TronAccount(
-            chain,
+            params.node,
             ACCOUNT_TYPE.MNEMONIC,
-            mnemonic
+            params.mnemonic,
+            params.name,
+            params.symbol,
+            params.decimal,
+            params.logo
         );
         logger.info(`Add account '${ account }'`);
 
         const {
             address
         } = account;
-        account.name = name;
+
+        this.accounts[ address ] = account;
+        StorageService.saveAccount(account);
+
+        // this.emit('setAccounts', this.getAccounts());
+        return true;
+    }
+
+    async addEthereumAccount(params) {
+        logger.info(`Adding Ethereum account '${ params.name }' from popup`);
+
+        const account = new EthereumAccount(
+            params.node,
+            ACCOUNT_TYPE.MNEMONIC,
+            params.mnemonic,
+            params.name,
+            params.symbol,
+            params.decimal,
+            params.logo
+        );
+        logger.info(`Add account '${ account }'`);
+
+        const {
+            address
+        } = account;
+
         this.accounts[ address ] = account;
         StorageService.saveAccount(account);
 
@@ -219,19 +276,23 @@ class Wallet extends EventEmitter {
 
     getAccounts() {
         const nodes = NodeService.getNodes().nodes;
+
         const accounts = Object.entries(this.accounts).reduce((accounts, [ address, account ]) => {
             accounts[ address ] = {
                 name: account.name,
+                logo: account.logo,
+                decimal: account.decimal,
+                symbol: account.symbol,
                 chain: nodes[account.chain],
-                balance: account.balance + account.frozenBalance,
-                energyUsed: account.energyUsed,
-                totalEnergyWeight: account.totalEnergyWeight,
-                TotalEnergyLimit: account.TotalEnergyLimit,
-                energy: account.energy,
-                netUsed: account.netUsed,
-                netLimit: account.netLimit,
-                tokenCount: Object.keys(account.tokens.basic).length + Object.keys(account.tokens.smart).length,
-                asset: account.asset
+                balance: account.balance + account.frozenBalance || 0,
+                // energyUsed: account.energyUsed,
+                // totalEnergyWeight: account.totalEnergyWeight,
+                // TotalEnergyLimit: account.TotalEnergyLimit,
+                // energy: account.energy,
+                // netUsed: account.netUsed,
+                // netLimit: account.netLimit,
+                // tokenCount: Object.keys(account.tokens.basic).length + Object.keys(account.tokens.smart).length,
+                // asset: account.asset
             };
 
             return accounts;

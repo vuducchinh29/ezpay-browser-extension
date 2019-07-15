@@ -70408,7 +70408,7 @@ function extend() {
 
 /***/ "./index.js":
 /*!*******************************!*\
-  !*** ./index.js + 15 modules ***!
+  !*** ./index.js + 17 modules ***!
   \*******************************/
 /*! no exports provided */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/asyncToGenerator.js (<- Module is not an ECMAScript module) */
@@ -70975,6 +70975,10 @@ var bip32_default = /*#__PURE__*/__webpack_require__.n(bip32);
 var TronWeb_node = __webpack_require__("../../node_modules/tronweb/dist/TronWeb.node.js");
 var TronWeb_node_default = /*#__PURE__*/__webpack_require__.n(TronWeb_node);
 
+// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/web3/src/index.js
+var src = __webpack_require__("../../node_modules/web3/src/index.js");
+var src_default = /*#__PURE__*/__webpack_require__.n(src);
+
 // EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/pbkdf2/browser.js
 var browser = __webpack_require__("../../node_modules/pbkdf2/browser.js");
 var browser_default = /*#__PURE__*/__webpack_require__.n(browser);
@@ -70996,10 +71000,12 @@ var utils_crypto = __webpack_require__("../../node_modules/@tronscan/client/src/
 
 
 
+
 var utils_encryptKey = function encryptKey(password, salt) {
   return browser_default.a.pbkdf2Sync(password, salt, 1, 256 / 8, 'sha512');
 };
 
+var web3 = new src_default.a();
 var Utils = {
   encryptionAlgorithm: 'aes-256-ctr',
   hashAlgorithm: 'sha256',
@@ -71113,7 +71119,7 @@ var Utils = {
   generateMnemonic: function generateMnemonic() {
     return bip39_default.a.generateMnemonic(128);
   },
-  getAccountAtIndex: function getAccountAtIndex(mnemonic) {
+  getTronAccountAtIndex: function getTronAccountAtIndex(mnemonic) {
     var index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
     var seed = bip39_default.a.mnemonicToSeed(mnemonic);
     var node = bip32_default.a.fromSeed(seed);
@@ -71123,6 +71129,18 @@ var Utils = {
     return {
       privateKey: privateKey,
       address: address
+    };
+  },
+  getEthereumAccountAtIndex: function getEthereumAccountAtIndex(mnemonic) {
+    var index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+    var seed = bip39_default.a.mnemonicToSeed(mnemonic);
+    var node = bip32_default.a.fromSeed(seed);
+    var child = node.derivePath("m/44'/195'/".concat(index, "'/0/0"));
+    var privateKey = child.privateKey.toString('hex');
+    var account = web3.eth.accounts.privateKeyToAccount(privateKey);
+    return {
+      privateKey: account.privateKey,
+      address: account.address
     };
   },
   validateMnemonic: function validateMnemonic(mnemonic) {
@@ -71284,40 +71302,49 @@ var NodeService = {
   _nodes: {
     'f0b1e38e-7bee-485e-9d3f-69410bf30681': {
       type: 'TRON',
-      name: 'Mainnet',
-      symbol: 'TRX',
-      decimal: 6,
-      logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1958.png',
-      endPoint: 'https://api.trongrid.io',
-      "default": true // false
-
+      endPoint: 'https://api.trongrid.io'
     },
     '0f22e40f-a004-4c5a-99ef-004c8e6769bf': {
-      type: 'TRON',
-      name: 'Shasta Testnet',
-      symbol: 'STRX',
-      decimal: 6,
-      logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1958.png',
-      endPoint: 'https://api.shasta.trongrid.io',
-      "default": true
+      type: 'TRON_SHASTA',
+      endPoint: 'https://api.shasta.trongrid.io'
     },
     '6739be94-ee43-46af-9a62-690cf0947280': {
       type: 'ETH',
-      name: 'Ethereum',
-      symbol: 'ETH',
-      decimal: 18,
-      logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
-      endPoint: 'https://mainnet.infura.io/v3/9a150d3a322645268224160ebf5b8599',
-      "default": true
+      endPoint: 'https://mainnet.infura.io/v3/9a150d3a322645268224160ebf5b8599'
     },
     '6739be94-ee43-46af-9a62-690cf0947281': {
-      type: 'ETH',
-      name: 'Rinkeby',
-      symbol: 'RETH',
+      type: 'ETH_RINKEBY',
+      endPoint: 'https://rinkeby.infura.io/v3/9a150d3a322645268224160ebf5b8599'
+    },
+    '6739be94-ee43-46af-9a62-690cf0947282': {
+      type: 'NTY',
+      endPoint: 'https://rpc.nexty.io'
+    }
+  },
+  _tokens: {
+    'f0b1e38e-7bee-485e-9d3f-69410bf30683': {
+      node: 'f0b1e38e-7bee-485e-9d3f-69410bf30681',
+      symbol: 'TRX',
+      decimal: 6,
+      logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1958.png'
+    },
+    'f0b1e38e-7bee-485e-9d3f-69410bf30684': {
+      node: '0f22e40f-a004-4c5a-99ef-004c8e6769bf',
+      symbol: 'TRX',
+      decimal: 6,
+      logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1958.png'
+    },
+    'f0b1e38e-7bee-485e-9d3f-69410bf30685': {
+      node: '6739be94-ee43-46af-9a62-690cf0947280',
+      symbol: 'ETH',
       decimal: 18,
-      logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
-      endPoint: 'https://rinkeby.infura.io/v3/9a150d3a322645268224160ebf5b8599',
-      "default": true
+      logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png'
+    },
+    'f0b1e38e-7bee-485e-9d3f-69410bf30686': {
+      node: '6739be94-ee43-46af-9a62-690cf0947282',
+      symbol: 'NTY',
+      decimal: 18,
+      logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/2714.png'
     }
   },
   _selectedNode: 'f0b1e38e-7bee-485e-9d3f-69410bf30681',
@@ -71369,6 +71396,9 @@ var NodeService = {
       nodes: this._nodes,
       selected: this._selectedNode
     };
+  },
+  getTokens: function getTokens() {
+    return this._tokens;
   },
   getCurrentNode: function getCurrentNode() {
     return this._nodes[this._selectedNode];
@@ -71983,6 +72013,35 @@ var StorageService = {
   }
 };
 /* harmony default export */ var services_StorageService = (StorageService);
+// CONCATENATED MODULE: ./services/WalletService/Account.js
+
+
+
+
+
+var Account_logger = new logger_Logger('WalletService/Account');
+
+var Account_Account = function Account(chain, accountType, importData, name, symbol, decimal, logo) {
+  var accountIndex = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : 0;
+
+  classCallCheck_default()(this, Account);
+
+  this.chain = chain;
+  this.type = accountType;
+  this.accountIndex = accountIndex;
+  this.address = false;
+  this.name = name;
+  this.symbol = symbol;
+  this.decimal = decimal;
+  this.logo = logo;
+  this.transactions = {};
+  this.ignoredTransactions = [];
+  this.tokens = {};
+  this.updatingTransactions = false;
+  this.balance = 0;
+};
+
+/* harmony default export */ var WalletService_Account = (Account_Account);
 // CONCATENATED MODULE: ../lib/constants.js
 var APP_STATE = {
   // Wallet is migrating / not unlocked
@@ -72022,7 +72081,8 @@ var CHAIN_TYPE = {
   TRON: 'TRON',
   ETH: 'ETH',
   BTC: 'BTC',
-  LTC: 'LTC'
+  LTC: 'LTC',
+  NTY: 'NTY'
 };
 var VALIDATION_STATE = {
   NONE: 'no-state',
@@ -72132,9 +72192,13 @@ var USDT_ACTIVITY_STAGE = {
 
 
 
+
+
+
 function TronAccount_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { keys.push.apply(keys, Object.getOwnPropertySymbols(object)); } if (enumerableOnly) keys = keys.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); return keys; }
 
 function TronAccount_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { TronAccount_ownKeys(source, true).forEach(function (key) { defineProperty_default()(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { TronAccount_ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
 
 
 
@@ -72151,40 +72215,38 @@ var TronAccount_logger = new logger_Logger('WalletService/TronAccount');
 
 var TronAccount_TronAccount =
 /*#__PURE__*/
-function () {
-  function TronAccount(chain, accountType, importData) {
-    var accountIndex = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+function (_Account) {
+  inherits_default()(TronAccount, _Account);
+
+  function TronAccount(chain, accountType, importData, name, symbol, decimal, logo) {
+    var _this;
+
+    var accountIndex = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : 0;
 
     classCallCheck_default()(this, TronAccount);
 
-    this.chain = chain;
-    this.type = accountType;
-    this.accountIndex = accountIndex;
-    this.address = false;
-    this.name = false;
-    this.updatingTransactions = false;
-    this.selectedBankRecordId = 0;
-    this.dealCurrencyPage = 0;
-    this.energy = 0;
-    this.energyUsed = 0;
-    this.balance = 0;
-    this.frozenBalance = 0;
-    this.netUsed = 0;
-    this.netLimit = 0;
-    this.totalEnergyWeight = 0; //totalEnergyWeight
+    _this = possibleConstructorReturn_default()(this, getPrototypeOf_default()(TronAccount).call(this, chain, accountType, importData, name, symbol, decimal, logo, accountIndex = 0));
+    _this.selectedBankRecordId = 0;
+    _this.dealCurrencyPage = 0;
+    _this.energy = 0;
+    _this.energyUsed = 0;
+    _this.frozenBalance = 0;
+    _this.netUsed = 0;
+    _this.netLimit = 0;
+    _this.totalEnergyWeight = 0; //totalEnergyWeight
 
-    this.TotalEnergyLimit = 0; //TotalEnergyLimit
+    _this.TotalEnergyLimit = 0; //TotalEnergyLimit
 
-    this.lastUpdated = 0;
-    this.asset = 0;
-    this.ignoredTransactions = [];
-    this.transactions = {};
-    this.airdropInfo = {};
-    this.tokens = {
+    _this.lastUpdated = 0;
+    _this.asset = 0;
+    _this.ignoredTransactions = [];
+    _this.transactions = {};
+    _this.airdropInfo = {};
+    _this.tokens = {
       basic: {},
       smart: {}
     };
-    this.tokens.smart[CONTRACT_ADDRESS.USDT] = {
+    _this.tokens.smart[CONTRACT_ADDRESS.USDT] = {
       symbol: 'USDT',
       name: 'Tether USD',
       decimal: 6,
@@ -72192,11 +72254,14 @@ function () {
       balance: 0,
       price: 0
     };
-    if (accountType == ACCOUNT_TYPE.MNEMONIC) this._importMnemonic(importData);else this._importPrivateKey(importData);
+    if (accountType == ACCOUNT_TYPE.MNEMONIC) _this._importMnemonic(importData);else _this._importPrivateKey(importData);
     var nodes = services_NodeService.getNodes().nodes;
     var node = nodes[chain];
-    this.tronWeb = new TronWeb_node_default.a(node.endPoint, node.endPoint, node.endPoint);
-    this.loadCache();
+    _this.tronWeb = new TronWeb_node_default.a(node.endPoint, node.endPoint, node.endPoint);
+
+    _this.loadCache();
+
+    return _this;
   }
 
   createClass_default()(TronAccount, [{
@@ -72205,7 +72270,7 @@ function () {
       var _cacheTransactions2 = asyncToGenerator_default()(
       /*#__PURE__*/
       regenerator_default.a.mark(function _callee() {
-        var _this = this;
+        var _this2 = this;
 
         var address, txID, txData, transaction;
         return regenerator_default.a.wrap(function _callee$(_context) {
@@ -72221,7 +72286,7 @@ function () {
                 }
 
                 return _context.abrupt("return", setTimeout(function () {
-                  return _this._cacheTransactions();
+                  return _this2._cacheTransactions();
                 }, 3000));
 
               case 4:
@@ -72241,7 +72306,7 @@ function () {
                 TronAccount_logger.info("Transaction ".concat(txID, " is still missing"));
                 services_StorageService.addPendingTransaction(address, txID);
                 return _context.abrupt("return", setTimeout(function () {
-                  return _this._cacheTransactions();
+                  return _this2._cacheTransactions();
                 }, 3000));
 
               case 13:
@@ -72299,12 +72364,12 @@ function () {
     value: function getAccountAtIndex() {
       var index = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
       if (this.type !== ACCOUNT_TYPE.MNEMONIC) throw new Error('Deriving account keys at a specific index requires a mnemonic account');
-      return utils.getAccountAtIndex(this.mnemonic, index);
+      return utils.getTronAccountAtIndex(this.mnemonic, index);
     }
   }, {
     key: "loadCache",
     value: function loadCache() {
-      var _this2 = this;
+      var _this3 = this;
 
       if (!services_StorageService.hasAccount(this.address)) return TronAccount_logger.warn('Attempted to load cache for an account that does not exist');
 
@@ -72328,10 +72393,10 @@ function () {
 
 
       Object.keys(this.transactions).forEach(function (txID) {
-        var transaction = _this2.transactions[txID];
+        var transaction = _this3.transactions[txID];
         if (transaction.type !== 'TransferAssetContract') return;
         if (transaction.tokenID) return;
-        delete _this2.transactions[txID];
+        delete _this3.transactions[txID];
       });
       this.type = type;
       this.name = name;
@@ -72371,7 +72436,7 @@ function () {
   }, {
     key: "reset",
     value: function reset() {
-      var _this3 = this;
+      var _this4 = this;
 
       this.balance = 0;
       this.energy = 0;
@@ -72382,7 +72447,7 @@ function () {
       this.netLimit = 0;
       this.asset = 0;
       Object.keys(this.tokens.smart).forEach(function (address) {
-        return _this3.tokens.smart[address].balance = 0;
+        return _this4.tokens.smart[address].balance = 0;
       });
       this.tokens.basic = {};
     }
@@ -72398,7 +72463,7 @@ function () {
       var _update = asyncToGenerator_default()(
       /*#__PURE__*/
       regenerator_default.a.mark(function _callee2() {
-        var _this4 = this;
+        var _this5 = this;
 
         var basicTokenPriceList,
             smartTokenPriceList,
@@ -72673,7 +72738,7 @@ function () {
                   var _step2$value = _step2.value,
                       key = _step2$value.key,
                       value = _step2$value.value;
-                  var token = _this4.tokens.basic[key] || false;
+                  var token = _this5.tokens.basic[key] || false;
                   var filter = basicTokenPriceList.length ? basicTokenPriceList.filter(function (_ref5) {
                     var first_token_id = _ref5.first_token_id;
                     return first_token_id === key;
@@ -72715,7 +72780,7 @@ function () {
                     imgUrl: imgUrl,
                     isLocked: token.hasOwnProperty('isLocked') ? token.isLocked : false
                   };
-                  _this4.tokens.basic[key] = TronAccount_objectSpread({}, token, {
+                  _this5.tokens.basic[key] = TronAccount_objectSpread({}, token, {
                     balance: value,
                     price: price
                   });
@@ -72776,14 +72841,14 @@ function () {
                       switch (_context2.prev = _context2.next) {
                         case 0:
                           _step3$value = _step3.value, contract_address = _step3$value.contract_address, precision = _step3$value.decimals;
-                          token = _this4.tokens.smart[contract_address] || false;
+                          token = _this5.tokens.smart[contract_address] || false;
                           filter = smartTokenPriceList.filter(function (_ref9) {
                             var fTokenAddr = _ref9.fTokenAddr;
                             return fTokenAddr === contract_address;
                           });
                           price = filter.length ? new bignumber["BigNumber"](filter[0].price).shiftedBy(-precision).toString() : 0;
                           _context2.next = 6;
-                          return _this4.tronWeb.contract().at(contract_address)["catch"](function (e) {
+                          return _this5.tronWeb.contract().at(contract_address)["catch"](function (e) {
                             return false;
                           });
 
@@ -72828,7 +72893,7 @@ function () {
                             imgUrl: imgUrl,
                             isLocked: token.hasOwnProperty('isLocked') ? token.isLocked : false
                           };
-                          _this4.tokens.smart[contract_address] = TronAccount_objectSpread({}, token, {
+                          _this5.tokens.smart[contract_address] = TronAccount_objectSpread({}, token, {
                             price: price,
                             balance: balance
                           });
@@ -72934,7 +72999,7 @@ function () {
                       switch (_context3.prev = _context3.next) {
                         case 0:
                           _step4$value = _step4.value, key = _step4$value.key, value = _step4$value.value;
-                          token = _this4.tokens.basic[key] || false;
+                          token = _this5.tokens.basic[key] || false;
                           filter = basicTokenPriceList.length ? basicTokenPriceList.filter(function (_ref12) {
                             var first_token_id = _ref12.first_token_id;
                             return first_token_id === key;
@@ -72972,7 +73037,7 @@ function () {
                             };
                           }
 
-                          _this4.tokens.basic[key] = TronAccount_objectSpread({}, token, {
+                          _this5.tokens.basic[key] = TronAccount_objectSpread({}, token, {
                             balance: value,
                             price: price
                           });
@@ -73553,14 +73618,83 @@ function () {
     key: "generateAccount",
     value: function generateAccount() {
       var mnemonic = utils.generateMnemonic();
-      return new Account(ACCOUNT_TYPE.MNEMONIC, mnemonic);
+      return new WalletService_Account(ACCOUNT_TYPE.MNEMONIC, mnemonic);
     }
   }]);
 
   return TronAccount;
-}();
+}(WalletService_Account);
 
 /* harmony default export */ var WalletService_TronAccount = (TronAccount_TronAccount);
+// CONCATENATED MODULE: ./services/WalletService/EthereumAccount.js
+
+
+
+
+
+
+
+
+
+
+
+var EthereumAccount_logger = new logger_Logger('WalletService/EthereumAccount');
+
+
+var EthereumAccount_EthereumAccount =
+/*#__PURE__*/
+function (_Account) {
+  inherits_default()(EthereumAccount, _Account);
+
+  function EthereumAccount(chain, accountType, importData, name, symbol, decimal, logo) {
+    var _this;
+
+    var accountIndex = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : 0;
+
+    classCallCheck_default()(this, EthereumAccount);
+
+    _this = possibleConstructorReturn_default()(this, getPrototypeOf_default()(EthereumAccount).call(this, chain, accountType, importData, name, symbol, decimal, logo, accountIndex = 0));
+    if (accountType == ACCOUNT_TYPE.MNEMONIC) _this._importMnemonic(importData);else _this._importPrivateKey(importData);
+    return _this;
+  }
+
+  createClass_default()(EthereumAccount, [{
+    key: "_importMnemonic",
+    value: function _importMnemonic(mnemonic) {
+      if (!utils.validateMnemonic(mnemonic)) throw new Error('INVALID_MNEMONIC');
+      this.mnemonic = mnemonic;
+
+      var _this$getAccountAtInd = this.getAccountAtIndex(this.accountIndex),
+          privateKey = _this$getAccountAtInd.privateKey,
+          address = _this$getAccountAtInd.address;
+
+      this.privateKey = privateKey;
+      this.address = address;
+    }
+  }, {
+    key: "getAccountAtIndex",
+    value: function getAccountAtIndex() {
+      var index = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+      if (this.type !== ACCOUNT_TYPE.MNEMONIC) throw new Error('Deriving account keys at a specific index requires a mnemonic account');
+      return utils.getEthereumAccountAtIndex(this.mnemonic, index);
+    }
+  }, {
+    key: "_importPrivateKey",
+    value: function _importPrivateKey(privateKey) {
+      try {
+        this.privateKey = privateKey;
+        this.address = TronWeb_node_default.a.address.fromPrivateKey(privateKey);
+      } catch (ex) {
+        // eslint-disable-line
+        throw new Error('INVALID_PRIVATE_KEY');
+      }
+    }
+  }]);
+
+  return EthereumAccount;
+}(WalletService_Account);
+
+/* harmony default export */ var WalletService_EthereumAccount = (EthereumAccount_EthereumAccount);
 // CONCATENATED MODULE: ./services/WalletService/Chain.js
 
 
@@ -73577,10 +73711,6 @@ var Chain_Chain = function Chain(params) {
 };
 
 /* harmony default export */ var WalletService_Chain = (Chain_Chain);
-// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/web3/src/index.js
-var src = __webpack_require__("../../node_modules/web3/src/index.js");
-var src_default = /*#__PURE__*/__webpack_require__.n(src);
-
 // CONCATENATED MODULE: ./services/WalletService/index.js
 
 
@@ -73588,6 +73718,13 @@ var src_default = /*#__PURE__*/__webpack_require__.n(src);
 
 
 
+
+
+
+
+function WalletService_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { keys.push.apply(keys, Object.getOwnPropertySymbols(object)); } if (enumerableOnly) keys = keys.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); return keys; }
+
+function WalletService_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { WalletService_ownKeys(source, true).forEach(function (key) { defineProperty_default()(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { WalletService_ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 
 
@@ -73811,9 +73948,11 @@ function (_EventEmitter) {
         var accountObj;
 
         if (node.type === CHAIN_TYPE.TRON) {
-          accountObj = new WalletService_TronAccount(account.chain, account.type, account.mnemonic || account.privateKey, account.symbol, account.accountIndex);
+          accountObj = new WalletService_TronAccount(account.chain, account.type, account.mnemonic || account.privateKey, account.name, account.symbol, account.decimal, account.logo, account.accountIndex);
           accountObj.loadCache();
           accountObj.update([], [], 0);
+        } else if (node.type === CHAIN_TYPE.NTY) {
+          accountObj = new WalletService_EthereumAccount(account.chain, account.type, account.mnemonic || account.privateKey, account.name, account.symbol, account.decimal, account.logo, account.accountIndex);
         }
 
         _this3.accounts[address] = accountObj;
@@ -73904,32 +74043,39 @@ function (_EventEmitter) {
   }, {
     key: "_createDefaultAccount",
     value: function _createDefaultAccount() {
-      this.addAccount({
-        chain: 'f0b1e38e-7bee-485e-9d3f-69410bf30681',
+      var tokens = services_NodeService.getTokens();
+      var token = tokens['f0b1e38e-7bee-485e-9d3f-69410bf30686'];
+      var token2 = tokens['f0b1e38e-7bee-485e-9d3f-69410bf30683'];
+      this.addAccount(WalletService_objectSpread({}, token, {
         mnemonic: utils.generateMnemonic(),
-        name: 'Account 1'
-      });
+        name: 'Nexty Account 2'
+      }));
+      this.addAccount(WalletService_objectSpread({}, token2, {
+        mnemonic: utils.generateMnemonic(),
+        name: 'Tron Account 2'
+      }));
     }
   }, {
     key: "addAccount",
     value: function () {
       var _addAccount = asyncToGenerator_default()(
       /*#__PURE__*/
-      regenerator_default.a.mark(function _callee5(_ref5) {
-        var chain, mnemonic, name, nodes, node;
+      regenerator_default.a.mark(function _callee5(params) {
+        var nodes, node;
         return regenerator_default.a.wrap(function _callee5$(_context5) {
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                chain = _ref5.chain, mnemonic = _ref5.mnemonic, name = _ref5.name;
                 nodes = services_NodeService.getNodes().nodes;
-                node = nodes[chain];
+                node = nodes[params.node];
 
                 if (node.type === CHAIN_TYPE.TRON) {
-                  this.addTronAccount(chain, mnemonic, name);
+                  this.addTronAccount(params);
+                } else if (node.type === CHAIN_TYPE.NTY) {
+                  this.addEthereumAccount(params);
                 }
 
-              case 4:
+              case 3:
               case "end":
                 return _context5.stop();
             }
@@ -73948,13 +74094,13 @@ function (_EventEmitter) {
     value: function () {
       var _addTronAccount = asyncToGenerator_default()(
       /*#__PURE__*/
-      regenerator_default.a.mark(function _callee6(chain, mnemonic, name, symbol) {
+      regenerator_default.a.mark(function _callee6(params) {
         var trc10tokens, trc20tokens, account, address;
         return regenerator_default.a.wrap(function _callee6$(_context6) {
           while (1) {
             switch (_context6.prev = _context6.next) {
               case 0:
-                WalletService_logger.info("Adding Tron account '".concat(name, "' from popup"));
+                WalletService_logger.info("Adding Tron account '".concat(params.name, "' from popup"));
                 trc10tokens = axios_default.a.get('https://apilist.tronscan.org/api/token?showAll=1&limit=4000', {
                   timeout: 10000
                 });
@@ -73964,19 +74110,19 @@ function (_EventEmitter) {
                 _context6.next = 5;
                 return Promise.all([trc10tokens, trc20tokens]).then(function (res) {
                   var t = [];
-                  res[0].data.data.concat(res[1].data.tokens).forEach(function (_ref6) {
-                    var abbr = _ref6.abbr,
-                        name = _ref6.name,
-                        _ref6$imgUrl = _ref6.imgUrl,
-                        imgUrl = _ref6$imgUrl === void 0 ? false : _ref6$imgUrl,
-                        _ref6$tokenID = _ref6.tokenID,
-                        tokenID = _ref6$tokenID === void 0 ? false : _ref6$tokenID,
-                        _ref6$contractAddress = _ref6.contractAddress,
-                        contractAddress = _ref6$contractAddress === void 0 ? false : _ref6$contractAddress,
-                        _ref6$decimal = _ref6.decimal,
-                        decimal = _ref6$decimal === void 0 ? false : _ref6$decimal,
-                        _ref6$precision = _ref6.precision,
-                        precision = _ref6$precision === void 0 ? false : _ref6$precision;
+                  res[0].data.data.concat(res[1].data.tokens).forEach(function (_ref5) {
+                    var abbr = _ref5.abbr,
+                        name = _ref5.name,
+                        _ref5$imgUrl = _ref5.imgUrl,
+                        imgUrl = _ref5$imgUrl === void 0 ? false : _ref5$imgUrl,
+                        _ref5$tokenID = _ref5.tokenID,
+                        tokenID = _ref5$tokenID === void 0 ? false : _ref5$tokenID,
+                        _ref5$contractAddress = _ref5.contractAddress,
+                        contractAddress = _ref5$contractAddress === void 0 ? false : _ref5$contractAddress,
+                        _ref5$decimal = _ref5.decimal,
+                        decimal = _ref5$decimal === void 0 ? false : _ref5$decimal,
+                        _ref5$precision = _ref5.precision,
+                        precision = _ref5$precision === void 0 ? false : _ref5$precision;
                     if (contractAddress && contractAddress === CONTRACT_ADDRESS.USDT) return;
                     t.push({
                       tokenId: tokenID ? tokenID.toString() : contractAddress,
@@ -73990,16 +74136,15 @@ function (_EventEmitter) {
                 });
 
               case 5:
-                account = new WalletService_TronAccount(chain, ACCOUNT_TYPE.MNEMONIC, mnemonic);
+                account = new WalletService_TronAccount(params.node, ACCOUNT_TYPE.MNEMONIC, params.mnemonic, params.name, params.symbol, params.decimal, params.logo);
                 WalletService_logger.info("Add account '".concat(account, "'"));
                 address = account.address;
-                account.name = name;
                 this.accounts[address] = account;
                 services_StorageService.saveAccount(account); // this.emit('setAccounts', this.getAccounts());
 
                 return _context6.abrupt("return", true);
 
-              case 12:
+              case 11:
               case "end":
                 return _context6.stop();
             }
@@ -74007,33 +74152,70 @@ function (_EventEmitter) {
         }, _callee6, this);
       }));
 
-      function addTronAccount(_x3, _x4, _x5, _x6) {
+      function addTronAccount(_x3) {
         return _addTronAccount.apply(this, arguments);
       }
 
       return addTronAccount;
     }()
   }, {
+    key: "addEthereumAccount",
+    value: function () {
+      var _addEthereumAccount = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee7(params) {
+        var account, address;
+        return regenerator_default.a.wrap(function _callee7$(_context7) {
+          while (1) {
+            switch (_context7.prev = _context7.next) {
+              case 0:
+                WalletService_logger.info("Adding Ethereum account '".concat(params.name, "' from popup"));
+                account = new WalletService_EthereumAccount(params.node, ACCOUNT_TYPE.MNEMONIC, params.mnemonic, params.name, params.symbol, params.decimal, params.logo);
+                WalletService_logger.info("Add account '".concat(account, "'"));
+                address = account.address;
+                this.accounts[address] = account;
+                services_StorageService.saveAccount(account); // this.emit('setAccounts', this.getAccounts());
+
+                return _context7.abrupt("return", true);
+
+              case 7:
+              case "end":
+                return _context7.stop();
+            }
+          }
+        }, _callee7, this);
+      }));
+
+      function addEthereumAccount(_x4) {
+        return _addEthereumAccount.apply(this, arguments);
+      }
+
+      return addEthereumAccount;
+    }()
+  }, {
     key: "getAccounts",
     value: function getAccounts() {
       var nodes = services_NodeService.getNodes().nodes;
-      var accounts = Object.entries(this.accounts).reduce(function (accounts, _ref7) {
-        var _ref8 = slicedToArray_default()(_ref7, 2),
-            address = _ref8[0],
-            account = _ref8[1];
+      var accounts = Object.entries(this.accounts).reduce(function (accounts, _ref6) {
+        var _ref7 = slicedToArray_default()(_ref6, 2),
+            address = _ref7[0],
+            account = _ref7[1];
 
         accounts[address] = {
           name: account.name,
+          logo: account.logo,
+          decimal: account.decimal,
+          symbol: account.symbol,
           chain: nodes[account.chain],
-          balance: account.balance + account.frozenBalance,
-          energyUsed: account.energyUsed,
-          totalEnergyWeight: account.totalEnergyWeight,
-          TotalEnergyLimit: account.TotalEnergyLimit,
-          energy: account.energy,
-          netUsed: account.netUsed,
-          netLimit: account.netLimit,
-          tokenCount: Object.keys(account.tokens.basic).length + Object.keys(account.tokens.smart).length,
-          asset: account.asset
+          balance: account.balance + account.frozenBalance || 0 // energyUsed: account.energyUsed,
+          // totalEnergyWeight: account.totalEnergyWeight,
+          // TotalEnergyLimit: account.TotalEnergyLimit,
+          // energy: account.energy,
+          // netUsed: account.netUsed,
+          // netLimit: account.netLimit,
+          // tokenCount: Object.keys(account.tokens.basic).length + Object.keys(account.tokens.smart).length,
+          // asset: account.asset
+
         };
         return accounts;
       }, {});
