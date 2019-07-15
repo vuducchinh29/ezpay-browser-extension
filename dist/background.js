@@ -71287,7 +71287,7 @@ var NodeService = {
       name: 'Mainnet',
       symbol: 'TRX',
       decimal: 6,
-      logo: '',
+      logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1958.png',
       endPoint: 'https://api.trongrid.io',
       "default": true // false
 
@@ -71297,7 +71297,7 @@ var NodeService = {
       name: 'Shasta Testnet',
       symbol: 'STRX',
       decimal: 6,
-      logo: '',
+      logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1958.png',
       endPoint: 'https://api.shasta.trongrid.io',
       "default": true
     },
@@ -71306,7 +71306,7 @@ var NodeService = {
       name: 'Ethereum',
       symbol: 'ETH',
       decimal: 18,
-      logo: '',
+      logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
       endPoint: 'https://mainnet.infura.io/v3/9a150d3a322645268224160ebf5b8599',
       "default": true
     },
@@ -71315,7 +71315,7 @@ var NodeService = {
       name: 'Rinkeby',
       symbol: 'RETH',
       decimal: 18,
-      logo: '',
+      logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
       endPoint: 'https://rinkeby.infura.io/v3/9a150d3a322645268224160ebf5b8599',
       "default": true
     }
@@ -73621,17 +73621,15 @@ function (_EventEmitter) {
     _this.chains = {};
     _this.accounts = {};
 
-    _this._checkStorage();
-
-    _this._initChains();
+    _this._start();
 
     return _this;
   }
 
   createClass_default()(Wallet, [{
-    key: "_checkStorage",
+    key: "_start",
     value: function () {
-      var _checkStorage2 = asyncToGenerator_default()(
+      var _start2 = asyncToGenerator_default()(
       /*#__PURE__*/
       regenerator_default.a.mark(function _callee() {
         return regenerator_default.a.wrap(function _callee$(_context) {
@@ -73639,21 +73637,55 @@ function (_EventEmitter) {
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
+                return this._checkStorage();
+
+              case 2:
+                _context.next = 4;
+                return this._initChains();
+
+              case 4:
+                this._loadAccounts();
+
+              case 5:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function _start() {
+        return _start2.apply(this, arguments);
+      }
+
+      return _start;
+    }()
+  }, {
+    key: "_checkStorage",
+    value: function () {
+      var _checkStorage2 = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee2() {
+        return regenerator_default.a.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                _context2.next = 2;
                 return services_StorageService.dataExists();
 
               case 2:
-                _context.t0 = _context.sent;
+                _context2.t0 = _context2.sent;
 
-                if (_context.t0) {
-                  _context.next = 5;
+                if (_context2.t0) {
+                  _context2.next = 5;
                   break;
                 }
 
-                _context.t0 = services_StorageService.needsMigrating;
+                _context2.t0 = services_StorageService.needsMigrating;
 
               case 5:
-                if (!_context.t0) {
-                  _context.next = 7;
+                if (!_context2.t0) {
+                  _context2.next = 7;
                   break;
                 }
 
@@ -73661,10 +73693,10 @@ function (_EventEmitter) {
 
               case 7:
               case "end":
-                return _context.stop();
+                return _context2.stop();
             }
           }
-        }, _callee, this);
+        }, _callee2, this);
       }));
 
       function _checkStorage() {
@@ -73723,20 +73755,20 @@ function (_EventEmitter) {
     value: function () {
       var _resetState = asyncToGenerator_default()(
       /*#__PURE__*/
-      regenerator_default.a.mark(function _callee2() {
-        return regenerator_default.a.wrap(function _callee2$(_context2) {
+      regenerator_default.a.mark(function _callee3() {
+        return regenerator_default.a.wrap(function _callee3$(_context3) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context3.prev = _context3.next) {
               case 0:
                 WalletService_logger.info('Resetting app state');
-                return _context2.abrupt("return", this._setState(APP_STATE.UNINITIALISED));
+                return _context3.abrupt("return", this._setState(APP_STATE.UNINITIALISED));
 
               case 2:
               case "end":
-                return _context2.stop();
+                return _context3.stop();
             }
           }
-        }, _callee2, this);
+        }, _callee3, this);
       }));
 
       function resetState() {
@@ -73787,70 +73819,69 @@ function (_EventEmitter) {
 
         _this3.accounts[address] = accountObj;
       });
-      console.log('xxx', this.accounts);
     }
   }, {
     key: "unlockWallet",
     value: function () {
       var _unlockWallet = asyncToGenerator_default()(
       /*#__PURE__*/
-      regenerator_default.a.mark(function _callee3(password) {
+      regenerator_default.a.mark(function _callee4(password) {
         var success, unlockFailed;
-        return regenerator_default.a.wrap(function _callee3$(_context3) {
+        return regenerator_default.a.wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
                 if (!(this.state !== APP_STATE.PASSWORD_SET)) {
-                  _context3.next = 3;
+                  _context4.next = 3;
                   break;
                 }
 
                 WalletService_logger.error('Attempted to unlock wallet whilst not in PASSWORD_SET state');
-                return _context3.abrupt("return", Promise.reject('ERRORS.NOT_LOCKED'));
+                return _context4.abrupt("return", Promise.reject('ERRORS.NOT_LOCKED'));
 
               case 3:
                 if (!services_StorageService.needsMigrating) {
-                  _context3.next = 8;
+                  _context4.next = 8;
                   break;
                 }
 
                 success = this.migrate(password);
 
                 if (success) {
-                  _context3.next = 7;
+                  _context4.next = 7;
                   break;
                 }
 
-                return _context3.abrupt("return", Promise.reject('ERRORS.INVALID_PASSWORD'));
+                return _context4.abrupt("return", Promise.reject('ERRORS.INVALID_PASSWORD'));
 
               case 7:
-                return _context3.abrupt("return");
+                return _context4.abrupt("return");
 
               case 8:
-                _context3.next = 10;
+                _context4.next = 10;
                 return services_StorageService.unlock(password);
 
               case 10:
-                unlockFailed = _context3.sent;
+                unlockFailed = _context4.sent;
 
                 if (!unlockFailed) {
-                  _context3.next = 14;
+                  _context4.next = 14;
                   break;
                 }
 
                 WalletService_logger.error("Failed to unlock wallet: ".concat(unlockFailed));
-                return _context3.abrupt("return", Promise.reject(unlockFailed));
+                return _context4.abrupt("return", Promise.reject(unlockFailed));
 
               case 14:
                 if (services_StorageService.hasAccounts) {
-                  _context3.next = 18;
+                  _context4.next = 18;
                   break;
                 }
 
                 this._createDefaultAccount();
 
                 WalletService_logger.info('Wallet does not have any accounts');
-                return _context3.abrupt("return", this._setState(APP_STATE.READY));
+                return _context4.abrupt("return", this._setState(APP_STATE.READY));
 
               case 18:
                 this._loadAccounts();
@@ -73859,10 +73890,10 @@ function (_EventEmitter) {
 
               case 20:
               case "end":
-                return _context3.stop();
+                return _context4.stop();
             }
           }
-        }, _callee3, this);
+        }, _callee4, this);
       }));
 
       function unlockWallet(_x) {
@@ -73885,11 +73916,11 @@ function (_EventEmitter) {
     value: function () {
       var _addAccount = asyncToGenerator_default()(
       /*#__PURE__*/
-      regenerator_default.a.mark(function _callee4(_ref5) {
+      regenerator_default.a.mark(function _callee5(_ref5) {
         var chain, mnemonic, name, nodes, node;
-        return regenerator_default.a.wrap(function _callee4$(_context4) {
+        return regenerator_default.a.wrap(function _callee5$(_context5) {
           while (1) {
-            switch (_context4.prev = _context4.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
                 chain = _ref5.chain, mnemonic = _ref5.mnemonic, name = _ref5.name;
                 nodes = services_NodeService.getNodes().nodes;
@@ -73901,10 +73932,10 @@ function (_EventEmitter) {
 
               case 4:
               case "end":
-                return _context4.stop();
+                return _context5.stop();
             }
           }
-        }, _callee4, this);
+        }, _callee5, this);
       }));
 
       function addAccount(_x2) {
@@ -73918,11 +73949,11 @@ function (_EventEmitter) {
     value: function () {
       var _addTronAccount = asyncToGenerator_default()(
       /*#__PURE__*/
-      regenerator_default.a.mark(function _callee5(chain, mnemonic, name, symbol) {
+      regenerator_default.a.mark(function _callee6(chain, mnemonic, name, symbol) {
         var trc10tokens, trc20tokens, account, address;
-        return regenerator_default.a.wrap(function _callee5$(_context5) {
+        return regenerator_default.a.wrap(function _callee6$(_context6) {
           while (1) {
-            switch (_context5.prev = _context5.next) {
+            switch (_context6.prev = _context6.next) {
               case 0:
                 WalletService_logger.info("Adding Tron account '".concat(name, "' from popup"));
                 trc10tokens = axios_default.a.get('https://apilist.tronscan.org/api/token?showAll=1&limit=4000', {
@@ -73931,7 +73962,7 @@ function (_EventEmitter) {
                 trc20tokens = axios_default.a.get('https://apilist.tronscan.org/api/tokens/overview?start=0&limit=1000&filter=trc20', {
                   timeout: 10000
                 });
-                _context5.next = 5;
+                _context6.next = 5;
                 return Promise.all([trc10tokens, trc20tokens]).then(function (res) {
                   var t = [];
                   res[0].data.data.concat(res[1].data.tokens).forEach(function (_ref6) {
@@ -73967,14 +73998,14 @@ function (_EventEmitter) {
                 this.accounts[address] = account;
                 services_StorageService.saveAccount(account); // this.emit('setAccounts', this.getAccounts());
 
-                return _context5.abrupt("return", true);
+                return _context6.abrupt("return", true);
 
               case 12:
               case "end":
-                return _context5.stop();
+                return _context6.stop();
             }
           }
-        }, _callee5, this);
+        }, _callee6, this);
       }));
 
       function addTronAccount(_x3, _x4, _x5, _x6) {
@@ -73983,6 +74014,33 @@ function (_EventEmitter) {
 
       return addTronAccount;
     }()
+  }, {
+    key: "getAccounts",
+    value: function getAccounts() {
+      var nodes = services_NodeService.getNodes().nodes;
+      var accounts = Object.entries(this.accounts).reduce(function (accounts, _ref7) {
+        var _ref8 = slicedToArray_default()(_ref7, 2),
+            address = _ref8[0],
+            account = _ref8[1];
+
+        accounts[address] = {
+          name: account.name,
+          chain: nodes[account.chain],
+          balance: account.balance + account.frozenBalance,
+          energyUsed: account.energyUsed,
+          totalEnergyWeight: account.totalEnergyWeight,
+          TotalEnergyLimit: account.TotalEnergyLimit,
+          energy: account.energy,
+          netUsed: account.netUsed,
+          netLimit: account.netLimit,
+          tokenCount: Object.keys(account.tokens.basic).length + Object.keys(account.tokens.smart).length,
+          asset: account.asset
+        };
+        return accounts;
+      }, {});
+      this.emit('setAccounts', accounts);
+      return accounts;
+    }
   }]);
 
   return Wallet;
@@ -74255,13 +74313,20 @@ var background = {
     duplex.on('resetState', this.walletService.resetState);
     duplex.on('setPassword', this.walletService.setPassword);
     duplex.on('unlockWallet', this.walletService.unlockWallet);
+    duplex.on('getAccounts', this.walletService.getAccounts);
   },
   bindWalletEvents: function bindWalletEvents() {
+    var _this2 = this;
+
     this.walletService.on('newState', function (appState) {
       return api_BackgroundAPI.setState(appState);
-    }); // this.walletService.on('setAccount', address => BackgroundAPI.setAccount(
-    //     this.walletService.getAccountDetails(address)
-    // ));
+    });
+    this.walletService.on('setAccount', function (address) {
+      return api_BackgroundAPI.setAccount(_this2.walletService.getAccountDetails(address));
+    });
+    this.walletService.on('setAccounts', function (accounts) {
+      return api_BackgroundAPI.setAccounts(accounts);
+    });
   },
   bindTabDuplex: function bindTabDuplex() {
     duplex.on('tabRequest',

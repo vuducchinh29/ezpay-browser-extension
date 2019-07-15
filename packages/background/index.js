@@ -35,6 +35,7 @@ const background = {
         duplex.on('resetState', this.walletService.resetState);
         duplex.on('setPassword', this.walletService.setPassword);
         duplex.on('unlockWallet', this.walletService.unlockWallet);
+        duplex.on('getAccounts', this.walletService.getAccounts);
     },
 
     bindWalletEvents() {
@@ -42,9 +43,13 @@ const background = {
             BackgroundAPI.setState(appState)
         ));
 
-        // this.walletService.on('setAccount', address => BackgroundAPI.setAccount(
-        //     this.walletService.getAccountDetails(address)
-        // ));
+        this.walletService.on('setAccount', address => BackgroundAPI.setAccount(
+            this.walletService.getAccountDetails(address)
+        ));
+
+        this.walletService.on('setAccounts', accounts => (
+            BackgroundAPI.setAccounts(accounts)
+        ));
     },
 
     bindTabDuplex() {

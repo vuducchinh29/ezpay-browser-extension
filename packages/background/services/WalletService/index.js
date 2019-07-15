@@ -28,8 +28,13 @@ class Wallet extends EventEmitter {
         this.chains = {};
         this.accounts = {};
 
-        this._checkStorage();
-        this._initChains();
+        this._start()
+    }
+
+    async _start() {
+        await this._checkStorage();
+        await this._initChains();
+        this._loadAccounts();
     }
 
     async _checkStorage() {
@@ -130,7 +135,6 @@ class Wallet extends EventEmitter {
 
             this.accounts[ address ] = accountObj;
         });
-        console.log('xxx', this.accounts)
     }
 
     async unlockWallet(password) {
@@ -212,6 +216,30 @@ class Wallet extends EventEmitter {
 
         // this.emit('setAccounts', this.getAccounts());
         return true;
+    }
+
+    getAccounts() {
+        const nodes = NodeService.getNodes().nodes;
+        const accounts = Object.entries(this.accounts).reduce((accounts, [ address, account ]) => {
+            accounts[ address ] = {
+                name: account.name,
+                chain: nodes[account.chain],
+                balance: account.balance + account.frozenBalance,
+                energyUsed: account.energyUsed,
+                totalEnergyWeight: account.totalEnergyWeight,
+                TotalEnergyLimit: account.TotalEnergyLimit,
+                energy: account.energy,
+                netUsed: account.netUsed,
+                netLimit: account.netLimit,
+                tokenCount: Object.keys(account.tokens.basic).length + Object.keys(account.tokens.smart).length,
+                asset: account.asset
+            };
+
+            return accounts;
+        }, {});
+
+        this.emit('setAccounts', accounts);
+        return accounts;
     }
 }
 

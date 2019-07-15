@@ -1,6 +1,8 @@
 import React from 'react';
 import { FormattedMessage, injectIntl } from 'react-intl';
+import { connect } from 'react-redux';
 import Header from './Header';
+import { PopupAPI } from '@ezpay/lib/api';
 
 import './style.scss';
 
@@ -14,36 +16,35 @@ class Controller extends React.Component {
         super();
     }
 
-    componentDidMount() {
-
+    async omponentDidMount() {
+        const accounts = await PopupAPI.getAccounts();
     }
 
     render() {
-        const { currentPage } = this.props;
+        const { accounts } = this.props;
         const pages = this.pages;
 
         return (
             <div className='homeContainer'>
                 <Header />
                 <div className="accounts scroll">
-                    <div className='item'>
-                        <img src={'https://s2.coinmarketcap.com/static/img/coins/64x64/1.png'} />
-                        <div className='content'>
-                            <div className={'title'}>{'Ethereum wallet'}</div>
-                            <div className='desc'>20 ETH</div>
-                        </div>
-                    </div>
-                    <div className='item'>
-                        <img src={'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png'} />
-                        <div className='content'>
-                            <div className={'title'}>{'Bitcoin wallet'}</div>
-                            <div className='desc'>20 BTC</div>
-                        </div>
-                    </div>
+                    {
+                        Object.entries(accounts).map(([ address, account ]) => (
+                            <div className='item'>
+                                <img src={account.chain.logo} />
+                                <div className='content'>
+                                    <div className={'title'}>{account.name}</div>
+                                    <div className='desc'>{account.balance} {account.chain.symbol}</div>
+                                </div>
+                            </div>
+                        ))
+                    }
                 </div>
             </div>
         );
     }
 }
 
-export default injectIntl(Controller);
+export default connect(state => ({
+    accounts: state.accounts.accounts
+}))(Controller);

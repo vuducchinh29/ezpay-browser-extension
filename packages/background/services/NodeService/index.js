@@ -14,7 +14,7 @@ const NodeService = {
             name: 'Mainnet',
             symbol: 'TRX',
             decimal: 6,
-            logo: '',
+            logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1958.png',
             endPoint: 'https://api.trongrid.io',
             default: true // false
         },
@@ -23,7 +23,7 @@ const NodeService = {
             name: 'Shasta Testnet',
             symbol: 'STRX',
             decimal: 6,
-            logo: '',
+            logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1958.png',
             endPoint: 'https://api.shasta.trongrid.io',
             default: true
         },
@@ -32,7 +32,7 @@ const NodeService = {
             name: 'Ethereum',
             symbol: 'ETH',
             decimal: 18,
-            logo: '',
+            logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
             endPoint: 'https://mainnet.infura.io/v3/9a150d3a322645268224160ebf5b8599',
             default: true
         },
@@ -41,7 +41,7 @@ const NodeService = {
             name: 'Rinkeby',
             symbol: 'RETH',
             decimal: 18,
-            logo: '',
+            logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
             endPoint: 'https://rinkeby.infura.io/v3/9a150d3a322645268224160ebf5b8599',
             default: true
         }

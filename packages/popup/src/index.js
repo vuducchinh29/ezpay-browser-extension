@@ -78,13 +78,13 @@ export const app = {
             appState,
             nodes,
             language,
-            // accounts,
+            accounts,
             // selectedAccount,
         ] = await Promise.all([
             PopupAPI.requestState(),
             PopupAPI.getNodes(),
             PopupAPI.getLanguage(),
-            // PopupAPI.getAccounts(),
+            PopupAPI.getAccounts(),
             // PopupAPI.getSelectedAccount(),
         ]);
         const lang = navigator.language || navigator.browserLanguage;
@@ -99,7 +99,7 @@ export const app = {
         this.store.dispatch(setAppState(appState));
         this.store.dispatch(setNodes(nodes));
         this.store.dispatch(setLanguage(language));
-        // this.store.dispatch(setAccounts(accounts));
+        this.store.dispatch(setAccounts(accounts));
         // this.store.dispatch(setCurrency(prices.selected));
         // this.store.dispatch(setSetting(setting));
         // if(selectedAccount)
@@ -118,6 +118,14 @@ export const app = {
         // this.duplex.on('setSelectedToken', token => this.store.dispatch(
         //     setToken(token)
         // ));
+
+        this.duplex.on('setAccount', account => this.store.dispatch(
+            setAccount(account)
+        ));
+
+        this.duplex.on('setAccounts', accounts => this.store.dispatch(
+            setAccounts(accounts)
+        ));
 
         this.duplex.on('setLanguage', language => this.store.dispatch(
             setLanguage(language)
