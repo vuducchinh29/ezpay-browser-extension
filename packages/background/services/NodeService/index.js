@@ -11,41 +11,55 @@ const NodeService = {
     _nodes: {
         'f0b1e38e-7bee-485e-9d3f-69410bf30681': {
             type: 'TRON',
-            name: 'Mainnet',
-            symbol: 'TRX',
-            decimal: 6,
-            logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1958.png',
-            endPoint: 'https://api.trongrid.io',
-            default: true // false
+            endPoint: 'https://api.trongrid.io'
         },
         '0f22e40f-a004-4c5a-99ef-004c8e6769bf': {
-            type: 'TRON',
-            name: 'Shasta Testnet',
-            symbol: 'STRX',
-            decimal: 6,
-            logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1958.png',
-            endPoint: 'https://api.shasta.trongrid.io',
-            default: true
+            type: 'TRON_SHASTA',
+            endPoint: 'https://api.shasta.trongrid.io'
         },
         '6739be94-ee43-46af-9a62-690cf0947280': {
             type: 'ETH',
+            endPoint: 'https://mainnet.infura.io/v3/9a150d3a322645268224160ebf5b8599'
+        },
+        '6739be94-ee43-46af-9a62-690cf0947281': {
+            type: 'ETH_RINKEBY',
+            endPoint: 'https://rinkeby.infura.io/v3/9a150d3a322645268224160ebf5b8599'
+        },
+        '6739be94-ee43-46af-9a62-690cf0947282': {
+            type: 'NTY',
+            endPoint: 'https://rpc.nexty.io'
+        }
+    },
+    _tokens = {
+        'f0b1e38e-7bee-485e-9d3f-69410bf30683': {
+            node: 'f0b1e38e-7bee-485e-9d3f-69410bf30681',
+            name: 'Tron',
+            symbol: 'TRX',
+            decimal: 6,
+            logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1958.png'
+        },
+        'f0b1e38e-7bee-485e-9d3f-69410bf30684': {
+            node: '0f22e40f-a004-4c5a-99ef-004c8e6769bf',
+            name: 'Tron Test',
+            symbol: 'TRX',
+            decimal: 6,
+            logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1958.png'
+        },
+        'f0b1e38e-7bee-485e-9d3f-69410bf30685': {
+            node: '6739be94-ee43-46af-9a62-690cf0947280',
             name: 'Ethereum',
             symbol: 'ETH',
             decimal: 18,
-            logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
-            endPoint: 'https://mainnet.infura.io/v3/9a150d3a322645268224160ebf5b8599',
-            default: true
+            logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png'
         },
-        '6739be94-ee43-46af-9a62-690cf0947281': {
-            type: 'ETH',
-            name: 'Rinkeby',
-            symbol: 'RETH',
+        'f0b1e38e-7bee-485e-9d3f-69410bf30686': {
+            node: '6739be94-ee43-46af-9a62-690cf0947282',
+            name: 'Nexty',
+            symbol: 'NTY',
             decimal: 18,
-            logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png',
-            endPoint: 'https://rinkeby.infura.io/v3/9a150d3a322645268224160ebf5b8599',
-            default: true
-        }
-    },
+            logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/2714.png'
+        },
+    }
 
     _selectedNode: 'f0b1e38e-7bee-485e-9d3f-69410bf30681',
 
@@ -115,6 +129,10 @@ const NodeService = {
             selected: this._selectedNode
         };
     },
+
+    getTokens() {
+        return this._tokens
+    }
 
     getCurrentNode() {
         return this._nodes[ this._selectedNode ];

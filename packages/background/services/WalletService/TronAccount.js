@@ -14,10 +14,9 @@ import axios from 'axios';
 BigNumber.config({ EXPONENTIAL_AT: [-20, 30] });
 const logger = new Logger('WalletService/TronAccount');
 class TronAccount {
-    constructor(chain, accountType, importData, symbol, accountIndex = 0) {
+    constructor(chain, accountType, importData, accountIndex = 0) {
         this.chain = chain;
         this.type = accountType;
-        this.symbol = symbol;
         this.accountIndex = accountIndex;
 
         this.address = false;

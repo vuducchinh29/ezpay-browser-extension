@@ -72152,14 +72152,13 @@ var TronAccount_logger = new logger_Logger('WalletService/TronAccount');
 var TronAccount_TronAccount =
 /*#__PURE__*/
 function () {
-  function TronAccount(chain, accountType, importData, symbol) {
-    var accountIndex = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 0;
+  function TronAccount(chain, accountType, importData) {
+    var accountIndex = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
 
     classCallCheck_default()(this, TronAccount);
 
     this.chain = chain;
     this.type = accountType;
-    this.symbol = symbol;
     this.accountIndex = accountIndex;
     this.address = false;
     this.name = false;
@@ -73927,7 +73926,7 @@ function (_EventEmitter) {
                 node = nodes[chain];
 
                 if (node.type === CHAIN_TYPE.TRON) {
-                  this.addTronAccount(chain, mnemonic, name, node.symbol);
+                  this.addTronAccount(chain, mnemonic, name);
                 }
 
               case 4:
@@ -73991,7 +73990,7 @@ function (_EventEmitter) {
                 });
 
               case 5:
-                account = new WalletService_TronAccount(chain, ACCOUNT_TYPE.MNEMONIC, mnemonic, symbol);
+                account = new WalletService_TronAccount(chain, ACCOUNT_TYPE.MNEMONIC, mnemonic);
                 WalletService_logger.info("Add account '".concat(account, "'"));
                 address = account.address;
                 account.name = name;

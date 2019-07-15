@@ -181,7 +181,7 @@ class Wallet extends EventEmitter {
         const node = nodes[chain]
 
         if (node.type === CHAIN_TYPE.TRON) {
-            this.addTronAccount(chain, mnemonic, name, node.symbol)
+            this.addTronAccount(chain, mnemonic, name)
         }
     }
 
@@ -202,8 +202,7 @@ class Wallet extends EventEmitter {
         const account = new TronAccount(
             chain,
             ACCOUNT_TYPE.MNEMONIC,
-            mnemonic,
-            symbol
+            mnemonic
         );
         logger.info(`Add account '${ account }'`);
 
