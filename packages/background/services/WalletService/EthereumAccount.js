@@ -1,5 +1,6 @@
 import Logger from '@ezpay/lib/logger';
 import Utils from '@ezpay/lib/utils';
+import ethUtils from '@ezpay/lib/ethUtils';
 import axios from 'axios';
 import { BigNumber } from 'bignumber.js';
 import TronWeb from 'tronweb';
@@ -39,7 +40,7 @@ class EthereumAccount extends Account {
         if(this.type !== ACCOUNT_TYPE.MNEMONIC)
             throw new Error('Deriving account keys at a specific index requires a mnemonic account');
 
-        return Utils.getEthereumAccountAtIndex(
+        return ethUtils.getEthereumAccountAtIndex(
             this.mnemonic,
             index
         );
