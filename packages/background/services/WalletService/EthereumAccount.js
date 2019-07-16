@@ -14,7 +14,7 @@ import {
 
 class EthereumAccount extends Account {
     constructor(chain, accountType, importData, name, symbol, decimal, logo, accountIndex = 0) {
-        super(chain, accountType, importData, name, symbol, decimal, logo, accountIndex = 0);
+        super(chain, accountType, importData, name, symbol, decimal, logo, accountIndex);
 
         if(accountType == ACCOUNT_TYPE.MNEMONIC)
             this._importMnemonic(importData);

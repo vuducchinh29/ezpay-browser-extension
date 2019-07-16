@@ -28,7 +28,8 @@ export const CHAIN_TYPE = {
     ETH: 'ETH',
     BTC: 'BTC',
     LTC: 'LTC',
-    NTY: 'NTY'
+    NTY: 'NTY',
+    ETH_RINKEBY: 'ETH_RINKEBY'
 };
 
 export const VALIDATION_STATE = {

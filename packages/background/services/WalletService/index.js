@@ -2,6 +2,7 @@ import Logger from '@ezpay/lib/logger';
 import EventEmitter from 'eventemitter3';
 import TronAccount from './TronAccount';
 import EthereumAccount from './EthereumAccount';
+import BitcoinAccount from './BitcoinAccount';
 import axios from 'axios';
 import extensionizer from 'extensionizer';
 import Utils from '@ezpay/lib/utils';
@@ -111,6 +112,11 @@ class Wallet extends EventEmitter {
 
         logger.info('User has set a password');
         this._setState(APP_STATE.READY);
+
+        if(!StorageService.hasAccounts) {
+            logger.info('Wallet does not have any accounts');
+            this._createDefaultAccount()
+        }
     }
 
     _loadAccounts() {
@@ -135,7 +141,7 @@ class Wallet extends EventEmitter {
 
                 accountObj.loadCache();
                 accountObj.update([], [], 0);
-            } else if (node.type === CHAIN_TYPE.NTY) {
+            } else if (node.type === CHAIN_TYPE.NTY || node.type === CHAIN_TYPE.ETH) {
                 accountObj = new EthereumAccount(
                     account.chain,
                     account.type,
@@ -144,6 +150,18 @@ class Wallet extends EventEmitter {
                     account.symbol,
                     account.decimal,
                     account.logo,
+                    account.accountIndex
+                );
+            } else if (node.type === CHAIN_TYPE.BTC) {
+                accountObj = new BitcoinAccount(
+                    account.chain,
+                    account.type,
+                    account.mnemonic || account.privateKey,
+                    account.name,
+                    account.symbol,
+                    account.decimal,
+                    account.logo,
+                    account.typeCoinInfo,
                     account.accountIndex
                 );
             }
@@ -173,8 +191,6 @@ class Wallet extends EventEmitter {
             return Promise.reject(unlockFailed);
         }
 
-        // this._createDefaultAccount()
-
         if(!StorageService.hasAccounts) {
             this._createDefaultAccount()
             logger.info('Wallet does not have any accounts');
@@ -189,16 +205,30 @@ class Wallet extends EventEmitter {
         const tokens = NodeService.getTokens()
         const token = tokens['f0b1e38e-7bee-485e-9d3f-69410bf30686']
         const token2 = tokens['f0b1e38e-7bee-485e-9d3f-69410bf30683']
+        const token3 = tokens['f0b1e38e-7bee-485e-9d3f-69410bf30687']
+        const token4 = tokens['f0b1e38e-7bee-485e-9d3f-69410bf30685']
 
         this.addAccount({
             ...token,
             mnemonic: Utils.generateMnemonic(),
-            name: 'Nexty Account 2'
+            accountName: 'Nexty Account 1'
         })
         this.addAccount({
             ...token2,
             mnemonic: Utils.generateMnemonic(),
-            name: 'Tron Account 2'
+            accountName: 'Tron Account 1'
+        })
+
+        this.addAccount({
+            ...token3,
+            mnemonic: Utils.generateMnemonic(),
+            accountName: 'Bitcoin Account 1'
+        })
+
+        this.addAccount({
+            ...token4,
+            mnemonic: Utils.generateMnemonic(),
+            accountName: 'Ethereum Account 1'
         })
     }
 
@@ -208,13 +238,15 @@ class Wallet extends EventEmitter {
 
         if (node.type === CHAIN_TYPE.TRON) {
             this.addTronAccount(params)
-        } else if (node.type === CHAIN_TYPE.NTY) {
+        } else if (node.type === CHAIN_TYPE.NTY || node.type === CHAIN_TYPE.ETH || node.type === CHAIN_TYPE.ETH_RINKEBY) {
             this.addEthereumAccount(params)
+        } else if (node.type === CHAIN_TYPE.BTC) {
+            this.addBitcoinAccount(params)
         }
     }
 
     async addTronAccount(params) {
-        logger.info(`Adding Tron account '${ params.name }' from popup`);
+        logger.info(`Adding Tron account '${ params.accountName }' from popup`);
 
         const trc10tokens = axios.get('https://apilist.tronscan.org/api/token?showAll=1&limit=4000',{ timeout: 10000 });
         const trc20tokens = axios.get('https://apilist.tronscan.org/api/tokens/overview?start=0&limit=1000&filter=trc20',{ timeout: 10000 });
@@ -231,7 +263,7 @@ class Wallet extends EventEmitter {
             params.node,
             ACCOUNT_TYPE.MNEMONIC,
             params.mnemonic,
-            params.name,
+            params.accountName,
             params.symbol,
             params.decimal,
             params.logo
@@ -250,13 +282,13 @@ class Wallet extends EventEmitter {
     }
 
     async addEthereumAccount(params) {
-        logger.info(`Adding Ethereum account '${ params.name }' from popup`);
+        logger.info(`Adding Ethereum account '${ params.accountName }' from popup`);
 
         const account = new EthereumAccount(
             params.node,
             ACCOUNT_TYPE.MNEMONIC,
             params.mnemonic,
-            params.name,
+            params.accountName,
             params.symbol,
             params.decimal,
             params.logo
@@ -274,10 +306,37 @@ class Wallet extends EventEmitter {
         return true;
     }
 
+    async addBitcoinAccount(params) {
+        logger.info(`Adding Bitcoin account '${ params.accountName }' from popup`);
+
+        const account = new BitcoinAccount(
+            params.node,
+            ACCOUNT_TYPE.MNEMONIC,
+            params.mnemonic,
+            params.accountName,
+            params.symbol,
+            params.decimal,
+            params.logo,
+            params.typeCoinInfo
+        );
+        logger.info(`Add account '${ account }'`);
+
+        const {
+            address
+        } = account;
+
+        this.accounts[ address ] = account;
+        StorageService.saveAccount(account);
+
+        // this.emit('setAccounts', this.getAccounts());
+        return true;
+    }
+
     getAccounts() {
         const nodes = NodeService.getNodes().nodes;
-
+        console.log('xxx', this.accounts)
         const accounts = Object.entries(this.accounts).reduce((accounts, [ address, account ]) => {
+            console.log('xxx', account)
             accounts[ address ] = {
                 name: account.name,
                 logo: account.logo,

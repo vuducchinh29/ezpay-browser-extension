@@ -5859,6 +5859,526 @@ PEMEncoder.prototype.encode = function encode(data, options) {
 
 /***/ }),
 
+/***/ "../../node_modules/assert/assert.js":
+/*!***********************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/assert/assert.js ***!
+  \***********************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(global) {
+
+var objectAssign = __webpack_require__(/*! object-assign */ "../../node_modules/object-assign/index.js");
+
+// compare and isBuffer taken from https://github.com/feross/buffer/blob/680e9e5e488f22aac27599a57dc844a6315928dd/index.js
+// original notice:
+
+/*!
+ * The buffer module from node.js, for the browser.
+ *
+ * @author   Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
+ * @license  MIT
+ */
+function compare(a, b) {
+  if (a === b) {
+    return 0;
+  }
+
+  var x = a.length;
+  var y = b.length;
+
+  for (var i = 0, len = Math.min(x, y); i < len; ++i) {
+    if (a[i] !== b[i]) {
+      x = a[i];
+      y = b[i];
+      break;
+    }
+  }
+
+  if (x < y) {
+    return -1;
+  }
+  if (y < x) {
+    return 1;
+  }
+  return 0;
+}
+function isBuffer(b) {
+  if (global.Buffer && typeof global.Buffer.isBuffer === 'function') {
+    return global.Buffer.isBuffer(b);
+  }
+  return !!(b != null && b._isBuffer);
+}
+
+// based on node assert, original notice:
+// NB: The URL to the CommonJS spec is kept just for tradition.
+//     node-assert has evolved a lot since then, both in API and behavior.
+
+// http://wiki.commonjs.org/wiki/Unit_Testing/1.0
+//
+// THIS IS NOT TESTED NOR LIKELY TO WORK OUTSIDE V8!
+//
+// Originally from narwhal.js (http://narwhaljs.org)
+// Copyright (c) 2009 Thomas Robinson <280north.com>
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the 'Software'), to
+// deal in the Software without restriction, including without limitation the
+// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+// sell copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+// ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+var util = __webpack_require__(/*! util/ */ "../../node_modules/util/util.js");
+var hasOwn = Object.prototype.hasOwnProperty;
+var pSlice = Array.prototype.slice;
+var functionsHaveNames = (function () {
+  return function foo() {}.name === 'foo';
+}());
+function pToString (obj) {
+  return Object.prototype.toString.call(obj);
+}
+function isView(arrbuf) {
+  if (isBuffer(arrbuf)) {
+    return false;
+  }
+  if (typeof global.ArrayBuffer !== 'function') {
+    return false;
+  }
+  if (typeof ArrayBuffer.isView === 'function') {
+    return ArrayBuffer.isView(arrbuf);
+  }
+  if (!arrbuf) {
+    return false;
+  }
+  if (arrbuf instanceof DataView) {
+    return true;
+  }
+  if (arrbuf.buffer && arrbuf.buffer instanceof ArrayBuffer) {
+    return true;
+  }
+  return false;
+}
+// 1. The assert module provides functions that throw
+// AssertionError's when particular conditions are not met. The
+// assert module must conform to the following interface.
+
+var assert = module.exports = ok;
+
+// 2. The AssertionError is defined in assert.
+// new assert.AssertionError({ message: message,
+//                             actual: actual,
+//                             expected: expected })
+
+var regex = /\s*function\s+([^\(\s]*)\s*/;
+// based on https://github.com/ljharb/function.prototype.name/blob/adeeeec8bfcc6068b187d7d9fb3d5bb1d3a30899/implementation.js
+function getName(func) {
+  if (!util.isFunction(func)) {
+    return;
+  }
+  if (functionsHaveNames) {
+    return func.name;
+  }
+  var str = func.toString();
+  var match = str.match(regex);
+  return match && match[1];
+}
+assert.AssertionError = function AssertionError(options) {
+  this.name = 'AssertionError';
+  this.actual = options.actual;
+  this.expected = options.expected;
+  this.operator = options.operator;
+  if (options.message) {
+    this.message = options.message;
+    this.generatedMessage = false;
+  } else {
+    this.message = getMessage(this);
+    this.generatedMessage = true;
+  }
+  var stackStartFunction = options.stackStartFunction || fail;
+  if (Error.captureStackTrace) {
+    Error.captureStackTrace(this, stackStartFunction);
+  } else {
+    // non v8 browsers so we can have a stacktrace
+    var err = new Error();
+    if (err.stack) {
+      var out = err.stack;
+
+      // try to strip useless frames
+      var fn_name = getName(stackStartFunction);
+      var idx = out.indexOf('\n' + fn_name);
+      if (idx >= 0) {
+        // once we have located the function frame
+        // we need to strip out everything before it (and its line)
+        var next_line = out.indexOf('\n', idx + 1);
+        out = out.substring(next_line + 1);
+      }
+
+      this.stack = out;
+    }
+  }
+};
+
+// assert.AssertionError instanceof Error
+util.inherits(assert.AssertionError, Error);
+
+function truncate(s, n) {
+  if (typeof s === 'string') {
+    return s.length < n ? s : s.slice(0, n);
+  } else {
+    return s;
+  }
+}
+function inspect(something) {
+  if (functionsHaveNames || !util.isFunction(something)) {
+    return util.inspect(something);
+  }
+  var rawname = getName(something);
+  var name = rawname ? ': ' + rawname : '';
+  return '[Function' +  name + ']';
+}
+function getMessage(self) {
+  return truncate(inspect(self.actual), 128) + ' ' +
+         self.operator + ' ' +
+         truncate(inspect(self.expected), 128);
+}
+
+// At present only the three keys mentioned above are used and
+// understood by the spec. Implementations or sub modules can pass
+// other keys to the AssertionError's constructor - they will be
+// ignored.
+
+// 3. All of the following functions must throw an AssertionError
+// when a corresponding condition is not met, with a message that
+// may be undefined if not provided.  All assertion methods provide
+// both the actual and expected values to the assertion error for
+// display purposes.
+
+function fail(actual, expected, message, operator, stackStartFunction) {
+  throw new assert.AssertionError({
+    message: message,
+    actual: actual,
+    expected: expected,
+    operator: operator,
+    stackStartFunction: stackStartFunction
+  });
+}
+
+// EXTENSION! allows for well behaved errors defined elsewhere.
+assert.fail = fail;
+
+// 4. Pure assertion tests whether a value is truthy, as determined
+// by !!guard.
+// assert.ok(guard, message_opt);
+// This statement is equivalent to assert.equal(true, !!guard,
+// message_opt);. To test strictly for the value true, use
+// assert.strictEqual(true, guard, message_opt);.
+
+function ok(value, message) {
+  if (!value) fail(value, true, message, '==', assert.ok);
+}
+assert.ok = ok;
+
+// 5. The equality assertion tests shallow, coercive equality with
+// ==.
+// assert.equal(actual, expected, message_opt);
+
+assert.equal = function equal(actual, expected, message) {
+  if (actual != expected) fail(actual, expected, message, '==', assert.equal);
+};
+
+// 6. The non-equality assertion tests for whether two objects are not equal
+// with != assert.notEqual(actual, expected, message_opt);
+
+assert.notEqual = function notEqual(actual, expected, message) {
+  if (actual == expected) {
+    fail(actual, expected, message, '!=', assert.notEqual);
+  }
+};
+
+// 7. The equivalence assertion tests a deep equality relation.
+// assert.deepEqual(actual, expected, message_opt);
+
+assert.deepEqual = function deepEqual(actual, expected, message) {
+  if (!_deepEqual(actual, expected, false)) {
+    fail(actual, expected, message, 'deepEqual', assert.deepEqual);
+  }
+};
+
+assert.deepStrictEqual = function deepStrictEqual(actual, expected, message) {
+  if (!_deepEqual(actual, expected, true)) {
+    fail(actual, expected, message, 'deepStrictEqual', assert.deepStrictEqual);
+  }
+};
+
+function _deepEqual(actual, expected, strict, memos) {
+  // 7.1. All identical values are equivalent, as determined by ===.
+  if (actual === expected) {
+    return true;
+  } else if (isBuffer(actual) && isBuffer(expected)) {
+    return compare(actual, expected) === 0;
+
+  // 7.2. If the expected value is a Date object, the actual value is
+  // equivalent if it is also a Date object that refers to the same time.
+  } else if (util.isDate(actual) && util.isDate(expected)) {
+    return actual.getTime() === expected.getTime();
+
+  // 7.3 If the expected value is a RegExp object, the actual value is
+  // equivalent if it is also a RegExp object with the same source and
+  // properties (`global`, `multiline`, `lastIndex`, `ignoreCase`).
+  } else if (util.isRegExp(actual) && util.isRegExp(expected)) {
+    return actual.source === expected.source &&
+           actual.global === expected.global &&
+           actual.multiline === expected.multiline &&
+           actual.lastIndex === expected.lastIndex &&
+           actual.ignoreCase === expected.ignoreCase;
+
+  // 7.4. Other pairs that do not both pass typeof value == 'object',
+  // equivalence is determined by ==.
+  } else if ((actual === null || typeof actual !== 'object') &&
+             (expected === null || typeof expected !== 'object')) {
+    return strict ? actual === expected : actual == expected;
+
+  // If both values are instances of typed arrays, wrap their underlying
+  // ArrayBuffers in a Buffer each to increase performance
+  // This optimization requires the arrays to have the same type as checked by
+  // Object.prototype.toString (aka pToString). Never perform binary
+  // comparisons for Float*Arrays, though, since e.g. +0 === -0 but their
+  // bit patterns are not identical.
+  } else if (isView(actual) && isView(expected) &&
+             pToString(actual) === pToString(expected) &&
+             !(actual instanceof Float32Array ||
+               actual instanceof Float64Array)) {
+    return compare(new Uint8Array(actual.buffer),
+                   new Uint8Array(expected.buffer)) === 0;
+
+  // 7.5 For all other Object pairs, including Array objects, equivalence is
+  // determined by having the same number of owned properties (as verified
+  // with Object.prototype.hasOwnProperty.call), the same set of keys
+  // (although not necessarily the same order), equivalent values for every
+  // corresponding key, and an identical 'prototype' property. Note: this
+  // accounts for both named and indexed properties on Arrays.
+  } else if (isBuffer(actual) !== isBuffer(expected)) {
+    return false;
+  } else {
+    memos = memos || {actual: [], expected: []};
+
+    var actualIndex = memos.actual.indexOf(actual);
+    if (actualIndex !== -1) {
+      if (actualIndex === memos.expected.indexOf(expected)) {
+        return true;
+      }
+    }
+
+    memos.actual.push(actual);
+    memos.expected.push(expected);
+
+    return objEquiv(actual, expected, strict, memos);
+  }
+}
+
+function isArguments(object) {
+  return Object.prototype.toString.call(object) == '[object Arguments]';
+}
+
+function objEquiv(a, b, strict, actualVisitedObjects) {
+  if (a === null || a === undefined || b === null || b === undefined)
+    return false;
+  // if one is a primitive, the other must be same
+  if (util.isPrimitive(a) || util.isPrimitive(b))
+    return a === b;
+  if (strict && Object.getPrototypeOf(a) !== Object.getPrototypeOf(b))
+    return false;
+  var aIsArgs = isArguments(a);
+  var bIsArgs = isArguments(b);
+  if ((aIsArgs && !bIsArgs) || (!aIsArgs && bIsArgs))
+    return false;
+  if (aIsArgs) {
+    a = pSlice.call(a);
+    b = pSlice.call(b);
+    return _deepEqual(a, b, strict);
+  }
+  var ka = objectKeys(a);
+  var kb = objectKeys(b);
+  var key, i;
+  // having the same number of owned properties (keys incorporates
+  // hasOwnProperty)
+  if (ka.length !== kb.length)
+    return false;
+  //the same set of keys (although not necessarily the same order),
+  ka.sort();
+  kb.sort();
+  //~~~cheap key test
+  for (i = ka.length - 1; i >= 0; i--) {
+    if (ka[i] !== kb[i])
+      return false;
+  }
+  //equivalent values for every corresponding key, and
+  //~~~possibly expensive deep test
+  for (i = ka.length - 1; i >= 0; i--) {
+    key = ka[i];
+    if (!_deepEqual(a[key], b[key], strict, actualVisitedObjects))
+      return false;
+  }
+  return true;
+}
+
+// 8. The non-equivalence assertion tests for any deep inequality.
+// assert.notDeepEqual(actual, expected, message_opt);
+
+assert.notDeepEqual = function notDeepEqual(actual, expected, message) {
+  if (_deepEqual(actual, expected, false)) {
+    fail(actual, expected, message, 'notDeepEqual', assert.notDeepEqual);
+  }
+};
+
+assert.notDeepStrictEqual = notDeepStrictEqual;
+function notDeepStrictEqual(actual, expected, message) {
+  if (_deepEqual(actual, expected, true)) {
+    fail(actual, expected, message, 'notDeepStrictEqual', notDeepStrictEqual);
+  }
+}
+
+
+// 9. The strict equality assertion tests strict equality, as determined by ===.
+// assert.strictEqual(actual, expected, message_opt);
+
+assert.strictEqual = function strictEqual(actual, expected, message) {
+  if (actual !== expected) {
+    fail(actual, expected, message, '===', assert.strictEqual);
+  }
+};
+
+// 10. The strict non-equality assertion tests for strict inequality, as
+// determined by !==.  assert.notStrictEqual(actual, expected, message_opt);
+
+assert.notStrictEqual = function notStrictEqual(actual, expected, message) {
+  if (actual === expected) {
+    fail(actual, expected, message, '!==', assert.notStrictEqual);
+  }
+};
+
+function expectedException(actual, expected) {
+  if (!actual || !expected) {
+    return false;
+  }
+
+  if (Object.prototype.toString.call(expected) == '[object RegExp]') {
+    return expected.test(actual);
+  }
+
+  try {
+    if (actual instanceof expected) {
+      return true;
+    }
+  } catch (e) {
+    // Ignore.  The instanceof check doesn't work for arrow functions.
+  }
+
+  if (Error.isPrototypeOf(expected)) {
+    return false;
+  }
+
+  return expected.call({}, actual) === true;
+}
+
+function _tryBlock(block) {
+  var error;
+  try {
+    block();
+  } catch (e) {
+    error = e;
+  }
+  return error;
+}
+
+function _throws(shouldThrow, block, expected, message) {
+  var actual;
+
+  if (typeof block !== 'function') {
+    throw new TypeError('"block" argument must be a function');
+  }
+
+  if (typeof expected === 'string') {
+    message = expected;
+    expected = null;
+  }
+
+  actual = _tryBlock(block);
+
+  message = (expected && expected.name ? ' (' + expected.name + ').' : '.') +
+            (message ? ' ' + message : '.');
+
+  if (shouldThrow && !actual) {
+    fail(actual, expected, 'Missing expected exception' + message);
+  }
+
+  var userProvidedMessage = typeof message === 'string';
+  var isUnwantedException = !shouldThrow && util.isError(actual);
+  var isUnexpectedException = !shouldThrow && actual && !expected;
+
+  if ((isUnwantedException &&
+      userProvidedMessage &&
+      expectedException(actual, expected)) ||
+      isUnexpectedException) {
+    fail(actual, expected, 'Got unwanted exception' + message);
+  }
+
+  if ((shouldThrow && actual && expected &&
+      !expectedException(actual, expected)) || (!shouldThrow && actual)) {
+    throw actual;
+  }
+}
+
+// 11. Expected to throw an error:
+// assert.throws(block, Error_opt, message_opt);
+
+assert.throws = function(block, /*optional*/error, /*optional*/message) {
+  _throws(true, block, error, message);
+};
+
+// EXTENSION! This is annoying to write outside this module.
+assert.doesNotThrow = function(block, /*optional*/error, /*optional*/message) {
+  _throws(false, block, error, message);
+};
+
+assert.ifError = function(err) { if (err) throw err; };
+
+// Expose a strict only variant of assert
+function strict(value, message) {
+  if (!value) fail(value, true, message, '==', strict);
+}
+assert.strict = objectAssign(strict, assert, {
+  equal: assert.strictEqual,
+  deepEqual: assert.deepStrictEqual,
+  notEqual: assert.notStrictEqual,
+  notDeepEqual: assert.notDeepStrictEqual
+});
+assert.strict.strict = assert.strict;
+
+var objectKeys = Object.keys || function (obj) {
+  var keys = [];
+  for (var key in obj) {
+    if (hasOwn.call(obj, key)) keys.push(key);
+  }
+  return keys;
+};
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../webpack/buildin/global.js */ "../../node_modules/webpack/buildin/global.js")))
+
+/***/ }),
+
 /***/ "../../node_modules/axios/index.js":
 /*!*********************************************************************!*\
   !*** /home/dev/ezpay-browser-extension/node_modules/axios/index.js ***!
@@ -7777,6 +8297,166 @@ function fromByteArray (uint8) {
   }
 
   return parts.join('')
+}
+
+
+/***/ }),
+
+/***/ "../../node_modules/bech32/index.js":
+/*!**********************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bech32/index.js ***!
+  \**********************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var ALPHABET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l'
+
+// pre-compute lookup table
+var ALPHABET_MAP = {}
+for (var z = 0; z < ALPHABET.length; z++) {
+  var x = ALPHABET.charAt(z)
+
+  if (ALPHABET_MAP[x] !== undefined) throw new TypeError(x + ' is ambiguous')
+  ALPHABET_MAP[x] = z
+}
+
+function polymodStep (pre) {
+  var b = pre >> 25
+  return ((pre & 0x1FFFFFF) << 5) ^
+    (-((b >> 0) & 1) & 0x3b6a57b2) ^
+    (-((b >> 1) & 1) & 0x26508e6d) ^
+    (-((b >> 2) & 1) & 0x1ea119fa) ^
+    (-((b >> 3) & 1) & 0x3d4233dd) ^
+    (-((b >> 4) & 1) & 0x2a1462b3)
+}
+
+function prefixChk (prefix) {
+  var chk = 1
+  for (var i = 0; i < prefix.length; ++i) {
+    var c = prefix.charCodeAt(i)
+    if (c < 33 || c > 126) throw new Error('Invalid prefix (' + prefix + ')')
+
+    chk = polymodStep(chk) ^ (c >> 5)
+  }
+  chk = polymodStep(chk)
+
+  for (i = 0; i < prefix.length; ++i) {
+    var v = prefix.charCodeAt(i)
+    chk = polymodStep(chk) ^ (v & 0x1f)
+  }
+  return chk
+}
+
+function encode (prefix, words, LIMIT) {
+  LIMIT = LIMIT || 90
+  if ((prefix.length + 7 + words.length) > LIMIT) throw new TypeError('Exceeds length limit')
+
+  prefix = prefix.toLowerCase()
+
+  // determine chk mod
+  var chk = prefixChk(prefix)
+  var result = prefix + '1'
+  for (var i = 0; i < words.length; ++i) {
+    var x = words[i]
+    if ((x >> 5) !== 0) throw new Error('Non 5-bit word')
+
+    chk = polymodStep(chk) ^ x
+    result += ALPHABET.charAt(x)
+  }
+
+  for (i = 0; i < 6; ++i) {
+    chk = polymodStep(chk)
+  }
+  chk ^= 1
+
+  for (i = 0; i < 6; ++i) {
+    var v = (chk >> ((5 - i) * 5)) & 0x1f
+    result += ALPHABET.charAt(v)
+  }
+
+  return result
+}
+
+function decode (str, LIMIT) {
+  LIMIT = LIMIT || 90
+  if (str.length < 8) throw new TypeError(str + ' too short')
+  if (str.length > LIMIT) throw new TypeError('Exceeds length limit')
+
+  // don't allow mixed case
+  var lowered = str.toLowerCase()
+  var uppered = str.toUpperCase()
+  if (str !== lowered && str !== uppered) throw new Error('Mixed-case string ' + str)
+  str = lowered
+
+  var split = str.lastIndexOf('1')
+  if (split === -1) throw new Error('No separator character for ' + str)
+  if (split === 0) throw new Error('Missing prefix for ' + str)
+
+  var prefix = str.slice(0, split)
+  var wordChars = str.slice(split + 1)
+  if (wordChars.length < 6) throw new Error('Data too short')
+
+  var chk = prefixChk(prefix)
+  var words = []
+  for (var i = 0; i < wordChars.length; ++i) {
+    var c = wordChars.charAt(i)
+    var v = ALPHABET_MAP[c]
+    if (v === undefined) throw new Error('Unknown character ' + c)
+    chk = polymodStep(chk) ^ v
+
+    // not in the checksum?
+    if (i + 6 >= wordChars.length) continue
+    words.push(v)
+  }
+
+  if (chk !== 1) throw new Error('Invalid checksum for ' + str)
+  return { prefix: prefix, words: words }
+}
+
+function convert (data, inBits, outBits, pad) {
+  var value = 0
+  var bits = 0
+  var maxV = (1 << outBits) - 1
+
+  var result = []
+  for (var i = 0; i < data.length; ++i) {
+    value = (value << inBits) | data[i]
+    bits += inBits
+
+    while (bits >= outBits) {
+      bits -= outBits
+      result.push((value >> bits) & maxV)
+    }
+  }
+
+  if (pad) {
+    if (bits > 0) {
+      result.push((value << (outBits - bits)) & maxV)
+    }
+  } else {
+    if (bits >= inBits) throw new Error('Excess padding')
+    if ((value << (outBits - bits)) & maxV) throw new Error('Non-zero padding')
+  }
+
+  return result
+}
+
+function toWords (bytes) {
+  return convert(bytes, 8, 5, true)
+}
+
+function fromWords (words) {
+  return convert(words, 5, 8, false)
+}
+
+module.exports = {
+  decode: decode,
+  encode: encode,
+  toWords: toWords,
+  fromWords: fromWords
 }
 
 
@@ -11321,6 +12001,4237 @@ module.exports = ["가격","가끔","가난","가�
 /***/ (function(module) {
 
 module.exports = ["ábaco","abdomen","abeja","abierto","abogado","abono","aborto","abrazo","abrir","abuelo","abuso","acabar","academia","acceso","acción","aceite","acelga","acento","aceptar","ácido","aclarar","acné","acoger","acoso","activo","acto","actriz","actuar","acudir","acuerdo","acusar","adicto","admitir","adoptar","adorno","aduana","adulto","aéreo","afectar","afición","afinar","afirmar","ágil","agitar","agonía","agosto","agotar","agregar","agrio","agua","agudo","águila","aguja","ahogo","ahorro","aire","aislar","ajedrez","ajeno","ajuste","alacrán","alambre","alarma","alba","álbum","alcalde","aldea","alegre","alejar","alerta","aleta","alfiler","alga","algodón","aliado","aliento","alivio","alma","almeja","almíbar","altar","alteza","altivo","alto","altura","alumno","alzar","amable","amante","amapola","amargo","amasar","ámbar","ámbito","ameno","amigo","amistad","amor","amparo","amplio","ancho","anciano","ancla","andar","andén","anemia","ángulo","anillo","ánimo","anís","anotar","antena","antiguo","antojo","anual","anular","anuncio","añadir","añejo","año","apagar","aparato","apetito","apio","aplicar","apodo","aporte","apoyo","aprender","aprobar","apuesta","apuro","arado","araña","arar","árbitro","árbol","arbusto","archivo","arco","arder","ardilla","arduo","área","árido","aries","armonía","arnés","aroma","arpa","arpón","arreglo","arroz","arruga","arte","artista","asa","asado","asalto","ascenso","asegurar","aseo","asesor","asiento","asilo","asistir","asno","asombro","áspero","astilla","astro","astuto","asumir","asunto","atajo","ataque","atar","atento","ateo","ático","atleta","átomo","atraer","atroz","atún","audaz","audio","auge","aula","aumento","ausente","autor","aval","avance","avaro","ave","avellana","avena","avestruz","avión","aviso","ayer","ayuda","ayuno","azafrán","azar","azote","azúcar","azufre","azul","baba","babor","bache","bahía","baile","bajar","balanza","balcón","balde","bambú","banco","banda","baño","barba","barco","barniz","barro","báscula","bastón","basura","batalla","batería","batir","batuta","baúl","bazar","bebé","bebida","bello","besar","beso","bestia","bicho","bien","bingo","blanco","bloque","blusa","boa","bobina","bobo","boca","bocina","boda","bodega","boina","bola","bolero","bolsa","bomba","bondad","bonito","bono","bonsái","borde","borrar","bosque","bote","botín","bóveda","bozal","bravo","brazo","brecha","breve","brillo","brinco","brisa","broca","broma","bronce","brote","bruja","brusco","bruto","buceo","bucle","bueno","buey","bufanda","bufón","búho","buitre","bulto","burbuja","burla","burro","buscar","butaca","buzón","caballo","cabeza","cabina","cabra","cacao","cadáver","cadena","caer","café","caída","caimán","caja","cajón","cal","calamar","calcio","caldo","calidad","calle","calma","calor","calvo","cama","cambio","camello","camino","campo","cáncer","candil","canela","canguro","canica","canto","caña","cañón","caoba","caos","capaz","capitán","capote","captar","capucha","cara","carbón","cárcel","careta","carga","cariño","carne","carpeta","carro","carta","casa","casco","casero","caspa","castor","catorce","catre","caudal","causa","cazo","cebolla","ceder","cedro","celda","célebre","celoso","célula","cemento","ceniza","centro","cerca","cerdo","cereza","cero","cerrar","certeza","césped","cetro","chacal","chaleco","champú","chancla","chapa","charla","chico","chiste","chivo","choque","choza","chuleta","chupar","ciclón","ciego","cielo","cien","cierto","cifra","cigarro","cima","cinco","cine","cinta","ciprés","circo","ciruela","cisne","cita","ciudad","clamor","clan","claro","clase","clave","cliente","clima","clínica","cobre","cocción","cochino","cocina","coco","código","codo","cofre","coger","cohete","cojín","cojo","cola","colcha","colegio","colgar","colina","collar","colmo","columna","combate","comer","comida","cómodo","compra","conde","conejo","conga","conocer","consejo","contar","copa","copia","corazón","corbata","corcho","cordón","corona","correr","coser","cosmos","costa","cráneo","cráter","crear","crecer","creído","crema","cría","crimen","cripta","crisis","cromo","crónica","croqueta","crudo","cruz","cuadro","cuarto","cuatro","cubo","cubrir","cuchara","cuello","cuento","cuerda","cuesta","cueva","cuidar","culebra","culpa","culto","cumbre","cumplir","cuna","cuneta","cuota","cupón","cúpula","curar","curioso","curso","curva","cutis","dama","danza","dar","dardo","dátil","deber","débil","década","decir","dedo","defensa","definir","dejar","delfín","delgado","delito","demora","denso","dental","deporte","derecho","derrota","desayuno","deseo","desfile","desnudo","destino","desvío","detalle","detener","deuda","día","diablo","diadema","diamante","diana","diario","dibujo","dictar","diente","dieta","diez","difícil","digno","dilema","diluir","dinero","directo","dirigir","disco","diseño","disfraz","diva","divino","doble","doce","dolor","domingo","don","donar","dorado","dormir","dorso","dos","dosis","dragón","droga","ducha","duda","duelo","dueño","dulce","dúo","duque","durar","dureza","duro","ébano","ebrio","echar","eco","ecuador","edad","edición","edificio","editor","educar","efecto","eficaz","eje","ejemplo","elefante","elegir","elemento","elevar","elipse","élite","elixir","elogio","eludir","embudo","emitir","emoción","empate","empeño","empleo","empresa","enano","encargo","enchufe","encía","enemigo","enero","enfado","enfermo","engaño","enigma","enlace","enorme","enredo","ensayo","enseñar","entero","entrar","envase","envío","época","equipo","erizo","escala","escena","escolar","escribir","escudo","esencia","esfera","esfuerzo","espada","espejo","espía","esposa","espuma","esquí","estar","este","estilo","estufa","etapa","eterno","ética","etnia","evadir","evaluar","evento","evitar","exacto","examen","exceso","excusa","exento","exigir","exilio","existir","éxito","experto","explicar","exponer","extremo","fábrica","fábula","fachada","fácil","factor","faena","faja","falda","fallo","falso","faltar","fama","familia","famoso","faraón","farmacia","farol","farsa","fase","fatiga","fauna","favor","fax","febrero","fecha","feliz","feo","feria","feroz","fértil","fervor","festín","fiable","fianza","fiar","fibra","ficción","ficha","fideo","fiebre","fiel","fiera","fiesta","figura","fijar","fijo","fila","filete","filial","filtro","fin","finca","fingir","finito","firma","flaco","flauta","flecha","flor","flota","fluir","flujo","flúor","fobia","foca","fogata","fogón","folio","folleto","fondo","forma","forro","fortuna","forzar","fosa","foto","fracaso","frágil","franja","frase","fraude","freír","freno","fresa","frío","frito","fruta","fuego","fuente","fuerza","fuga","fumar","función","funda","furgón","furia","fusil","fútbol","futuro","gacela","gafas","gaita","gajo","gala","galería","gallo","gamba","ganar","gancho","ganga","ganso","garaje","garza","gasolina","gastar","gato","gavilán","gemelo","gemir","gen","género","genio","gente","geranio","gerente","germen","gesto","gigante","gimnasio","girar","giro","glaciar","globo","gloria","gol","golfo","goloso","golpe","goma","gordo","gorila","gorra","gota","goteo","gozar","grada","gráfico","grano","grasa","gratis","grave","grieta","grillo","gripe","gris","grito","grosor","grúa","grueso","grumo","grupo","guante","guapo","guardia","guerra","guía","guiño","guion","guiso","guitarra","gusano","gustar","haber","hábil","hablar","hacer","hacha","hada","hallar","hamaca","harina","haz","hazaña","hebilla","hebra","hecho","helado","helio","hembra","herir","hermano","héroe","hervir","hielo","hierro","hígado","higiene","hijo","himno","historia","hocico","hogar","hoguera","hoja","hombre","hongo","honor","honra","hora","hormiga","horno","hostil","hoyo","hueco","huelga","huerta","hueso","huevo","huida","huir","humano","húmedo","humilde","humo","hundir","huracán","hurto","icono","ideal","idioma","ídolo","iglesia","iglú","igual","ilegal","ilusión","imagen","imán","imitar","impar","imperio","imponer","impulso","incapaz","índice","inerte","infiel","informe","ingenio","inicio","inmenso","inmune","innato","insecto","instante","interés","íntimo","intuir","inútil","invierno","ira","iris","ironía","isla","islote","jabalí","jabón","jamón","jarabe","jardín","jarra","jaula","jazmín","jefe","jeringa","jinete","jornada","joroba","joven","joya","juerga","jueves","juez","jugador","jugo","juguete","juicio","junco","jungla","junio","juntar","júpiter","jurar","justo","juvenil","juzgar","kilo","koala","labio","lacio","lacra","lado","ladrón","lagarto","lágrima","laguna","laico","lamer","lámina","lámpara","lana","lancha","langosta","lanza","lápiz","largo","larva","lástima","lata","látex","latir","laurel","lavar","lazo","leal","lección","leche","lector","leer","legión","legumbre","lejano","lengua","lento","leña","león","leopardo","lesión","letal","letra","leve","leyenda","libertad","libro","licor","líder","lidiar","lienzo","liga","ligero","lima","límite","limón","limpio","lince","lindo","línea","lingote","lino","linterna","líquido","liso","lista","litera","litio","litro","llaga","llama","llanto","llave","llegar","llenar","llevar","llorar","llover","lluvia","lobo","loción","loco","locura","lógica","logro","lombriz","lomo","lonja","lote","lucha","lucir","lugar","lujo","luna","lunes","lupa","lustro","luto","luz","maceta","macho","madera","madre","maduro","maestro","mafia","magia","mago","maíz","maldad","maleta","malla","malo","mamá","mambo","mamut","manco","mando","manejar","manga","maniquí","manjar","mano","manso","manta","mañana","mapa","máquina","mar","marco","marea","marfil","margen","marido","mármol","marrón","martes","marzo","masa","máscara","masivo","matar","materia","matiz","matriz","máximo","mayor","mazorca","mecha","medalla","medio","médula","mejilla","mejor","melena","melón","memoria","menor","mensaje","mente","menú","mercado","merengue","mérito","mes","mesón","meta","meter","método","metro","mezcla","miedo","miel","miembro","miga","mil","milagro","militar","millón","mimo","mina","minero","mínimo","minuto","miope","mirar","misa","miseria","misil","mismo","mitad","mito","mochila","moción","moda","modelo","moho","mojar","molde","moler","molino","momento","momia","monarca","moneda","monja","monto","moño","morada","morder","moreno","morir","morro","morsa","mortal","mosca","mostrar","motivo","mover","móvil","mozo","mucho","mudar","mueble","muela","muerte","muestra","mugre","mujer","mula","muleta","multa","mundo","muñeca","mural","muro","músculo","museo","musgo","música","muslo","nácar","nación","nadar","naipe","naranja","nariz","narrar","nasal","natal","nativo","natural","náusea","naval","nave","navidad","necio","néctar","negar","negocio","negro","neón","nervio","neto","neutro","nevar","nevera","nicho","nido","niebla","nieto","niñez","niño","nítido","nivel","nobleza","noche","nómina","noria","norma","norte","nota","noticia","novato","novela","novio","nube","nuca","núcleo","nudillo","nudo","nuera","nueve","nuez","nulo","número","nutria","oasis","obeso","obispo","objeto","obra","obrero","observar","obtener","obvio","oca","ocaso","océano","ochenta","ocho","ocio","ocre","octavo","octubre","oculto","ocupar","ocurrir","odiar","odio","odisea","oeste","ofensa","oferta","oficio","ofrecer","ogro","oído","oír","ojo","ola","oleada","olfato","olivo","olla","olmo","olor","olvido","ombligo","onda","onza","opaco","opción","ópera","opinar","oponer","optar","óptica","opuesto","oración","orador","oral","órbita","orca","orden","oreja","órgano","orgía","orgullo","oriente","origen","orilla","oro","orquesta","oruga","osadía","oscuro","osezno","oso","ostra","otoño","otro","oveja","óvulo","óxido","oxígeno","oyente","ozono","pacto","padre","paella","página","pago","país","pájaro","palabra","palco","paleta","pálido","palma","paloma","palpar","pan","panal","pánico","pantera","pañuelo","papá","papel","papilla","paquete","parar","parcela","pared","parir","paro","párpado","parque","párrafo","parte","pasar","paseo","pasión","paso","pasta","pata","patio","patria","pausa","pauta","pavo","payaso","peatón","pecado","pecera","pecho","pedal","pedir","pegar","peine","pelar","peldaño","pelea","peligro","pellejo","pelo","peluca","pena","pensar","peñón","peón","peor","pepino","pequeño","pera","percha","perder","pereza","perfil","perico","perla","permiso","perro","persona","pesa","pesca","pésimo","pestaña","pétalo","petróleo","pez","pezuña","picar","pichón","pie","piedra","pierna","pieza","pijama","pilar","piloto","pimienta","pino","pintor","pinza","piña","piojo","pipa","pirata","pisar","piscina","piso","pista","pitón","pizca","placa","plan","plata","playa","plaza","pleito","pleno","plomo","pluma","plural","pobre","poco","poder","podio","poema","poesía","poeta","polen","policía","pollo","polvo","pomada","pomelo","pomo","pompa","poner","porción","portal","posada","poseer","posible","poste","potencia","potro","pozo","prado","precoz","pregunta","premio","prensa","preso","previo","primo","príncipe","prisión","privar","proa","probar","proceso","producto","proeza","profesor","programa","prole","promesa","pronto","propio","próximo","prueba","público","puchero","pudor","pueblo","puerta","puesto","pulga","pulir","pulmón","pulpo","pulso","puma","punto","puñal","puño","pupa","pupila","puré","quedar","queja","quemar","querer","queso","quieto","química","quince","quitar","rábano","rabia","rabo","ración","radical","raíz","rama","rampa","rancho","rango","rapaz","rápido","rapto","rasgo","raspa","rato","rayo","raza","razón","reacción","realidad","rebaño","rebote","recaer","receta","rechazo","recoger","recreo","recto","recurso","red","redondo","reducir","reflejo","reforma","refrán","refugio","regalo","regir","regla","regreso","rehén","reino","reír","reja","relato","relevo","relieve","relleno","reloj","remar","remedio","remo","rencor","rendir","renta","reparto","repetir","reposo","reptil","res","rescate","resina","respeto","resto","resumen","retiro","retorno","retrato","reunir","revés","revista","rey","rezar","rico","riego","rienda","riesgo","rifa","rígido","rigor","rincón","riñón","río","riqueza","risa","ritmo","rito","rizo","roble","roce","rociar","rodar","rodeo","rodilla","roer","rojizo","rojo","romero","romper","ron","ronco","ronda","ropa","ropero","rosa","rosca","rostro","rotar","rubí","rubor","rudo","rueda","rugir","ruido","ruina","ruleta","rulo","rumbo","rumor","ruptura","ruta","rutina","sábado","saber","sabio","sable","sacar","sagaz","sagrado","sala","saldo","salero","salir","salmón","salón","salsa","salto","salud","salvar","samba","sanción","sandía","sanear","sangre","sanidad","sano","santo","sapo","saque","sardina","sartén","sastre","satán","sauna","saxofón","sección","seco","secreto","secta","sed","seguir","seis","sello","selva","semana","semilla","senda","sensor","señal","señor","separar","sepia","sequía","ser","serie","sermón","servir","sesenta","sesión","seta","setenta","severo","sexo","sexto","sidra","siesta","siete","siglo","signo","sílaba","silbar","silencio","silla","símbolo","simio","sirena","sistema","sitio","situar","sobre","socio","sodio","sol","solapa","soldado","soledad","sólido","soltar","solución","sombra","sondeo","sonido","sonoro","sonrisa","sopa","soplar","soporte","sordo","sorpresa","sorteo","sostén","sótano","suave","subir","suceso","sudor","suegra","suelo","sueño","suerte","sufrir","sujeto","sultán","sumar","superar","suplir","suponer","supremo","sur","surco","sureño","surgir","susto","sutil","tabaco","tabique","tabla","tabú","taco","tacto","tajo","talar","talco","talento","talla","talón","tamaño","tambor","tango","tanque","tapa","tapete","tapia","tapón","taquilla","tarde","tarea","tarifa","tarjeta","tarot","tarro","tarta","tatuaje","tauro","taza","tazón","teatro","techo","tecla","técnica","tejado","tejer","tejido","tela","teléfono","tema","temor","templo","tenaz","tender","tener","tenis","tenso","teoría","terapia","terco","término","ternura","terror","tesis","tesoro","testigo","tetera","texto","tez","tibio","tiburón","tiempo","tienda","tierra","tieso","tigre","tijera","tilde","timbre","tímido","timo","tinta","tío","típico","tipo","tira","tirón","titán","títere","título","tiza","toalla","tobillo","tocar","tocino","todo","toga","toldo","tomar","tono","tonto","topar","tope","toque","tórax","torero","tormenta","torneo","toro","torpedo","torre","torso","tortuga","tos","tosco","toser","tóxico","trabajo","tractor","traer","tráfico","trago","traje","tramo","trance","trato","trauma","trazar","trébol","tregua","treinta","tren","trepar","tres","tribu","trigo","tripa","triste","triunfo","trofeo","trompa","tronco","tropa","trote","trozo","truco","trueno","trufa","tubería","tubo","tuerto","tumba","tumor","túnel","túnica","turbina","turismo","turno","tutor","ubicar","úlcera","umbral","unidad","unir","universo","uno","untar","uña","urbano","urbe","urgente","urna","usar","usuario","útil","utopía","uva","vaca","vacío","vacuna","vagar","vago","vaina","vajilla","vale","válido","valle","valor","válvula","vampiro","vara","variar","varón","vaso","vecino","vector","vehículo","veinte","vejez","vela","velero","veloz","vena","vencer","venda","veneno","vengar","venir","venta","venus","ver","verano","verbo","verde","vereda","verja","verso","verter","vía","viaje","vibrar","vicio","víctima","vida","vídeo","vidrio","viejo","viernes","vigor","vil","villa","vinagre","vino","viñedo","violín","viral","virgo","virtud","visor","víspera","vista","vitamina","viudo","vivaz","vivero","vivir","vivo","volcán","volumen","volver","voraz","votar","voto","voz","vuelo","vulgar","yacer","yate","yegua","yema","yerno","yeso","yodo","yoga","yogur","zafiro","zanja","zapato","zarza","zona","zorro","zumo","zurdo"];
+
+/***/ }),
+
+/***/ "../../node_modules/bip66/index.js":
+/*!*********************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bip66/index.js ***!
+  \*********************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+// Reference https://github.com/bitcoin/bips/blob/master/bip-0066.mediawiki
+// Format: 0x30 [total-length] 0x02 [R-length] [R] 0x02 [S-length] [S]
+// NOTE: SIGHASH byte ignored AND restricted, truncate before use
+
+var Buffer = __webpack_require__(/*! safe-buffer */ "../../node_modules/safe-buffer/index.js").Buffer
+
+function check (buffer) {
+  if (buffer.length < 8) return false
+  if (buffer.length > 72) return false
+  if (buffer[0] !== 0x30) return false
+  if (buffer[1] !== buffer.length - 2) return false
+  if (buffer[2] !== 0x02) return false
+
+  var lenR = buffer[3]
+  if (lenR === 0) return false
+  if (5 + lenR >= buffer.length) return false
+  if (buffer[4 + lenR] !== 0x02) return false
+
+  var lenS = buffer[5 + lenR]
+  if (lenS === 0) return false
+  if ((6 + lenR + lenS) !== buffer.length) return false
+
+  if (buffer[4] & 0x80) return false
+  if (lenR > 1 && (buffer[4] === 0x00) && !(buffer[5] & 0x80)) return false
+
+  if (buffer[lenR + 6] & 0x80) return false
+  if (lenS > 1 && (buffer[lenR + 6] === 0x00) && !(buffer[lenR + 7] & 0x80)) return false
+  return true
+}
+
+function decode (buffer) {
+  if (buffer.length < 8) throw new Error('DER sequence length is too short')
+  if (buffer.length > 72) throw new Error('DER sequence length is too long')
+  if (buffer[0] !== 0x30) throw new Error('Expected DER sequence')
+  if (buffer[1] !== buffer.length - 2) throw new Error('DER sequence length is invalid')
+  if (buffer[2] !== 0x02) throw new Error('Expected DER integer')
+
+  var lenR = buffer[3]
+  if (lenR === 0) throw new Error('R length is zero')
+  if (5 + lenR >= buffer.length) throw new Error('R length is too long')
+  if (buffer[4 + lenR] !== 0x02) throw new Error('Expected DER integer (2)')
+
+  var lenS = buffer[5 + lenR]
+  if (lenS === 0) throw new Error('S length is zero')
+  if ((6 + lenR + lenS) !== buffer.length) throw new Error('S length is invalid')
+
+  if (buffer[4] & 0x80) throw new Error('R value is negative')
+  if (lenR > 1 && (buffer[4] === 0x00) && !(buffer[5] & 0x80)) throw new Error('R value excessively padded')
+
+  if (buffer[lenR + 6] & 0x80) throw new Error('S value is negative')
+  if (lenS > 1 && (buffer[lenR + 6] === 0x00) && !(buffer[lenR + 7] & 0x80)) throw new Error('S value excessively padded')
+
+  // non-BIP66 - extract R, S values
+  return {
+    r: buffer.slice(4, 4 + lenR),
+    s: buffer.slice(6 + lenR)
+  }
+}
+
+/*
+ * Expects r and s to be positive DER integers.
+ *
+ * The DER format uses the most significant bit as a sign bit (& 0x80).
+ * If the significant bit is set AND the integer is positive, a 0x00 is prepended.
+ *
+ * Examples:
+ *
+ *      0 =>     0x00
+ *      1 =>     0x01
+ *     -1 =>     0xff
+ *    127 =>     0x7f
+ *   -127 =>     0x81
+ *    128 =>   0x0080
+ *   -128 =>     0x80
+ *    255 =>   0x00ff
+ *   -255 =>   0xff01
+ *  16300 =>   0x3fac
+ * -16300 =>   0xc054
+ *  62300 => 0x00f35c
+ * -62300 => 0xff0ca4
+*/
+function encode (r, s) {
+  var lenR = r.length
+  var lenS = s.length
+  if (lenR === 0) throw new Error('R length is zero')
+  if (lenS === 0) throw new Error('S length is zero')
+  if (lenR > 33) throw new Error('R length is too long')
+  if (lenS > 33) throw new Error('S length is too long')
+  if (r[0] & 0x80) throw new Error('R value is negative')
+  if (s[0] & 0x80) throw new Error('S value is negative')
+  if (lenR > 1 && (r[0] === 0x00) && !(r[1] & 0x80)) throw new Error('R value excessively padded')
+  if (lenS > 1 && (s[0] === 0x00) && !(s[1] & 0x80)) throw new Error('S value excessively padded')
+
+  var signature = Buffer.allocUnsafe(6 + lenR + lenS)
+
+  // 0x30 [total-length] 0x02 [R-length] [R] 0x02 [S-length] [S]
+  signature[0] = 0x30
+  signature[1] = signature.length - 2
+  signature[2] = 0x02
+  signature[3] = r.length
+  r.copy(signature, 4)
+  signature[4 + lenR] = 0x02
+  signature[5 + lenR] = s.length
+  s.copy(signature, 6 + lenR)
+
+  return signature
+}
+
+module.exports = {
+  check: check,
+  decode: decode,
+  encode: encode
+}
+
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoin-ops/index.json":
+/*!*****************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoin-ops/index.json ***!
+  \*****************************************************************************/
+/*! exports provided: OP_FALSE, OP_0, OP_PUSHDATA1, OP_PUSHDATA2, OP_PUSHDATA4, OP_1NEGATE, OP_RESERVED, OP_TRUE, OP_1, OP_2, OP_3, OP_4, OP_5, OP_6, OP_7, OP_8, OP_9, OP_10, OP_11, OP_12, OP_13, OP_14, OP_15, OP_16, OP_NOP, OP_VER, OP_IF, OP_NOTIF, OP_VERIF, OP_VERNOTIF, OP_ELSE, OP_ENDIF, OP_VERIFY, OP_RETURN, OP_TOALTSTACK, OP_FROMALTSTACK, OP_2DROP, OP_2DUP, OP_3DUP, OP_2OVER, OP_2ROT, OP_2SWAP, OP_IFDUP, OP_DEPTH, OP_DROP, OP_DUP, OP_NIP, OP_OVER, OP_PICK, OP_ROLL, OP_ROT, OP_SWAP, OP_TUCK, OP_CAT, OP_SUBSTR, OP_LEFT, OP_RIGHT, OP_SIZE, OP_INVERT, OP_AND, OP_OR, OP_XOR, OP_EQUAL, OP_EQUALVERIFY, OP_RESERVED1, OP_RESERVED2, OP_1ADD, OP_1SUB, OP_2MUL, OP_2DIV, OP_NEGATE, OP_ABS, OP_NOT, OP_0NOTEQUAL, OP_ADD, OP_SUB, OP_MUL, OP_DIV, OP_MOD, OP_LSHIFT, OP_RSHIFT, OP_BOOLAND, OP_BOOLOR, OP_NUMEQUAL, OP_NUMEQUALVERIFY, OP_NUMNOTEQUAL, OP_LESSTHAN, OP_GREATERTHAN, OP_LESSTHANOREQUAL, OP_GREATERTHANOREQUAL, OP_MIN, OP_MAX, OP_WITHIN, OP_RIPEMD160, OP_SHA1, OP_SHA256, OP_HASH160, OP_HASH256, OP_CODESEPARATOR, OP_CHECKSIG, OP_CHECKSIGVERIFY, OP_CHECKMULTISIG, OP_CHECKMULTISIGVERIFY, OP_NOP1, OP_NOP2, OP_CHECKLOCKTIMEVERIFY, OP_NOP3, OP_CHECKSEQUENCEVERIFY, OP_NOP4, OP_NOP5, OP_NOP6, OP_NOP7, OP_NOP8, OP_NOP9, OP_NOP10, OP_PUBKEYHASH, OP_PUBKEY, OP_INVALIDOPCODE, default */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module) {
+
+module.exports = {"OP_FALSE":0,"OP_0":0,"OP_PUSHDATA1":76,"OP_PUSHDATA2":77,"OP_PUSHDATA4":78,"OP_1NEGATE":79,"OP_RESERVED":80,"OP_TRUE":81,"OP_1":81,"OP_2":82,"OP_3":83,"OP_4":84,"OP_5":85,"OP_6":86,"OP_7":87,"OP_8":88,"OP_9":89,"OP_10":90,"OP_11":91,"OP_12":92,"OP_13":93,"OP_14":94,"OP_15":95,"OP_16":96,"OP_NOP":97,"OP_VER":98,"OP_IF":99,"OP_NOTIF":100,"OP_VERIF":101,"OP_VERNOTIF":102,"OP_ELSE":103,"OP_ENDIF":104,"OP_VERIFY":105,"OP_RETURN":106,"OP_TOALTSTACK":107,"OP_FROMALTSTACK":108,"OP_2DROP":109,"OP_2DUP":110,"OP_3DUP":111,"OP_2OVER":112,"OP_2ROT":113,"OP_2SWAP":114,"OP_IFDUP":115,"OP_DEPTH":116,"OP_DROP":117,"OP_DUP":118,"OP_NIP":119,"OP_OVER":120,"OP_PICK":121,"OP_ROLL":122,"OP_ROT":123,"OP_SWAP":124,"OP_TUCK":125,"OP_CAT":126,"OP_SUBSTR":127,"OP_LEFT":128,"OP_RIGHT":129,"OP_SIZE":130,"OP_INVERT":131,"OP_AND":132,"OP_OR":133,"OP_XOR":134,"OP_EQUAL":135,"OP_EQUALVERIFY":136,"OP_RESERVED1":137,"OP_RESERVED2":138,"OP_1ADD":139,"OP_1SUB":140,"OP_2MUL":141,"OP_2DIV":142,"OP_NEGATE":143,"OP_ABS":144,"OP_NOT":145,"OP_0NOTEQUAL":146,"OP_ADD":147,"OP_SUB":148,"OP_MUL":149,"OP_DIV":150,"OP_MOD":151,"OP_LSHIFT":152,"OP_RSHIFT":153,"OP_BOOLAND":154,"OP_BOOLOR":155,"OP_NUMEQUAL":156,"OP_NUMEQUALVERIFY":157,"OP_NUMNOTEQUAL":158,"OP_LESSTHAN":159,"OP_GREATERTHAN":160,"OP_LESSTHANOREQUAL":161,"OP_GREATERTHANOREQUAL":162,"OP_MIN":163,"OP_MAX":164,"OP_WITHIN":165,"OP_RIPEMD160":166,"OP_SHA1":167,"OP_SHA256":168,"OP_HASH160":169,"OP_HASH256":170,"OP_CODESEPARATOR":171,"OP_CHECKSIG":172,"OP_CHECKSIGVERIFY":173,"OP_CHECKMULTISIG":174,"OP_CHECKMULTISIGVERIFY":175,"OP_NOP1":176,"OP_NOP2":177,"OP_CHECKLOCKTIMEVERIFY":177,"OP_NOP3":178,"OP_CHECKSEQUENCEVERIFY":178,"OP_NOP4":179,"OP_NOP5":180,"OP_NOP6":181,"OP_NOP7":182,"OP_NOP8":183,"OP_NOP9":184,"OP_NOP10":185,"OP_PUBKEYHASH":253,"OP_PUBKEY":254,"OP_INVALIDOPCODE":255};
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoin-ops/map.js":
+/*!*************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoin-ops/map.js ***!
+  \*************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+var OPS = __webpack_require__(/*! ./index.json */ "../../node_modules/bitcoin-ops/index.json")
+
+var map = {}
+for (var op in OPS) {
+  var code = OPS[op]
+  map[code] = op
+}
+
+module.exports = map
+
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/address.js":
+/*!***********************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/address.js ***!
+  \***********************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(Buffer) {
+Object.defineProperty(exports, '__esModule', { value: true });
+const networks = __webpack_require__(/*! ./networks */ "../../node_modules/bitcoinjs-lib/src/networks.js");
+const payments = __webpack_require__(/*! ./payments */ "../../node_modules/bitcoinjs-lib/src/payments/index.js");
+const bscript = __webpack_require__(/*! ./script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+const types = __webpack_require__(/*! ./types */ "../../node_modules/bitcoinjs-lib/src/types.js");
+const bech32 = __webpack_require__(/*! bech32 */ "../../node_modules/bech32/index.js");
+const bs58check = __webpack_require__(/*! bs58check */ "../../node_modules/bs58check/index.js");
+const typeforce = __webpack_require__(/*! typeforce */ "../../node_modules/typeforce/index.js");
+function fromBase58Check(address) {
+  const payload = bs58check.decode(address);
+  // TODO: 4.0.0, move to "toOutputScript"
+  if (payload.length < 21) throw new TypeError(address + ' is too short');
+  if (payload.length > 21) throw new TypeError(address + ' is too long');
+  const version = payload.readUInt8(0);
+  const hash = payload.slice(1);
+  return { version, hash };
+}
+exports.fromBase58Check = fromBase58Check;
+function fromBech32(address) {
+  const result = bech32.decode(address);
+  const data = bech32.fromWords(result.words.slice(1));
+  return {
+    version: result.words[0],
+    prefix: result.prefix,
+    data: Buffer.from(data),
+  };
+}
+exports.fromBech32 = fromBech32;
+function toBase58Check(hash, version) {
+  typeforce(types.tuple(types.Hash160bit, types.UInt8), arguments);
+  const payload = Buffer.allocUnsafe(21);
+  payload.writeUInt8(version, 0);
+  hash.copy(payload, 1);
+  return bs58check.encode(payload);
+}
+exports.toBase58Check = toBase58Check;
+function toBech32(data, version, prefix) {
+  const words = bech32.toWords(data);
+  words.unshift(version);
+  return bech32.encode(prefix, words);
+}
+exports.toBech32 = toBech32;
+function fromOutputScript(output, network) {
+  // TODO: Network
+  network = network || networks.bitcoin;
+  try {
+    return payments.p2pkh({ output, network }).address;
+  } catch (e) {}
+  try {
+    return payments.p2sh({ output, network }).address;
+  } catch (e) {}
+  try {
+    return payments.p2wpkh({ output, network }).address;
+  } catch (e) {}
+  try {
+    return payments.p2wsh({ output, network }).address;
+  } catch (e) {}
+  throw new Error(bscript.toASM(output) + ' has no matching Address');
+}
+exports.fromOutputScript = fromOutputScript;
+function toOutputScript(address, network) {
+  network = network || networks.bitcoin;
+  let decodeBase58;
+  let decodeBech32;
+  try {
+    decodeBase58 = fromBase58Check(address);
+  } catch (e) {}
+  if (decodeBase58) {
+    if (decodeBase58.version === network.pubKeyHash)
+      return payments.p2pkh({ hash: decodeBase58.hash }).output;
+    if (decodeBase58.version === network.scriptHash)
+      return payments.p2sh({ hash: decodeBase58.hash }).output;
+  } else {
+    try {
+      decodeBech32 = fromBech32(address);
+    } catch (e) {}
+    if (decodeBech32) {
+      if (decodeBech32.prefix !== network.bech32)
+        throw new Error(address + ' has an invalid prefix');
+      if (decodeBech32.version === 0) {
+        if (decodeBech32.data.length === 20)
+          return payments.p2wpkh({ hash: decodeBech32.data }).output;
+        if (decodeBech32.data.length === 32)
+          return payments.p2wsh({ hash: decodeBech32.data }).output;
+      }
+    }
+  }
+  throw new Error(address + ' has no matching Script');
+}
+exports.toOutputScript = toOutputScript;
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../node-libs-browser/node_modules/buffer/index.js */ "../../node_modules/node-libs-browser/node_modules/buffer/index.js").Buffer))
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/block.js":
+/*!*********************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/block.js ***!
+  \*********************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(Buffer) {
+Object.defineProperty(exports, '__esModule', { value: true });
+const bufferutils_1 = __webpack_require__(/*! ./bufferutils */ "../../node_modules/bitcoinjs-lib/src/bufferutils.js");
+const bcrypto = __webpack_require__(/*! ./crypto */ "../../node_modules/bitcoinjs-lib/src/crypto.js");
+const transaction_1 = __webpack_require__(/*! ./transaction */ "../../node_modules/bitcoinjs-lib/src/transaction.js");
+const types = __webpack_require__(/*! ./types */ "../../node_modules/bitcoinjs-lib/src/types.js");
+const fastMerkleRoot = __webpack_require__(/*! merkle-lib/fastRoot */ "../../node_modules/merkle-lib/fastRoot.js");
+const typeforce = __webpack_require__(/*! typeforce */ "../../node_modules/typeforce/index.js");
+const varuint = __webpack_require__(/*! varuint-bitcoin */ "../../node_modules/varuint-bitcoin/index.js");
+const errorMerkleNoTxes = new TypeError(
+  'Cannot compute merkle root for zero transactions',
+);
+const errorWitnessNotSegwit = new TypeError(
+  'Cannot compute witness commit for non-segwit block',
+);
+class Block {
+  constructor() {
+    this.version = 1;
+    this.prevHash = undefined;
+    this.merkleRoot = undefined;
+    this.timestamp = 0;
+    this.witnessCommit = undefined;
+    this.bits = 0;
+    this.nonce = 0;
+    this.transactions = undefined;
+  }
+  static fromBuffer(buffer) {
+    if (buffer.length < 80) throw new Error('Buffer too small (< 80 bytes)');
+    let offset = 0;
+    const readSlice = n => {
+      offset += n;
+      return buffer.slice(offset - n, offset);
+    };
+    const readUInt32 = () => {
+      const i = buffer.readUInt32LE(offset);
+      offset += 4;
+      return i;
+    };
+    const readInt32 = () => {
+      const i = buffer.readInt32LE(offset);
+      offset += 4;
+      return i;
+    };
+    const block = new Block();
+    block.version = readInt32();
+    block.prevHash = readSlice(32);
+    block.merkleRoot = readSlice(32);
+    block.timestamp = readUInt32();
+    block.bits = readUInt32();
+    block.nonce = readUInt32();
+    if (buffer.length === 80) return block;
+    const readVarInt = () => {
+      const vi = varuint.decode(buffer, offset);
+      offset += varuint.decode.bytes;
+      return vi;
+    };
+    const readTransaction = () => {
+      const tx = transaction_1.Transaction.fromBuffer(
+        buffer.slice(offset),
+        true,
+      );
+      offset += tx.byteLength();
+      return tx;
+    };
+    const nTransactions = readVarInt();
+    block.transactions = [];
+    for (let i = 0; i < nTransactions; ++i) {
+      const tx = readTransaction();
+      block.transactions.push(tx);
+    }
+    const witnessCommit = block.getWitnessCommit();
+    // This Block contains a witness commit
+    if (witnessCommit) block.witnessCommit = witnessCommit;
+    return block;
+  }
+  static fromHex(hex) {
+    return Block.fromBuffer(Buffer.from(hex, 'hex'));
+  }
+  static calculateTarget(bits) {
+    const exponent = ((bits & 0xff000000) >> 24) - 3;
+    const mantissa = bits & 0x007fffff;
+    const target = Buffer.alloc(32, 0);
+    target.writeUIntBE(mantissa, 29 - exponent, 3);
+    return target;
+  }
+  static calculateMerkleRoot(transactions, forWitness) {
+    typeforce([{ getHash: types.Function }], transactions);
+    if (transactions.length === 0) throw errorMerkleNoTxes;
+    if (forWitness && !txesHaveWitnessCommit(transactions))
+      throw errorWitnessNotSegwit;
+    const hashes = transactions.map(transaction =>
+      transaction.getHash(forWitness),
+    );
+    const rootHash = fastMerkleRoot(hashes, bcrypto.hash256);
+    return forWitness
+      ? bcrypto.hash256(
+          Buffer.concat([rootHash, transactions[0].ins[0].witness[0]]),
+        )
+      : rootHash;
+  }
+  getWitnessCommit() {
+    if (!txesHaveWitnessCommit(this.transactions)) return null;
+    // The merkle root for the witness data is in an OP_RETURN output.
+    // There is no rule for the index of the output, so use filter to find it.
+    // The root is prepended with 0xaa21a9ed so check for 0x6a24aa21a9ed
+    // If multiple commits are found, the output with highest index is assumed.
+    const witnessCommits = this.transactions[0].outs
+      .filter(out =>
+        out.script.slice(0, 6).equals(Buffer.from('6a24aa21a9ed', 'hex')),
+      )
+      .map(out => out.script.slice(6, 38));
+    if (witnessCommits.length === 0) return null;
+    // Use the commit with the highest output (should only be one though)
+    const result = witnessCommits[witnessCommits.length - 1];
+    if (!(result instanceof Buffer && result.length === 32)) return null;
+    return result;
+  }
+  hasWitnessCommit() {
+    if (
+      this.witnessCommit instanceof Buffer &&
+      this.witnessCommit.length === 32
+    )
+      return true;
+    if (this.getWitnessCommit() !== null) return true;
+    return false;
+  }
+  hasWitness() {
+    return anyTxHasWitness(this.transactions);
+  }
+  byteLength(headersOnly) {
+    if (headersOnly || !this.transactions) return 80;
+    return (
+      80 +
+      varuint.encodingLength(this.transactions.length) +
+      this.transactions.reduce((a, x) => a + x.byteLength(), 0)
+    );
+  }
+  getHash() {
+    return bcrypto.hash256(this.toBuffer(true));
+  }
+  getId() {
+    return bufferutils_1.reverseBuffer(this.getHash()).toString('hex');
+  }
+  getUTCDate() {
+    const date = new Date(0); // epoch
+    date.setUTCSeconds(this.timestamp);
+    return date;
+  }
+  // TODO: buffer, offset compatibility
+  toBuffer(headersOnly) {
+    const buffer = Buffer.allocUnsafe(this.byteLength(headersOnly));
+    let offset = 0;
+    const writeSlice = slice => {
+      slice.copy(buffer, offset);
+      offset += slice.length;
+    };
+    const writeInt32 = i => {
+      buffer.writeInt32LE(i, offset);
+      offset += 4;
+    };
+    const writeUInt32 = i => {
+      buffer.writeUInt32LE(i, offset);
+      offset += 4;
+    };
+    writeInt32(this.version);
+    writeSlice(this.prevHash);
+    writeSlice(this.merkleRoot);
+    writeUInt32(this.timestamp);
+    writeUInt32(this.bits);
+    writeUInt32(this.nonce);
+    if (headersOnly || !this.transactions) return buffer;
+    varuint.encode(this.transactions.length, buffer, offset);
+    offset += varuint.encode.bytes;
+    this.transactions.forEach(tx => {
+      const txSize = tx.byteLength(); // TODO: extract from toBuffer?
+      tx.toBuffer(buffer, offset);
+      offset += txSize;
+    });
+    return buffer;
+  }
+  toHex(headersOnly) {
+    return this.toBuffer(headersOnly).toString('hex');
+  }
+  checkTxRoots() {
+    // If the Block has segwit transactions but no witness commit,
+    // there's no way it can be valid, so fail the check.
+    const hasWitnessCommit = this.hasWitnessCommit();
+    if (!hasWitnessCommit && this.hasWitness()) return false;
+    return (
+      this.__checkMerkleRoot() &&
+      (hasWitnessCommit ? this.__checkWitnessCommit() : true)
+    );
+  }
+  checkProofOfWork() {
+    const hash = bufferutils_1.reverseBuffer(this.getHash());
+    const target = Block.calculateTarget(this.bits);
+    return hash.compare(target) <= 0;
+  }
+  __checkMerkleRoot() {
+    if (!this.transactions) throw errorMerkleNoTxes;
+    const actualMerkleRoot = Block.calculateMerkleRoot(this.transactions);
+    return this.merkleRoot.compare(actualMerkleRoot) === 0;
+  }
+  __checkWitnessCommit() {
+    if (!this.transactions) throw errorMerkleNoTxes;
+    if (!this.hasWitnessCommit()) throw errorWitnessNotSegwit;
+    const actualWitnessCommit = Block.calculateMerkleRoot(
+      this.transactions,
+      true,
+    );
+    return this.witnessCommit.compare(actualWitnessCommit) === 0;
+  }
+}
+exports.Block = Block;
+function txesHaveWitnessCommit(transactions) {
+  return (
+    transactions instanceof Array &&
+    transactions[0] &&
+    transactions[0].ins &&
+    transactions[0].ins instanceof Array &&
+    transactions[0].ins[0] &&
+    transactions[0].ins[0].witness &&
+    transactions[0].ins[0].witness instanceof Array &&
+    transactions[0].ins[0].witness.length > 0
+  );
+}
+function anyTxHasWitness(transactions) {
+  return (
+    transactions instanceof Array &&
+    transactions.some(
+      tx =>
+        typeof tx === 'object' &&
+        tx.ins instanceof Array &&
+        tx.ins.some(
+          input =>
+            typeof input === 'object' &&
+            input.witness instanceof Array &&
+            input.witness.length > 0,
+        ),
+    )
+  );
+}
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../node-libs-browser/node_modules/buffer/index.js */ "../../node_modules/node-libs-browser/node_modules/buffer/index.js").Buffer))
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/bufferutils.js":
+/*!***************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/bufferutils.js ***!
+  \***************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, '__esModule', { value: true });
+// https://github.com/feross/buffer/blob/master/index.js#L1127
+function verifuint(value, max) {
+  if (typeof value !== 'number')
+    throw new Error('cannot write a non-number as a number');
+  if (value < 0)
+    throw new Error('specified a negative value for writing an unsigned value');
+  if (value > max) throw new Error('RangeError: value out of range');
+  if (Math.floor(value) !== value)
+    throw new Error('value has a fractional component');
+}
+function readUInt64LE(buffer, offset) {
+  const a = buffer.readUInt32LE(offset);
+  let b = buffer.readUInt32LE(offset + 4);
+  b *= 0x100000000;
+  verifuint(b + a, 0x001fffffffffffff);
+  return b + a;
+}
+exports.readUInt64LE = readUInt64LE;
+function writeUInt64LE(buffer, value, offset) {
+  verifuint(value, 0x001fffffffffffff);
+  buffer.writeInt32LE(value & -1, offset);
+  buffer.writeUInt32LE(Math.floor(value / 0x100000000), offset + 4);
+  return offset + 8;
+}
+exports.writeUInt64LE = writeUInt64LE;
+function reverseBuffer(buffer) {
+  if (buffer.length < 1) return buffer;
+  let j = buffer.length - 1;
+  let tmp = 0;
+  for (let i = 0; i < buffer.length / 2; i++) {
+    tmp = buffer[i];
+    buffer[i] = buffer[j];
+    buffer[j] = tmp;
+    j--;
+  }
+  return buffer;
+}
+exports.reverseBuffer = reverseBuffer;
+
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/classify.js":
+/*!************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/classify.js ***!
+  \************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, '__esModule', { value: true });
+const script_1 = __webpack_require__(/*! ./script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+const multisig = __webpack_require__(/*! ./templates/multisig */ "../../node_modules/bitcoinjs-lib/src/templates/multisig/index.js");
+const nullData = __webpack_require__(/*! ./templates/nulldata */ "../../node_modules/bitcoinjs-lib/src/templates/nulldata.js");
+const pubKey = __webpack_require__(/*! ./templates/pubkey */ "../../node_modules/bitcoinjs-lib/src/templates/pubkey/index.js");
+const pubKeyHash = __webpack_require__(/*! ./templates/pubkeyhash */ "../../node_modules/bitcoinjs-lib/src/templates/pubkeyhash/index.js");
+const scriptHash = __webpack_require__(/*! ./templates/scripthash */ "../../node_modules/bitcoinjs-lib/src/templates/scripthash/index.js");
+const witnessCommitment = __webpack_require__(/*! ./templates/witnesscommitment */ "../../node_modules/bitcoinjs-lib/src/templates/witnesscommitment/index.js");
+const witnessPubKeyHash = __webpack_require__(/*! ./templates/witnesspubkeyhash */ "../../node_modules/bitcoinjs-lib/src/templates/witnesspubkeyhash/index.js");
+const witnessScriptHash = __webpack_require__(/*! ./templates/witnessscripthash */ "../../node_modules/bitcoinjs-lib/src/templates/witnessscripthash/index.js");
+const types = {
+  P2MS: 'multisig',
+  NONSTANDARD: 'nonstandard',
+  NULLDATA: 'nulldata',
+  P2PK: 'pubkey',
+  P2PKH: 'pubkeyhash',
+  P2SH: 'scripthash',
+  P2WPKH: 'witnesspubkeyhash',
+  P2WSH: 'witnessscripthash',
+  WITNESS_COMMITMENT: 'witnesscommitment',
+};
+exports.types = types;
+function classifyOutput(script) {
+  if (witnessPubKeyHash.output.check(script)) return types.P2WPKH;
+  if (witnessScriptHash.output.check(script)) return types.P2WSH;
+  if (pubKeyHash.output.check(script)) return types.P2PKH;
+  if (scriptHash.output.check(script)) return types.P2SH;
+  // XXX: optimization, below functions .decompile before use
+  const chunks = script_1.decompile(script);
+  if (!chunks) throw new TypeError('Invalid script');
+  if (multisig.output.check(chunks)) return types.P2MS;
+  if (pubKey.output.check(chunks)) return types.P2PK;
+  if (witnessCommitment.output.check(chunks)) return types.WITNESS_COMMITMENT;
+  if (nullData.output.check(chunks)) return types.NULLDATA;
+  return types.NONSTANDARD;
+}
+exports.output = classifyOutput;
+function classifyInput(script, allowIncomplete) {
+  // XXX: optimization, below functions .decompile before use
+  const chunks = script_1.decompile(script);
+  if (!chunks) throw new TypeError('Invalid script');
+  if (pubKeyHash.input.check(chunks)) return types.P2PKH;
+  if (scriptHash.input.check(chunks, allowIncomplete)) return types.P2SH;
+  if (multisig.input.check(chunks, allowIncomplete)) return types.P2MS;
+  if (pubKey.input.check(chunks)) return types.P2PK;
+  return types.NONSTANDARD;
+}
+exports.input = classifyInput;
+function classifyWitness(script, allowIncomplete) {
+  // XXX: optimization, below functions .decompile before use
+  const chunks = script_1.decompile(script);
+  if (!chunks) throw new TypeError('Invalid script');
+  if (witnessPubKeyHash.input.check(chunks)) return types.P2WPKH;
+  if (witnessScriptHash.input.check(chunks, allowIncomplete))
+    return types.P2WSH;
+  return types.NONSTANDARD;
+}
+exports.witness = classifyWitness;
+
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/crypto.js":
+/*!**********************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/crypto.js ***!
+  \**********************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, '__esModule', { value: true });
+const createHash = __webpack_require__(/*! create-hash */ "../../node_modules/create-hash/browser.js");
+function ripemd160(buffer) {
+  try {
+    return createHash('rmd160')
+      .update(buffer)
+      .digest();
+  } catch (err) {
+    return createHash('ripemd160')
+      .update(buffer)
+      .digest();
+  }
+}
+exports.ripemd160 = ripemd160;
+function sha1(buffer) {
+  return createHash('sha1')
+    .update(buffer)
+    .digest();
+}
+exports.sha1 = sha1;
+function sha256(buffer) {
+  return createHash('sha256')
+    .update(buffer)
+    .digest();
+}
+exports.sha256 = sha256;
+function hash160(buffer) {
+  return ripemd160(sha256(buffer));
+}
+exports.hash160 = hash160;
+function hash256(buffer) {
+  return sha256(sha256(buffer));
+}
+exports.hash256 = hash256;
+
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/ecpair.js":
+/*!**********************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/ecpair.js ***!
+  \**********************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(Buffer) {
+Object.defineProperty(exports, '__esModule', { value: true });
+const NETWORKS = __webpack_require__(/*! ./networks */ "../../node_modules/bitcoinjs-lib/src/networks.js");
+const types = __webpack_require__(/*! ./types */ "../../node_modules/bitcoinjs-lib/src/types.js");
+const ecc = __webpack_require__(/*! tiny-secp256k1 */ "../../node_modules/tiny-secp256k1/js.js");
+const randomBytes = __webpack_require__(/*! randombytes */ "../../node_modules/randombytes/browser.js");
+const typeforce = __webpack_require__(/*! typeforce */ "../../node_modules/typeforce/index.js");
+const wif = __webpack_require__(/*! wif */ "../../node_modules/wif/index.js");
+const isOptions = typeforce.maybe(
+  typeforce.compile({
+    compressed: types.maybe(types.Boolean),
+    network: types.maybe(types.Network),
+  }),
+);
+class ECPair {
+  constructor(__D, __Q, options) {
+    this.__D = __D;
+    this.__Q = __Q;
+    if (options === undefined) options = {};
+    this.compressed =
+      options.compressed === undefined ? true : options.compressed;
+    this.network = options.network || NETWORKS.bitcoin;
+    if (__Q !== undefined) this.__Q = ecc.pointCompress(__Q, this.compressed);
+  }
+  get privateKey() {
+    return this.__D;
+  }
+  get publicKey() {
+    if (!this.__Q) this.__Q = ecc.pointFromScalar(this.__D, this.compressed);
+    return this.__Q;
+  }
+  toWIF() {
+    if (!this.__D) throw new Error('Missing private key');
+    return wif.encode(this.network.wif, this.__D, this.compressed);
+  }
+  sign(hash, lowR = false) {
+    if (!this.__D) throw new Error('Missing private key');
+    if (lowR === false) {
+      return ecc.sign(hash, this.__D);
+    } else {
+      let sig = ecc.sign(hash, this.__D);
+      const extraData = Buffer.alloc(32, 0);
+      let counter = 0;
+      // if first try is lowR, skip the loop
+      // for second try and on, add extra entropy counting up
+      while (sig[0] > 0x7f) {
+        counter++;
+        extraData.writeUIntLE(counter, 0, 6);
+        sig = ecc.signWithEntropy(hash, this.__D, extraData);
+      }
+      return sig;
+    }
+  }
+  verify(hash, signature) {
+    return ecc.verify(hash, this.publicKey, signature);
+  }
+}
+function fromPrivateKey(buffer, options) {
+  typeforce(types.Buffer256bit, buffer);
+  if (!ecc.isPrivate(buffer))
+    throw new TypeError('Private key not in range [1, n)');
+  typeforce(isOptions, options);
+  return new ECPair(buffer, undefined, options);
+}
+exports.fromPrivateKey = fromPrivateKey;
+function fromPublicKey(buffer, options) {
+  typeforce(ecc.isPoint, buffer);
+  typeforce(isOptions, options);
+  return new ECPair(undefined, buffer, options);
+}
+exports.fromPublicKey = fromPublicKey;
+function fromWIF(wifString, network) {
+  const decoded = wif.decode(wifString);
+  const version = decoded.version;
+  // list of networks?
+  if (types.Array(network)) {
+    network = network
+      .filter(x => {
+        return version === x.wif;
+      })
+      .pop();
+    if (!network) throw new Error('Unknown network version');
+    // otherwise, assume a network object (or default to bitcoin)
+  } else {
+    network = network || NETWORKS.bitcoin;
+    if (version !== network.wif) throw new Error('Invalid network version');
+  }
+  return fromPrivateKey(decoded.privateKey, {
+    compressed: decoded.compressed,
+    network: network,
+  });
+}
+exports.fromWIF = fromWIF;
+function makeRandom(options) {
+  typeforce(isOptions, options);
+  if (options === undefined) options = {};
+  const rng = options.rng || randomBytes;
+  let d;
+  do {
+    d = rng(32);
+    typeforce(types.Buffer256bit, d);
+  } while (!ecc.isPrivate(d));
+  return fromPrivateKey(d, options);
+}
+exports.makeRandom = makeRandom;
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../node-libs-browser/node_modules/buffer/index.js */ "../../node_modules/node-libs-browser/node_modules/buffer/index.js").Buffer))
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/index.js":
+/*!*********************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/index.js ***!
+  \*********************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, '__esModule', { value: true });
+const bip32 = __webpack_require__(/*! bip32 */ "../../node_modules/bip32/index.js");
+exports.bip32 = bip32;
+const address = __webpack_require__(/*! ./address */ "../../node_modules/bitcoinjs-lib/src/address.js");
+exports.address = address;
+const crypto = __webpack_require__(/*! ./crypto */ "../../node_modules/bitcoinjs-lib/src/crypto.js");
+exports.crypto = crypto;
+const ECPair = __webpack_require__(/*! ./ecpair */ "../../node_modules/bitcoinjs-lib/src/ecpair.js");
+exports.ECPair = ECPair;
+const networks = __webpack_require__(/*! ./networks */ "../../node_modules/bitcoinjs-lib/src/networks.js");
+exports.networks = networks;
+const payments = __webpack_require__(/*! ./payments */ "../../node_modules/bitcoinjs-lib/src/payments/index.js");
+exports.payments = payments;
+const script = __webpack_require__(/*! ./script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+exports.script = script;
+var block_1 = __webpack_require__(/*! ./block */ "../../node_modules/bitcoinjs-lib/src/block.js");
+exports.Block = block_1.Block;
+var script_1 = __webpack_require__(/*! ./script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+exports.opcodes = script_1.OPS;
+var transaction_1 = __webpack_require__(/*! ./transaction */ "../../node_modules/bitcoinjs-lib/src/transaction.js");
+exports.Transaction = transaction_1.Transaction;
+var transaction_builder_1 = __webpack_require__(/*! ./transaction_builder */ "../../node_modules/bitcoinjs-lib/src/transaction_builder.js");
+exports.TransactionBuilder = transaction_builder_1.TransactionBuilder;
+
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/networks.js":
+/*!************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/networks.js ***!
+  \************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, '__esModule', { value: true });
+exports.bitcoin = {
+  messagePrefix: '\x18Bitcoin Signed Message:\n',
+  bech32: 'bc',
+  bip32: {
+    public: 0x0488b21e,
+    private: 0x0488ade4,
+  },
+  pubKeyHash: 0x00,
+  scriptHash: 0x05,
+  wif: 0x80,
+};
+exports.regtest = {
+  messagePrefix: '\x18Bitcoin Signed Message:\n',
+  bech32: 'bcrt',
+  bip32: {
+    public: 0x043587cf,
+    private: 0x04358394,
+  },
+  pubKeyHash: 0x6f,
+  scriptHash: 0xc4,
+  wif: 0xef,
+};
+exports.testnet = {
+  messagePrefix: '\x18Bitcoin Signed Message:\n',
+  bech32: 'tb',
+  bip32: {
+    public: 0x043587cf,
+    private: 0x04358394,
+  },
+  pubKeyHash: 0x6f,
+  scriptHash: 0xc4,
+  wif: 0xef,
+};
+
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/payments/embed.js":
+/*!******************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/payments/embed.js ***!
+  \******************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, '__esModule', { value: true });
+const networks_1 = __webpack_require__(/*! ../networks */ "../../node_modules/bitcoinjs-lib/src/networks.js");
+const bscript = __webpack_require__(/*! ../script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+const lazy = __webpack_require__(/*! ./lazy */ "../../node_modules/bitcoinjs-lib/src/payments/lazy.js");
+const typef = __webpack_require__(/*! typeforce */ "../../node_modules/typeforce/index.js");
+const OPS = bscript.OPS;
+function stacksEqual(a, b) {
+  if (a.length !== b.length) return false;
+  return a.every((x, i) => {
+    return x.equals(b[i]);
+  });
+}
+// output: OP_RETURN ...
+function p2data(a, opts) {
+  if (!a.data && !a.output) throw new TypeError('Not enough data');
+  opts = Object.assign({ validate: true }, opts || {});
+  typef(
+    {
+      network: typef.maybe(typef.Object),
+      output: typef.maybe(typef.Buffer),
+      data: typef.maybe(typef.arrayOf(typef.Buffer)),
+    },
+    a,
+  );
+  const network = a.network || networks_1.bitcoin;
+  const o = { network };
+  lazy.prop(o, 'output', () => {
+    if (!a.data) return;
+    return bscript.compile([OPS.OP_RETURN].concat(a.data));
+  });
+  lazy.prop(o, 'data', () => {
+    if (!a.output) return;
+    return bscript.decompile(a.output).slice(1);
+  });
+  // extended validation
+  if (opts.validate) {
+    if (a.output) {
+      const chunks = bscript.decompile(a.output);
+      if (chunks[0] !== OPS.OP_RETURN) throw new TypeError('Output is invalid');
+      if (!chunks.slice(1).every(typef.Buffer))
+        throw new TypeError('Output is invalid');
+      if (a.data && !stacksEqual(a.data, o.data))
+        throw new TypeError('Data mismatch');
+    }
+  }
+  return Object.assign(o, a);
+}
+exports.p2data = p2data;
+
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/payments/index.js":
+/*!******************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/payments/index.js ***!
+  \******************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, '__esModule', { value: true });
+const embed_1 = __webpack_require__(/*! ./embed */ "../../node_modules/bitcoinjs-lib/src/payments/embed.js");
+exports.embed = embed_1.p2data;
+const p2ms_1 = __webpack_require__(/*! ./p2ms */ "../../node_modules/bitcoinjs-lib/src/payments/p2ms.js");
+exports.p2ms = p2ms_1.p2ms;
+const p2pk_1 = __webpack_require__(/*! ./p2pk */ "../../node_modules/bitcoinjs-lib/src/payments/p2pk.js");
+exports.p2pk = p2pk_1.p2pk;
+const p2pkh_1 = __webpack_require__(/*! ./p2pkh */ "../../node_modules/bitcoinjs-lib/src/payments/p2pkh.js");
+exports.p2pkh = p2pkh_1.p2pkh;
+const p2sh_1 = __webpack_require__(/*! ./p2sh */ "../../node_modules/bitcoinjs-lib/src/payments/p2sh.js");
+exports.p2sh = p2sh_1.p2sh;
+const p2wpkh_1 = __webpack_require__(/*! ./p2wpkh */ "../../node_modules/bitcoinjs-lib/src/payments/p2wpkh.js");
+exports.p2wpkh = p2wpkh_1.p2wpkh;
+const p2wsh_1 = __webpack_require__(/*! ./p2wsh */ "../../node_modules/bitcoinjs-lib/src/payments/p2wsh.js");
+exports.p2wsh = p2wsh_1.p2wsh;
+// TODO
+// witness commitment
+
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/payments/lazy.js":
+/*!*****************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/payments/lazy.js ***!
+  \*****************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, '__esModule', { value: true });
+function prop(object, name, f) {
+  Object.defineProperty(object, name, {
+    configurable: true,
+    enumerable: true,
+    get() {
+      const _value = f.call(this);
+      this[name] = _value;
+      return _value;
+    },
+    set(_value) {
+      Object.defineProperty(this, name, {
+        configurable: true,
+        enumerable: true,
+        value: _value,
+        writable: true,
+      });
+    },
+  });
+}
+exports.prop = prop;
+function value(f) {
+  let _value;
+  return () => {
+    if (_value !== undefined) return _value;
+    _value = f();
+    return _value;
+  };
+}
+exports.value = value;
+
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/payments/p2ms.js":
+/*!*****************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/payments/p2ms.js ***!
+  \*****************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, '__esModule', { value: true });
+const networks_1 = __webpack_require__(/*! ../networks */ "../../node_modules/bitcoinjs-lib/src/networks.js");
+const bscript = __webpack_require__(/*! ../script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+const lazy = __webpack_require__(/*! ./lazy */ "../../node_modules/bitcoinjs-lib/src/payments/lazy.js");
+const OPS = bscript.OPS;
+const typef = __webpack_require__(/*! typeforce */ "../../node_modules/typeforce/index.js");
+const ecc = __webpack_require__(/*! tiny-secp256k1 */ "../../node_modules/tiny-secp256k1/js.js");
+const OP_INT_BASE = OPS.OP_RESERVED; // OP_1 - 1
+function stacksEqual(a, b) {
+  if (a.length !== b.length) return false;
+  return a.every((x, i) => {
+    return x.equals(b[i]);
+  });
+}
+// input: OP_0 [signatures ...]
+// output: m [pubKeys ...] n OP_CHECKMULTISIG
+function p2ms(a, opts) {
+  if (
+    !a.input &&
+    !a.output &&
+    !(a.pubkeys && a.m !== undefined) &&
+    !a.signatures
+  )
+    throw new TypeError('Not enough data');
+  opts = Object.assign({ validate: true }, opts || {});
+  function isAcceptableSignature(x) {
+    return (
+      bscript.isCanonicalScriptSignature(x) ||
+      (opts.allowIncomplete && x === OPS.OP_0) !== undefined
+    );
+  }
+  typef(
+    {
+      network: typef.maybe(typef.Object),
+      m: typef.maybe(typef.Number),
+      n: typef.maybe(typef.Number),
+      output: typef.maybe(typef.Buffer),
+      pubkeys: typef.maybe(typef.arrayOf(ecc.isPoint)),
+      signatures: typef.maybe(typef.arrayOf(isAcceptableSignature)),
+      input: typef.maybe(typef.Buffer),
+    },
+    a,
+  );
+  const network = a.network || networks_1.bitcoin;
+  const o = { network };
+  let chunks = [];
+  let decoded = false;
+  function decode(output) {
+    if (decoded) return;
+    decoded = true;
+    chunks = bscript.decompile(output);
+    o.m = chunks[0] - OP_INT_BASE;
+    o.n = chunks[chunks.length - 2] - OP_INT_BASE;
+    o.pubkeys = chunks.slice(1, -2);
+  }
+  lazy.prop(o, 'output', () => {
+    if (!a.m) return;
+    if (!o.n) return;
+    if (!a.pubkeys) return;
+    return bscript.compile(
+      [].concat(
+        OP_INT_BASE + a.m,
+        a.pubkeys,
+        OP_INT_BASE + o.n,
+        OPS.OP_CHECKMULTISIG,
+      ),
+    );
+  });
+  lazy.prop(o, 'm', () => {
+    if (!o.output) return;
+    decode(o.output);
+    return o.m;
+  });
+  lazy.prop(o, 'n', () => {
+    if (!o.pubkeys) return;
+    return o.pubkeys.length;
+  });
+  lazy.prop(o, 'pubkeys', () => {
+    if (!a.output) return;
+    decode(a.output);
+    return o.pubkeys;
+  });
+  lazy.prop(o, 'signatures', () => {
+    if (!a.input) return;
+    return bscript.decompile(a.input).slice(1);
+  });
+  lazy.prop(o, 'input', () => {
+    if (!a.signatures) return;
+    return bscript.compile([OPS.OP_0].concat(a.signatures));
+  });
+  lazy.prop(o, 'witness', () => {
+    if (!o.input) return;
+    return [];
+  });
+  // extended validation
+  if (opts.validate) {
+    if (a.output) {
+      decode(a.output);
+      if (!typef.Number(chunks[0])) throw new TypeError('Output is invalid');
+      if (!typef.Number(chunks[chunks.length - 2]))
+        throw new TypeError('Output is invalid');
+      if (chunks[chunks.length - 1] !== OPS.OP_CHECKMULTISIG)
+        throw new TypeError('Output is invalid');
+      if (o.m <= 0 || o.n > 16 || o.m > o.n || o.n !== chunks.length - 3)
+        throw new TypeError('Output is invalid');
+      if (!o.pubkeys.every(x => ecc.isPoint(x)))
+        throw new TypeError('Output is invalid');
+      if (a.m !== undefined && a.m !== o.m) throw new TypeError('m mismatch');
+      if (a.n !== undefined && a.n !== o.n) throw new TypeError('n mismatch');
+      if (a.pubkeys && !stacksEqual(a.pubkeys, o.pubkeys))
+        throw new TypeError('Pubkeys mismatch');
+    }
+    if (a.pubkeys) {
+      if (a.n !== undefined && a.n !== a.pubkeys.length)
+        throw new TypeError('Pubkey count mismatch');
+      o.n = a.pubkeys.length;
+      if (o.n < o.m) throw new TypeError('Pubkey count cannot be less than m');
+    }
+    if (a.signatures) {
+      if (a.signatures.length < o.m)
+        throw new TypeError('Not enough signatures provided');
+      if (a.signatures.length > o.m)
+        throw new TypeError('Too many signatures provided');
+    }
+    if (a.input) {
+      if (a.input[0] !== OPS.OP_0) throw new TypeError('Input is invalid');
+      if (
+        o.signatures.length === 0 ||
+        !o.signatures.every(isAcceptableSignature)
+      )
+        throw new TypeError('Input has invalid signature(s)');
+      if (a.signatures && !stacksEqual(a.signatures, o.signatures))
+        throw new TypeError('Signature mismatch');
+      if (a.m !== undefined && a.m !== a.signatures.length)
+        throw new TypeError('Signature count mismatch');
+    }
+  }
+  return Object.assign(o, a);
+}
+exports.p2ms = p2ms;
+
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/payments/p2pk.js":
+/*!*****************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/payments/p2pk.js ***!
+  \*****************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, '__esModule', { value: true });
+const networks_1 = __webpack_require__(/*! ../networks */ "../../node_modules/bitcoinjs-lib/src/networks.js");
+const bscript = __webpack_require__(/*! ../script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+const lazy = __webpack_require__(/*! ./lazy */ "../../node_modules/bitcoinjs-lib/src/payments/lazy.js");
+const typef = __webpack_require__(/*! typeforce */ "../../node_modules/typeforce/index.js");
+const OPS = bscript.OPS;
+const ecc = __webpack_require__(/*! tiny-secp256k1 */ "../../node_modules/tiny-secp256k1/js.js");
+// input: {signature}
+// output: {pubKey} OP_CHECKSIG
+function p2pk(a, opts) {
+  if (!a.input && !a.output && !a.pubkey && !a.input && !a.signature)
+    throw new TypeError('Not enough data');
+  opts = Object.assign({ validate: true }, opts || {});
+  typef(
+    {
+      network: typef.maybe(typef.Object),
+      output: typef.maybe(typef.Buffer),
+      pubkey: typef.maybe(ecc.isPoint),
+      signature: typef.maybe(bscript.isCanonicalScriptSignature),
+      input: typef.maybe(typef.Buffer),
+    },
+    a,
+  );
+  const _chunks = lazy.value(() => {
+    return bscript.decompile(a.input);
+  });
+  const network = a.network || networks_1.bitcoin;
+  const o = { network };
+  lazy.prop(o, 'output', () => {
+    if (!a.pubkey) return;
+    return bscript.compile([a.pubkey, OPS.OP_CHECKSIG]);
+  });
+  lazy.prop(o, 'pubkey', () => {
+    if (!a.output) return;
+    return a.output.slice(1, -1);
+  });
+  lazy.prop(o, 'signature', () => {
+    if (!a.input) return;
+    return _chunks()[0];
+  });
+  lazy.prop(o, 'input', () => {
+    if (!a.signature) return;
+    return bscript.compile([a.signature]);
+  });
+  lazy.prop(o, 'witness', () => {
+    if (!o.input) return;
+    return [];
+  });
+  // extended validation
+  if (opts.validate) {
+    if (a.output) {
+      if (a.output[a.output.length - 1] !== OPS.OP_CHECKSIG)
+        throw new TypeError('Output is invalid');
+      if (!ecc.isPoint(o.pubkey))
+        throw new TypeError('Output pubkey is invalid');
+      if (a.pubkey && !a.pubkey.equals(o.pubkey))
+        throw new TypeError('Pubkey mismatch');
+    }
+    if (a.signature) {
+      if (a.input && !a.input.equals(o.input))
+        throw new TypeError('Signature mismatch');
+    }
+    if (a.input) {
+      if (_chunks().length !== 1) throw new TypeError('Input is invalid');
+      if (!bscript.isCanonicalScriptSignature(o.signature))
+        throw new TypeError('Input has invalid signature');
+    }
+  }
+  return Object.assign(o, a);
+}
+exports.p2pk = p2pk;
+
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/payments/p2pkh.js":
+/*!******************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/payments/p2pkh.js ***!
+  \******************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(Buffer) {
+Object.defineProperty(exports, '__esModule', { value: true });
+const bcrypto = __webpack_require__(/*! ../crypto */ "../../node_modules/bitcoinjs-lib/src/crypto.js");
+const networks_1 = __webpack_require__(/*! ../networks */ "../../node_modules/bitcoinjs-lib/src/networks.js");
+const bscript = __webpack_require__(/*! ../script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+const lazy = __webpack_require__(/*! ./lazy */ "../../node_modules/bitcoinjs-lib/src/payments/lazy.js");
+const typef = __webpack_require__(/*! typeforce */ "../../node_modules/typeforce/index.js");
+const OPS = bscript.OPS;
+const ecc = __webpack_require__(/*! tiny-secp256k1 */ "../../node_modules/tiny-secp256k1/js.js");
+const bs58check = __webpack_require__(/*! bs58check */ "../../node_modules/bs58check/index.js");
+// input: {signature} {pubkey}
+// output: OP_DUP OP_HASH160 {hash160(pubkey)} OP_EQUALVERIFY OP_CHECKSIG
+function p2pkh(a, opts) {
+  if (!a.address && !a.hash && !a.output && !a.pubkey && !a.input)
+    throw new TypeError('Not enough data');
+  opts = Object.assign({ validate: true }, opts || {});
+  typef(
+    {
+      network: typef.maybe(typef.Object),
+      address: typef.maybe(typef.String),
+      hash: typef.maybe(typef.BufferN(20)),
+      output: typef.maybe(typef.BufferN(25)),
+      pubkey: typef.maybe(ecc.isPoint),
+      signature: typef.maybe(bscript.isCanonicalScriptSignature),
+      input: typef.maybe(typef.Buffer),
+    },
+    a,
+  );
+  const _address = lazy.value(() => {
+    const payload = bs58check.decode(a.address);
+    const version = payload.readUInt8(0);
+    const hash = payload.slice(1);
+    return { version, hash };
+  });
+  const _chunks = lazy.value(() => {
+    return bscript.decompile(a.input);
+  });
+  const network = a.network || networks_1.bitcoin;
+  const o = { network };
+  lazy.prop(o, 'address', () => {
+    if (!o.hash) return;
+    const payload = Buffer.allocUnsafe(21);
+    payload.writeUInt8(network.pubKeyHash, 0);
+    o.hash.copy(payload, 1);
+    return bs58check.encode(payload);
+  });
+  lazy.prop(o, 'hash', () => {
+    if (a.output) return a.output.slice(3, 23);
+    if (a.address) return _address().hash;
+    if (a.pubkey || o.pubkey) return bcrypto.hash160(a.pubkey || o.pubkey);
+  });
+  lazy.prop(o, 'output', () => {
+    if (!o.hash) return;
+    return bscript.compile([
+      OPS.OP_DUP,
+      OPS.OP_HASH160,
+      o.hash,
+      OPS.OP_EQUALVERIFY,
+      OPS.OP_CHECKSIG,
+    ]);
+  });
+  lazy.prop(o, 'pubkey', () => {
+    if (!a.input) return;
+    return _chunks()[1];
+  });
+  lazy.prop(o, 'signature', () => {
+    if (!a.input) return;
+    return _chunks()[0];
+  });
+  lazy.prop(o, 'input', () => {
+    if (!a.pubkey) return;
+    if (!a.signature) return;
+    return bscript.compile([a.signature, a.pubkey]);
+  });
+  lazy.prop(o, 'witness', () => {
+    if (!o.input) return;
+    return [];
+  });
+  // extended validation
+  if (opts.validate) {
+    let hash = Buffer.from([]);
+    if (a.address) {
+      if (_address().version !== network.pubKeyHash)
+        throw new TypeError('Invalid version or Network mismatch');
+      if (_address().hash.length !== 20) throw new TypeError('Invalid address');
+      hash = _address().hash;
+    }
+    if (a.hash) {
+      if (hash.length > 0 && !hash.equals(a.hash))
+        throw new TypeError('Hash mismatch');
+      else hash = a.hash;
+    }
+    if (a.output) {
+      if (
+        a.output.length !== 25 ||
+        a.output[0] !== OPS.OP_DUP ||
+        a.output[1] !== OPS.OP_HASH160 ||
+        a.output[2] !== 0x14 ||
+        a.output[23] !== OPS.OP_EQUALVERIFY ||
+        a.output[24] !== OPS.OP_CHECKSIG
+      )
+        throw new TypeError('Output is invalid');
+      const hash2 = a.output.slice(3, 23);
+      if (hash.length > 0 && !hash.equals(hash2))
+        throw new TypeError('Hash mismatch');
+      else hash = hash2;
+    }
+    if (a.pubkey) {
+      const pkh = bcrypto.hash160(a.pubkey);
+      if (hash.length > 0 && !hash.equals(pkh))
+        throw new TypeError('Hash mismatch');
+      else hash = pkh;
+    }
+    if (a.input) {
+      const chunks = _chunks();
+      if (chunks.length !== 2) throw new TypeError('Input is invalid');
+      if (!bscript.isCanonicalScriptSignature(chunks[0]))
+        throw new TypeError('Input has invalid signature');
+      if (!ecc.isPoint(chunks[1]))
+        throw new TypeError('Input has invalid pubkey');
+      if (a.signature && !a.signature.equals(chunks[0]))
+        throw new TypeError('Signature mismatch');
+      if (a.pubkey && !a.pubkey.equals(chunks[1]))
+        throw new TypeError('Pubkey mismatch');
+      const pkh = bcrypto.hash160(chunks[1]);
+      if (hash.length > 0 && !hash.equals(pkh))
+        throw new TypeError('Hash mismatch');
+    }
+  }
+  return Object.assign(o, a);
+}
+exports.p2pkh = p2pkh;
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../../node-libs-browser/node_modules/buffer/index.js */ "../../node_modules/node-libs-browser/node_modules/buffer/index.js").Buffer))
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/payments/p2sh.js":
+/*!*****************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/payments/p2sh.js ***!
+  \*****************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(Buffer) {
+Object.defineProperty(exports, '__esModule', { value: true });
+const bcrypto = __webpack_require__(/*! ../crypto */ "../../node_modules/bitcoinjs-lib/src/crypto.js");
+const networks_1 = __webpack_require__(/*! ../networks */ "../../node_modules/bitcoinjs-lib/src/networks.js");
+const bscript = __webpack_require__(/*! ../script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+const lazy = __webpack_require__(/*! ./lazy */ "../../node_modules/bitcoinjs-lib/src/payments/lazy.js");
+const typef = __webpack_require__(/*! typeforce */ "../../node_modules/typeforce/index.js");
+const OPS = bscript.OPS;
+const bs58check = __webpack_require__(/*! bs58check */ "../../node_modules/bs58check/index.js");
+function stacksEqual(a, b) {
+  if (a.length !== b.length) return false;
+  return a.every((x, i) => {
+    return x.equals(b[i]);
+  });
+}
+// input: [redeemScriptSig ...] {redeemScript}
+// witness: <?>
+// output: OP_HASH160 {hash160(redeemScript)} OP_EQUAL
+function p2sh(a, opts) {
+  if (!a.address && !a.hash && !a.output && !a.redeem && !a.input)
+    throw new TypeError('Not enough data');
+  opts = Object.assign({ validate: true }, opts || {});
+  typef(
+    {
+      network: typef.maybe(typef.Object),
+      address: typef.maybe(typef.String),
+      hash: typef.maybe(typef.BufferN(20)),
+      output: typef.maybe(typef.BufferN(23)),
+      redeem: typef.maybe({
+        network: typef.maybe(typef.Object),
+        output: typef.maybe(typef.Buffer),
+        input: typef.maybe(typef.Buffer),
+        witness: typef.maybe(typef.arrayOf(typef.Buffer)),
+      }),
+      input: typef.maybe(typef.Buffer),
+      witness: typef.maybe(typef.arrayOf(typef.Buffer)),
+    },
+    a,
+  );
+  let network = a.network;
+  if (!network) {
+    network = (a.redeem && a.redeem.network) || networks_1.bitcoin;
+  }
+  const o = { network };
+  const _address = lazy.value(() => {
+    const payload = bs58check.decode(a.address);
+    const version = payload.readUInt8(0);
+    const hash = payload.slice(1);
+    return { version, hash };
+  });
+  const _chunks = lazy.value(() => {
+    return bscript.decompile(a.input);
+  });
+  const _redeem = lazy.value(() => {
+    const chunks = _chunks();
+    return {
+      network,
+      output: chunks[chunks.length - 1],
+      input: bscript.compile(chunks.slice(0, -1)),
+      witness: a.witness || [],
+    };
+  });
+  // output dependents
+  lazy.prop(o, 'address', () => {
+    if (!o.hash) return;
+    const payload = Buffer.allocUnsafe(21);
+    payload.writeUInt8(o.network.scriptHash, 0);
+    o.hash.copy(payload, 1);
+    return bs58check.encode(payload);
+  });
+  lazy.prop(o, 'hash', () => {
+    // in order of least effort
+    if (a.output) return a.output.slice(2, 22);
+    if (a.address) return _address().hash;
+    if (o.redeem && o.redeem.output) return bcrypto.hash160(o.redeem.output);
+  });
+  lazy.prop(o, 'output', () => {
+    if (!o.hash) return;
+    return bscript.compile([OPS.OP_HASH160, o.hash, OPS.OP_EQUAL]);
+  });
+  // input dependents
+  lazy.prop(o, 'redeem', () => {
+    if (!a.input) return;
+    return _redeem();
+  });
+  lazy.prop(o, 'input', () => {
+    if (!a.redeem || !a.redeem.input || !a.redeem.output) return;
+    return bscript.compile(
+      [].concat(bscript.decompile(a.redeem.input), a.redeem.output),
+    );
+  });
+  lazy.prop(o, 'witness', () => {
+    if (o.redeem && o.redeem.witness) return o.redeem.witness;
+    if (o.input) return [];
+  });
+  if (opts.validate) {
+    let hash = Buffer.from([]);
+    if (a.address) {
+      if (_address().version !== network.scriptHash)
+        throw new TypeError('Invalid version or Network mismatch');
+      if (_address().hash.length !== 20) throw new TypeError('Invalid address');
+      hash = _address().hash;
+    }
+    if (a.hash) {
+      if (hash.length > 0 && !hash.equals(a.hash))
+        throw new TypeError('Hash mismatch');
+      else hash = a.hash;
+    }
+    if (a.output) {
+      if (
+        a.output.length !== 23 ||
+        a.output[0] !== OPS.OP_HASH160 ||
+        a.output[1] !== 0x14 ||
+        a.output[22] !== OPS.OP_EQUAL
+      )
+        throw new TypeError('Output is invalid');
+      const hash2 = a.output.slice(2, 22);
+      if (hash.length > 0 && !hash.equals(hash2))
+        throw new TypeError('Hash mismatch');
+      else hash = hash2;
+    }
+    // inlined to prevent 'no-inner-declarations' failing
+    const checkRedeem = redeem => {
+      // is the redeem output empty/invalid?
+      if (redeem.output) {
+        const decompile = bscript.decompile(redeem.output);
+        if (!decompile || decompile.length < 1)
+          throw new TypeError('Redeem.output too short');
+        // match hash against other sources
+        const hash2 = bcrypto.hash160(redeem.output);
+        if (hash.length > 0 && !hash.equals(hash2))
+          throw new TypeError('Hash mismatch');
+        else hash = hash2;
+      }
+      if (redeem.input) {
+        const hasInput = redeem.input.length > 0;
+        const hasWitness = redeem.witness && redeem.witness.length > 0;
+        if (!hasInput && !hasWitness) throw new TypeError('Empty input');
+        if (hasInput && hasWitness)
+          throw new TypeError('Input and witness provided');
+        if (hasInput) {
+          const richunks = bscript.decompile(redeem.input);
+          if (!bscript.isPushOnly(richunks))
+            throw new TypeError('Non push-only scriptSig');
+        }
+      }
+    };
+    if (a.input) {
+      const chunks = _chunks();
+      if (!chunks || chunks.length < 1) throw new TypeError('Input too short');
+      if (!Buffer.isBuffer(_redeem().output))
+        throw new TypeError('Input is invalid');
+      checkRedeem(_redeem());
+    }
+    if (a.redeem) {
+      if (a.redeem.network && a.redeem.network !== network)
+        throw new TypeError('Network mismatch');
+      if (a.input) {
+        const redeem = _redeem();
+        if (a.redeem.output && !a.redeem.output.equals(redeem.output))
+          throw new TypeError('Redeem.output mismatch');
+        if (a.redeem.input && !a.redeem.input.equals(redeem.input))
+          throw new TypeError('Redeem.input mismatch');
+      }
+      checkRedeem(a.redeem);
+    }
+    if (a.witness) {
+      if (
+        a.redeem &&
+        a.redeem.witness &&
+        !stacksEqual(a.redeem.witness, a.witness)
+      )
+        throw new TypeError('Witness and redeem.witness mismatch');
+    }
+  }
+  return Object.assign(o, a);
+}
+exports.p2sh = p2sh;
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../../node-libs-browser/node_modules/buffer/index.js */ "../../node_modules/node-libs-browser/node_modules/buffer/index.js").Buffer))
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/payments/p2wpkh.js":
+/*!*******************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/payments/p2wpkh.js ***!
+  \*******************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(Buffer) {
+Object.defineProperty(exports, '__esModule', { value: true });
+const bcrypto = __webpack_require__(/*! ../crypto */ "../../node_modules/bitcoinjs-lib/src/crypto.js");
+const networks_1 = __webpack_require__(/*! ../networks */ "../../node_modules/bitcoinjs-lib/src/networks.js");
+const bscript = __webpack_require__(/*! ../script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+const lazy = __webpack_require__(/*! ./lazy */ "../../node_modules/bitcoinjs-lib/src/payments/lazy.js");
+const typef = __webpack_require__(/*! typeforce */ "../../node_modules/typeforce/index.js");
+const OPS = bscript.OPS;
+const ecc = __webpack_require__(/*! tiny-secp256k1 */ "../../node_modules/tiny-secp256k1/js.js");
+const bech32 = __webpack_require__(/*! bech32 */ "../../node_modules/bech32/index.js");
+const EMPTY_BUFFER = Buffer.alloc(0);
+// witness: {signature} {pubKey}
+// input: <>
+// output: OP_0 {pubKeyHash}
+function p2wpkh(a, opts) {
+  if (!a.address && !a.hash && !a.output && !a.pubkey && !a.witness)
+    throw new TypeError('Not enough data');
+  opts = Object.assign({ validate: true }, opts || {});
+  typef(
+    {
+      address: typef.maybe(typef.String),
+      hash: typef.maybe(typef.BufferN(20)),
+      input: typef.maybe(typef.BufferN(0)),
+      network: typef.maybe(typef.Object),
+      output: typef.maybe(typef.BufferN(22)),
+      pubkey: typef.maybe(ecc.isPoint),
+      signature: typef.maybe(bscript.isCanonicalScriptSignature),
+      witness: typef.maybe(typef.arrayOf(typef.Buffer)),
+    },
+    a,
+  );
+  const _address = lazy.value(() => {
+    const result = bech32.decode(a.address);
+    const version = result.words.shift();
+    const data = bech32.fromWords(result.words);
+    return {
+      version,
+      prefix: result.prefix,
+      data: Buffer.from(data),
+    };
+  });
+  const network = a.network || networks_1.bitcoin;
+  const o = { network };
+  lazy.prop(o, 'address', () => {
+    if (!o.hash) return;
+    const words = bech32.toWords(o.hash);
+    words.unshift(0x00);
+    return bech32.encode(network.bech32, words);
+  });
+  lazy.prop(o, 'hash', () => {
+    if (a.output) return a.output.slice(2, 22);
+    if (a.address) return _address().data;
+    if (a.pubkey || o.pubkey) return bcrypto.hash160(a.pubkey || o.pubkey);
+  });
+  lazy.prop(o, 'output', () => {
+    if (!o.hash) return;
+    return bscript.compile([OPS.OP_0, o.hash]);
+  });
+  lazy.prop(o, 'pubkey', () => {
+    if (a.pubkey) return a.pubkey;
+    if (!a.witness) return;
+    return a.witness[1];
+  });
+  lazy.prop(o, 'signature', () => {
+    if (!a.witness) return;
+    return a.witness[0];
+  });
+  lazy.prop(o, 'input', () => {
+    if (!o.witness) return;
+    return EMPTY_BUFFER;
+  });
+  lazy.prop(o, 'witness', () => {
+    if (!a.pubkey) return;
+    if (!a.signature) return;
+    return [a.signature, a.pubkey];
+  });
+  // extended validation
+  if (opts.validate) {
+    let hash = Buffer.from([]);
+    if (a.address) {
+      if (network && network.bech32 !== _address().prefix)
+        throw new TypeError('Invalid prefix or Network mismatch');
+      if (_address().version !== 0x00)
+        throw new TypeError('Invalid address version');
+      if (_address().data.length !== 20)
+        throw new TypeError('Invalid address data');
+      hash = _address().data;
+    }
+    if (a.hash) {
+      if (hash.length > 0 && !hash.equals(a.hash))
+        throw new TypeError('Hash mismatch');
+      else hash = a.hash;
+    }
+    if (a.output) {
+      if (
+        a.output.length !== 22 ||
+        a.output[0] !== OPS.OP_0 ||
+        a.output[1] !== 0x14
+      )
+        throw new TypeError('Output is invalid');
+      if (hash.length > 0 && !hash.equals(a.output.slice(2)))
+        throw new TypeError('Hash mismatch');
+      else hash = a.output.slice(2);
+    }
+    if (a.pubkey) {
+      const pkh = bcrypto.hash160(a.pubkey);
+      if (hash.length > 0 && !hash.equals(pkh))
+        throw new TypeError('Hash mismatch');
+      else hash = pkh;
+    }
+    if (a.witness) {
+      if (a.witness.length !== 2) throw new TypeError('Witness is invalid');
+      if (!bscript.isCanonicalScriptSignature(a.witness[0]))
+        throw new TypeError('Witness has invalid signature');
+      if (!ecc.isPoint(a.witness[1]))
+        throw new TypeError('Witness has invalid pubkey');
+      if (a.signature && !a.signature.equals(a.witness[0]))
+        throw new TypeError('Signature mismatch');
+      if (a.pubkey && !a.pubkey.equals(a.witness[1]))
+        throw new TypeError('Pubkey mismatch');
+      const pkh = bcrypto.hash160(a.witness[1]);
+      if (hash.length > 0 && !hash.equals(pkh))
+        throw new TypeError('Hash mismatch');
+    }
+  }
+  return Object.assign(o, a);
+}
+exports.p2wpkh = p2wpkh;
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../../node-libs-browser/node_modules/buffer/index.js */ "../../node_modules/node-libs-browser/node_modules/buffer/index.js").Buffer))
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/payments/p2wsh.js":
+/*!******************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/payments/p2wsh.js ***!
+  \******************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(Buffer) {
+Object.defineProperty(exports, '__esModule', { value: true });
+const bcrypto = __webpack_require__(/*! ../crypto */ "../../node_modules/bitcoinjs-lib/src/crypto.js");
+const networks_1 = __webpack_require__(/*! ../networks */ "../../node_modules/bitcoinjs-lib/src/networks.js");
+const bscript = __webpack_require__(/*! ../script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+const lazy = __webpack_require__(/*! ./lazy */ "../../node_modules/bitcoinjs-lib/src/payments/lazy.js");
+const typef = __webpack_require__(/*! typeforce */ "../../node_modules/typeforce/index.js");
+const OPS = bscript.OPS;
+const bech32 = __webpack_require__(/*! bech32 */ "../../node_modules/bech32/index.js");
+const EMPTY_BUFFER = Buffer.alloc(0);
+function stacksEqual(a, b) {
+  if (a.length !== b.length) return false;
+  return a.every((x, i) => {
+    return x.equals(b[i]);
+  });
+}
+// input: <>
+// witness: [redeemScriptSig ...] {redeemScript}
+// output: OP_0 {sha256(redeemScript)}
+function p2wsh(a, opts) {
+  if (!a.address && !a.hash && !a.output && !a.redeem && !a.witness)
+    throw new TypeError('Not enough data');
+  opts = Object.assign({ validate: true }, opts || {});
+  typef(
+    {
+      network: typef.maybe(typef.Object),
+      address: typef.maybe(typef.String),
+      hash: typef.maybe(typef.BufferN(32)),
+      output: typef.maybe(typef.BufferN(34)),
+      redeem: typef.maybe({
+        input: typef.maybe(typef.Buffer),
+        network: typef.maybe(typef.Object),
+        output: typef.maybe(typef.Buffer),
+        witness: typef.maybe(typef.arrayOf(typef.Buffer)),
+      }),
+      input: typef.maybe(typef.BufferN(0)),
+      witness: typef.maybe(typef.arrayOf(typef.Buffer)),
+    },
+    a,
+  );
+  const _address = lazy.value(() => {
+    const result = bech32.decode(a.address);
+    const version = result.words.shift();
+    const data = bech32.fromWords(result.words);
+    return {
+      version,
+      prefix: result.prefix,
+      data: Buffer.from(data),
+    };
+  });
+  const _rchunks = lazy.value(() => {
+    return bscript.decompile(a.redeem.input);
+  });
+  let network = a.network;
+  if (!network) {
+    network = (a.redeem && a.redeem.network) || networks_1.bitcoin;
+  }
+  const o = { network };
+  lazy.prop(o, 'address', () => {
+    if (!o.hash) return;
+    const words = bech32.toWords(o.hash);
+    words.unshift(0x00);
+    return bech32.encode(network.bech32, words);
+  });
+  lazy.prop(o, 'hash', () => {
+    if (a.output) return a.output.slice(2);
+    if (a.address) return _address().data;
+    if (o.redeem && o.redeem.output) return bcrypto.sha256(o.redeem.output);
+  });
+  lazy.prop(o, 'output', () => {
+    if (!o.hash) return;
+    return bscript.compile([OPS.OP_0, o.hash]);
+  });
+  lazy.prop(o, 'redeem', () => {
+    if (!a.witness) return;
+    return {
+      output: a.witness[a.witness.length - 1],
+      input: EMPTY_BUFFER,
+      witness: a.witness.slice(0, -1),
+    };
+  });
+  lazy.prop(o, 'input', () => {
+    if (!o.witness) return;
+    return EMPTY_BUFFER;
+  });
+  lazy.prop(o, 'witness', () => {
+    // transform redeem input to witness stack?
+    if (
+      a.redeem &&
+      a.redeem.input &&
+      a.redeem.input.length > 0 &&
+      a.redeem.output &&
+      a.redeem.output.length > 0
+    ) {
+      const stack = bscript.toStack(_rchunks());
+      // assign, and blank the existing input
+      o.redeem = Object.assign({ witness: stack }, a.redeem);
+      o.redeem.input = EMPTY_BUFFER;
+      return [].concat(stack, a.redeem.output);
+    }
+    if (!a.redeem) return;
+    if (!a.redeem.output) return;
+    if (!a.redeem.witness) return;
+    return [].concat(a.redeem.witness, a.redeem.output);
+  });
+  // extended validation
+  if (opts.validate) {
+    let hash = Buffer.from([]);
+    if (a.address) {
+      if (_address().prefix !== network.bech32)
+        throw new TypeError('Invalid prefix or Network mismatch');
+      if (_address().version !== 0x00)
+        throw new TypeError('Invalid address version');
+      if (_address().data.length !== 32)
+        throw new TypeError('Invalid address data');
+      hash = _address().data;
+    }
+    if (a.hash) {
+      if (hash.length > 0 && !hash.equals(a.hash))
+        throw new TypeError('Hash mismatch');
+      else hash = a.hash;
+    }
+    if (a.output) {
+      if (
+        a.output.length !== 34 ||
+        a.output[0] !== OPS.OP_0 ||
+        a.output[1] !== 0x20
+      )
+        throw new TypeError('Output is invalid');
+      const hash2 = a.output.slice(2);
+      if (hash.length > 0 && !hash.equals(hash2))
+        throw new TypeError('Hash mismatch');
+      else hash = hash2;
+    }
+    if (a.redeem) {
+      if (a.redeem.network && a.redeem.network !== network)
+        throw new TypeError('Network mismatch');
+      // is there two redeem sources?
+      if (
+        a.redeem.input &&
+        a.redeem.input.length > 0 &&
+        a.redeem.witness &&
+        a.redeem.witness.length > 0
+      )
+        throw new TypeError('Ambiguous witness source');
+      // is the redeem output non-empty?
+      if (a.redeem.output) {
+        if (bscript.decompile(a.redeem.output).length === 0)
+          throw new TypeError('Redeem.output is invalid');
+        // match hash against other sources
+        const hash2 = bcrypto.sha256(a.redeem.output);
+        if (hash.length > 0 && !hash.equals(hash2))
+          throw new TypeError('Hash mismatch');
+        else hash = hash2;
+      }
+      if (a.redeem.input && !bscript.isPushOnly(_rchunks()))
+        throw new TypeError('Non push-only scriptSig');
+      if (
+        a.witness &&
+        a.redeem.witness &&
+        !stacksEqual(a.witness, a.redeem.witness)
+      )
+        throw new TypeError('Witness and redeem.witness mismatch');
+    }
+    if (a.witness) {
+      if (
+        a.redeem &&
+        a.redeem.output &&
+        !a.redeem.output.equals(a.witness[a.witness.length - 1])
+      )
+        throw new TypeError('Witness and redeem.output mismatch');
+    }
+  }
+  return Object.assign(o, a);
+}
+exports.p2wsh = p2wsh;
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../../node-libs-browser/node_modules/buffer/index.js */ "../../node_modules/node-libs-browser/node_modules/buffer/index.js").Buffer))
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/script.js":
+/*!**********************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/script.js ***!
+  \**********************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(Buffer) {
+Object.defineProperty(exports, '__esModule', { value: true });
+const scriptNumber = __webpack_require__(/*! ./script_number */ "../../node_modules/bitcoinjs-lib/src/script_number.js");
+const scriptSignature = __webpack_require__(/*! ./script_signature */ "../../node_modules/bitcoinjs-lib/src/script_signature.js");
+const types = __webpack_require__(/*! ./types */ "../../node_modules/bitcoinjs-lib/src/types.js");
+const bip66 = __webpack_require__(/*! bip66 */ "../../node_modules/bip66/index.js");
+const ecc = __webpack_require__(/*! tiny-secp256k1 */ "../../node_modules/tiny-secp256k1/js.js");
+const pushdata = __webpack_require__(/*! pushdata-bitcoin */ "../../node_modules/pushdata-bitcoin/index.js");
+const typeforce = __webpack_require__(/*! typeforce */ "../../node_modules/typeforce/index.js");
+exports.OPS = __webpack_require__(/*! bitcoin-ops */ "../../node_modules/bitcoin-ops/index.json");
+const REVERSE_OPS = __webpack_require__(/*! bitcoin-ops/map */ "../../node_modules/bitcoin-ops/map.js");
+const OP_INT_BASE = exports.OPS.OP_RESERVED; // OP_1 - 1
+function isOPInt(value) {
+  return (
+    types.Number(value) &&
+    (value === exports.OPS.OP_0 ||
+      (value >= exports.OPS.OP_1 && value <= exports.OPS.OP_16) ||
+      value === exports.OPS.OP_1NEGATE)
+  );
+}
+function isPushOnlyChunk(value) {
+  return types.Buffer(value) || isOPInt(value);
+}
+function isPushOnly(value) {
+  return types.Array(value) && value.every(isPushOnlyChunk);
+}
+exports.isPushOnly = isPushOnly;
+function asMinimalOP(buffer) {
+  if (buffer.length === 0) return exports.OPS.OP_0;
+  if (buffer.length !== 1) return;
+  if (buffer[0] >= 1 && buffer[0] <= 16) return OP_INT_BASE + buffer[0];
+  if (buffer[0] === 0x81) return exports.OPS.OP_1NEGATE;
+}
+function chunksIsBuffer(buf) {
+  return Buffer.isBuffer(buf);
+}
+function chunksIsArray(buf) {
+  return types.Array(buf);
+}
+function singleChunkIsBuffer(buf) {
+  return Buffer.isBuffer(buf);
+}
+function compile(chunks) {
+  // TODO: remove me
+  if (chunksIsBuffer(chunks)) return chunks;
+  typeforce(types.Array, chunks);
+  const bufferSize = chunks.reduce((accum, chunk) => {
+    // data chunk
+    if (singleChunkIsBuffer(chunk)) {
+      // adhere to BIP62.3, minimal push policy
+      if (chunk.length === 1 && asMinimalOP(chunk) !== undefined) {
+        return accum + 1;
+      }
+      return accum + pushdata.encodingLength(chunk.length) + chunk.length;
+    }
+    // opcode
+    return accum + 1;
+  }, 0.0);
+  const buffer = Buffer.allocUnsafe(bufferSize);
+  let offset = 0;
+  chunks.forEach(chunk => {
+    // data chunk
+    if (singleChunkIsBuffer(chunk)) {
+      // adhere to BIP62.3, minimal push policy
+      const opcode = asMinimalOP(chunk);
+      if (opcode !== undefined) {
+        buffer.writeUInt8(opcode, offset);
+        offset += 1;
+        return;
+      }
+      offset += pushdata.encode(buffer, chunk.length, offset);
+      chunk.copy(buffer, offset);
+      offset += chunk.length;
+      // opcode
+    } else {
+      buffer.writeUInt8(chunk, offset);
+      offset += 1;
+    }
+  });
+  if (offset !== buffer.length) throw new Error('Could not decode chunks');
+  return buffer;
+}
+exports.compile = compile;
+function decompile(buffer) {
+  // TODO: remove me
+  if (chunksIsArray(buffer)) return buffer;
+  typeforce(types.Buffer, buffer);
+  const chunks = [];
+  let i = 0;
+  while (i < buffer.length) {
+    const opcode = buffer[i];
+    // data chunk
+    if (opcode > exports.OPS.OP_0 && opcode <= exports.OPS.OP_PUSHDATA4) {
+      const d = pushdata.decode(buffer, i);
+      // did reading a pushDataInt fail?
+      if (d === null) return null;
+      i += d.size;
+      // attempt to read too much data?
+      if (i + d.number > buffer.length) return null;
+      const data = buffer.slice(i, i + d.number);
+      i += d.number;
+      // decompile minimally
+      const op = asMinimalOP(data);
+      if (op !== undefined) {
+        chunks.push(op);
+      } else {
+        chunks.push(data);
+      }
+      // opcode
+    } else {
+      chunks.push(opcode);
+      i += 1;
+    }
+  }
+  return chunks;
+}
+exports.decompile = decompile;
+function toASM(chunks) {
+  if (chunksIsBuffer(chunks)) {
+    chunks = decompile(chunks);
+  }
+  return chunks
+    .map(chunk => {
+      // data?
+      if (singleChunkIsBuffer(chunk)) {
+        const op = asMinimalOP(chunk);
+        if (op === undefined) return chunk.toString('hex');
+        chunk = op;
+      }
+      // opcode!
+      return REVERSE_OPS[chunk];
+    })
+    .join(' ');
+}
+exports.toASM = toASM;
+function fromASM(asm) {
+  typeforce(types.String, asm);
+  return compile(
+    asm.split(' ').map(chunkStr => {
+      // opcode?
+      if (exports.OPS[chunkStr] !== undefined) return exports.OPS[chunkStr];
+      typeforce(types.Hex, chunkStr);
+      // data!
+      return Buffer.from(chunkStr, 'hex');
+    }),
+  );
+}
+exports.fromASM = fromASM;
+function toStack(chunks) {
+  chunks = decompile(chunks);
+  typeforce(isPushOnly, chunks);
+  return chunks.map(op => {
+    if (singleChunkIsBuffer(op)) return op;
+    if (op === exports.OPS.OP_0) return Buffer.allocUnsafe(0);
+    return scriptNumber.encode(op - OP_INT_BASE);
+  });
+}
+exports.toStack = toStack;
+function isCanonicalPubKey(buffer) {
+  return ecc.isPoint(buffer);
+}
+exports.isCanonicalPubKey = isCanonicalPubKey;
+function isDefinedHashType(hashType) {
+  const hashTypeMod = hashType & ~0x80;
+  // return hashTypeMod > SIGHASH_ALL && hashTypeMod < SIGHASH_SINGLE
+  return hashTypeMod > 0x00 && hashTypeMod < 0x04;
+}
+exports.isDefinedHashType = isDefinedHashType;
+function isCanonicalScriptSignature(buffer) {
+  if (!Buffer.isBuffer(buffer)) return false;
+  if (!isDefinedHashType(buffer[buffer.length - 1])) return false;
+  return bip66.check(buffer.slice(0, -1));
+}
+exports.isCanonicalScriptSignature = isCanonicalScriptSignature;
+// tslint:disable-next-line variable-name
+exports.number = scriptNumber;
+exports.signature = scriptSignature;
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../node-libs-browser/node_modules/buffer/index.js */ "../../node_modules/node-libs-browser/node_modules/buffer/index.js").Buffer))
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/script_number.js":
+/*!*****************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/script_number.js ***!
+  \*****************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(Buffer) {
+Object.defineProperty(exports, '__esModule', { value: true });
+function decode(buffer, maxLength, minimal) {
+  maxLength = maxLength || 4;
+  minimal = minimal === undefined ? true : minimal;
+  const length = buffer.length;
+  if (length === 0) return 0;
+  if (length > maxLength) throw new TypeError('Script number overflow');
+  if (minimal) {
+    if ((buffer[length - 1] & 0x7f) === 0) {
+      if (length <= 1 || (buffer[length - 2] & 0x80) === 0)
+        throw new Error('Non-minimally encoded script number');
+    }
+  }
+  // 40-bit
+  if (length === 5) {
+    const a = buffer.readUInt32LE(0);
+    const b = buffer.readUInt8(4);
+    if (b & 0x80) return -((b & ~0x80) * 0x100000000 + a);
+    return b * 0x100000000 + a;
+  }
+  // 32-bit / 24-bit / 16-bit / 8-bit
+  let result = 0;
+  for (let i = 0; i < length; ++i) {
+    result |= buffer[i] << (8 * i);
+  }
+  if (buffer[length - 1] & 0x80)
+    return -(result & ~(0x80 << (8 * (length - 1))));
+  return result;
+}
+exports.decode = decode;
+function scriptNumSize(i) {
+  return i > 0x7fffffff
+    ? 5
+    : i > 0x7fffff
+    ? 4
+    : i > 0x7fff
+    ? 3
+    : i > 0x7f
+    ? 2
+    : i > 0x00
+    ? 1
+    : 0;
+}
+function encode(_number) {
+  let value = Math.abs(_number);
+  const size = scriptNumSize(value);
+  const buffer = Buffer.allocUnsafe(size);
+  const negative = _number < 0;
+  for (let i = 0; i < size; ++i) {
+    buffer.writeUInt8(value & 0xff, i);
+    value >>= 8;
+  }
+  if (buffer[size - 1] & 0x80) {
+    buffer.writeUInt8(negative ? 0x80 : 0x00, size - 1);
+  } else if (negative) {
+    buffer[size - 1] |= 0x80;
+  }
+  return buffer;
+}
+exports.encode = encode;
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../node-libs-browser/node_modules/buffer/index.js */ "../../node_modules/node-libs-browser/node_modules/buffer/index.js").Buffer))
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/script_signature.js":
+/*!********************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/script_signature.js ***!
+  \********************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(Buffer) {
+Object.defineProperty(exports, '__esModule', { value: true });
+const types = __webpack_require__(/*! ./types */ "../../node_modules/bitcoinjs-lib/src/types.js");
+const bip66 = __webpack_require__(/*! bip66 */ "../../node_modules/bip66/index.js");
+const typeforce = __webpack_require__(/*! typeforce */ "../../node_modules/typeforce/index.js");
+const ZERO = Buffer.alloc(1, 0);
+function toDER(x) {
+  let i = 0;
+  while (x[i] === 0) ++i;
+  if (i === x.length) return ZERO;
+  x = x.slice(i);
+  if (x[0] & 0x80) return Buffer.concat([ZERO, x], 1 + x.length);
+  return x;
+}
+function fromDER(x) {
+  if (x[0] === 0x00) x = x.slice(1);
+  const buffer = Buffer.alloc(32, 0);
+  const bstart = Math.max(0, 32 - x.length);
+  x.copy(buffer, bstart);
+  return buffer;
+}
+// BIP62: 1 byte hashType flag (only 0x01, 0x02, 0x03, 0x81, 0x82 and 0x83 are allowed)
+function decode(buffer) {
+  const hashType = buffer.readUInt8(buffer.length - 1);
+  const hashTypeMod = hashType & ~0x80;
+  if (hashTypeMod <= 0 || hashTypeMod >= 4)
+    throw new Error('Invalid hashType ' + hashType);
+  const decoded = bip66.decode(buffer.slice(0, -1));
+  const r = fromDER(decoded.r);
+  const s = fromDER(decoded.s);
+  const signature = Buffer.concat([r, s], 64);
+  return { signature, hashType };
+}
+exports.decode = decode;
+function encode(signature, hashType) {
+  typeforce(
+    {
+      signature: types.BufferN(64),
+      hashType: types.UInt8,
+    },
+    { signature, hashType },
+  );
+  const hashTypeMod = hashType & ~0x80;
+  if (hashTypeMod <= 0 || hashTypeMod >= 4)
+    throw new Error('Invalid hashType ' + hashType);
+  const hashTypeBuffer = Buffer.allocUnsafe(1);
+  hashTypeBuffer.writeUInt8(hashType, 0);
+  const r = toDER(signature.slice(0, 32));
+  const s = toDER(signature.slice(32, 64));
+  return Buffer.concat([bip66.encode(r, s), hashTypeBuffer]);
+}
+exports.encode = encode;
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../node-libs-browser/node_modules/buffer/index.js */ "../../node_modules/node-libs-browser/node_modules/buffer/index.js").Buffer))
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/templates/multisig/index.js":
+/*!****************************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/templates/multisig/index.js ***!
+  \****************************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, '__esModule', { value: true });
+const input = __webpack_require__(/*! ./input */ "../../node_modules/bitcoinjs-lib/src/templates/multisig/input.js");
+exports.input = input;
+const output = __webpack_require__(/*! ./output */ "../../node_modules/bitcoinjs-lib/src/templates/multisig/output.js");
+exports.output = output;
+
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/templates/multisig/input.js":
+/*!****************************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/templates/multisig/input.js ***!
+  \****************************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+// OP_0 [signatures ...]
+Object.defineProperty(exports, '__esModule', { value: true });
+const bscript = __webpack_require__(/*! ../../script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+const script_1 = __webpack_require__(/*! ../../script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+function partialSignature(value) {
+  return (
+    value === script_1.OPS.OP_0 || bscript.isCanonicalScriptSignature(value)
+  );
+}
+function check(script, allowIncomplete) {
+  const chunks = bscript.decompile(script);
+  if (chunks.length < 2) return false;
+  if (chunks[0] !== script_1.OPS.OP_0) return false;
+  if (allowIncomplete) {
+    return chunks.slice(1).every(partialSignature);
+  }
+  return chunks.slice(1).every(bscript.isCanonicalScriptSignature);
+}
+exports.check = check;
+check.toJSON = () => {
+  return 'multisig input';
+};
+
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/templates/multisig/output.js":
+/*!*****************************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/templates/multisig/output.js ***!
+  \*****************************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+// m [pubKeys ...] n OP_CHECKMULTISIG
+Object.defineProperty(exports, '__esModule', { value: true });
+const bscript = __webpack_require__(/*! ../../script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+const script_1 = __webpack_require__(/*! ../../script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+const types = __webpack_require__(/*! ../../types */ "../../node_modules/bitcoinjs-lib/src/types.js");
+const OP_INT_BASE = script_1.OPS.OP_RESERVED; // OP_1 - 1
+function check(script, allowIncomplete) {
+  const chunks = bscript.decompile(script);
+  if (chunks.length < 4) return false;
+  if (chunks[chunks.length - 1] !== script_1.OPS.OP_CHECKMULTISIG) return false;
+  if (!types.Number(chunks[0])) return false;
+  if (!types.Number(chunks[chunks.length - 2])) return false;
+  const m = chunks[0] - OP_INT_BASE;
+  const n = chunks[chunks.length - 2] - OP_INT_BASE;
+  if (m <= 0) return false;
+  if (n > 16) return false;
+  if (m > n) return false;
+  if (n !== chunks.length - 3) return false;
+  if (allowIncomplete) return true;
+  const keys = chunks.slice(1, -2);
+  return keys.every(bscript.isCanonicalPubKey);
+}
+exports.check = check;
+check.toJSON = () => {
+  return 'multi-sig output';
+};
+
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/templates/nulldata.js":
+/*!**********************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/templates/nulldata.js ***!
+  \**********************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, '__esModule', { value: true });
+// OP_RETURN {data}
+const bscript = __webpack_require__(/*! ../script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+const OPS = bscript.OPS;
+function check(script) {
+  const buffer = bscript.compile(script);
+  return buffer.length > 1 && buffer[0] === OPS.OP_RETURN;
+}
+exports.check = check;
+check.toJSON = () => {
+  return 'null data output';
+};
+const output = { check };
+exports.output = output;
+
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/templates/pubkey/index.js":
+/*!**************************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/templates/pubkey/index.js ***!
+  \**************************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, '__esModule', { value: true });
+const input = __webpack_require__(/*! ./input */ "../../node_modules/bitcoinjs-lib/src/templates/pubkey/input.js");
+exports.input = input;
+const output = __webpack_require__(/*! ./output */ "../../node_modules/bitcoinjs-lib/src/templates/pubkey/output.js");
+exports.output = output;
+
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/templates/pubkey/input.js":
+/*!**************************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/templates/pubkey/input.js ***!
+  \**************************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+// {signature}
+Object.defineProperty(exports, '__esModule', { value: true });
+const bscript = __webpack_require__(/*! ../../script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+function check(script) {
+  const chunks = bscript.decompile(script);
+  return chunks.length === 1 && bscript.isCanonicalScriptSignature(chunks[0]);
+}
+exports.check = check;
+check.toJSON = () => {
+  return 'pubKey input';
+};
+
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/templates/pubkey/output.js":
+/*!***************************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/templates/pubkey/output.js ***!
+  \***************************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+// {pubKey} OP_CHECKSIG
+Object.defineProperty(exports, '__esModule', { value: true });
+const bscript = __webpack_require__(/*! ../../script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+const script_1 = __webpack_require__(/*! ../../script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+function check(script) {
+  const chunks = bscript.decompile(script);
+  return (
+    chunks.length === 2 &&
+    bscript.isCanonicalPubKey(chunks[0]) &&
+    chunks[1] === script_1.OPS.OP_CHECKSIG
+  );
+}
+exports.check = check;
+check.toJSON = () => {
+  return 'pubKey output';
+};
+
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/templates/pubkeyhash/index.js":
+/*!******************************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/templates/pubkeyhash/index.js ***!
+  \******************************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, '__esModule', { value: true });
+const input = __webpack_require__(/*! ./input */ "../../node_modules/bitcoinjs-lib/src/templates/pubkeyhash/input.js");
+exports.input = input;
+const output = __webpack_require__(/*! ./output */ "../../node_modules/bitcoinjs-lib/src/templates/pubkeyhash/output.js");
+exports.output = output;
+
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/templates/pubkeyhash/input.js":
+/*!******************************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/templates/pubkeyhash/input.js ***!
+  \******************************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+// {signature} {pubKey}
+Object.defineProperty(exports, '__esModule', { value: true });
+const bscript = __webpack_require__(/*! ../../script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+function check(script) {
+  const chunks = bscript.decompile(script);
+  return (
+    chunks.length === 2 &&
+    bscript.isCanonicalScriptSignature(chunks[0]) &&
+    bscript.isCanonicalPubKey(chunks[1])
+  );
+}
+exports.check = check;
+check.toJSON = () => {
+  return 'pubKeyHash input';
+};
+
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/templates/pubkeyhash/output.js":
+/*!*******************************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/templates/pubkeyhash/output.js ***!
+  \*******************************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+// OP_DUP OP_HASH160 {pubKeyHash} OP_EQUALVERIFY OP_CHECKSIG
+Object.defineProperty(exports, '__esModule', { value: true });
+const bscript = __webpack_require__(/*! ../../script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+const script_1 = __webpack_require__(/*! ../../script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+function check(script) {
+  const buffer = bscript.compile(script);
+  return (
+    buffer.length === 25 &&
+    buffer[0] === script_1.OPS.OP_DUP &&
+    buffer[1] === script_1.OPS.OP_HASH160 &&
+    buffer[2] === 0x14 &&
+    buffer[23] === script_1.OPS.OP_EQUALVERIFY &&
+    buffer[24] === script_1.OPS.OP_CHECKSIG
+  );
+}
+exports.check = check;
+check.toJSON = () => {
+  return 'pubKeyHash output';
+};
+
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/templates/scripthash/index.js":
+/*!******************************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/templates/scripthash/index.js ***!
+  \******************************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, '__esModule', { value: true });
+const input = __webpack_require__(/*! ./input */ "../../node_modules/bitcoinjs-lib/src/templates/scripthash/input.js");
+exports.input = input;
+const output = __webpack_require__(/*! ./output */ "../../node_modules/bitcoinjs-lib/src/templates/scripthash/output.js");
+exports.output = output;
+
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/templates/scripthash/input.js":
+/*!******************************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/templates/scripthash/input.js ***!
+  \******************************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(Buffer) {
+// <scriptSig> {serialized scriptPubKey script}
+Object.defineProperty(exports, '__esModule', { value: true });
+const bscript = __webpack_require__(/*! ../../script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+const p2ms = __webpack_require__(/*! ../multisig */ "../../node_modules/bitcoinjs-lib/src/templates/multisig/index.js");
+const p2pk = __webpack_require__(/*! ../pubkey */ "../../node_modules/bitcoinjs-lib/src/templates/pubkey/index.js");
+const p2pkh = __webpack_require__(/*! ../pubkeyhash */ "../../node_modules/bitcoinjs-lib/src/templates/pubkeyhash/index.js");
+const p2wpkho = __webpack_require__(/*! ../witnesspubkeyhash/output */ "../../node_modules/bitcoinjs-lib/src/templates/witnesspubkeyhash/output.js");
+const p2wsho = __webpack_require__(/*! ../witnessscripthash/output */ "../../node_modules/bitcoinjs-lib/src/templates/witnessscripthash/output.js");
+function check(script, allowIncomplete) {
+  const chunks = bscript.decompile(script);
+  if (chunks.length < 1) return false;
+  const lastChunk = chunks[chunks.length - 1];
+  if (!Buffer.isBuffer(lastChunk)) return false;
+  const scriptSigChunks = bscript.decompile(
+    bscript.compile(chunks.slice(0, -1)),
+  );
+  const redeemScriptChunks = bscript.decompile(lastChunk);
+  // is redeemScript a valid script?
+  if (!redeemScriptChunks) return false;
+  // is redeemScriptSig push only?
+  if (!bscript.isPushOnly(scriptSigChunks)) return false;
+  // is witness?
+  if (chunks.length === 1) {
+    return (
+      p2wsho.check(redeemScriptChunks) || p2wpkho.check(redeemScriptChunks)
+    );
+  }
+  // match types
+  if (
+    p2pkh.input.check(scriptSigChunks) &&
+    p2pkh.output.check(redeemScriptChunks)
+  )
+    return true;
+  if (
+    p2ms.input.check(scriptSigChunks, allowIncomplete) &&
+    p2ms.output.check(redeemScriptChunks)
+  )
+    return true;
+  if (
+    p2pk.input.check(scriptSigChunks) &&
+    p2pk.output.check(redeemScriptChunks)
+  )
+    return true;
+  return false;
+}
+exports.check = check;
+check.toJSON = () => {
+  return 'scriptHash input';
+};
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../../../node-libs-browser/node_modules/buffer/index.js */ "../../node_modules/node-libs-browser/node_modules/buffer/index.js").Buffer))
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/templates/scripthash/output.js":
+/*!*******************************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/templates/scripthash/output.js ***!
+  \*******************************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+// OP_HASH160 {scriptHash} OP_EQUAL
+Object.defineProperty(exports, '__esModule', { value: true });
+const bscript = __webpack_require__(/*! ../../script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+const script_1 = __webpack_require__(/*! ../../script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+function check(script) {
+  const buffer = bscript.compile(script);
+  return (
+    buffer.length === 23 &&
+    buffer[0] === script_1.OPS.OP_HASH160 &&
+    buffer[1] === 0x14 &&
+    buffer[22] === script_1.OPS.OP_EQUAL
+  );
+}
+exports.check = check;
+check.toJSON = () => {
+  return 'scriptHash output';
+};
+
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/templates/witnesscommitment/index.js":
+/*!*************************************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/templates/witnesscommitment/index.js ***!
+  \*************************************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, '__esModule', { value: true });
+const output = __webpack_require__(/*! ./output */ "../../node_modules/bitcoinjs-lib/src/templates/witnesscommitment/output.js");
+exports.output = output;
+
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/templates/witnesscommitment/output.js":
+/*!**************************************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/templates/witnesscommitment/output.js ***!
+  \**************************************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(Buffer) {
+// OP_RETURN {aa21a9ed} {commitment}
+Object.defineProperty(exports, '__esModule', { value: true });
+const bscript = __webpack_require__(/*! ../../script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+const script_1 = __webpack_require__(/*! ../../script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+const types = __webpack_require__(/*! ../../types */ "../../node_modules/bitcoinjs-lib/src/types.js");
+const typeforce = __webpack_require__(/*! typeforce */ "../../node_modules/typeforce/index.js");
+const HEADER = Buffer.from('aa21a9ed', 'hex');
+function check(script) {
+  const buffer = bscript.compile(script);
+  return (
+    buffer.length > 37 &&
+    buffer[0] === script_1.OPS.OP_RETURN &&
+    buffer[1] === 0x24 &&
+    buffer.slice(2, 6).equals(HEADER)
+  );
+}
+exports.check = check;
+check.toJSON = () => {
+  return 'Witness commitment output';
+};
+function encode(commitment) {
+  typeforce(types.Hash256bit, commitment);
+  const buffer = Buffer.allocUnsafe(36);
+  HEADER.copy(buffer, 0);
+  commitment.copy(buffer, 4);
+  return bscript.compile([script_1.OPS.OP_RETURN, buffer]);
+}
+exports.encode = encode;
+function decode(buffer) {
+  typeforce(check, buffer);
+  return bscript.decompile(buffer)[1].slice(4, 36);
+}
+exports.decode = decode;
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../../../node-libs-browser/node_modules/buffer/index.js */ "../../node_modules/node-libs-browser/node_modules/buffer/index.js").Buffer))
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/templates/witnesspubkeyhash/index.js":
+/*!*************************************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/templates/witnesspubkeyhash/index.js ***!
+  \*************************************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, '__esModule', { value: true });
+const input = __webpack_require__(/*! ./input */ "../../node_modules/bitcoinjs-lib/src/templates/witnesspubkeyhash/input.js");
+exports.input = input;
+const output = __webpack_require__(/*! ./output */ "../../node_modules/bitcoinjs-lib/src/templates/witnesspubkeyhash/output.js");
+exports.output = output;
+
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/templates/witnesspubkeyhash/input.js":
+/*!*************************************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/templates/witnesspubkeyhash/input.js ***!
+  \*************************************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+// {signature} {pubKey}
+Object.defineProperty(exports, '__esModule', { value: true });
+const bscript = __webpack_require__(/*! ../../script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+function isCompressedCanonicalPubKey(pubKey) {
+  return bscript.isCanonicalPubKey(pubKey) && pubKey.length === 33;
+}
+function check(script) {
+  const chunks = bscript.decompile(script);
+  return (
+    chunks.length === 2 &&
+    bscript.isCanonicalScriptSignature(chunks[0]) &&
+    isCompressedCanonicalPubKey(chunks[1])
+  );
+}
+exports.check = check;
+check.toJSON = () => {
+  return 'witnessPubKeyHash input';
+};
+
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/templates/witnesspubkeyhash/output.js":
+/*!**************************************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/templates/witnesspubkeyhash/output.js ***!
+  \**************************************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+// OP_0 {pubKeyHash}
+Object.defineProperty(exports, '__esModule', { value: true });
+const bscript = __webpack_require__(/*! ../../script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+const script_1 = __webpack_require__(/*! ../../script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+function check(script) {
+  const buffer = bscript.compile(script);
+  return (
+    buffer.length === 22 &&
+    buffer[0] === script_1.OPS.OP_0 &&
+    buffer[1] === 0x14
+  );
+}
+exports.check = check;
+check.toJSON = () => {
+  return 'Witness pubKeyHash output';
+};
+
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/templates/witnessscripthash/index.js":
+/*!*************************************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/templates/witnessscripthash/index.js ***!
+  \*************************************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, '__esModule', { value: true });
+const input = __webpack_require__(/*! ./input */ "../../node_modules/bitcoinjs-lib/src/templates/witnessscripthash/input.js");
+exports.input = input;
+const output = __webpack_require__(/*! ./output */ "../../node_modules/bitcoinjs-lib/src/templates/witnessscripthash/output.js");
+exports.output = output;
+
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/templates/witnessscripthash/input.js":
+/*!*************************************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/templates/witnessscripthash/input.js ***!
+  \*************************************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(Buffer) {
+// <scriptSig> {serialized scriptPubKey script}
+Object.defineProperty(exports, '__esModule', { value: true });
+const bscript = __webpack_require__(/*! ../../script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+const typeforce = __webpack_require__(/*! typeforce */ "../../node_modules/typeforce/index.js");
+const p2ms = __webpack_require__(/*! ../multisig */ "../../node_modules/bitcoinjs-lib/src/templates/multisig/index.js");
+const p2pk = __webpack_require__(/*! ../pubkey */ "../../node_modules/bitcoinjs-lib/src/templates/pubkey/index.js");
+const p2pkh = __webpack_require__(/*! ../pubkeyhash */ "../../node_modules/bitcoinjs-lib/src/templates/pubkeyhash/index.js");
+function check(chunks, allowIncomplete) {
+  typeforce(typeforce.Array, chunks);
+  if (chunks.length < 1) return false;
+  const witnessScript = chunks[chunks.length - 1];
+  if (!Buffer.isBuffer(witnessScript)) return false;
+  const witnessScriptChunks = bscript.decompile(witnessScript);
+  // is witnessScript a valid script?
+  if (!witnessScriptChunks || witnessScriptChunks.length === 0) return false;
+  const witnessRawScriptSig = bscript.compile(chunks.slice(0, -1));
+  // match types
+  if (
+    p2pkh.input.check(witnessRawScriptSig) &&
+    p2pkh.output.check(witnessScriptChunks)
+  )
+    return true;
+  if (
+    p2ms.input.check(witnessRawScriptSig, allowIncomplete) &&
+    p2ms.output.check(witnessScriptChunks)
+  )
+    return true;
+  if (
+    p2pk.input.check(witnessRawScriptSig) &&
+    p2pk.output.check(witnessScriptChunks)
+  )
+    return true;
+  return false;
+}
+exports.check = check;
+check.toJSON = () => {
+  return 'witnessScriptHash input';
+};
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../../../node-libs-browser/node_modules/buffer/index.js */ "../../node_modules/node-libs-browser/node_modules/buffer/index.js").Buffer))
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/templates/witnessscripthash/output.js":
+/*!**************************************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/templates/witnessscripthash/output.js ***!
+  \**************************************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+// OP_0 {scriptHash}
+Object.defineProperty(exports, '__esModule', { value: true });
+const bscript = __webpack_require__(/*! ../../script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+const script_1 = __webpack_require__(/*! ../../script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+function check(script) {
+  const buffer = bscript.compile(script);
+  return (
+    buffer.length === 34 &&
+    buffer[0] === script_1.OPS.OP_0 &&
+    buffer[1] === 0x20
+  );
+}
+exports.check = check;
+check.toJSON = () => {
+  return 'Witness scriptHash output';
+};
+
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/transaction.js":
+/*!***************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/transaction.js ***!
+  \***************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(Buffer) {
+Object.defineProperty(exports, '__esModule', { value: true });
+const bufferutils = __webpack_require__(/*! ./bufferutils */ "../../node_modules/bitcoinjs-lib/src/bufferutils.js");
+const bufferutils_1 = __webpack_require__(/*! ./bufferutils */ "../../node_modules/bitcoinjs-lib/src/bufferutils.js");
+const bcrypto = __webpack_require__(/*! ./crypto */ "../../node_modules/bitcoinjs-lib/src/crypto.js");
+const bscript = __webpack_require__(/*! ./script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+const script_1 = __webpack_require__(/*! ./script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+const types = __webpack_require__(/*! ./types */ "../../node_modules/bitcoinjs-lib/src/types.js");
+const typeforce = __webpack_require__(/*! typeforce */ "../../node_modules/typeforce/index.js");
+const varuint = __webpack_require__(/*! varuint-bitcoin */ "../../node_modules/varuint-bitcoin/index.js");
+function varSliceSize(someScript) {
+  const length = someScript.length;
+  return varuint.encodingLength(length) + length;
+}
+function vectorSize(someVector) {
+  const length = someVector.length;
+  return (
+    varuint.encodingLength(length) +
+    someVector.reduce((sum, witness) => {
+      return sum + varSliceSize(witness);
+    }, 0)
+  );
+}
+const EMPTY_SCRIPT = Buffer.allocUnsafe(0);
+const EMPTY_WITNESS = [];
+const ZERO = Buffer.from(
+  '0000000000000000000000000000000000000000000000000000000000000000',
+  'hex',
+);
+const ONE = Buffer.from(
+  '0000000000000000000000000000000000000000000000000000000000000001',
+  'hex',
+);
+const VALUE_UINT64_MAX = Buffer.from('ffffffffffffffff', 'hex');
+const BLANK_OUTPUT = {
+  script: EMPTY_SCRIPT,
+  valueBuffer: VALUE_UINT64_MAX,
+};
+function isOutput(out) {
+  return out.value !== undefined;
+}
+class Transaction {
+  constructor() {
+    this.version = 1;
+    this.locktime = 0;
+    this.ins = [];
+    this.outs = [];
+  }
+  static fromBuffer(buffer, _NO_STRICT) {
+    let offset = 0;
+    function readSlice(n) {
+      offset += n;
+      return buffer.slice(offset - n, offset);
+    }
+    function readUInt32() {
+      const i = buffer.readUInt32LE(offset);
+      offset += 4;
+      return i;
+    }
+    function readInt32() {
+      const i = buffer.readInt32LE(offset);
+      offset += 4;
+      return i;
+    }
+    function readUInt64() {
+      const i = bufferutils.readUInt64LE(buffer, offset);
+      offset += 8;
+      return i;
+    }
+    function readVarInt() {
+      const vi = varuint.decode(buffer, offset);
+      offset += varuint.decode.bytes;
+      return vi;
+    }
+    function readVarSlice() {
+      return readSlice(readVarInt());
+    }
+    function readVector() {
+      const count = readVarInt();
+      const vector = [];
+      for (let i = 0; i < count; i++) vector.push(readVarSlice());
+      return vector;
+    }
+    const tx = new Transaction();
+    tx.version = readInt32();
+    const marker = buffer.readUInt8(offset);
+    const flag = buffer.readUInt8(offset + 1);
+    let hasWitnesses = false;
+    if (
+      marker === Transaction.ADVANCED_TRANSACTION_MARKER &&
+      flag === Transaction.ADVANCED_TRANSACTION_FLAG
+    ) {
+      offset += 2;
+      hasWitnesses = true;
+    }
+    const vinLen = readVarInt();
+    for (let i = 0; i < vinLen; ++i) {
+      tx.ins.push({
+        hash: readSlice(32),
+        index: readUInt32(),
+        script: readVarSlice(),
+        sequence: readUInt32(),
+        witness: EMPTY_WITNESS,
+      });
+    }
+    const voutLen = readVarInt();
+    for (let i = 0; i < voutLen; ++i) {
+      tx.outs.push({
+        value: readUInt64(),
+        script: readVarSlice(),
+      });
+    }
+    if (hasWitnesses) {
+      for (let i = 0; i < vinLen; ++i) {
+        tx.ins[i].witness = readVector();
+      }
+      // was this pointless?
+      if (!tx.hasWitnesses())
+        throw new Error('Transaction has superfluous witness data');
+    }
+    tx.locktime = readUInt32();
+    if (_NO_STRICT) return tx;
+    if (offset !== buffer.length)
+      throw new Error('Transaction has unexpected data');
+    return tx;
+  }
+  static fromHex(hex) {
+    return Transaction.fromBuffer(Buffer.from(hex, 'hex'), false);
+  }
+  static isCoinbaseHash(buffer) {
+    typeforce(types.Hash256bit, buffer);
+    for (let i = 0; i < 32; ++i) {
+      if (buffer[i] !== 0) return false;
+    }
+    return true;
+  }
+  isCoinbase() {
+    return (
+      this.ins.length === 1 && Transaction.isCoinbaseHash(this.ins[0].hash)
+    );
+  }
+  addInput(hash, index, sequence, scriptSig) {
+    typeforce(
+      types.tuple(
+        types.Hash256bit,
+        types.UInt32,
+        types.maybe(types.UInt32),
+        types.maybe(types.Buffer),
+      ),
+      arguments,
+    );
+    if (types.Null(sequence)) {
+      sequence = Transaction.DEFAULT_SEQUENCE;
+    }
+    // Add the input and return the input's index
+    return (
+      this.ins.push({
+        hash,
+        index,
+        script: scriptSig || EMPTY_SCRIPT,
+        sequence: sequence,
+        witness: EMPTY_WITNESS,
+      }) - 1
+    );
+  }
+  addOutput(scriptPubKey, value) {
+    typeforce(types.tuple(types.Buffer, types.Satoshi), arguments);
+    // Add the output and return the output's index
+    return (
+      this.outs.push({
+        script: scriptPubKey,
+        value,
+      }) - 1
+    );
+  }
+  hasWitnesses() {
+    return this.ins.some(x => {
+      return x.witness.length !== 0;
+    });
+  }
+  weight() {
+    const base = this.__byteLength(false);
+    const total = this.__byteLength(true);
+    return base * 3 + total;
+  }
+  virtualSize() {
+    return Math.ceil(this.weight() / 4);
+  }
+  byteLength() {
+    return this.__byteLength(true);
+  }
+  clone() {
+    const newTx = new Transaction();
+    newTx.version = this.version;
+    newTx.locktime = this.locktime;
+    newTx.ins = this.ins.map(txIn => {
+      return {
+        hash: txIn.hash,
+        index: txIn.index,
+        script: txIn.script,
+        sequence: txIn.sequence,
+        witness: txIn.witness,
+      };
+    });
+    newTx.outs = this.outs.map(txOut => {
+      return {
+        script: txOut.script,
+        value: txOut.value,
+      };
+    });
+    return newTx;
+  }
+  /**
+   * Hash transaction for signing a specific input.
+   *
+   * Bitcoin uses a different hash for each signed transaction input.
+   * This method copies the transaction, makes the necessary changes based on the
+   * hashType, and then hashes the result.
+   * This hash can then be used to sign the provided transaction input.
+   */
+  hashForSignature(inIndex, prevOutScript, hashType) {
+    typeforce(
+      types.tuple(types.UInt32, types.Buffer, /* types.UInt8 */ types.Number),
+      arguments,
+    );
+    // https://github.com/bitcoin/bitcoin/blob/master/src/test/sighash_tests.cpp#L29
+    if (inIndex >= this.ins.length) return ONE;
+    // ignore OP_CODESEPARATOR
+    const ourScript = bscript.compile(
+      bscript.decompile(prevOutScript).filter(x => {
+        return x !== script_1.OPS.OP_CODESEPARATOR;
+      }),
+    );
+    const txTmp = this.clone();
+    // SIGHASH_NONE: ignore all outputs? (wildcard payee)
+    if ((hashType & 0x1f) === Transaction.SIGHASH_NONE) {
+      txTmp.outs = [];
+      // ignore sequence numbers (except at inIndex)
+      txTmp.ins.forEach((input, i) => {
+        if (i === inIndex) return;
+        input.sequence = 0;
+      });
+      // SIGHASH_SINGLE: ignore all outputs, except at the same index?
+    } else if ((hashType & 0x1f) === Transaction.SIGHASH_SINGLE) {
+      // https://github.com/bitcoin/bitcoin/blob/master/src/test/sighash_tests.cpp#L60
+      if (inIndex >= this.outs.length) return ONE;
+      // truncate outputs after
+      txTmp.outs.length = inIndex + 1;
+      // "blank" outputs before
+      for (let i = 0; i < inIndex; i++) {
+        txTmp.outs[i] = BLANK_OUTPUT;
+      }
+      // ignore sequence numbers (except at inIndex)
+      txTmp.ins.forEach((input, y) => {
+        if (y === inIndex) return;
+        input.sequence = 0;
+      });
+    }
+    // SIGHASH_ANYONECANPAY: ignore inputs entirely?
+    if (hashType & Transaction.SIGHASH_ANYONECANPAY) {
+      txTmp.ins = [txTmp.ins[inIndex]];
+      txTmp.ins[0].script = ourScript;
+      // SIGHASH_ALL: only ignore input scripts
+    } else {
+      // "blank" others input scripts
+      txTmp.ins.forEach(input => {
+        input.script = EMPTY_SCRIPT;
+      });
+      txTmp.ins[inIndex].script = ourScript;
+    }
+    // serialize and hash
+    const buffer = Buffer.allocUnsafe(txTmp.__byteLength(false) + 4);
+    buffer.writeInt32LE(hashType, buffer.length - 4);
+    txTmp.__toBuffer(buffer, 0, false);
+    return bcrypto.hash256(buffer);
+  }
+  hashForWitnessV0(inIndex, prevOutScript, value, hashType) {
+    typeforce(
+      types.tuple(types.UInt32, types.Buffer, types.Satoshi, types.UInt32),
+      arguments,
+    );
+    let tbuffer = Buffer.from([]);
+    let toffset = 0;
+    function writeSlice(slice) {
+      toffset += slice.copy(tbuffer, toffset);
+    }
+    function writeUInt32(i) {
+      toffset = tbuffer.writeUInt32LE(i, toffset);
+    }
+    function writeUInt64(i) {
+      toffset = bufferutils.writeUInt64LE(tbuffer, i, toffset);
+    }
+    function writeVarInt(i) {
+      varuint.encode(i, tbuffer, toffset);
+      toffset += varuint.encode.bytes;
+    }
+    function writeVarSlice(slice) {
+      writeVarInt(slice.length);
+      writeSlice(slice);
+    }
+    let hashOutputs = ZERO;
+    let hashPrevouts = ZERO;
+    let hashSequence = ZERO;
+    if (!(hashType & Transaction.SIGHASH_ANYONECANPAY)) {
+      tbuffer = Buffer.allocUnsafe(36 * this.ins.length);
+      toffset = 0;
+      this.ins.forEach(txIn => {
+        writeSlice(txIn.hash);
+        writeUInt32(txIn.index);
+      });
+      hashPrevouts = bcrypto.hash256(tbuffer);
+    }
+    if (
+      !(hashType & Transaction.SIGHASH_ANYONECANPAY) &&
+      (hashType & 0x1f) !== Transaction.SIGHASH_SINGLE &&
+      (hashType & 0x1f) !== Transaction.SIGHASH_NONE
+    ) {
+      tbuffer = Buffer.allocUnsafe(4 * this.ins.length);
+      toffset = 0;
+      this.ins.forEach(txIn => {
+        writeUInt32(txIn.sequence);
+      });
+      hashSequence = bcrypto.hash256(tbuffer);
+    }
+    if (
+      (hashType & 0x1f) !== Transaction.SIGHASH_SINGLE &&
+      (hashType & 0x1f) !== Transaction.SIGHASH_NONE
+    ) {
+      const txOutsSize = this.outs.reduce((sum, output) => {
+        return sum + 8 + varSliceSize(output.script);
+      }, 0);
+      tbuffer = Buffer.allocUnsafe(txOutsSize);
+      toffset = 0;
+      this.outs.forEach(out => {
+        writeUInt64(out.value);
+        writeVarSlice(out.script);
+      });
+      hashOutputs = bcrypto.hash256(tbuffer);
+    } else if (
+      (hashType & 0x1f) === Transaction.SIGHASH_SINGLE &&
+      inIndex < this.outs.length
+    ) {
+      const output = this.outs[inIndex];
+      tbuffer = Buffer.allocUnsafe(8 + varSliceSize(output.script));
+      toffset = 0;
+      writeUInt64(output.value);
+      writeVarSlice(output.script);
+      hashOutputs = bcrypto.hash256(tbuffer);
+    }
+    tbuffer = Buffer.allocUnsafe(156 + varSliceSize(prevOutScript));
+    toffset = 0;
+    const input = this.ins[inIndex];
+    writeUInt32(this.version);
+    writeSlice(hashPrevouts);
+    writeSlice(hashSequence);
+    writeSlice(input.hash);
+    writeUInt32(input.index);
+    writeVarSlice(prevOutScript);
+    writeUInt64(value);
+    writeUInt32(input.sequence);
+    writeSlice(hashOutputs);
+    writeUInt32(this.locktime);
+    writeUInt32(hashType);
+    return bcrypto.hash256(tbuffer);
+  }
+  getHash(forWitness) {
+    // wtxid for coinbase is always 32 bytes of 0x00
+    if (forWitness && this.isCoinbase()) return Buffer.alloc(32, 0);
+    return bcrypto.hash256(this.__toBuffer(undefined, undefined, forWitness));
+  }
+  getId() {
+    // transaction hash's are displayed in reverse order
+    return bufferutils_1.reverseBuffer(this.getHash(false)).toString('hex');
+  }
+  toBuffer(buffer, initialOffset) {
+    return this.__toBuffer(buffer, initialOffset, true);
+  }
+  toHex() {
+    return this.toBuffer(undefined, undefined).toString('hex');
+  }
+  setInputScript(index, scriptSig) {
+    typeforce(types.tuple(types.Number, types.Buffer), arguments);
+    this.ins[index].script = scriptSig;
+  }
+  setWitness(index, witness) {
+    typeforce(types.tuple(types.Number, [types.Buffer]), arguments);
+    this.ins[index].witness = witness;
+  }
+  __byteLength(_ALLOW_WITNESS) {
+    const hasWitnesses = _ALLOW_WITNESS && this.hasWitnesses();
+    return (
+      (hasWitnesses ? 10 : 8) +
+      varuint.encodingLength(this.ins.length) +
+      varuint.encodingLength(this.outs.length) +
+      this.ins.reduce((sum, input) => {
+        return sum + 40 + varSliceSize(input.script);
+      }, 0) +
+      this.outs.reduce((sum, output) => {
+        return sum + 8 + varSliceSize(output.script);
+      }, 0) +
+      (hasWitnesses
+        ? this.ins.reduce((sum, input) => {
+            return sum + vectorSize(input.witness);
+          }, 0)
+        : 0)
+    );
+  }
+  __toBuffer(buffer, initialOffset, _ALLOW_WITNESS) {
+    if (!buffer) buffer = Buffer.allocUnsafe(this.__byteLength(_ALLOW_WITNESS));
+    let offset = initialOffset || 0;
+    function writeSlice(slice) {
+      offset += slice.copy(buffer, offset);
+    }
+    function writeUInt8(i) {
+      offset = buffer.writeUInt8(i, offset);
+    }
+    function writeUInt32(i) {
+      offset = buffer.writeUInt32LE(i, offset);
+    }
+    function writeInt32(i) {
+      offset = buffer.writeInt32LE(i, offset);
+    }
+    function writeUInt64(i) {
+      offset = bufferutils.writeUInt64LE(buffer, i, offset);
+    }
+    function writeVarInt(i) {
+      varuint.encode(i, buffer, offset);
+      offset += varuint.encode.bytes;
+    }
+    function writeVarSlice(slice) {
+      writeVarInt(slice.length);
+      writeSlice(slice);
+    }
+    function writeVector(vector) {
+      writeVarInt(vector.length);
+      vector.forEach(writeVarSlice);
+    }
+    writeInt32(this.version);
+    const hasWitnesses = _ALLOW_WITNESS && this.hasWitnesses();
+    if (hasWitnesses) {
+      writeUInt8(Transaction.ADVANCED_TRANSACTION_MARKER);
+      writeUInt8(Transaction.ADVANCED_TRANSACTION_FLAG);
+    }
+    writeVarInt(this.ins.length);
+    this.ins.forEach(txIn => {
+      writeSlice(txIn.hash);
+      writeUInt32(txIn.index);
+      writeVarSlice(txIn.script);
+      writeUInt32(txIn.sequence);
+    });
+    writeVarInt(this.outs.length);
+    this.outs.forEach(txOut => {
+      if (isOutput(txOut)) {
+        writeUInt64(txOut.value);
+      } else {
+        writeSlice(txOut.valueBuffer);
+      }
+      writeVarSlice(txOut.script);
+    });
+    if (hasWitnesses) {
+      this.ins.forEach(input => {
+        writeVector(input.witness);
+      });
+    }
+    writeUInt32(this.locktime);
+    // avoid slicing unless necessary
+    if (initialOffset !== undefined) return buffer.slice(initialOffset, offset);
+    return buffer;
+  }
+}
+Transaction.DEFAULT_SEQUENCE = 0xffffffff;
+Transaction.SIGHASH_ALL = 0x01;
+Transaction.SIGHASH_NONE = 0x02;
+Transaction.SIGHASH_SINGLE = 0x03;
+Transaction.SIGHASH_ANYONECANPAY = 0x80;
+Transaction.ADVANCED_TRANSACTION_MARKER = 0x00;
+Transaction.ADVANCED_TRANSACTION_FLAG = 0x01;
+exports.Transaction = Transaction;
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../node-libs-browser/node_modules/buffer/index.js */ "../../node_modules/node-libs-browser/node_modules/buffer/index.js").Buffer))
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/transaction_builder.js":
+/*!***********************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/transaction_builder.js ***!
+  \***********************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(Buffer) {
+Object.defineProperty(exports, '__esModule', { value: true });
+const baddress = __webpack_require__(/*! ./address */ "../../node_modules/bitcoinjs-lib/src/address.js");
+const bufferutils_1 = __webpack_require__(/*! ./bufferutils */ "../../node_modules/bitcoinjs-lib/src/bufferutils.js");
+const classify = __webpack_require__(/*! ./classify */ "../../node_modules/bitcoinjs-lib/src/classify.js");
+const bcrypto = __webpack_require__(/*! ./crypto */ "../../node_modules/bitcoinjs-lib/src/crypto.js");
+const ECPair = __webpack_require__(/*! ./ecpair */ "../../node_modules/bitcoinjs-lib/src/ecpair.js");
+const networks = __webpack_require__(/*! ./networks */ "../../node_modules/bitcoinjs-lib/src/networks.js");
+const payments = __webpack_require__(/*! ./payments */ "../../node_modules/bitcoinjs-lib/src/payments/index.js");
+const bscript = __webpack_require__(/*! ./script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+const script_1 = __webpack_require__(/*! ./script */ "../../node_modules/bitcoinjs-lib/src/script.js");
+const transaction_1 = __webpack_require__(/*! ./transaction */ "../../node_modules/bitcoinjs-lib/src/transaction.js");
+const types = __webpack_require__(/*! ./types */ "../../node_modules/bitcoinjs-lib/src/types.js");
+const typeforce = __webpack_require__(/*! typeforce */ "../../node_modules/typeforce/index.js");
+const SCRIPT_TYPES = classify.types;
+function txIsString(tx) {
+  return typeof tx === 'string' || tx instanceof String;
+}
+function txIsTransaction(tx) {
+  return tx instanceof transaction_1.Transaction;
+}
+class TransactionBuilder {
+  // WARNING: maximumFeeRate is __NOT__ to be relied on,
+  //          it's just another potential safety mechanism (safety in-depth)
+  constructor(network = networks.bitcoin, maximumFeeRate = 2500) {
+    this.network = network;
+    this.maximumFeeRate = maximumFeeRate;
+    this.__PREV_TX_SET = {};
+    this.__INPUTS = [];
+    this.__TX = new transaction_1.Transaction();
+    this.__TX.version = 2;
+    this.__USE_LOW_R = false;
+  }
+  static fromTransaction(transaction, network) {
+    const txb = new TransactionBuilder(network);
+    // Copy transaction fields
+    txb.setVersion(transaction.version);
+    txb.setLockTime(transaction.locktime);
+    // Copy outputs (done first to avoid signature invalidation)
+    transaction.outs.forEach(txOut => {
+      txb.addOutput(txOut.script, txOut.value);
+    });
+    // Copy inputs
+    transaction.ins.forEach(txIn => {
+      txb.__addInputUnsafe(txIn.hash, txIn.index, {
+        sequence: txIn.sequence,
+        script: txIn.script,
+        witness: txIn.witness,
+      });
+    });
+    // fix some things not possible through the public API
+    txb.__INPUTS.forEach((input, i) => {
+      fixMultisigOrder(input, transaction, i);
+    });
+    return txb;
+  }
+  setLowR(setting) {
+    typeforce(typeforce.maybe(typeforce.Boolean), setting);
+    if (setting === undefined) {
+      setting = true;
+    }
+    this.__USE_LOW_R = setting;
+    return setting;
+  }
+  setLockTime(locktime) {
+    typeforce(types.UInt32, locktime);
+    // if any signatures exist, throw
+    if (
+      this.__INPUTS.some(input => {
+        if (!input.signatures) return false;
+        return input.signatures.some(s => s !== undefined);
+      })
+    ) {
+      throw new Error('No, this would invalidate signatures');
+    }
+    this.__TX.locktime = locktime;
+  }
+  setVersion(version) {
+    typeforce(types.UInt32, version);
+    // XXX: this might eventually become more complex depending on what the versions represent
+    this.__TX.version = version;
+  }
+  addInput(txHash, vout, sequence, prevOutScript) {
+    if (!this.__canModifyInputs()) {
+      throw new Error('No, this would invalidate signatures');
+    }
+    let value;
+    // is it a hex string?
+    if (txIsString(txHash)) {
+      // transaction hashs's are displayed in reverse order, un-reverse it
+      txHash = bufferutils_1.reverseBuffer(Buffer.from(txHash, 'hex'));
+      // is it a Transaction object?
+    } else if (txIsTransaction(txHash)) {
+      const txOut = txHash.outs[vout];
+      prevOutScript = txOut.script;
+      value = txOut.value;
+      txHash = txHash.getHash(false);
+    }
+    return this.__addInputUnsafe(txHash, vout, {
+      sequence,
+      prevOutScript,
+      value,
+    });
+  }
+  addOutput(scriptPubKey, value) {
+    if (!this.__canModifyOutputs()) {
+      throw new Error('No, this would invalidate signatures');
+    }
+    // Attempt to get a script if it's a base58 or bech32 address string
+    if (typeof scriptPubKey === 'string') {
+      scriptPubKey = baddress.toOutputScript(scriptPubKey, this.network);
+    }
+    return this.__TX.addOutput(scriptPubKey, value);
+  }
+  build() {
+    return this.__build(false);
+  }
+  buildIncomplete() {
+    return this.__build(true);
+  }
+  sign(vin, keyPair, redeemScript, hashType, witnessValue, witnessScript) {
+    // TODO: remove keyPair.network matching in 4.0.0
+    if (keyPair.network && keyPair.network !== this.network)
+      throw new TypeError('Inconsistent network');
+    if (!this.__INPUTS[vin]) throw new Error('No input at index: ' + vin);
+    hashType = hashType || transaction_1.Transaction.SIGHASH_ALL;
+    if (this.__needsOutputs(hashType))
+      throw new Error('Transaction needs outputs');
+    const input = this.__INPUTS[vin];
+    // if redeemScript was previously provided, enforce consistency
+    if (
+      input.redeemScript !== undefined &&
+      redeemScript &&
+      !input.redeemScript.equals(redeemScript)
+    ) {
+      throw new Error('Inconsistent redeemScript');
+    }
+    const ourPubKey = keyPair.publicKey || keyPair.getPublicKey();
+    if (!canSign(input)) {
+      if (witnessValue !== undefined) {
+        if (input.value !== undefined && input.value !== witnessValue)
+          throw new Error('Input did not match witnessValue');
+        typeforce(types.Satoshi, witnessValue);
+        input.value = witnessValue;
+      }
+      if (!canSign(input)) {
+        const prepared = prepareInput(
+          input,
+          ourPubKey,
+          redeemScript,
+          witnessScript,
+        );
+        // updates inline
+        Object.assign(input, prepared);
+      }
+      if (!canSign(input)) throw Error(input.prevOutType + ' not supported');
+    }
+    // ready to sign
+    let signatureHash;
+    if (input.hasWitness) {
+      signatureHash = this.__TX.hashForWitnessV0(
+        vin,
+        input.signScript,
+        input.value,
+        hashType,
+      );
+    } else {
+      signatureHash = this.__TX.hashForSignature(
+        vin,
+        input.signScript,
+        hashType,
+      );
+    }
+    // enforce in order signing of public keys
+    const signed = input.pubkeys.some((pubKey, i) => {
+      if (!ourPubKey.equals(pubKey)) return false;
+      if (input.signatures[i]) throw new Error('Signature already exists');
+      // TODO: add tests
+      if (ourPubKey.length !== 33 && input.hasWitness) {
+        throw new Error(
+          'BIP143 rejects uncompressed public keys in P2WPKH or P2WSH',
+        );
+      }
+      const signature = keyPair.sign(signatureHash, this.__USE_LOW_R);
+      input.signatures[i] = bscript.signature.encode(signature, hashType);
+      return true;
+    });
+    if (!signed) throw new Error('Key pair cannot sign for this input');
+  }
+  __addInputUnsafe(txHash, vout, options) {
+    if (transaction_1.Transaction.isCoinbaseHash(txHash)) {
+      throw new Error('coinbase inputs not supported');
+    }
+    const prevTxOut = txHash.toString('hex') + ':' + vout;
+    if (this.__PREV_TX_SET[prevTxOut] !== undefined)
+      throw new Error('Duplicate TxOut: ' + prevTxOut);
+    let input = {};
+    // derive what we can from the scriptSig
+    if (options.script !== undefined) {
+      input = expandInput(options.script, options.witness || []);
+    }
+    // if an input value was given, retain it
+    if (options.value !== undefined) {
+      input.value = options.value;
+    }
+    // derive what we can from the previous transactions output script
+    if (!input.prevOutScript && options.prevOutScript) {
+      let prevOutType;
+      if (!input.pubkeys && !input.signatures) {
+        const expanded = expandOutput(options.prevOutScript);
+        if (expanded.pubkeys) {
+          input.pubkeys = expanded.pubkeys;
+          input.signatures = expanded.signatures;
+        }
+        prevOutType = expanded.type;
+      }
+      input.prevOutScript = options.prevOutScript;
+      input.prevOutType = prevOutType || classify.output(options.prevOutScript);
+    }
+    const vin = this.__TX.addInput(
+      txHash,
+      vout,
+      options.sequence,
+      options.scriptSig,
+    );
+    this.__INPUTS[vin] = input;
+    this.__PREV_TX_SET[prevTxOut] = true;
+    return vin;
+  }
+  __build(allowIncomplete) {
+    if (!allowIncomplete) {
+      if (!this.__TX.ins.length) throw new Error('Transaction has no inputs');
+      if (!this.__TX.outs.length) throw new Error('Transaction has no outputs');
+    }
+    const tx = this.__TX.clone();
+    // create script signatures from inputs
+    this.__INPUTS.forEach((input, i) => {
+      if (!input.prevOutType && !allowIncomplete)
+        throw new Error('Transaction is not complete');
+      const result = build(input.prevOutType, input, allowIncomplete);
+      if (!result) {
+        if (!allowIncomplete && input.prevOutType === SCRIPT_TYPES.NONSTANDARD)
+          throw new Error('Unknown input type');
+        if (!allowIncomplete) throw new Error('Not enough information');
+        return;
+      }
+      tx.setInputScript(i, result.input);
+      tx.setWitness(i, result.witness);
+    });
+    if (!allowIncomplete) {
+      // do not rely on this, its merely a last resort
+      if (this.__overMaximumFees(tx.virtualSize())) {
+        throw new Error('Transaction has absurd fees');
+      }
+    }
+    return tx;
+  }
+  __canModifyInputs() {
+    return this.__INPUTS.every(input => {
+      if (!input.signatures) return true;
+      return input.signatures.every(signature => {
+        if (!signature) return true;
+        const hashType = signatureHashType(signature);
+        // if SIGHASH_ANYONECANPAY is set, signatures would not
+        // be invalidated by more inputs
+        return (
+          (hashType & transaction_1.Transaction.SIGHASH_ANYONECANPAY) !== 0
+        );
+      });
+    });
+  }
+  __needsOutputs(signingHashType) {
+    if (signingHashType === transaction_1.Transaction.SIGHASH_ALL) {
+      return this.__TX.outs.length === 0;
+    }
+    // if inputs are being signed with SIGHASH_NONE, we don't strictly need outputs
+    // .build() will fail, but .buildIncomplete() is OK
+    return (
+      this.__TX.outs.length === 0 &&
+      this.__INPUTS.some(input => {
+        if (!input.signatures) return false;
+        return input.signatures.some(signature => {
+          if (!signature) return false; // no signature, no issue
+          const hashType = signatureHashType(signature);
+          if (hashType & transaction_1.Transaction.SIGHASH_NONE) return false; // SIGHASH_NONE doesn't care about outputs
+          return true; // SIGHASH_* does care
+        });
+      })
+    );
+  }
+  __canModifyOutputs() {
+    const nInputs = this.__TX.ins.length;
+    const nOutputs = this.__TX.outs.length;
+    return this.__INPUTS.every(input => {
+      if (input.signatures === undefined) return true;
+      return input.signatures.every(signature => {
+        if (!signature) return true;
+        const hashType = signatureHashType(signature);
+        const hashTypeMod = hashType & 0x1f;
+        if (hashTypeMod === transaction_1.Transaction.SIGHASH_NONE) return true;
+        if (hashTypeMod === transaction_1.Transaction.SIGHASH_SINGLE) {
+          // if SIGHASH_SINGLE is set, and nInputs > nOutputs
+          // some signatures would be invalidated by the addition
+          // of more outputs
+          return nInputs <= nOutputs;
+        }
+        return false;
+      });
+    });
+  }
+  __overMaximumFees(bytes) {
+    // not all inputs will have .value defined
+    const incoming = this.__INPUTS.reduce((a, x) => a + (x.value >>> 0), 0);
+    // but all outputs do, and if we have any input value
+    // we can immediately determine if the outputs are too small
+    const outgoing = this.__TX.outs.reduce((a, x) => a + x.value, 0);
+    const fee = incoming - outgoing;
+    const feeRate = fee / bytes;
+    return feeRate > this.maximumFeeRate;
+  }
+}
+exports.TransactionBuilder = TransactionBuilder;
+function expandInput(scriptSig, witnessStack, type, scriptPubKey) {
+  if (scriptSig.length === 0 && witnessStack.length === 0) return {};
+  if (!type) {
+    let ssType = classify.input(scriptSig, true);
+    let wsType = classify.witness(witnessStack, true);
+    if (ssType === SCRIPT_TYPES.NONSTANDARD) ssType = undefined;
+    if (wsType === SCRIPT_TYPES.NONSTANDARD) wsType = undefined;
+    type = ssType || wsType;
+  }
+  switch (type) {
+    case SCRIPT_TYPES.P2WPKH: {
+      const { output, pubkey, signature } = payments.p2wpkh({
+        witness: witnessStack,
+      });
+      return {
+        prevOutScript: output,
+        prevOutType: SCRIPT_TYPES.P2WPKH,
+        pubkeys: [pubkey],
+        signatures: [signature],
+      };
+    }
+    case SCRIPT_TYPES.P2PKH: {
+      const { output, pubkey, signature } = payments.p2pkh({
+        input: scriptSig,
+      });
+      return {
+        prevOutScript: output,
+        prevOutType: SCRIPT_TYPES.P2PKH,
+        pubkeys: [pubkey],
+        signatures: [signature],
+      };
+    }
+    case SCRIPT_TYPES.P2PK: {
+      const { signature } = payments.p2pk({ input: scriptSig });
+      return {
+        prevOutType: SCRIPT_TYPES.P2PK,
+        pubkeys: [undefined],
+        signatures: [signature],
+      };
+    }
+    case SCRIPT_TYPES.P2MS: {
+      const { m, pubkeys, signatures } = payments.p2ms(
+        {
+          input: scriptSig,
+          output: scriptPubKey,
+        },
+        { allowIncomplete: true },
+      );
+      return {
+        prevOutType: SCRIPT_TYPES.P2MS,
+        pubkeys,
+        signatures,
+        maxSignatures: m,
+      };
+    }
+  }
+  if (type === SCRIPT_TYPES.P2SH) {
+    const { output, redeem } = payments.p2sh({
+      input: scriptSig,
+      witness: witnessStack,
+    });
+    const outputType = classify.output(redeem.output);
+    const expanded = expandInput(
+      redeem.input,
+      redeem.witness,
+      outputType,
+      redeem.output,
+    );
+    if (!expanded.prevOutType) return {};
+    return {
+      prevOutScript: output,
+      prevOutType: SCRIPT_TYPES.P2SH,
+      redeemScript: redeem.output,
+      redeemScriptType: expanded.prevOutType,
+      witnessScript: expanded.witnessScript,
+      witnessScriptType: expanded.witnessScriptType,
+      pubkeys: expanded.pubkeys,
+      signatures: expanded.signatures,
+    };
+  }
+  if (type === SCRIPT_TYPES.P2WSH) {
+    const { output, redeem } = payments.p2wsh({
+      input: scriptSig,
+      witness: witnessStack,
+    });
+    const outputType = classify.output(redeem.output);
+    let expanded;
+    if (outputType === SCRIPT_TYPES.P2WPKH) {
+      expanded = expandInput(redeem.input, redeem.witness, outputType);
+    } else {
+      expanded = expandInput(
+        bscript.compile(redeem.witness),
+        [],
+        outputType,
+        redeem.output,
+      );
+    }
+    if (!expanded.prevOutType) return {};
+    return {
+      prevOutScript: output,
+      prevOutType: SCRIPT_TYPES.P2WSH,
+      witnessScript: redeem.output,
+      witnessScriptType: expanded.prevOutType,
+      pubkeys: expanded.pubkeys,
+      signatures: expanded.signatures,
+    };
+  }
+  return {
+    prevOutType: SCRIPT_TYPES.NONSTANDARD,
+    prevOutScript: scriptSig,
+  };
+}
+// could be done in expandInput, but requires the original Transaction for hashForSignature
+function fixMultisigOrder(input, transaction, vin) {
+  if (input.redeemScriptType !== SCRIPT_TYPES.P2MS || !input.redeemScript)
+    return;
+  if (input.pubkeys.length === input.signatures.length) return;
+  const unmatched = input.signatures.concat();
+  input.signatures = input.pubkeys.map(pubKey => {
+    const keyPair = ECPair.fromPublicKey(pubKey);
+    let match;
+    // check for a signature
+    unmatched.some((signature, i) => {
+      // skip if undefined || OP_0
+      if (!signature) return false;
+      // TODO: avoid O(n) hashForSignature
+      const parsed = bscript.signature.decode(signature);
+      const hash = transaction.hashForSignature(
+        vin,
+        input.redeemScript,
+        parsed.hashType,
+      );
+      // skip if signature does not match pubKey
+      if (!keyPair.verify(hash, parsed.signature)) return false;
+      // remove matched signature from unmatched
+      unmatched[i] = undefined;
+      match = signature;
+      return true;
+    });
+    return match;
+  });
+}
+function expandOutput(script, ourPubKey) {
+  typeforce(types.Buffer, script);
+  const type = classify.output(script);
+  switch (type) {
+    case SCRIPT_TYPES.P2PKH: {
+      if (!ourPubKey) return { type };
+      // does our hash160(pubKey) match the output scripts?
+      const pkh1 = payments.p2pkh({ output: script }).hash;
+      const pkh2 = bcrypto.hash160(ourPubKey);
+      if (!pkh1.equals(pkh2)) return { type };
+      return {
+        type,
+        pubkeys: [ourPubKey],
+        signatures: [undefined],
+      };
+    }
+    case SCRIPT_TYPES.P2WPKH: {
+      if (!ourPubKey) return { type };
+      // does our hash160(pubKey) match the output scripts?
+      const wpkh1 = payments.p2wpkh({ output: script }).hash;
+      const wpkh2 = bcrypto.hash160(ourPubKey);
+      if (!wpkh1.equals(wpkh2)) return { type };
+      return {
+        type,
+        pubkeys: [ourPubKey],
+        signatures: [undefined],
+      };
+    }
+    case SCRIPT_TYPES.P2PK: {
+      const p2pk = payments.p2pk({ output: script });
+      return {
+        type,
+        pubkeys: [p2pk.pubkey],
+        signatures: [undefined],
+      };
+    }
+    case SCRIPT_TYPES.P2MS: {
+      const p2ms = payments.p2ms({ output: script });
+      return {
+        type,
+        pubkeys: p2ms.pubkeys,
+        signatures: p2ms.pubkeys.map(() => undefined),
+        maxSignatures: p2ms.m,
+      };
+    }
+  }
+  return { type };
+}
+function prepareInput(input, ourPubKey, redeemScript, witnessScript) {
+  if (redeemScript && witnessScript) {
+    const p2wsh = payments.p2wsh({
+      redeem: { output: witnessScript },
+    });
+    const p2wshAlt = payments.p2wsh({ output: redeemScript });
+    const p2sh = payments.p2sh({ redeem: { output: redeemScript } });
+    const p2shAlt = payments.p2sh({ redeem: p2wsh });
+    // enforces P2SH(P2WSH(...))
+    if (!p2wsh.hash.equals(p2wshAlt.hash))
+      throw new Error('Witness script inconsistent with prevOutScript');
+    if (!p2sh.hash.equals(p2shAlt.hash))
+      throw new Error('Redeem script inconsistent with prevOutScript');
+    const expanded = expandOutput(p2wsh.redeem.output, ourPubKey);
+    if (!expanded.pubkeys)
+      throw new Error(
+        expanded.type +
+          ' not supported as witnessScript (' +
+          bscript.toASM(witnessScript) +
+          ')',
+      );
+    if (input.signatures && input.signatures.some(x => x !== undefined)) {
+      expanded.signatures = input.signatures;
+    }
+    const signScript = witnessScript;
+    if (expanded.type === SCRIPT_TYPES.P2WPKH)
+      throw new Error('P2SH(P2WSH(P2WPKH)) is a consensus failure');
+    return {
+      redeemScript,
+      redeemScriptType: SCRIPT_TYPES.P2WSH,
+      witnessScript,
+      witnessScriptType: expanded.type,
+      prevOutType: SCRIPT_TYPES.P2SH,
+      prevOutScript: p2sh.output,
+      hasWitness: true,
+      signScript,
+      signType: expanded.type,
+      pubkeys: expanded.pubkeys,
+      signatures: expanded.signatures,
+      maxSignatures: expanded.maxSignatures,
+    };
+  }
+  if (redeemScript) {
+    const p2sh = payments.p2sh({ redeem: { output: redeemScript } });
+    if (input.prevOutScript) {
+      let p2shAlt;
+      try {
+        p2shAlt = payments.p2sh({ output: input.prevOutScript });
+      } catch (e) {
+        throw new Error('PrevOutScript must be P2SH');
+      }
+      if (!p2sh.hash.equals(p2shAlt.hash))
+        throw new Error('Redeem script inconsistent with prevOutScript');
+    }
+    const expanded = expandOutput(p2sh.redeem.output, ourPubKey);
+    if (!expanded.pubkeys)
+      throw new Error(
+        expanded.type +
+          ' not supported as redeemScript (' +
+          bscript.toASM(redeemScript) +
+          ')',
+      );
+    if (input.signatures && input.signatures.some(x => x !== undefined)) {
+      expanded.signatures = input.signatures;
+    }
+    let signScript = redeemScript;
+    if (expanded.type === SCRIPT_TYPES.P2WPKH) {
+      signScript = payments.p2pkh({ pubkey: expanded.pubkeys[0] }).output;
+    }
+    return {
+      redeemScript,
+      redeemScriptType: expanded.type,
+      prevOutType: SCRIPT_TYPES.P2SH,
+      prevOutScript: p2sh.output,
+      hasWitness: expanded.type === SCRIPT_TYPES.P2WPKH,
+      signScript,
+      signType: expanded.type,
+      pubkeys: expanded.pubkeys,
+      signatures: expanded.signatures,
+      maxSignatures: expanded.maxSignatures,
+    };
+  }
+  if (witnessScript) {
+    const p2wsh = payments.p2wsh({ redeem: { output: witnessScript } });
+    if (input.prevOutScript) {
+      const p2wshAlt = payments.p2wsh({ output: input.prevOutScript });
+      if (!p2wsh.hash.equals(p2wshAlt.hash))
+        throw new Error('Witness script inconsistent with prevOutScript');
+    }
+    const expanded = expandOutput(p2wsh.redeem.output, ourPubKey);
+    if (!expanded.pubkeys)
+      throw new Error(
+        expanded.type +
+          ' not supported as witnessScript (' +
+          bscript.toASM(witnessScript) +
+          ')',
+      );
+    if (input.signatures && input.signatures.some(x => x !== undefined)) {
+      expanded.signatures = input.signatures;
+    }
+    const signScript = witnessScript;
+    if (expanded.type === SCRIPT_TYPES.P2WPKH)
+      throw new Error('P2WSH(P2WPKH) is a consensus failure');
+    return {
+      witnessScript,
+      witnessScriptType: expanded.type,
+      prevOutType: SCRIPT_TYPES.P2WSH,
+      prevOutScript: p2wsh.output,
+      hasWitness: true,
+      signScript,
+      signType: expanded.type,
+      pubkeys: expanded.pubkeys,
+      signatures: expanded.signatures,
+      maxSignatures: expanded.maxSignatures,
+    };
+  }
+  if (input.prevOutType && input.prevOutScript) {
+    // embedded scripts are not possible without extra information
+    if (input.prevOutType === SCRIPT_TYPES.P2SH)
+      throw new Error(
+        'PrevOutScript is ' + input.prevOutType + ', requires redeemScript',
+      );
+    if (input.prevOutType === SCRIPT_TYPES.P2WSH)
+      throw new Error(
+        'PrevOutScript is ' + input.prevOutType + ', requires witnessScript',
+      );
+    if (!input.prevOutScript) throw new Error('PrevOutScript is missing');
+    const expanded = expandOutput(input.prevOutScript, ourPubKey);
+    if (!expanded.pubkeys)
+      throw new Error(
+        expanded.type +
+          ' not supported (' +
+          bscript.toASM(input.prevOutScript) +
+          ')',
+      );
+    if (input.signatures && input.signatures.some(x => x !== undefined)) {
+      expanded.signatures = input.signatures;
+    }
+    let signScript = input.prevOutScript;
+    if (expanded.type === SCRIPT_TYPES.P2WPKH) {
+      signScript = payments.p2pkh({ pubkey: expanded.pubkeys[0] }).output;
+    }
+    return {
+      prevOutType: expanded.type,
+      prevOutScript: input.prevOutScript,
+      hasWitness: expanded.type === SCRIPT_TYPES.P2WPKH,
+      signScript,
+      signType: expanded.type,
+      pubkeys: expanded.pubkeys,
+      signatures: expanded.signatures,
+      maxSignatures: expanded.maxSignatures,
+    };
+  }
+  const prevOutScript = payments.p2pkh({ pubkey: ourPubKey }).output;
+  return {
+    prevOutType: SCRIPT_TYPES.P2PKH,
+    prevOutScript,
+    hasWitness: false,
+    signScript: prevOutScript,
+    signType: SCRIPT_TYPES.P2PKH,
+    pubkeys: [ourPubKey],
+    signatures: [undefined],
+  };
+}
+function build(type, input, allowIncomplete) {
+  const pubkeys = input.pubkeys || [];
+  let signatures = input.signatures || [];
+  switch (type) {
+    case SCRIPT_TYPES.P2PKH: {
+      if (pubkeys.length === 0) break;
+      if (signatures.length === 0) break;
+      return payments.p2pkh({ pubkey: pubkeys[0], signature: signatures[0] });
+    }
+    case SCRIPT_TYPES.P2WPKH: {
+      if (pubkeys.length === 0) break;
+      if (signatures.length === 0) break;
+      return payments.p2wpkh({ pubkey: pubkeys[0], signature: signatures[0] });
+    }
+    case SCRIPT_TYPES.P2PK: {
+      if (pubkeys.length === 0) break;
+      if (signatures.length === 0) break;
+      return payments.p2pk({ signature: signatures[0] });
+    }
+    case SCRIPT_TYPES.P2MS: {
+      const m = input.maxSignatures;
+      if (allowIncomplete) {
+        signatures = signatures.map(x => x || script_1.OPS.OP_0);
+      } else {
+        signatures = signatures.filter(x => x);
+      }
+      // if the transaction is not not complete (complete), or if signatures.length === m, validate
+      // otherwise, the number of OP_0's may be >= m, so don't validate (boo)
+      const validate = !allowIncomplete || m === signatures.length;
+      return payments.p2ms(
+        { m, pubkeys, signatures },
+        { allowIncomplete, validate },
+      );
+    }
+    case SCRIPT_TYPES.P2SH: {
+      const redeem = build(input.redeemScriptType, input, allowIncomplete);
+      if (!redeem) return;
+      return payments.p2sh({
+        redeem: {
+          output: redeem.output || input.redeemScript,
+          input: redeem.input,
+          witness: redeem.witness,
+        },
+      });
+    }
+    case SCRIPT_TYPES.P2WSH: {
+      const redeem = build(input.witnessScriptType, input, allowIncomplete);
+      if (!redeem) return;
+      return payments.p2wsh({
+        redeem: {
+          output: input.witnessScript,
+          input: redeem.input,
+          witness: redeem.witness,
+        },
+      });
+    }
+  }
+}
+function canSign(input) {
+  return (
+    input.signScript !== undefined &&
+    input.signType !== undefined &&
+    input.pubkeys !== undefined &&
+    input.signatures !== undefined &&
+    input.signatures.length === input.pubkeys.length &&
+    input.pubkeys.length > 0 &&
+    (input.hasWitness === false || input.value !== undefined)
+  );
+}
+function signatureHashType(buffer) {
+  return buffer.readUInt8(buffer.length - 1);
+}
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../node-libs-browser/node_modules/buffer/index.js */ "../../node_modules/node-libs-browser/node_modules/buffer/index.js").Buffer))
+
+/***/ }),
+
+/***/ "../../node_modules/bitcoinjs-lib/src/types.js":
+/*!*********************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/bitcoinjs-lib/src/types.js ***!
+  \*********************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, '__esModule', { value: true });
+const typeforce = __webpack_require__(/*! typeforce */ "../../node_modules/typeforce/index.js");
+const UINT31_MAX = Math.pow(2, 31) - 1;
+function UInt31(value) {
+  return typeforce.UInt32(value) && value <= UINT31_MAX;
+}
+exports.UInt31 = UInt31;
+function BIP32Path(value) {
+  return typeforce.String(value) && !!value.match(/^(m\/)?(\d+'?\/)*\d+'?$/);
+}
+exports.BIP32Path = BIP32Path;
+BIP32Path.toJSON = () => {
+  return 'BIP32 derivation path';
+};
+const SATOSHI_MAX = 21 * 1e14;
+function Satoshi(value) {
+  return typeforce.UInt53(value) && value <= SATOSHI_MAX;
+}
+exports.Satoshi = Satoshi;
+// external dependent types
+exports.ECPoint = typeforce.quacksLike('Point');
+// exposed, external API
+exports.Network = typeforce.compile({
+  messagePrefix: typeforce.oneOf(typeforce.Buffer, typeforce.String),
+  bip32: {
+    public: typeforce.UInt32,
+    private: typeforce.UInt32,
+  },
+  pubKeyHash: typeforce.UInt8,
+  scriptHash: typeforce.UInt8,
+  wif: typeforce.UInt8,
+});
+exports.Buffer256bit = typeforce.BufferN(32);
+exports.Hash160bit = typeforce.BufferN(20);
+exports.Hash256bit = typeforce.BufferN(32);
+exports.Number = typeforce.Number; // tslint:disable-line variable-name
+exports.Array = typeforce.Array;
+exports.Boolean = typeforce.Boolean; // tslint:disable-line variable-name
+exports.String = typeforce.String; // tslint:disable-line variable-name
+exports.Buffer = typeforce.Buffer;
+exports.Hex = typeforce.Hex;
+exports.maybe = typeforce.maybe;
+exports.tuple = typeforce.tuple;
+exports.UInt8 = typeforce.UInt8;
+exports.UInt32 = typeforce.UInt32;
+exports.Function = typeforce.Function;
+exports.BufferN = typeforce.BufferN;
+exports.Null = typeforce.Null;
+exports.oneOf = typeforce.oneOf;
+
 
 /***/ }),
 
@@ -16930,6 +21841,1699 @@ module.exports = CipherBase
 
 /***/ }),
 
+/***/ "../../node_modules/coininfo/lib/coininfo.js":
+/*!*******************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/coininfo/lib/coininfo.js ***!
+  \*******************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Buffer = __webpack_require__(/*! safe-buffer */ "../../node_modules/safe-buffer/index.js").Buffer
+
+// annoyingly, this is for browserify
+var coins = [
+  __webpack_require__(/*! ./coins/bch */ "../../node_modules/coininfo/lib/coins/bch.js"),
+  __webpack_require__(/*! ./coins/blk */ "../../node_modules/coininfo/lib/coins/blk.js"),
+  __webpack_require__(/*! ./coins/btc */ "../../node_modules/coininfo/lib/coins/btc.js"),
+  __webpack_require__(/*! ./coins/btg */ "../../node_modules/coininfo/lib/coins/btg.js"),
+  __webpack_require__(/*! ./coins/dash */ "../../node_modules/coininfo/lib/coins/dash.js"),
+  __webpack_require__(/*! ./coins/dcr */ "../../node_modules/coininfo/lib/coins/dcr.js"),
+  __webpack_require__(/*! ./coins/dgb */ "../../node_modules/coininfo/lib/coins/dgb.js"),
+  __webpack_require__(/*! ./coins/doge */ "../../node_modules/coininfo/lib/coins/doge.js"),
+  __webpack_require__(/*! ./coins/ltc */ "../../node_modules/coininfo/lib/coins/ltc.js"),
+  __webpack_require__(/*! ./coins/via */ "../../node_modules/coininfo/lib/coins/via.js"),
+  __webpack_require__(/*! ./coins/mona */ "../../node_modules/coininfo/lib/coins/mona.js"),
+  __webpack_require__(/*! ./coins/nbt */ "../../node_modules/coininfo/lib/coins/nbt.js"),
+  __webpack_require__(/*! ./coins/nmc */ "../../node_modules/coininfo/lib/coins/nmc.js"),
+  __webpack_require__(/*! ./coins/ppc */ "../../node_modules/coininfo/lib/coins/ppc.js"),
+  __webpack_require__(/*! ./coins/qtum */ "../../node_modules/coininfo/lib/coins/qtum.js"),
+  __webpack_require__(/*! ./coins/rvn */ "../../node_modules/coininfo/lib/coins/rvn.js"),
+  __webpack_require__(/*! ./coins/rdd */ "../../node_modules/coininfo/lib/coins/rdd.js"),
+  __webpack_require__(/*! ./coins/vtc */ "../../node_modules/coininfo/lib/coins/vtc.js"),
+  __webpack_require__(/*! ./coins/zec */ "../../node_modules/coininfo/lib/coins/zec.js")
+]
+
+var supportedCoins = {}
+
+coins.forEach(function (coin) {
+  var unit = coin.main.unit.toLowerCase()
+  var name = coin.main.name.toLowerCase()
+
+  coin.main.testnet = false
+  coin.main.toBitcoinJS = toBitcoinJS.bind(coin.main)
+  coin.main.toBitcore = toBitcore.bind(coin.main)
+  supportedCoins[unit] = coin.main
+  supportedCoins[name] = coin.main
+
+  if (coin.test) {
+    coin.test.testnet = true
+    coin.test.toBitcoinJS = toBitcoinJS.bind(coin.test)
+    coin.test.toBitcore = toBitcore.bind(coin.test)
+    supportedCoins[unit + '-test'] = coin.test
+    supportedCoins[name + '-test'] = coin.test
+  }
+
+  if (coin.regtest) {
+    coin.regtest.testnet = true
+    coin.regtest.toBitcoinJS = toBitcoinJS.bind(coin.regtest)
+    coin.regtest.toBitcore = toBitcore.bind(coin.regtest)
+    supportedCoins[unit + '-regtest'] = coin.regtest
+    supportedCoins[name + '-regtest'] = coin.regtest
+  }
+})
+
+function coininfo (input) {
+  var coin = input.toLowerCase()
+
+  if (!(coin in supportedCoins)) {
+    return null
+  } else {
+    return supportedCoins[coin]
+  }
+}
+
+coins.forEach(function (coin) {
+  coininfo[coin.main.name.toLowerCase()] = coin
+})
+
+function toBitcoinJS () {
+  return Object.assign({}, this, {
+    messagePrefix: this.messagePrefix || ('\x19' + this.name + ' Signed Message:\n'),
+    bech32: this.bech32,
+    bip32: {
+      public: (this.versions.bip32 || {}).public,
+      private: (this.versions.bip32 || {}).private
+    },
+    pubKeyHash: this.versions.public,
+    scriptHash: this.versions.scripthash,
+    wif: this.versions.private,
+    dustThreshold: null // TODO
+  })
+}
+
+function toBitcore () {
+  // reverse magic
+  var nm = Buffer.allocUnsafe(4)
+  nm.writeUInt32BE(this.protocol ? this.protocol.magic : 0, 0)
+  nm = nm.readUInt32LE(0)
+
+  return Object.assign({}, this, {
+    name: this.testnet ? 'testnet' : 'livenet',
+    alias: this.testnet ? 'testnet' : 'mainnet',
+    pubkeyhash: this.versions.public,
+    privatekey: this.versions.private,
+    scripthash: this.versions.scripthash,
+    xpubkey: (this.versions.bip32 || {}).public,
+    xprivkey: (this.versions.bip32 || {}).private,
+    networkMagic: nm,
+    port: this.port,
+    dnsSeeds: this.seedsDns || []
+  })
+}
+
+module.exports = coininfo
+
+
+/***/ }),
+
+/***/ "../../node_modules/coininfo/lib/coins/bch.js":
+/*!********************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/coininfo/lib/coins/bch.js ***!
+  \********************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports) {
+
+/*
+  info from:
+    https://github.com/Bitcoin-ABC/bitcoin-abc/blob/master/src/chainparams.cpp
+*/
+
+var common = {
+  name: 'BitcoinCash',
+  per1: 1e8,
+  unit: 'BCH'
+}
+
+var main = Object.assign({}, {
+  hashGenesisBlock: '000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f',
+  // nDefaultPort
+  port: 8333,
+  portRpc: 8332,
+  protocol: {
+    // pchMessageStart
+    magic: 0xe8f3e1e3 // careful, sent over wire as little endian
+  },
+  // vSeeds
+  seedsDns: [
+    'seed.bitcoinabc.org',
+    'seed-abc.bitcoinforks.org',
+    'btccash-seeder.bitcoinunlimited.info',
+    'seed.bitprim.org',
+    'seed.deadalnix.me',
+    'seeder.criptolayer.net'
+  ],
+  // base58Prefixes
+  versions: {
+    bip32: {
+      private: 0x0488ade4,
+      public: 0x0488b21e
+    },
+    bip44: 145,
+    private: 0x80,
+    public: 0x00,
+    scripthash: 0x05
+  }
+}, common)
+
+var test = Object.assign({}, {
+  hashGenesisBlock: '000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943',
+  port: 18333,
+  portRpc: 18332,
+  protocol: {
+    magic: 0xf4f3e5f4
+  },
+  seedsDns: [
+    'testnet-seed.bitcoinabc.org',
+    'testnet-seed-abc.bitcoinforks.org',
+    'testnet-seed.bitprim.org',
+    'testnet-seed.deadalnix.me',
+    'testnet-seeder.criptolayer.net'
+  ],
+  versions: {
+    bip32: {
+      private: 0x04358394,
+      public: 0x043587cf
+    },
+    bip44: 1,
+    private: 0xef,
+    public: 0x6f,
+    scripthash: 0xc4
+  }
+}, common)
+
+var regtest = Object.assign({}, {
+  hashGenesisBlock: '0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206',
+  port: 18444,
+  portRpc: 18332,
+  protocol: {
+    magic: 0xfabfb5da
+  },
+  seedsDns: [],
+  versions: {
+    bip32: {
+      private: 0x04358394,
+      public: 0x043587cf
+    },
+    bip44: 1,
+    private: 0xef,
+    public: 0x6f,
+    scripthash: 0xc4
+  }
+}, common)
+
+module.exports = {
+  main: main,
+  test: test,
+  regtest: regtest
+}
+
+
+/***/ }),
+
+/***/ "../../node_modules/coininfo/lib/coins/blk.js":
+/*!********************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/coininfo/lib/coins/blk.js ***!
+  \********************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports) {
+
+/*
+  info from:
+    https://github.com/rat4/blackcoin/blob/master/src/chainparams.cpp
+*/
+var common = {
+  name: 'BlackCoin',
+  per1: 1e8,
+  unit: 'BLK'
+}
+
+var main = Object.assign({}, {
+  hashGenesisBlock: '000001faef25dec4fbcf906e6242621df2c183bf232f263d0ba5b101911e4563',
+  port: 15714,
+  portRpc: 15715,
+  protocol: {
+    magic: 0x05223570 // careful, sent over wire as little endian
+  },
+  seedsDns: [
+    'rat4.blackcoin.co',
+    'seed.blackcoin.co',
+    'archon.darkfox.id.au',
+    'foxy.seeds.darkfox.id.au',
+    '6.syllabear.us.to',
+    'bcseed.syllabear.us.to'
+  ],
+  versions: {
+    bip32: {
+      private: 0x0488ade4,
+      public: 0x0488b21e
+    },
+    bip44: 0xa,
+    private: 0x99,
+    public: 0x19,
+    scripthash: 0x55
+  }
+}, common)
+
+module.exports = {
+  main: main,
+  test: null
+}
+
+
+/***/ }),
+
+/***/ "../../node_modules/coininfo/lib/coins/btc.js":
+/*!********************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/coininfo/lib/coins/btc.js ***!
+  \********************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports) {
+
+/*
+  info from:
+    https://github.com/bitcoin/bitcoin/blob/master/src/chainparams.cpp
+*/
+
+var common = {
+  name: 'Bitcoin',
+  per1: 1e8,
+  unit: 'BTC',
+  messagePrefix: '\x18Bitcoin Signed Message:\n'
+}
+
+var main = Object.assign({}, {
+  hashGenesisBlock: '000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f',
+  // nDefaultPort
+  port: 8333,
+  portRpc: 8332,
+  protocol: {
+    // pchMessageStart
+    magic: 0xd9b4bef9 // careful, sent over wire as little endian
+  },
+  bech32: 'bc',
+  // vSeeds
+  seedsDns: [
+    'seed.bitcoin.sipa.be',
+    'dnsseed.bluematt.me',
+    'seed.bitcoinstats.com',
+    'seed.bitcoin.jonasschnelli.ch',
+    'seed.btc.petertodd.org',
+    'seed.bitcoin.sprovoost.nl',
+    'dnsseed.emzy.de'
+  ],
+  // base58Prefixes
+  versions: {
+    bip32: {
+      private: 0x0488ade4,
+      public: 0x0488b21e
+    },
+    bip44: 0,
+    private: 0x80,
+    public: 0x00,
+    scripthash: 0x05
+  }
+}, common)
+
+var test = Object.assign({}, {
+  hashGenesisBlock: '000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943',
+  port: 18333,
+  portRpc: 18332,
+  protocol: {
+    magic: 0x0709110b
+  },
+  bech32: 'tb',
+  seedsDns: [
+    'testnet-seed.alexykot.me',
+    'testnet-seed.bitcoin.schildbach.de',
+    'testnet-seed.bitcoin.petertodd.org',
+    'testnet-seed.bluematt.me'
+  ],
+  versions: {
+    bip32: {
+      private: 0x04358394,
+      public: 0x043587cf
+    },
+    bip44: 1,
+    private: 0xef,
+    public: 0x6f,
+    scripthash: 0xc4
+  }
+}, common)
+
+var regtest = Object.assign({}, {
+  hashGenesisBlock: '0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206',
+  port: 18444,
+  portRpc: 18332,
+  protocol: {
+    magic: 0xdab5bffa
+  },
+  bech32: 'bcrt',
+  seedsDns: [],
+  versions: {
+    bip32: {
+      private: 0x04358394,
+      public: 0x043587cf
+    },
+    bip44: 1,
+    private: 0xef,
+    public: 0x6f,
+    scripthash: 0xc4
+  }
+}, common)
+
+module.exports = {
+  main: main,
+  test: test,
+  regtest: regtest
+}
+
+
+/***/ }),
+
+/***/ "../../node_modules/coininfo/lib/coins/btg.js":
+/*!********************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/coininfo/lib/coins/btg.js ***!
+  \********************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports) {
+
+/*
+  info from:
+    https://github.com/BTCGPU/BTCGPU/blob/master/src/chainparams.cpp
+*/
+
+var common = {
+  name: 'Bitcoin Gold',
+  unit: 'BTG'
+}
+
+var main = Object.assign({}, {
+  hashGenesisBlock: '000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f',
+  // nDefaultPort
+  port: 8338,
+  protocol: {
+    // pchMessageStart
+    magic: 0x446d47e1 // careful, sent over wire as little endian
+  },
+  bech32: 'btg',
+  // vSeeds
+  seedsDns: [
+    'eu-dnsseed.bitcoingold-official.org',
+    'dnsseed.bitcoingold.org',
+    'dnsseed.btcgpu.org'
+  ],
+  // base58Prefixes
+  versions: {
+    bip32: {
+      private: 0x0488ade4,
+      public: 0x0488b21e
+    },
+    bip44: 156,
+    private: 0x80,
+    public: 0x26,
+    scripthash: 0x17
+  }
+}, common)
+
+var test = Object.assign({}, {
+  hashGenesisBlock: '0x00000000e0781ebe24b91eedc293adfea2f557b53ec379e78959de3853e6f9f6',
+  port: 18338,
+  portRpc: 18332,
+  protocol: {
+    magic: 0x456e48e2
+  },
+  bech32: 'tbtg',
+  seedsDns: [
+    'test-dnsseed.bitcoingold.org',
+    'test-dnsseed.btcgpu.org',
+    'eu-test-dnsseed.bitcoingold-official.org'
+  ],
+  versions: {
+    bip32: {
+      private: 0x04358394,
+      public: 0x043587cf
+    },
+    bip44: 156,
+    private: 0xef,
+    public: 0x6f,
+    scripthash: 0xc4
+  }
+}, common)
+
+module.exports = {
+  main: main,
+  test: test
+}
+
+
+/***/ }),
+
+/***/ "../../node_modules/coininfo/lib/coins/dash.js":
+/*!*********************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/coininfo/lib/coins/dash.js ***!
+  \*********************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports) {
+
+/*
+  info from:
+    https://github.com/dashpay/dash/blob/master/src/chainparams.cpp
+*/
+
+var common = {
+  name: 'Dash',
+  unit: 'DASH'
+}
+
+var main = Object.assign({}, {
+  hashGenesisBlock: '00000ffd590b1485b3caadc19b22e6379c733355108f107a430458cdf3407ab6',
+  // nDefaultPort
+  port: 9999,
+  portRpc: 9998,
+  protocol: {
+    magic: 0xbd6b0cbf // careful, sent over wire as little endian
+  },
+  // vSeeds
+  seedsDns: [
+    'dash.org',
+    'dnsseed.dash.org',
+    'dashdot.io',
+    'dnsseed.dashdot.io',
+    'masternode.io',
+    'dnsseed.masternode.io',
+    'dashpay.io',
+    'dnsseed.dashpay.io'
+  ],
+  // base58Prefixes
+  versions: {
+    bip32: {
+      private: 0x0488ade4,
+      public: 0x0488b21e
+    },
+    bip44: 5,
+    private: 0xcc,
+    public: 0x4c,
+    scripthash: 0x10
+  }
+}, common)
+
+var test = Object.assign({}, {
+  hashGenesisBlock: '00000bafbc94add76cb75e2ec92894837288a481e5c005f6563d91623bf8bc2c',
+  port: 19999,
+  portRpc: 19998,
+  seedsDns: [
+    'dashdot.io',
+    'testnet-seed.dashdot.io',
+    'masternode.io',
+    'test.dnsseed.masternode.io'
+  ],
+  versions: {
+    bip32: {
+      private: 0x04358394,
+      public: 0x043587cf
+    },
+    bip44: 1,
+    private: 0xef,
+    public: 0x8c,
+    scripthash: 0x13
+  }
+}, common)
+
+module.exports = {
+  main: main,
+  test: test
+}
+
+
+/***/ }),
+
+/***/ "../../node_modules/coininfo/lib/coins/dcr.js":
+/*!********************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/coininfo/lib/coins/dcr.js ***!
+  \********************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports) {
+
+var common = {
+  name: 'Decred',
+  unit: 'DCR'
+}
+
+// https://github.com/decred/dcrd/blob/ef71103c95cbf77e5a0418e3d413b5906e710b25/chaincfg/params.go
+// https://github.com/decred/bitcore/blob/a92381b2b0023b28a1b7eb03e6cb0bfb7800200d/lib/networks.js
+var main = Object.assign({}, {
+  hashGenesisBlock: '298e5cc3d985bfe7f81dc135f360abe089edd4396b86d2de66b0cef42b21d980',
+  port: 9108,
+  portRpc: 9109,
+  protocol: {
+    magic: 0xf900b4d9
+  },
+  seedsDns: [
+    'mainnet-seed.decred.mindcry.org',
+    'mainnet-seed.decred.netpurgatory.com',
+    'mainnet.decredseed.org',
+    'mainnet-seed.decred.org'
+  ],
+  versions: {
+    bip32: {
+      private: 0x02fda4e8,
+      public: 0x02fda926
+    },
+    bip44: 42,
+    private: 0x22de,
+    public: 0x073f,
+    scripthash: 0x071a
+  }
+}, common)
+
+var test = Object.assign({}, {
+  hashGenesisBlock: '5b7466edf6739adc9b32aaedc54e24bdc59a05f0ced855088835fe3cbe58375f',
+  port: 19108,
+  portRpc: 19109,
+  protocol: {
+    magic: 0x48e7a065
+  },
+  seedsDns: [
+    'testnet-seed.decred.mindcry.org',
+    'testnet-seed.decred.netpurgatory.org',
+    'testnet.decredseed.org',
+    'testnet-seed.decred.org'
+  ],
+  versions: {
+    bip32: {
+      private: 0x04358397,
+      public: 0x043587d1
+    },
+    bip44: 42,
+    private: 0x230e,
+    public: 0x0f21,
+    scripthash: 0x0efc
+  }
+}, common)
+
+module.exports = {
+  main: main,
+  test: test
+}
+
+
+/***/ }),
+
+/***/ "../../node_modules/coininfo/lib/coins/dgb.js":
+/*!********************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/coininfo/lib/coins/dgb.js ***!
+  \********************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports) {
+
+/*
+  info from:
+    https://github.com/digibyte/digibyte/blob/9e4c0b3ddfd10a7ab852240ff716a7b93af89a07/src/chainparams.cpp
+*/
+
+var common = {
+  name: 'DigiByte',
+  per1: 1e8,
+  unit: 'DGB'
+}
+
+var main = Object.assign({}, {
+  hashGenesisBlock: '000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f',
+  // nDefaultPort
+  port: 12024,
+  portRpc: 14022,
+  protocol: {
+    // pchMessageStart
+    magic: 0xfac3b6da // careful, sent over wire as little endian
+  },
+  bech32: 'dgb',
+  // vSeeds
+  seedsDns: [
+    'seed.digibyte.io',
+    'digiexplorer.info',
+    'digihash.co'
+  ],
+  // base58Prefixes
+  versions: {
+    bip44: 0x80000014,
+    private: 0x80,
+    public: 0x1e,
+    scripthash: 0x3f, // new 'S' prefix
+    scripthash2: 0x05 // old '3' prefix
+  }
+}, common)
+
+module.exports = { main: main }
+
+
+/***/ }),
+
+/***/ "../../node_modules/coininfo/lib/coins/doge.js":
+/*!*********************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/coininfo/lib/coins/doge.js ***!
+  \*********************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports) {
+
+// https://github.com/dogecoin/dogecoin/blob/master/src/chainparams.cpp
+
+var common = {
+  name: 'Dogecoin',
+  unit: 'DOGE'
+}
+
+var main = Object.assign({}, {
+  hashGenesisBlock: '1a91e3dace36e2be3bf030a65679fe821aa1d6ef92e7c9902eb318182c355691',
+  port: 22556,
+  protocol: {
+    magic: 0xc0c0c0c0
+  },
+  seedsDns: [
+    'seed.dogecoin.com',
+    'seed.multidoge.org',
+    'seed2.multidoge.org',
+    'seed.doger.dogecoin.com'
+  ],
+  versions: {
+    bip32: {
+      private: 0x02fac398,
+      public: 0x02facafd
+    },
+    bip44: 3,
+    private: 0x9e,
+    public: 0x1e,
+    scripthash: 0x16
+  }
+}, common)
+
+var test = Object.assign({}, {
+  hashGenesisBlock: 'bb0a78264637406b6360aad926284d544d7049f45189db5664f3c4d07350559e',
+  versions: {
+    bip44: 1,
+    private: 0xf1,
+    public: 0x71,
+    scripthash: 0xc4
+  }
+}, common)
+
+module.exports = {
+  main: main,
+  test: test
+}
+
+
+/***/ }),
+
+/***/ "../../node_modules/coininfo/lib/coins/ltc.js":
+/*!********************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/coininfo/lib/coins/ltc.js ***!
+  \********************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports) {
+
+// https://github.com/litecoin-project/litecoin/blob/master-0.10/src/chainparams.cpp
+
+var common = {
+  name: 'Litecoin',
+  unit: 'LTC'
+}
+
+var main = Object.assign({}, {
+  hashGenesisBlock: '12a765e31ffd4059bada1e25190f6e98c99d9714d334efa41a195a7e7e04bfe2',
+  port: 9333,
+  protocol: {
+    magic: 0xdbb6c0fb
+  },
+  bech32: 'ltc',
+  seedsDns: [
+    'dnsseed.litecointools.com',
+    'dnsseed.litecoinpool.org',
+    'dnsseed.ltc.xurious.com',
+    'dnsseed.koin-project.com',
+    'dnsseed.weminemnc.com'
+  ],
+  versions: {
+    bip32: {
+      private: 0x019d9cfe,
+      public: 0x019da462
+    },
+    bip44: 2,
+    private: 0xb0,
+    public: 0x30,
+    scripthash: 0x32,
+    scripthash2: 0x05 // old '3' prefix. available for backward compatibility.
+  }
+}, common)
+
+var test = Object.assign({}, {
+  hashGenesisBlock: 'f5ae71e26c74beacc88382716aced69cddf3dffff24f384e1808905e0188f68f',
+  bech32: 'tltc',
+  versions: {
+    bip32: {
+      private: 0x0436ef7d,
+      public: 0x0436f6e1
+    },
+    bip44: 1,
+    private: 0xef,
+    public: 0x6f,
+    scripthash: 0x3a,
+    scripthash2: 0xc4
+  }
+}, common)
+
+module.exports = {
+  main: main,
+  test: test
+}
+
+
+/***/ }),
+
+/***/ "../../node_modules/coininfo/lib/coins/mona.js":
+/*!*********************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/coininfo/lib/coins/mona.js ***!
+  \*********************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports) {
+
+// https://github.com/monacoinproject/monacoin/blob/master-0.13/src/chainparams.cpp
+
+var common = {
+  name: 'Monacoin',
+  unit: 'MONA'
+}
+
+var main = Object.assign({}, {
+  hashGenesisBlock: 'ff9f1c0116d19de7c9963845e129f9ed1bfc0b376eb54fd7afa42e0d418c8bb6',
+  port: 9401,
+  portRpc: 9402,
+  protocol: {
+    magic: 0xdbb6c0fb
+  },
+  bech32: 'mona',
+  seedsDns: [
+    'dnsseed.monacoin.org'
+  ],
+  versions: {
+    bip32: {
+      private: 0x0488ade4,
+      public: 0x0488b21e
+    },
+    bip44: 22,
+    private: 0xb0,
+    private2: 0xb2, // old wif
+    public: 0x32,
+    scripthash: 0x37,
+    scripthash2: 0x05 // old '3' prefix. available for backward compatibility.
+  }
+}, common)
+
+var test = Object.assign({}, {
+  hashGenesisBlock: 'a2b106ceba3be0c6d097b2a6a6aacf9d638ba8258ae478158f449c321061e0b2',
+  port: 19403,
+  portRpc: 19402,
+  protocol: {
+    magic: 0xf1c8d2fd
+  },
+  bech32: 'tmona',
+  seedsDns: [
+    'testnet-dnsseed.monacoin.org'
+  ],
+  versions: {
+    bip32: {
+      private: 0x04358394,
+      public: 0x043587cf
+    },
+    bip44: 1,
+    private: 0xef,
+    public: 0x6f,
+    scripthash: 0x75,
+    scripthash2: 0xc4
+  }
+}, common)
+
+module.exports = {
+  main: main,
+  test: test
+}
+
+
+/***/ }),
+
+/***/ "../../node_modules/coininfo/lib/coins/nbt.js":
+/*!********************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/coininfo/lib/coins/nbt.js ***!
+  \********************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports) {
+
+var common = {
+  name: 'NuBits',
+  per1: 1e6,
+  unit: 'NBT'
+}
+
+var main = Object.assign({}, {
+  hashGenesisBlock: '000003cc2da5a0a289ad0a590c20a8b975219ddc1204efd169e947dd4cbad73f',
+  // nDefaultPort
+  port: 7890,
+  portRpc: 14002,
+  protocol: {
+    // pchMessageStart
+    magic: 0xd9b4bef9 // careful, sent over wire as little endian
+  },
+  // vSeeds
+  seedsDns: [
+  ],
+  // base58Prefixes
+  versions: {
+    bip32: {
+      private: 0x0488ade4,
+      public: 0x0488b21e
+    },
+    bip44: 12,
+    private: 0x96,
+    public: 0x19,
+    scripthash: 0x1a
+  }
+}, common)
+
+module.exports = {
+  main: main
+}
+
+
+/***/ }),
+
+/***/ "../../node_modules/coininfo/lib/coins/nmc.js":
+/*!********************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/coininfo/lib/coins/nmc.js ***!
+  \********************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports) {
+
+var common = {
+  name: 'Namecoin',
+  unit: 'NMC'
+}
+
+var main = Object.assign({}, {
+  hashGenesisBlock: '000000000062b72c5e2ceb45fbc8587e807c155b0da735e6483dfba2f0a9c770',
+  versions: {
+    bip44: 7,
+    private: 0xb4,
+    public: 0x34,
+    scripthash: 0x05
+  }
+}, common)
+
+module.exports = {
+  main: main,
+  test: null
+}
+
+
+/***/ }),
+
+/***/ "../../node_modules/coininfo/lib/coins/ppc.js":
+/*!********************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/coininfo/lib/coins/ppc.js ***!
+  \********************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports) {
+
+// https://github.com/peercoin/peercoin/tree/v0.7.0ppc/src
+// https://github.com/peercoin/peercoin/blob/v0.7.0ppc/src/${filename}
+
+var common = {
+  name: 'Peercoin',
+  per1: 1e6, // util.h:40
+  unit: 'PPC',
+  messagePrefix: '\x18Peercoin Signed Message:\n' // main.cpp:77
+}
+
+var main = Object.assign({}, {
+  hashGenesisBlock: '0000000032fe677166d54963b62a4677d8957e87c508eaa4fd7eb1c880cd27e3', // main.h:84
+  // nDefaultPort
+  port: 9901, // protocol.h:18
+  portRpc: 9902, // protocol.h:19
+  protocol: {
+    // pchMessageStart
+    magic: 0xe5e9e8e6 // careful, sent over wire as little endian protocol.cpp:31
+  },
+  // vSeeds
+  seedsDns: [
+    // net.cpp:1209
+    'seed.peercoin.net',
+    'seed2.peercoin.net',
+    'seed.peercoin-library.org',
+    'ppcseed.ns.7server.net'
+  ],
+  versions: {
+    // not implemented in Peercoin <= v0.7.x nodes, only 3rd party wallets
+    // https://github.com/jmacwhyte/recovery-phrase-recovery/blob/52073aba08e9d01032c0b5aff8c682911fe2e5fc/js/bitcoinjs-extensions.js#L58
+    bip32: {
+      private: 0x0488ade4,
+      public: 0x0488b21e
+    },
+    bip44: 6, // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
+    private: 0xb7, // base58.h:402 ; 128 + PUBKEY_ADDRESS
+    public: 0x37, // base58.h:276
+    scripthash: 0x75 // base58.h:277
+  }
+}, common)
+
+var test = Object.assign({}, {
+  hashGenesisBlock: '00000001f757bb737f6596503e17cd17b0658ce630cc727c0cca81aec47c9f06',
+  port: 9903,
+  portRpc: 9904,
+  protocol: {
+    magic: 0xefc0f2cb
+  },
+  seedsDns: [
+    'tseed.peercoin.net',
+    'tseed2.peercoin.net',
+    'tseed.peercoin-library.org'
+  ],
+  versions: {
+    bip32: {
+      private: 0x04358394,
+      public: 0x043587cf
+    },
+    bip44: 1,
+    private: 0xef,
+    public: 0x6f,
+    scripthash: 0xc4
+  }
+}, common)
+
+module.exports = {
+  main: main,
+  test: test
+}
+
+
+/***/ }),
+
+/***/ "../../node_modules/coininfo/lib/coins/qtum.js":
+/*!*********************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/coininfo/lib/coins/qtum.js ***!
+  \*********************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports) {
+
+/*
+  info from:
+    https://github.com/qtumproject/qtum/blob/master/src/chainparams.cpp
+*/
+
+var common = {
+  name: 'Qtum',
+  unit: 'QTUM'
+}
+
+var main = Object.assign({}, {
+  hashGenesisBlock: '000075aef83cf2853580f8ae8ce6f8c3096cfa21d98334d6e3f95e5582ed986c',
+  // nDefaultPort
+  port: 3888,
+  protocol: {
+    // pchMessageStart
+    magic: 0xd3a6cff1 // careful, sent over wire as little endian
+  },
+  bech32: 'qc',
+  // vSeeds
+  seedsDns: [
+    'qtum3.dynu.net'
+  ],
+  // base58Prefixes
+  versions: {
+    bip32: {
+      private: 0x0488ade4,
+      public: 0x0488b21e
+    },
+    bip44: 2301,
+    private: 0x80,
+    public: 0x3A,
+    scripthash: 0x32
+  }
+}, common)
+
+module.exports = {
+  main: main
+}
+
+
+/***/ }),
+
+/***/ "../../node_modules/coininfo/lib/coins/rdd.js":
+/*!********************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/coininfo/lib/coins/rdd.js ***!
+  \********************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports) {
+
+var common = {
+  name: 'ReddCoin',
+  unit: 'RDD'
+}
+
+var main = Object.assign({}, {
+  hashGenesisBlock: 'b868e0d95a3c3c0e0dadc67ee587aaf9dc8acbf99e3b4b3110fad4eb74c1decc',
+  versions: {
+    bip44: 4,
+    private: 0xbd,
+    public: 0x3d,
+    scripthash: 0x05
+  }
+}, common)
+
+var test = Object.assign({}, {
+  hashGenesisBlock: 'a12ac9bd4cd26262c53a6277aafc61fe9dfe1e2b05eaa1ca148a5be8b394e35a',
+  versions: {
+    bip44: 1,
+    private: 0xef,
+    public: 0x6f,
+    scripthash: 0xc4
+  }
+}, common)
+
+module.exports = {
+  main: main,
+  test: test
+}
+
+
+/***/ }),
+
+/***/ "../../node_modules/coininfo/lib/coins/rvn.js":
+/*!********************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/coininfo/lib/coins/rvn.js ***!
+  \********************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports) {
+
+// https://github.com/RavenProject/Ravencoin/blob/master/src/chainparams.cpp
+
+var common = {
+  name: 'Ravencoin',
+  unit: 'RVN'
+}
+
+var main = Object.assign({}, {
+  hashGenesisBlock: '0000006b444bc2f2ffe627be9d9e7e7a0730000870ef6eb6da46c8eae389df90',
+  port: 8767,
+  protocol: {
+    magic: 0x4e564152
+  },
+  seedsDns: [
+    'seed-raven.bitactivate.com',
+    'seed-raven.ravencoin.com',
+    'seed-raven.ravencoin.org'
+  ],
+  versions: {
+    bip32: {
+      private: 0x0488ade4,
+      public: 0x0488b21e
+    },
+    bip44: 175,
+    private: 0x80,
+    public: 0x3c,
+    scripthash: 0x7a
+  }
+}, common)
+
+var test = Object.assign({}, {
+  hashGenesisBlock: '000000ecfc5e6324a079542221d00e10362bdc894d56500c414060eea8a3ad5a',
+  port: 18770,
+  protocol: {
+    magic: 0x544e5652
+  },
+  seedsDns: [
+    'seed-testnet-raven.bitactivate.com',
+    'seed-testnet-raven.ravencoin.com',
+    'seed-testnet-raven.ravencoin.org'
+  ],
+  versions: {
+    bip32: {
+      private: 0x04358394,
+      public: 0x043587cf
+    },
+    bip44: 1,
+    private: 0xef,
+    public: 0x6f,
+    scripthash: 0xc4
+  }
+}, common)
+
+module.exports = {
+  main: main,
+  test: test
+}
+
+
+/***/ }),
+
+/***/ "../../node_modules/coininfo/lib/coins/via.js":
+/*!********************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/coininfo/lib/coins/via.js ***!
+  \********************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports) {
+
+// https://github.com/viacoin/viacoin/blob/master/src/chainparams.cpp
+
+var common = {
+  name: 'Viacoin',
+  unit: 'VIA'
+}
+
+var main = Object.assign({}, {
+  hashGenesisBlock: '4e9b54001f9976049830128ec0331515eaabe35a70970d79971da1539a400ba1',
+  port: 5223,
+  protocol: {
+    magic: 0xcbc6680f
+  },
+  seedsDns: [
+    'seed.viacoin.net',
+    'viaseeder.barbatos.fr',
+    'mainnet.viacoin.net'
+  ],
+  versions: {
+    bip32: {
+      private: 0x0488ade4,
+      public: 0x0488b21e
+    },
+    bip44: 14,
+    private: 0xc7,
+    public: 0x47,
+    scripthash: 0x21
+  }
+}, common)
+
+var test = Object.assign({}, {
+  hashGenesisBlock: '770aa712aa08fdcbdecc1c8df1b3e2d4e17a7cf6e63a28b785b32e74c96cb27d',
+  port: 25223,
+  protocol: {
+    magic: 0x92efc5a9
+  },
+  seedsDns: [
+    'testnet.viacoin.net',
+    'seed-testnet.viacoin.net'
+  ],
+  versions: {
+    bip32: {
+      private: 0x04358394,
+      public: 0x043587cf
+    },
+    bip44: 1,
+    private: 0xff,
+    public: 0x7f,
+    scripthash: 0xc4
+  }
+}, common)
+
+module.exports = {
+  main: main,
+  test: test
+}
+
+
+/***/ }),
+
+/***/ "../../node_modules/coininfo/lib/coins/vtc.js":
+/*!********************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/coininfo/lib/coins/vtc.js ***!
+  \********************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports) {
+
+/*
+  info from:
+    https://github.com/vertcoin/vertcoin/blob/master/src/chainparams.cpp
+*/
+
+var common = {
+  name: 'Vertcoin',
+  unit: 'VTC'
+}
+
+var main = Object.assign({}, {
+  hashGenesisBlock: '4d96a915f49d40b1e5c2844d1ee2dccb90013a990ccea12c492d22110489f0c4',
+  // nDefaultPort
+  port: 5889,
+  protocol: {
+    // pchMessageStart
+    magic: 0xdab5bffa // careful, sent over wire as little endian
+  },
+  bech32: 'vtc',
+  // vSeeds
+  seedsDns: [
+    'useast1.vtconline.org',
+    'vtc.gertjaap.org',
+    'seed.vtc.bryangoodson.org',
+    'dnsseed.pknight.ca',
+    'seed.orderofthetaco.org',
+    'seed.alexturek.org',
+    'vertcoin.mbl.cash'
+  ],
+  // base58Prefixes
+  versions: {
+    bip32: {
+      private: 0x0488ade4,
+      public: 0x0488b21e
+    },
+    bip44: 28,
+    private: 0x80,
+    public: 0x47,
+    scripthash: 0x05
+  }
+}, common)
+
+var test = Object.assign({}, {
+  hashGenesisBlock: 'cee8f24feb7a64c8f07916976aa4855decac79b6741a8ec2e32e2747497ad2c9',
+  port: 15889,
+  // portRpc: 18332,
+  protocol: {
+    magic: 0x74726576
+  },
+  bech32: 'tvtc',
+  seedsDns: [
+    'jlovejoy.mit.edu',
+    'gertjaap.ddns.net',
+    'fr1.vtconline.org',
+    'tvtc.vertcoin.org'
+  ],
+  versions: {
+    bip32: {
+      private: 0x04358394,
+      public: 0x043587cf
+    },
+    private: 0xef,
+    public: 0x4a,
+    scripthash: 0xc4
+  }
+}, common)
+
+var regtest = Object.assign({}, {
+  hashGenesisBlock: '0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206',
+  port: 18444,
+  // portRpc: 18332,
+  protocol: {
+    magic: 0xdab5bffa
+  },
+  seedsDns: [],
+  versions: {
+    bip32: {
+      private: 0x04358394,
+      public: 0x043587cf
+    },
+    private: 0xef,
+    public: 0x6f,
+    scripthash: 0xc4
+  }
+}, common)
+
+module.exports = {
+  main: main,
+  test: test,
+  regtest: regtest
+}
+
+
+/***/ }),
+
+/***/ "../../node_modules/coininfo/lib/coins/zec.js":
+/*!********************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/coininfo/lib/coins/zec.js ***!
+  \********************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports) {
+
+/*
+  info from:
+    https://github.com/zcash/zcash/blob/v1.0.12/src/chainparamsbase.cpp
+    https://github.com/zcash/zcash/blob/v1.0.12/src/chainparams.cpp
+*/
+
+var common = {
+  name: 'Zcash',
+  unit: 'ZEC'
+}
+
+var main = Object.assign({}, {
+  hashGenesisBlock: '00040fe8ec8471911baa1db1266ea15dd06b4a8a5c453883c000b031973dce08',
+  // nDefaultPort
+  port: 8233,
+  portRpc: 8232,
+  protocol: {
+    // pchMessageStart
+    magic: 0x6427e924 // careful, sent over wire as little endian
+  },
+  // vSeeds
+  seedsDns: [
+    'dnsseed.z.cash',
+    'dnsseed.str4d.xyz',
+    'dnsseed.znodes.org'
+  ],
+  // base58Prefixes
+  versions: {
+    bip32: {
+      private: 0x0488ade4,
+      public: 0x0488b21e
+    },
+    bip44: 133,
+    private: 0x80,
+    public: 0x1cb8,
+    scripthash: 0x1cbd
+  }
+}, common)
+
+var test = Object.assign({}, {
+  hashGenesisBlock: '0x05a60a92d99d85997cce3b87616c089f6124d7342af37106edc76126334a2c38',
+  port: 18233,
+  portRpc: 18232,
+  protocol: {
+    magic: 0xbff91afa
+  },
+  seedsDns: [
+    'dnsseed.testnet.z.cash'
+  ],
+  versions: {
+    bip32: {
+      private: 0x04358394,
+      public: 0x043587cf
+    },
+    bip44: 133,
+    private: 0xef,
+    public: 0x1d25,
+    scripthash: 0x1cba
+  }
+}, common)
+
+module.exports = {
+  main: main,
+  test: test
+}
+
+
+/***/ }),
+
+/***/ "../../node_modules/coinkey/lib/coinkey.js":
+/*!*****************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/coinkey/lib/coinkey.js ***!
+  \*****************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+var assert = __webpack_require__(/*! assert */ "../../node_modules/assert/assert.js")
+var cs = __webpack_require__(/*! coinstring */ "../../node_modules/coinstring/lib/coinstring.js")
+var ECKey = __webpack_require__(/*! eckey */ "../../node_modules/eckey/lib/eckey.js")
+var inherits = __webpack_require__(/*! inherits */ "../../node_modules/inherits/inherits_browser.js")
+var secureRandom = __webpack_require__(/*! secure-random */ "../../node_modules/secure-random/lib/secure-random.js")
+var util = __webpack_require__(/*! ./util */ "../../node_modules/coinkey/lib/util.js")
+
+// Bitcoin
+var DEFAULT_VERSIONS = {
+  public: 0x0,
+  private: 0x80
+}
+
+function CoinKey (privateKey, versions) {
+  if (!(this instanceof CoinKey)) return new CoinKey(privateKey, versions)
+  assert(util.isArrayish(privateKey), 'privateKey must be arrayish')
+  this._versions = util.normalizeVersions(versions) || util.clone(DEFAULT_VERSIONS)
+  // true => default compressed
+  ECKey.call(this, privateKey, true)
+}
+inherits(CoinKey, ECKey)
+
+// Instance props
+
+Object.defineProperty(CoinKey.prototype, 'versions', {
+  enumerable: true,
+  configurable: true,
+  get: function () {
+    return this._versions
+  },
+  set: function (versions) {
+    this._versions = versions
+  }
+})
+
+Object.defineProperty(CoinKey.prototype, 'privateWif', {
+  get: function () {
+    return cs.encode(this.privateExportKey, this.versions.private)
+  }
+})
+
+Object.defineProperty(CoinKey.prototype, 'publicAddress', {
+  get: function () {
+    var bufVersion = util.bufferizeVersion(this.versions.public)
+    return cs.encode(this.pubKeyHash, bufVersion)
+  }
+})
+
+CoinKey.prototype.toString = function () {
+  return this.privateWif + ': ' + this.publicAddress
+}
+
+// Class methods
+
+CoinKey.fromWif = function (wif, versions) {
+  versions = util.normalizeVersions(versions)
+  var res = cs.decode(wif)
+  var version = res.slice(0, 1)
+  var privateKey = res.slice(1) // get rid of version byte
+  var compressed = (privateKey.length === 33)
+  if (compressed) privateKey = privateKey.slice(0, 32) // slice off compression byte
+
+  var v = versions || {}
+  v.private = v.private || version.readUInt8(0)
+  v.public = v.public || v.private - 0x80
+
+  var ck = new CoinKey(privateKey, v)
+  ck.compressed = compressed
+  return ck
+}
+
+CoinKey.createRandom = function (versions) {
+  var privateKey = secureRandom.randomBuffer(32)
+  return new CoinKey(privateKey, versions)
+}
+
+CoinKey.addressToHash = function (address) {
+  return cs.decode(address).slice(1)
+}
+
+module.exports = CoinKey
+
+
+/***/ }),
+
+/***/ "../../node_modules/coinkey/lib/util.js":
+/*!**************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/coinkey/lib/util.js ***!
+  \**************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(Buffer) {// poor man's clone
+function clone (obj) {
+  return JSON.parse(JSON.stringify(obj))
+}
+
+function isArrayish (maybeArray) {
+  return Array.isArray(maybeArray) ||
+    (maybeArray instanceof Uint8Array) ||
+    Buffer.isBuffer(maybeArray)
+}
+
+// versions === { private, public } ? if no, check '.version(s)'
+function normalizeVersions (versions) {
+  if (!versions) return null
+  if (typeof versions !== 'object') return null
+  versions = clone(versions)
+  if (versions.version) versions.versions = versions.version
+  // check for actual versions object
+  if (versions && 'private' in versions) return versions
+  // if it exists, maybe in .versions?
+  else versions = versions.versions
+  if (versions && 'private' in versions) return versions
+  else return null
+}
+
+function bufferizeVersion (version) {
+  if (typeof version === 'string') return hexStringToBuffer(version)
+  if (typeof version === 'number') return beUIntToBuffer(version)
+  throw new Error('invalid version type.')
+}
+
+// accepts hex string sequence with or without 0x prefix
+function hexStringToBuffer (input) {
+  var isValidRE = /^(0x)?([\dA-Fa-f]{2})+$/g
+  if (!isValidRE.test(input)) throw new Error('invalid hex string.')
+  return Buffer.from(input.slice(input.slice(0, 2) === '0x' ? 2 : 0), 'hex')
+}
+
+function beUIntToBuffer (num) {
+  var length
+  if (num === 0) length = 1
+  else if (num > 0) length = Math.ceil((Math.log(num + 1) / Math.log(2)) / 8)
+  var buf = Buffer.alloc(length)
+  buf.writeUIntBE(num, 0, length)
+
+  return buf
+}
+
+module.exports = {
+  clone: clone,
+  isArrayish: isArrayish,
+  normalizeVersions: normalizeVersions,
+  bufferizeVersion: bufferizeVersion
+}
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../node-libs-browser/node_modules/buffer/index.js */ "../../node_modules/node-libs-browser/node_modules/buffer/index.js").Buffer))
+
+/***/ }),
+
+/***/ "../../node_modules/coinstring/lib/coinstring.js":
+/*!***********************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/coinstring/lib/coinstring.js ***!
+  \***********************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(Buffer) {var base58 = __webpack_require__(/*! bs58 */ "../../node_modules/bs58/index.js")
+var createHash = __webpack_require__(/*! create-hash */ "../../node_modules/create-hash/browser.js")
+
+function encode (payload, version) {
+  if (Array.isArray(payload) || payload instanceof Uint8Array) {
+    payload = new Buffer(payload)
+  }
+
+  var buf
+  if (version != null) {
+    if (typeof version === 'number') {
+      version = new Buffer([version])
+    }
+    buf = Buffer.concat([version, payload])
+  } else {
+    buf = payload
+  }
+
+  var checksum = sha256x2(buf).slice(0, 4)
+  var result = Buffer.concat([buf, checksum])
+  return base58.encode(result)
+}
+
+function decode (base58str, version) {
+  var arr = base58.decode(base58str)
+  var buf = new Buffer(arr)
+  var versionLength
+
+  if (version == null) {
+    versionLength = 0
+  } else {
+    if (typeof version === 'number') version = new Buffer([version])
+
+    versionLength = version.length
+    var versionCompare = buf.slice(0, versionLength)
+    if (versionCompare.toString('hex') !== version.toString('hex')) {
+      throw new Error('Invalid version')
+    }
+  }
+
+  var checksum = buf.slice(-4)
+  var endPos = buf.length - 4
+  var bytes = buf.slice(0, endPos)
+
+  var newChecksum = sha256x2(bytes).slice(0, 4)
+  if (checksum.toString('hex') !== newChecksum.toString('hex')) {
+    throw new Error('Invalid checksum')
+  }
+
+  return bytes.slice(versionLength)
+}
+
+function isValid (base58str, version) {
+  try {
+    decode(base58str, version)
+  } catch (e) {
+    return false
+  }
+
+  return true
+}
+
+function createEncoder (version) {
+  return function (payload) {
+    return encode(payload, version)
+  }
+}
+
+function createDecoder (version) {
+  return function (base58str) {
+    return decode(base58str, version)
+  }
+}
+
+function createValidator (version) {
+  return function (base58str) {
+    return isValid(base58str, version)
+  }
+}
+
+function sha256x2 (buffer) {
+  var sha = createHash('sha256').update(buffer).digest()
+  return createHash('sha256').update(sha).digest()
+}
+
+module.exports = {
+  encode: encode,
+  decode: decode,
+  isValid: isValid,
+  createEncoder: createEncoder,
+  createDecoder: createDecoder,
+  createValidator: createValidator
+}
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../node-libs-browser/node_modules/buffer/index.js */ "../../node_modules/node-libs-browser/node_modules/buffer/index.js").Buffer))
+
+/***/ }),
+
 /***/ "../../node_modules/cookiejar/cookiejar.js":
 /*!*****************************************************************************!*\
   !*** /home/dev/ezpay-browser-extension/node_modules/cookiejar/cookiejar.js ***!
@@ -19298,6 +25902,112 @@ function findPrime(bits, gen) {
 /***/ (function(module) {
 
 module.exports = {"modp1":{"gen":"02","prime":"ffffffffffffffffc90fdaa22168c234c4c6628b80dc1cd129024e088a67cc74020bbea63b139b22514a08798e3404ddef9519b3cd3a431b302b0a6df25f14374fe1356d6d51c245e485b576625e7ec6f44c42e9a63a3620ffffffffffffffff"},"modp2":{"gen":"02","prime":"ffffffffffffffffc90fdaa22168c234c4c6628b80dc1cd129024e088a67cc74020bbea63b139b22514a08798e3404ddef9519b3cd3a431b302b0a6df25f14374fe1356d6d51c245e485b576625e7ec6f44c42e9a637ed6b0bff5cb6f406b7edee386bfb5a899fa5ae9f24117c4b1fe649286651ece65381ffffffffffffffff"},"modp5":{"gen":"02","prime":"ffffffffffffffffc90fdaa22168c234c4c6628b80dc1cd129024e088a67cc74020bbea63b139b22514a08798e3404ddef9519b3cd3a431b302b0a6df25f14374fe1356d6d51c245e485b576625e7ec6f44c42e9a637ed6b0bff5cb6f406b7edee386bfb5a899fa5ae9f24117c4b1fe649286651ece45b3dc2007cb8a163bf0598da48361c55d39a69163fa8fd24cf5f83655d23dca3ad961c62f356208552bb9ed529077096966d670c354e4abc9804f1746c08ca237327ffffffffffffffff"},"modp14":{"gen":"02","prime":"ffffffffffffffffc90fdaa22168c234c4c6628b80dc1cd129024e088a67cc74020bbea63b139b22514a08798e3404ddef9519b3cd3a431b302b0a6df25f14374fe1356d6d51c245e485b576625e7ec6f44c42e9a637ed6b0bff5cb6f406b7edee386bfb5a899fa5ae9f24117c4b1fe649286651ece45b3dc2007cb8a163bf0598da48361c55d39a69163fa8fd24cf5f83655d23dca3ad961c62f356208552bb9ed529077096966d670c354e4abc9804f1746c08ca18217c32905e462e36ce3be39e772c180e86039b2783a2ec07a28fb5c55df06f4c52c9de2bcbf6955817183995497cea956ae515d2261898fa051015728e5a8aacaa68ffffffffffffffff"},"modp15":{"gen":"02","prime":"ffffffffffffffffc90fdaa22168c234c4c6628b80dc1cd129024e088a67cc74020bbea63b139b22514a08798e3404ddef9519b3cd3a431b302b0a6df25f14374fe1356d6d51c245e485b576625e7ec6f44c42e9a637ed6b0bff5cb6f406b7edee386bfb5a899fa5ae9f24117c4b1fe649286651ece45b3dc2007cb8a163bf0598da48361c55d39a69163fa8fd24cf5f83655d23dca3ad961c62f356208552bb9ed529077096966d670c354e4abc9804f1746c08ca18217c32905e462e36ce3be39e772c180e86039b2783a2ec07a28fb5c55df06f4c52c9de2bcbf6955817183995497cea956ae515d2261898fa051015728e5a8aaac42dad33170d04507a33a85521abdf1cba64ecfb850458dbef0a8aea71575d060c7db3970f85a6e1e4c7abf5ae8cdb0933d71e8c94e04a25619dcee3d2261ad2ee6bf12ffa06d98a0864d87602733ec86a64521f2b18177b200cbbe117577a615d6c770988c0bad946e208e24fa074e5ab3143db5bfce0fd108e4b82d120a93ad2caffffffffffffffff"},"modp16":{"gen":"02","prime":"ffffffffffffffffc90fdaa22168c234c4c6628b80dc1cd129024e088a67cc74020bbea63b139b22514a08798e3404ddef9519b3cd3a431b302b0a6df25f14374fe1356d6d51c245e485b576625e7ec6f44c42e9a637ed6b0bff5cb6f406b7edee386bfb5a899fa5ae9f24117c4b1fe649286651ece45b3dc2007cb8a163bf0598da48361c55d39a69163fa8fd24cf5f83655d23dca3ad961c62f356208552bb9ed529077096966d670c354e4abc9804f1746c08ca18217c32905e462e36ce3be39e772c180e86039b2783a2ec07a28fb5c55df06f4c52c9de2bcbf6955817183995497cea956ae515d2261898fa051015728e5a8aaac42dad33170d04507a33a85521abdf1cba64ecfb850458dbef0a8aea71575d060c7db3970f85a6e1e4c7abf5ae8cdb0933d71e8c94e04a25619dcee3d2261ad2ee6bf12ffa06d98a0864d87602733ec86a64521f2b18177b200cbbe117577a615d6c770988c0bad946e208e24fa074e5ab3143db5bfce0fd108e4b82d120a92108011a723c12a787e6d788719a10bdba5b2699c327186af4e23c1a946834b6150bda2583e9ca2ad44ce8dbbbc2db04de8ef92e8efc141fbecaa6287c59474e6bc05d99b2964fa090c3a2233ba186515be7ed1f612970cee2d7afb81bdd762170481cd0069127d5b05aa993b4ea988d8fddc186ffb7dc90a6c08f4df435c934063199ffffffffffffffff"},"modp17":{"gen":"02","prime":"ffffffffffffffffc90fdaa22168c234c4c6628b80dc1cd129024e088a67cc74020bbea63b139b22514a08798e3404ddef9519b3cd3a431b302b0a6df25f14374fe1356d6d51c245e485b576625e7ec6f44c42e9a637ed6b0bff5cb6f406b7edee386bfb5a899fa5ae9f24117c4b1fe649286651ece45b3dc2007cb8a163bf0598da48361c55d39a69163fa8fd24cf5f83655d23dca3ad961c62f356208552bb9ed529077096966d670c354e4abc9804f1746c08ca18217c32905e462e36ce3be39e772c180e86039b2783a2ec07a28fb5c55df06f4c52c9de2bcbf6955817183995497cea956ae515d2261898fa051015728e5a8aaac42dad33170d04507a33a85521abdf1cba64ecfb850458dbef0a8aea71575d060c7db3970f85a6e1e4c7abf5ae8cdb0933d71e8c94e04a25619dcee3d2261ad2ee6bf12ffa06d98a0864d87602733ec86a64521f2b18177b200cbbe117577a615d6c770988c0bad946e208e24fa074e5ab3143db5bfce0fd108e4b82d120a92108011a723c12a787e6d788719a10bdba5b2699c327186af4e23c1a946834b6150bda2583e9ca2ad44ce8dbbbc2db04de8ef92e8efc141fbecaa6287c59474e6bc05d99b2964fa090c3a2233ba186515be7ed1f612970cee2d7afb81bdd762170481cd0069127d5b05aa993b4ea988d8fddc186ffb7dc90a6c08f4df435c93402849236c3fab4d27c7026c1d4dcb2602646dec9751e763dba37bdf8ff9406ad9e530ee5db382f413001aeb06a53ed9027d831179727b0865a8918da3edbebcf9b14ed44ce6cbaced4bb1bdb7f1447e6cc254b332051512bd7af426fb8f401378cd2bf5983ca01c64b92ecf032ea15d1721d03f482d7ce6e74fef6d55e702f46980c82b5a84031900b1c9e59e7c97fbec7e8f323a97a7e36cc88be0f1d45b7ff585ac54bd407b22b4154aacc8f6d7ebf48e1d814cc5ed20f8037e0a79715eef29be32806a1d58bb7c5da76f550aa3d8a1fbff0eb19ccb1a313d55cda56c9ec2ef29632387fe8d76e3c0468043e8f663f4860ee12bf2d5b0b7474d6e694f91e6dcc4024ffffffffffffffff"},"modp18":{"gen":"02","prime":"ffffffffffffffffc90fdaa22168c234c4c6628b80dc1cd129024e088a67cc74020bbea63b139b22514a08798e3404ddef9519b3cd3a431b302b0a6df25f14374fe1356d6d51c245e485b576625e7ec6f44c42e9a637ed6b0bff5cb6f406b7edee386bfb5a899fa5ae9f24117c4b1fe649286651ece45b3dc2007cb8a163bf0598da48361c55d39a69163fa8fd24cf5f83655d23dca3ad961c62f356208552bb9ed529077096966d670c354e4abc9804f1746c08ca18217c32905e462e36ce3be39e772c180e86039b2783a2ec07a28fb5c55df06f4c52c9de2bcbf6955817183995497cea956ae515d2261898fa051015728e5a8aaac42dad33170d04507a33a85521abdf1cba64ecfb850458dbef0a8aea71575d060c7db3970f85a6e1e4c7abf5ae8cdb0933d71e8c94e04a25619dcee3d2261ad2ee6bf12ffa06d98a0864d87602733ec86a64521f2b18177b200cbbe117577a615d6c770988c0bad946e208e24fa074e5ab3143db5bfce0fd108e4b82d120a92108011a723c12a787e6d788719a10bdba5b2699c327186af4e23c1a946834b6150bda2583e9ca2ad44ce8dbbbc2db04de8ef92e8efc141fbecaa6287c59474e6bc05d99b2964fa090c3a2233ba186515be7ed1f612970cee2d7afb81bdd762170481cd0069127d5b05aa993b4ea988d8fddc186ffb7dc90a6c08f4df435c93402849236c3fab4d27c7026c1d4dcb2602646dec9751e763dba37bdf8ff9406ad9e530ee5db382f413001aeb06a53ed9027d831179727b0865a8918da3edbebcf9b14ed44ce6cbaced4bb1bdb7f1447e6cc254b332051512bd7af426fb8f401378cd2bf5983ca01c64b92ecf032ea15d1721d03f482d7ce6e74fef6d55e702f46980c82b5a84031900b1c9e59e7c97fbec7e8f323a97a7e36cc88be0f1d45b7ff585ac54bd407b22b4154aacc8f6d7ebf48e1d814cc5ed20f8037e0a79715eef29be32806a1d58bb7c5da76f550aa3d8a1fbff0eb19ccb1a313d55cda56c9ec2ef29632387fe8d76e3c0468043e8f663f4860ee12bf2d5b0b7474d6e694f91e6dbe115974a3926f12fee5e438777cb6a932df8cd8bec4d073b931ba3bc832b68d9dd300741fa7bf8afc47ed2576f6936ba424663aab639c5ae4f5683423b4742bf1c978238f16cbe39d652de3fdb8befc848ad922222e04a4037c0713eb57a81a23f0c73473fc646cea306b4bcbc8862f8385ddfa9d4b7fa2c087e879683303ed5bdd3a062b3cf5b3a278a66d2a13f83f44f82ddf310ee074ab6a364597e899a0255dc164f31cc50846851df9ab48195ded7ea1b1d510bd7ee74d73faf36bc31ecfa268359046f4eb879f924009438b481c6cd7889a002ed5ee382bc9190da6fc026e479558e4475677e9aa9e3050e2765694dfc81f56e880b96e7160c980dd98edd3dfffffffffffffffff"}};
+
+/***/ }),
+
+/***/ "../../node_modules/eckey/lib/eckey.js":
+/*!*************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/eckey/lib/eckey.js ***!
+  \*************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(Buffer) {var crypto = __webpack_require__(/*! crypto */ "../../node_modules/crypto-browserify/index.js")
+var secp256k1 = __webpack_require__(/*! secp256k1 */ "../../node_modules/secp256k1/elliptic.js")
+
+function ECKey (bytes, compressed) {
+  if (!(this instanceof ECKey)) return new ECKey(bytes, compressed)
+
+  this._compressed = typeof compressed === 'boolean' ? compressed : true
+  if (bytes) this.privateKey = bytes
+}
+
+Object.defineProperty(ECKey.prototype, 'privateKey', {
+  enumerable: true, configurable: true,
+  get: function () {
+    return this.key
+  },
+  set: function (bytes) {
+    var byteArr
+    if (Buffer.isBuffer(bytes)) {
+      this.key = bytes
+      byteArr = [].slice.call(bytes)
+    } else if (bytes instanceof Uint8Array) {
+      byteArr = [].slice.call(bytes)
+      this.key = new Buffer(byteArr)
+    } else if (Array.isArray(bytes)) {
+      byteArr = bytes
+      this.key = new Buffer(byteArr)
+    } else {
+      throw new Error('Invalid type. private key bytes must be either a Buffer, Array, or Uint8Array.')
+    }
+
+    if (bytes.length !== 32) throw new Error('private key bytes must have a length of 32')
+
+    // _exportKey => privateKey + (0x01 if compressed)
+    if (this._compressed) {
+      this._exportKey = Buffer.concat([ this.key, new Buffer([0x01]) ])
+    } else {
+      this._exportKey = Buffer.concat([ this.key ]) // clone key as opposed to passing a reference (relevant to Node.js only)
+    }
+
+    // reset
+    this._publicKey = null
+    this._pubKeyHash = null
+  }
+})
+
+Object.defineProperty(ECKey.prototype, 'privateExportKey', {
+  get: function () {
+    return this._exportKey
+  }
+})
+
+Object.defineProperty(ECKey.prototype, 'publicHash', {
+  get: function () {
+    return this.pubKeyHash
+  }
+})
+
+Object.defineProperty(ECKey.prototype, 'pubKeyHash', {
+  get: function () {
+    if (this._pubKeyHash) return this._pubKeyHash
+    var sha = crypto.createHash('sha256').update(this.publicKey).digest()
+    this._pubKeyHash = crypto.createHash('rmd160').update(sha).digest()
+    return this._pubKeyHash
+  }
+})
+
+Object.defineProperty(ECKey.prototype, 'publicKey', {
+  get: function () {
+    if (!this._publicKey) this._publicKey = secp256k1.publicKeyCreate(this.key, this.compressed)
+    return new Buffer(this._publicKey)
+  }
+})
+
+Object.defineProperty(ECKey.prototype, 'compressed', {
+  get: function () {
+    return this._compressed
+  },
+  set: function (val) {
+    var c = !!val
+    if (c === this._compressed) return
+
+    // reset key stuff
+    var pk = this.privateKey
+    this._compressed = c
+    this.privateKey = pk
+  }
+})
+
+ECKey.prototype.toString = function (format) {
+  return this.privateKey.toString('hex')
+}
+
+module.exports = ECKey
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../node-libs-browser/node_modules/buffer/index.js */ "../../node_modules/node-libs-browser/node_modules/buffer/index.js").Buffer))
 
 /***/ }),
 
@@ -32072,6 +38782,43 @@ module.exports = MD5
 
 /***/ }),
 
+/***/ "../../node_modules/merkle-lib/fastRoot.js":
+/*!*****************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/merkle-lib/fastRoot.js ***!
+  \*****************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(Buffer) {// constant-space merkle root calculation algorithm
+module.exports = function fastRoot (values, digestFn) {
+  if (!Array.isArray(values)) throw TypeError('Expected values Array')
+  if (typeof digestFn !== 'function') throw TypeError('Expected digest Function')
+
+  var length = values.length
+  var results = values.concat()
+
+  while (length > 1) {
+    var j = 0
+
+    for (var i = 0; i < length; i += 2, ++j) {
+      var left = results[i]
+      var right = i + 1 === length ? left : results[i + 1]
+      var data = Buffer.concat([left, right])
+
+      results[j] = digestFn(data)
+    }
+
+    length = j
+  }
+
+  return results[0]
+}
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../node-libs-browser/node_modules/buffer/index.js */ "../../node_modules/node-libs-browser/node_modules/buffer/index.js").Buffer))
+
+/***/ }),
+
 /***/ "../../node_modules/miller-rabin/lib/mr.js":
 /*!*****************************************************************************!*\
   !*** /home/dev/ezpay-browser-extension/node_modules/miller-rabin/lib/mr.js ***!
@@ -39088,6 +45835,95 @@ module.exports = function xor (a, b) {
     a[i] ^= b[i]
   }
   return a
+}
+
+
+/***/ }),
+
+/***/ "../../node_modules/pushdata-bitcoin/index.js":
+/*!********************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/pushdata-bitcoin/index.js ***!
+  \********************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+var OPS = __webpack_require__(/*! bitcoin-ops */ "../../node_modules/bitcoin-ops/index.json")
+
+function encodingLength (i) {
+  return i < OPS.OP_PUSHDATA1 ? 1
+  : i <= 0xff ? 2
+  : i <= 0xffff ? 3
+  : 5
+}
+
+function encode (buffer, number, offset) {
+  var size = encodingLength(number)
+
+  // ~6 bit
+  if (size === 1) {
+    buffer.writeUInt8(number, offset)
+
+  // 8 bit
+  } else if (size === 2) {
+    buffer.writeUInt8(OPS.OP_PUSHDATA1, offset)
+    buffer.writeUInt8(number, offset + 1)
+
+  // 16 bit
+  } else if (size === 3) {
+    buffer.writeUInt8(OPS.OP_PUSHDATA2, offset)
+    buffer.writeUInt16LE(number, offset + 1)
+
+  // 32 bit
+  } else {
+    buffer.writeUInt8(OPS.OP_PUSHDATA4, offset)
+    buffer.writeUInt32LE(number, offset + 1)
+  }
+
+  return size
+}
+
+function decode (buffer, offset) {
+  var opcode = buffer.readUInt8(offset)
+  var number, size
+
+  // ~6 bit
+  if (opcode < OPS.OP_PUSHDATA1) {
+    number = opcode
+    size = 1
+
+  // 8 bit
+  } else if (opcode === OPS.OP_PUSHDATA1) {
+    if (offset + 2 > buffer.length) return null
+    number = buffer.readUInt8(offset + 1)
+    size = 2
+
+  // 16 bit
+  } else if (opcode === OPS.OP_PUSHDATA2) {
+    if (offset + 3 > buffer.length) return null
+    number = buffer.readUInt16LE(offset + 1)
+    size = 3
+
+  // 32 bit
+  } else {
+    if (offset + 5 > buffer.length) return null
+    if (opcode !== OPS.OP_PUSHDATA4) throw new Error('Unexpected opcode')
+
+    number = buffer.readUInt32LE(offset + 1)
+    size = 5
+  }
+
+  return {
+    opcode: opcode,
+    number: number,
+    size: size
+  }
+}
+
+module.exports = {
+  encodingLength: encodingLength,
+  encode: encode,
+  decode: decode
 }
 
 
@@ -46754,6 +53590,924 @@ function arraycopy (src, srcPos, dest, destPos, length) {
 module.exports = scrypt
 
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../node-libs-browser/node_modules/buffer/index.js */ "../../node_modules/node-libs-browser/node_modules/buffer/index.js").Buffer))
+
+/***/ }),
+
+/***/ "../../node_modules/secp256k1/elliptic.js":
+/*!****************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/secp256k1/elliptic.js ***!
+  \****************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+module.exports = __webpack_require__(/*! ./lib */ "../../node_modules/secp256k1/lib/index.js")(__webpack_require__(/*! ./lib/elliptic */ "../../node_modules/secp256k1/lib/elliptic/index.js"))
+
+
+/***/ }),
+
+/***/ "../../node_modules/secp256k1/lib/assert.js":
+/*!******************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/secp256k1/lib/assert.js ***!
+  \******************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(Buffer) {
+var toString = Object.prototype.toString
+
+// TypeError
+exports.isArray = function (value, message) {
+  if (!Array.isArray(value)) throw TypeError(message)
+}
+
+exports.isBoolean = function (value, message) {
+  if (toString.call(value) !== '[object Boolean]') throw TypeError(message)
+}
+
+exports.isBuffer = function (value, message) {
+  if (!Buffer.isBuffer(value)) throw TypeError(message)
+}
+
+exports.isFunction = function (value, message) {
+  if (toString.call(value) !== '[object Function]') throw TypeError(message)
+}
+
+exports.isNumber = function (value, message) {
+  if (toString.call(value) !== '[object Number]') throw TypeError(message)
+}
+
+exports.isObject = function (value, message) {
+  if (toString.call(value) !== '[object Object]') throw TypeError(message)
+}
+
+// RangeError
+exports.isBufferLength = function (buffer, length, message) {
+  if (buffer.length !== length) throw RangeError(message)
+}
+
+exports.isBufferLength2 = function (buffer, length1, length2, message) {
+  if (buffer.length !== length1 && buffer.length !== length2) throw RangeError(message)
+}
+
+exports.isLengthGTZero = function (value, message) {
+  if (value.length === 0) throw RangeError(message)
+}
+
+exports.isNumberInInterval = function (number, x, y, message) {
+  if (number <= x || number >= y) throw RangeError(message)
+}
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../node-libs-browser/node_modules/buffer/index.js */ "../../node_modules/node-libs-browser/node_modules/buffer/index.js").Buffer))
+
+/***/ }),
+
+/***/ "../../node_modules/secp256k1/lib/der.js":
+/*!***************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/secp256k1/lib/der.js ***!
+  \***************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var Buffer = __webpack_require__(/*! safe-buffer */ "../../node_modules/safe-buffer/index.js").Buffer
+var bip66 = __webpack_require__(/*! bip66 */ "../../node_modules/bip66/index.js")
+
+var EC_PRIVKEY_EXPORT_DER_COMPRESSED = Buffer.from([
+  // begin
+  0x30, 0x81, 0xd3, 0x02, 0x01, 0x01, 0x04, 0x20,
+  // private key
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  // middle
+  0xa0, 0x81, 0x85, 0x30, 0x81, 0x82, 0x02, 0x01, 0x01, 0x30, 0x2c, 0x06, 0x07, 0x2a, 0x86, 0x48,
+  0xcE, 0x3d, 0x01, 0x01, 0x02, 0x21, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xfE, 0xff, 0xff, 0xfc, 0x2f, 0x30, 0x06, 0x04, 0x01, 0x00, 0x04, 0x01, 0x07, 0x04,
+  0x21, 0x02, 0x79, 0xbE, 0x66, 0x7E, 0xf9, 0xdc, 0xbb, 0xac, 0x55, 0xa0, 0x62, 0x95, 0xcE, 0x87,
+  0x0b, 0x07, 0x02, 0x9b, 0xfc, 0xdb, 0x2d, 0xcE, 0x28, 0xd9, 0x59, 0xf2, 0x81, 0x5b, 0x16, 0xf8,
+  0x17, 0x98, 0x02, 0x21, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xfE, 0xba, 0xaE, 0xdc, 0xE6, 0xaf, 0x48, 0xa0, 0x3b, 0xbf, 0xd2, 0x5E,
+  0x8c, 0xd0, 0x36, 0x41, 0x41, 0x02, 0x01, 0x01, 0xa1, 0x24, 0x03, 0x22, 0x00,
+  // public key
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00
+])
+
+var EC_PRIVKEY_EXPORT_DER_UNCOMPRESSED = Buffer.from([
+  // begin
+  0x30, 0x82, 0x01, 0x13, 0x02, 0x01, 0x01, 0x04, 0x20,
+  // private key
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  // middle
+  0xa0, 0x81, 0xa5, 0x30, 0x81, 0xa2, 0x02, 0x01, 0x01, 0x30, 0x2c, 0x06, 0x07, 0x2a, 0x86, 0x48,
+  0xcE, 0x3d, 0x01, 0x01, 0x02, 0x21, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xfE, 0xff, 0xff, 0xfc, 0x2f, 0x30, 0x06, 0x04, 0x01, 0x00, 0x04, 0x01, 0x07, 0x04,
+  0x41, 0x04, 0x79, 0xbE, 0x66, 0x7E, 0xf9, 0xdc, 0xbb, 0xac, 0x55, 0xa0, 0x62, 0x95, 0xcE, 0x87,
+  0x0b, 0x07, 0x02, 0x9b, 0xfc, 0xdb, 0x2d, 0xcE, 0x28, 0xd9, 0x59, 0xf2, 0x81, 0x5b, 0x16, 0xf8,
+  0x17, 0x98, 0x48, 0x3a, 0xda, 0x77, 0x26, 0xa3, 0xc4, 0x65, 0x5d, 0xa4, 0xfb, 0xfc, 0x0E, 0x11,
+  0x08, 0xa8, 0xfd, 0x17, 0xb4, 0x48, 0xa6, 0x85, 0x54, 0x19, 0x9c, 0x47, 0xd0, 0x8f, 0xfb, 0x10,
+  0xd4, 0xb8, 0x02, 0x21, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+  0xff, 0xff, 0xff, 0xff, 0xfE, 0xba, 0xaE, 0xdc, 0xE6, 0xaf, 0x48, 0xa0, 0x3b, 0xbf, 0xd2, 0x5E,
+  0x8c, 0xd0, 0x36, 0x41, 0x41, 0x02, 0x01, 0x01, 0xa1, 0x44, 0x03, 0x42, 0x00,
+  // public key
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00
+])
+
+exports.privateKeyExport = function (privateKey, publicKey, compressed) {
+  var result = Buffer.from(compressed ? EC_PRIVKEY_EXPORT_DER_COMPRESSED : EC_PRIVKEY_EXPORT_DER_UNCOMPRESSED)
+  privateKey.copy(result, compressed ? 8 : 9)
+  publicKey.copy(result, compressed ? 181 : 214)
+  return result
+}
+
+exports.privateKeyImport = function (privateKey) {
+  var length = privateKey.length
+
+  // sequence header
+  var index = 0
+  if (length < index + 1 || privateKey[index] !== 0x30) return
+  index += 1
+
+  // sequence length constructor
+  if (length < index + 1 || !(privateKey[index] & 0x80)) return
+
+  var lenb = privateKey[index] & 0x7f
+  index += 1
+  if (lenb < 1 || lenb > 2) return
+  if (length < index + lenb) return
+
+  // sequence length
+  var len = privateKey[index + lenb - 1] | (lenb > 1 ? privateKey[index + lenb - 2] << 8 : 0)
+  index += lenb
+  if (length < index + len) return
+
+  // sequence element 0: version number (=1)
+  if (length < index + 3 ||
+      privateKey[index] !== 0x02 ||
+      privateKey[index + 1] !== 0x01 ||
+      privateKey[index + 2] !== 0x01) {
+    return
+  }
+  index += 3
+
+  // sequence element 1: octet string, up to 32 bytes
+  if (length < index + 2 ||
+      privateKey[index] !== 0x04 ||
+      privateKey[index + 1] > 0x20 ||
+      length < index + 2 + privateKey[index + 1]) {
+    return
+  }
+
+  return privateKey.slice(index + 2, index + 2 + privateKey[index + 1])
+}
+
+exports.signatureExport = function (sigObj) {
+  var r = Buffer.concat([Buffer.from([0]), sigObj.r])
+  for (var lenR = 33, posR = 0; lenR > 1 && r[posR] === 0x00 && !(r[posR + 1] & 0x80); --lenR, ++posR);
+
+  var s = Buffer.concat([Buffer.from([0]), sigObj.s])
+  for (var lenS = 33, posS = 0; lenS > 1 && s[posS] === 0x00 && !(s[posS + 1] & 0x80); --lenS, ++posS);
+
+  return bip66.encode(r.slice(posR), s.slice(posS))
+}
+
+exports.signatureImport = function (sig) {
+  var r = Buffer.alloc(32, 0)
+  var s = Buffer.alloc(32, 0)
+
+  try {
+    var sigObj = bip66.decode(sig)
+    if (sigObj.r.length === 33 && sigObj.r[0] === 0x00) sigObj.r = sigObj.r.slice(1)
+    if (sigObj.r.length > 32) throw new Error('R length is too long')
+    if (sigObj.s.length === 33 && sigObj.s[0] === 0x00) sigObj.s = sigObj.s.slice(1)
+    if (sigObj.s.length > 32) throw new Error('S length is too long')
+  } catch (err) {
+    return
+  }
+
+  sigObj.r.copy(r, 32 - sigObj.r.length)
+  sigObj.s.copy(s, 32 - sigObj.s.length)
+
+  return { r: r, s: s }
+}
+
+exports.signatureImportLax = function (sig) {
+  var r = Buffer.alloc(32, 0)
+  var s = Buffer.alloc(32, 0)
+
+  var length = sig.length
+  var index = 0
+
+  // sequence tag byte
+  if (sig[index++] !== 0x30) return
+
+  // sequence length byte
+  var lenbyte = sig[index++]
+  if (lenbyte & 0x80) {
+    index += lenbyte - 0x80
+    if (index > length) return
+  }
+
+  // sequence tag byte for r
+  if (sig[index++] !== 0x02) return
+
+  // length for r
+  var rlen = sig[index++]
+  if (rlen & 0x80) {
+    lenbyte = rlen - 0x80
+    if (index + lenbyte > length) return
+    for (; lenbyte > 0 && sig[index] === 0x00; index += 1, lenbyte -= 1);
+    for (rlen = 0; lenbyte > 0; index += 1, lenbyte -= 1) rlen = (rlen << 8) + sig[index]
+  }
+  if (rlen > length - index) return
+  var rindex = index
+  index += rlen
+
+  // sequence tag byte for s
+  if (sig[index++] !== 0x02) return
+
+  // length for s
+  var slen = sig[index++]
+  if (slen & 0x80) {
+    lenbyte = slen - 0x80
+    if (index + lenbyte > length) return
+    for (; lenbyte > 0 && sig[index] === 0x00; index += 1, lenbyte -= 1);
+    for (slen = 0; lenbyte > 0; index += 1, lenbyte -= 1) slen = (slen << 8) + sig[index]
+  }
+  if (slen > length - index) return
+  var sindex = index
+  index += slen
+
+  // ignore leading zeros in r
+  for (; rlen > 0 && sig[rindex] === 0x00; rlen -= 1, rindex += 1);
+  // copy r value
+  if (rlen > 32) return
+  var rvalue = sig.slice(rindex, rindex + rlen)
+  rvalue.copy(r, 32 - rvalue.length)
+
+  // ignore leading zeros in s
+  for (; slen > 0 && sig[sindex] === 0x00; slen -= 1, sindex += 1);
+  // copy s value
+  if (slen > 32) return
+  var svalue = sig.slice(sindex, sindex + slen)
+  svalue.copy(s, 32 - svalue.length)
+
+  return { r: r, s: s }
+}
+
+
+/***/ }),
+
+/***/ "../../node_modules/secp256k1/lib/elliptic/index.js":
+/*!**************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/secp256k1/lib/elliptic/index.js ***!
+  \**************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var Buffer = __webpack_require__(/*! safe-buffer */ "../../node_modules/safe-buffer/index.js").Buffer
+var createHash = __webpack_require__(/*! create-hash */ "../../node_modules/create-hash/browser.js")
+var BN = __webpack_require__(/*! bn.js */ "../../node_modules/bn.js/lib/bn.js")
+var EC = __webpack_require__(/*! elliptic */ "../../node_modules/elliptic/lib/elliptic.js").ec
+
+var messages = __webpack_require__(/*! ../messages.json */ "../../node_modules/secp256k1/lib/messages.json")
+
+var ec = new EC('secp256k1')
+var ecparams = ec.curve
+
+function loadCompressedPublicKey (first, xBuffer) {
+  var x = new BN(xBuffer)
+
+  // overflow
+  if (x.cmp(ecparams.p) >= 0) return null
+  x = x.toRed(ecparams.red)
+
+  // compute corresponding Y
+  var y = x.redSqr().redIMul(x).redIAdd(ecparams.b).redSqrt()
+  if ((first === 0x03) !== y.isOdd()) y = y.redNeg()
+
+  return ec.keyPair({ pub: { x: x, y: y } })
+}
+
+function loadUncompressedPublicKey (first, xBuffer, yBuffer) {
+  var x = new BN(xBuffer)
+  var y = new BN(yBuffer)
+
+  // overflow
+  if (x.cmp(ecparams.p) >= 0 || y.cmp(ecparams.p) >= 0) return null
+
+  x = x.toRed(ecparams.red)
+  y = y.toRed(ecparams.red)
+
+  // is odd flag
+  if ((first === 0x06 || first === 0x07) && y.isOdd() !== (first === 0x07)) return null
+
+  // x*x*x + b = y*y
+  var x3 = x.redSqr().redIMul(x)
+  if (!y.redSqr().redISub(x3.redIAdd(ecparams.b)).isZero()) return null
+
+  return ec.keyPair({ pub: { x: x, y: y } })
+}
+
+function loadPublicKey (publicKey) {
+  var first = publicKey[0]
+  switch (first) {
+    case 0x02:
+    case 0x03:
+      if (publicKey.length !== 33) return null
+      return loadCompressedPublicKey(first, publicKey.slice(1, 33))
+    case 0x04:
+    case 0x06:
+    case 0x07:
+      if (publicKey.length !== 65) return null
+      return loadUncompressedPublicKey(first, publicKey.slice(1, 33), publicKey.slice(33, 65))
+    default:
+      return null
+  }
+}
+
+exports.privateKeyVerify = function (privateKey) {
+  var bn = new BN(privateKey)
+  return bn.cmp(ecparams.n) < 0 && !bn.isZero()
+}
+
+exports.privateKeyExport = function (privateKey, compressed) {
+  var d = new BN(privateKey)
+  if (d.cmp(ecparams.n) >= 0 || d.isZero()) throw new Error(messages.EC_PRIVATE_KEY_EXPORT_DER_FAIL)
+
+  return Buffer.from(ec.keyFromPrivate(privateKey).getPublic(compressed, true))
+}
+
+exports.privateKeyNegate = function (privateKey) {
+  var bn = new BN(privateKey)
+  return bn.isZero() ? Buffer.alloc(32) : ecparams.n.sub(bn).umod(ecparams.n).toArrayLike(Buffer, 'be', 32)
+}
+
+exports.privateKeyModInverse = function (privateKey) {
+  var bn = new BN(privateKey)
+  if (bn.cmp(ecparams.n) >= 0 || bn.isZero()) throw new Error(messages.EC_PRIVATE_KEY_RANGE_INVALID)
+
+  return bn.invm(ecparams.n).toArrayLike(Buffer, 'be', 32)
+}
+
+exports.privateKeyTweakAdd = function (privateKey, tweak) {
+  var bn = new BN(tweak)
+  if (bn.cmp(ecparams.n) >= 0) throw new Error(messages.EC_PRIVATE_KEY_TWEAK_ADD_FAIL)
+
+  bn.iadd(new BN(privateKey))
+  if (bn.cmp(ecparams.n) >= 0) bn.isub(ecparams.n)
+  if (bn.isZero()) throw new Error(messages.EC_PRIVATE_KEY_TWEAK_ADD_FAIL)
+
+  return bn.toArrayLike(Buffer, 'be', 32)
+}
+
+exports.privateKeyTweakMul = function (privateKey, tweak) {
+  var bn = new BN(tweak)
+  if (bn.cmp(ecparams.n) >= 0 || bn.isZero()) throw new Error(messages.EC_PRIVATE_KEY_TWEAK_MUL_FAIL)
+
+  bn.imul(new BN(privateKey))
+  if (bn.cmp(ecparams.n)) bn = bn.umod(ecparams.n)
+
+  return bn.toArrayLike(Buffer, 'be', 32)
+}
+
+exports.publicKeyCreate = function (privateKey, compressed) {
+  var d = new BN(privateKey)
+  if (d.cmp(ecparams.n) >= 0 || d.isZero()) throw new Error(messages.EC_PUBLIC_KEY_CREATE_FAIL)
+
+  return Buffer.from(ec.keyFromPrivate(privateKey).getPublic(compressed, true))
+}
+
+exports.publicKeyConvert = function (publicKey, compressed) {
+  var pair = loadPublicKey(publicKey)
+  if (pair === null) throw new Error(messages.EC_PUBLIC_KEY_PARSE_FAIL)
+
+  return Buffer.from(pair.getPublic(compressed, true))
+}
+
+exports.publicKeyVerify = function (publicKey) {
+  return loadPublicKey(publicKey) !== null
+}
+
+exports.publicKeyTweakAdd = function (publicKey, tweak, compressed) {
+  var pair = loadPublicKey(publicKey)
+  if (pair === null) throw new Error(messages.EC_PUBLIC_KEY_PARSE_FAIL)
+
+  tweak = new BN(tweak)
+  if (tweak.cmp(ecparams.n) >= 0) throw new Error(messages.EC_PUBLIC_KEY_TWEAK_ADD_FAIL)
+
+  var point = ecparams.g.mul(tweak).add(pair.pub)
+  if (point.isInfinity()) throw new Error(messages.EC_PUBLIC_KEY_TWEAK_ADD_FAIL)
+
+  return Buffer.from(point.encode(true, compressed))
+}
+
+exports.publicKeyTweakMul = function (publicKey, tweak, compressed) {
+  var pair = loadPublicKey(publicKey)
+  if (pair === null) throw new Error(messages.EC_PUBLIC_KEY_PARSE_FAIL)
+
+  tweak = new BN(tweak)
+  if (tweak.cmp(ecparams.n) >= 0 || tweak.isZero()) throw new Error(messages.EC_PUBLIC_KEY_TWEAK_MUL_FAIL)
+
+  return Buffer.from(pair.pub.mul(tweak).encode(true, compressed))
+}
+
+exports.publicKeyCombine = function (publicKeys, compressed) {
+  var pairs = new Array(publicKeys.length)
+  for (var i = 0; i < publicKeys.length; ++i) {
+    pairs[i] = loadPublicKey(publicKeys[i])
+    if (pairs[i] === null) throw new Error(messages.EC_PUBLIC_KEY_PARSE_FAIL)
+  }
+
+  var point = pairs[0].pub
+  for (var j = 1; j < pairs.length; ++j) point = point.add(pairs[j].pub)
+  if (point.isInfinity()) throw new Error(messages.EC_PUBLIC_KEY_COMBINE_FAIL)
+
+  return Buffer.from(point.encode(true, compressed))
+}
+
+exports.signatureNormalize = function (signature) {
+  var r = new BN(signature.slice(0, 32))
+  var s = new BN(signature.slice(32, 64))
+  if (r.cmp(ecparams.n) >= 0 || s.cmp(ecparams.n) >= 0) throw new Error(messages.ECDSA_SIGNATURE_PARSE_FAIL)
+
+  var result = Buffer.from(signature)
+  if (s.cmp(ec.nh) === 1) ecparams.n.sub(s).toArrayLike(Buffer, 'be', 32).copy(result, 32)
+
+  return result
+}
+
+exports.signatureExport = function (signature) {
+  var r = signature.slice(0, 32)
+  var s = signature.slice(32, 64)
+  if (new BN(r).cmp(ecparams.n) >= 0 || new BN(s).cmp(ecparams.n) >= 0) throw new Error(messages.ECDSA_SIGNATURE_PARSE_FAIL)
+
+  return { r: r, s: s }
+}
+
+exports.signatureImport = function (sigObj) {
+  var r = new BN(sigObj.r)
+  if (r.cmp(ecparams.n) >= 0) r = new BN(0)
+
+  var s = new BN(sigObj.s)
+  if (s.cmp(ecparams.n) >= 0) s = new BN(0)
+
+  return Buffer.concat([
+    r.toArrayLike(Buffer, 'be', 32),
+    s.toArrayLike(Buffer, 'be', 32)
+  ])
+}
+
+exports.sign = function (message, privateKey, noncefn, data) {
+  if (typeof noncefn === 'function') {
+    var getNonce = noncefn
+    noncefn = function (counter) {
+      var nonce = getNonce(message, privateKey, null, data, counter)
+      if (!Buffer.isBuffer(nonce) || nonce.length !== 32) throw new Error(messages.ECDSA_SIGN_FAIL)
+
+      return new BN(nonce)
+    }
+  }
+
+  var d = new BN(privateKey)
+  if (d.cmp(ecparams.n) >= 0 || d.isZero()) throw new Error(messages.ECDSA_SIGN_FAIL)
+
+  var result = ec.sign(message, privateKey, { canonical: true, k: noncefn, pers: data })
+  return {
+    signature: Buffer.concat([
+      result.r.toArrayLike(Buffer, 'be', 32),
+      result.s.toArrayLike(Buffer, 'be', 32)
+    ]),
+    recovery: result.recoveryParam
+  }
+}
+
+exports.verify = function (message, signature, publicKey) {
+  var sigObj = { r: signature.slice(0, 32), s: signature.slice(32, 64) }
+
+  var sigr = new BN(sigObj.r)
+  var sigs = new BN(sigObj.s)
+  if (sigr.cmp(ecparams.n) >= 0 || sigs.cmp(ecparams.n) >= 0) throw new Error(messages.ECDSA_SIGNATURE_PARSE_FAIL)
+  if (sigs.cmp(ec.nh) === 1 || sigr.isZero() || sigs.isZero()) return false
+
+  var pair = loadPublicKey(publicKey)
+  if (pair === null) throw new Error(messages.EC_PUBLIC_KEY_PARSE_FAIL)
+
+  return ec.verify(message, sigObj, { x: pair.pub.x, y: pair.pub.y })
+}
+
+exports.recover = function (message, signature, recovery, compressed) {
+  var sigObj = { r: signature.slice(0, 32), s: signature.slice(32, 64) }
+
+  var sigr = new BN(sigObj.r)
+  var sigs = new BN(sigObj.s)
+  if (sigr.cmp(ecparams.n) >= 0 || sigs.cmp(ecparams.n) >= 0) throw new Error(messages.ECDSA_SIGNATURE_PARSE_FAIL)
+
+  try {
+    if (sigr.isZero() || sigs.isZero()) throw new Error()
+
+    var point = ec.recoverPubKey(message, sigObj, recovery)
+    return Buffer.from(point.encode(true, compressed))
+  } catch (err) {
+    throw new Error(messages.ECDSA_RECOVER_FAIL)
+  }
+}
+
+exports.ecdh = function (publicKey, privateKey) {
+  var shared = exports.ecdhUnsafe(publicKey, privateKey, true)
+  return createHash('sha256').update(shared).digest()
+}
+
+exports.ecdhUnsafe = function (publicKey, privateKey, compressed) {
+  var pair = loadPublicKey(publicKey)
+  if (pair === null) throw new Error(messages.EC_PUBLIC_KEY_PARSE_FAIL)
+
+  var scalar = new BN(privateKey)
+  if (scalar.cmp(ecparams.n) >= 0 || scalar.isZero()) throw new Error(messages.ECDH_FAIL)
+
+  return Buffer.from(pair.pub.mul(scalar).encode(true, compressed))
+}
+
+
+/***/ }),
+
+/***/ "../../node_modules/secp256k1/lib/index.js":
+/*!*****************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/secp256k1/lib/index.js ***!
+  \*****************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var assert = __webpack_require__(/*! ./assert */ "../../node_modules/secp256k1/lib/assert.js")
+var der = __webpack_require__(/*! ./der */ "../../node_modules/secp256k1/lib/der.js")
+var messages = __webpack_require__(/*! ./messages.json */ "../../node_modules/secp256k1/lib/messages.json")
+
+function initCompressedValue (value, defaultValue) {
+  if (value === undefined) return defaultValue
+
+  assert.isBoolean(value, messages.COMPRESSED_TYPE_INVALID)
+  return value
+}
+
+module.exports = function (secp256k1) {
+  return {
+    privateKeyVerify: function (privateKey) {
+      assert.isBuffer(privateKey, messages.EC_PRIVATE_KEY_TYPE_INVALID)
+      return privateKey.length === 32 && secp256k1.privateKeyVerify(privateKey)
+    },
+
+    privateKeyExport: function (privateKey, compressed) {
+      assert.isBuffer(privateKey, messages.EC_PRIVATE_KEY_TYPE_INVALID)
+      assert.isBufferLength(privateKey, 32, messages.EC_PRIVATE_KEY_LENGTH_INVALID)
+
+      compressed = initCompressedValue(compressed, true)
+      var publicKey = secp256k1.privateKeyExport(privateKey, compressed)
+
+      return der.privateKeyExport(privateKey, publicKey, compressed)
+    },
+
+    privateKeyImport: function (privateKey) {
+      assert.isBuffer(privateKey, messages.EC_PRIVATE_KEY_TYPE_INVALID)
+
+      privateKey = der.privateKeyImport(privateKey)
+      if (privateKey && privateKey.length === 32 && secp256k1.privateKeyVerify(privateKey)) return privateKey
+
+      throw new Error(messages.EC_PRIVATE_KEY_IMPORT_DER_FAIL)
+    },
+
+    privateKeyNegate: function (privateKey) {
+      assert.isBuffer(privateKey, messages.EC_PRIVATE_KEY_TYPE_INVALID)
+      assert.isBufferLength(privateKey, 32, messages.EC_PRIVATE_KEY_LENGTH_INVALID)
+
+      return secp256k1.privateKeyNegate(privateKey)
+    },
+
+    privateKeyModInverse: function (privateKey) {
+      assert.isBuffer(privateKey, messages.EC_PRIVATE_KEY_TYPE_INVALID)
+      assert.isBufferLength(privateKey, 32, messages.EC_PRIVATE_KEY_LENGTH_INVALID)
+
+      return secp256k1.privateKeyModInverse(privateKey)
+    },
+
+    privateKeyTweakAdd: function (privateKey, tweak) {
+      assert.isBuffer(privateKey, messages.EC_PRIVATE_KEY_TYPE_INVALID)
+      assert.isBufferLength(privateKey, 32, messages.EC_PRIVATE_KEY_LENGTH_INVALID)
+
+      assert.isBuffer(tweak, messages.TWEAK_TYPE_INVALID)
+      assert.isBufferLength(tweak, 32, messages.TWEAK_LENGTH_INVALID)
+
+      return secp256k1.privateKeyTweakAdd(privateKey, tweak)
+    },
+
+    privateKeyTweakMul: function (privateKey, tweak) {
+      assert.isBuffer(privateKey, messages.EC_PRIVATE_KEY_TYPE_INVALID)
+      assert.isBufferLength(privateKey, 32, messages.EC_PRIVATE_KEY_LENGTH_INVALID)
+
+      assert.isBuffer(tweak, messages.TWEAK_TYPE_INVALID)
+      assert.isBufferLength(tweak, 32, messages.TWEAK_LENGTH_INVALID)
+
+      return secp256k1.privateKeyTweakMul(privateKey, tweak)
+    },
+
+    publicKeyCreate: function (privateKey, compressed) {
+      assert.isBuffer(privateKey, messages.EC_PRIVATE_KEY_TYPE_INVALID)
+      assert.isBufferLength(privateKey, 32, messages.EC_PRIVATE_KEY_LENGTH_INVALID)
+
+      compressed = initCompressedValue(compressed, true)
+
+      return secp256k1.publicKeyCreate(privateKey, compressed)
+    },
+
+    publicKeyConvert: function (publicKey, compressed) {
+      assert.isBuffer(publicKey, messages.EC_PUBLIC_KEY_TYPE_INVALID)
+      assert.isBufferLength2(publicKey, 33, 65, messages.EC_PUBLIC_KEY_LENGTH_INVALID)
+
+      compressed = initCompressedValue(compressed, true)
+
+      return secp256k1.publicKeyConvert(publicKey, compressed)
+    },
+
+    publicKeyVerify: function (publicKey) {
+      assert.isBuffer(publicKey, messages.EC_PUBLIC_KEY_TYPE_INVALID)
+      return secp256k1.publicKeyVerify(publicKey)
+    },
+
+    publicKeyTweakAdd: function (publicKey, tweak, compressed) {
+      assert.isBuffer(publicKey, messages.EC_PUBLIC_KEY_TYPE_INVALID)
+      assert.isBufferLength2(publicKey, 33, 65, messages.EC_PUBLIC_KEY_LENGTH_INVALID)
+
+      assert.isBuffer(tweak, messages.TWEAK_TYPE_INVALID)
+      assert.isBufferLength(tweak, 32, messages.TWEAK_LENGTH_INVALID)
+
+      compressed = initCompressedValue(compressed, true)
+
+      return secp256k1.publicKeyTweakAdd(publicKey, tweak, compressed)
+    },
+
+    publicKeyTweakMul: function (publicKey, tweak, compressed) {
+      assert.isBuffer(publicKey, messages.EC_PUBLIC_KEY_TYPE_INVALID)
+      assert.isBufferLength2(publicKey, 33, 65, messages.EC_PUBLIC_KEY_LENGTH_INVALID)
+
+      assert.isBuffer(tweak, messages.TWEAK_TYPE_INVALID)
+      assert.isBufferLength(tweak, 32, messages.TWEAK_LENGTH_INVALID)
+
+      compressed = initCompressedValue(compressed, true)
+
+      return secp256k1.publicKeyTweakMul(publicKey, tweak, compressed)
+    },
+
+    publicKeyCombine: function (publicKeys, compressed) {
+      assert.isArray(publicKeys, messages.EC_PUBLIC_KEYS_TYPE_INVALID)
+      assert.isLengthGTZero(publicKeys, messages.EC_PUBLIC_KEYS_LENGTH_INVALID)
+      for (var i = 0; i < publicKeys.length; ++i) {
+        assert.isBuffer(publicKeys[i], messages.EC_PUBLIC_KEY_TYPE_INVALID)
+        assert.isBufferLength2(publicKeys[i], 33, 65, messages.EC_PUBLIC_KEY_LENGTH_INVALID)
+      }
+
+      compressed = initCompressedValue(compressed, true)
+
+      return secp256k1.publicKeyCombine(publicKeys, compressed)
+    },
+
+    signatureNormalize: function (signature) {
+      assert.isBuffer(signature, messages.ECDSA_SIGNATURE_TYPE_INVALID)
+      assert.isBufferLength(signature, 64, messages.ECDSA_SIGNATURE_LENGTH_INVALID)
+
+      return secp256k1.signatureNormalize(signature)
+    },
+
+    signatureExport: function (signature) {
+      assert.isBuffer(signature, messages.ECDSA_SIGNATURE_TYPE_INVALID)
+      assert.isBufferLength(signature, 64, messages.ECDSA_SIGNATURE_LENGTH_INVALID)
+
+      var sigObj = secp256k1.signatureExport(signature)
+      return der.signatureExport(sigObj)
+    },
+
+    signatureImport: function (sig) {
+      assert.isBuffer(sig, messages.ECDSA_SIGNATURE_TYPE_INVALID)
+      assert.isLengthGTZero(sig, messages.ECDSA_SIGNATURE_LENGTH_INVALID)
+
+      var sigObj = der.signatureImport(sig)
+      if (sigObj) return secp256k1.signatureImport(sigObj)
+
+      throw new Error(messages.ECDSA_SIGNATURE_PARSE_DER_FAIL)
+    },
+
+    signatureImportLax: function (sig) {
+      assert.isBuffer(sig, messages.ECDSA_SIGNATURE_TYPE_INVALID)
+      assert.isLengthGTZero(sig, messages.ECDSA_SIGNATURE_LENGTH_INVALID)
+
+      var sigObj = der.signatureImportLax(sig)
+      if (sigObj) return secp256k1.signatureImport(sigObj)
+
+      throw new Error(messages.ECDSA_SIGNATURE_PARSE_DER_FAIL)
+    },
+
+    sign: function (message, privateKey, options) {
+      assert.isBuffer(message, messages.MSG32_TYPE_INVALID)
+      assert.isBufferLength(message, 32, messages.MSG32_LENGTH_INVALID)
+
+      assert.isBuffer(privateKey, messages.EC_PRIVATE_KEY_TYPE_INVALID)
+      assert.isBufferLength(privateKey, 32, messages.EC_PRIVATE_KEY_LENGTH_INVALID)
+
+      var data = null
+      var noncefn = null
+      if (options !== undefined) {
+        assert.isObject(options, messages.OPTIONS_TYPE_INVALID)
+
+        if (options.data !== undefined) {
+          assert.isBuffer(options.data, messages.OPTIONS_DATA_TYPE_INVALID)
+          assert.isBufferLength(options.data, 32, messages.OPTIONS_DATA_LENGTH_INVALID)
+          data = options.data
+        }
+
+        if (options.noncefn !== undefined) {
+          assert.isFunction(options.noncefn, messages.OPTIONS_NONCEFN_TYPE_INVALID)
+          noncefn = options.noncefn
+        }
+      }
+
+      return secp256k1.sign(message, privateKey, noncefn, data)
+    },
+
+    verify: function (message, signature, publicKey) {
+      assert.isBuffer(message, messages.MSG32_TYPE_INVALID)
+      assert.isBufferLength(message, 32, messages.MSG32_LENGTH_INVALID)
+
+      assert.isBuffer(signature, messages.ECDSA_SIGNATURE_TYPE_INVALID)
+      assert.isBufferLength(signature, 64, messages.ECDSA_SIGNATURE_LENGTH_INVALID)
+
+      assert.isBuffer(publicKey, messages.EC_PUBLIC_KEY_TYPE_INVALID)
+      assert.isBufferLength2(publicKey, 33, 65, messages.EC_PUBLIC_KEY_LENGTH_INVALID)
+
+      return secp256k1.verify(message, signature, publicKey)
+    },
+
+    recover: function (message, signature, recovery, compressed) {
+      assert.isBuffer(message, messages.MSG32_TYPE_INVALID)
+      assert.isBufferLength(message, 32, messages.MSG32_LENGTH_INVALID)
+
+      assert.isBuffer(signature, messages.ECDSA_SIGNATURE_TYPE_INVALID)
+      assert.isBufferLength(signature, 64, messages.ECDSA_SIGNATURE_LENGTH_INVALID)
+
+      assert.isNumber(recovery, messages.RECOVERY_ID_TYPE_INVALID)
+      assert.isNumberInInterval(recovery, -1, 4, messages.RECOVERY_ID_VALUE_INVALID)
+
+      compressed = initCompressedValue(compressed, true)
+
+      return secp256k1.recover(message, signature, recovery, compressed)
+    },
+
+    ecdh: function (publicKey, privateKey) {
+      assert.isBuffer(publicKey, messages.EC_PUBLIC_KEY_TYPE_INVALID)
+      assert.isBufferLength2(publicKey, 33, 65, messages.EC_PUBLIC_KEY_LENGTH_INVALID)
+
+      assert.isBuffer(privateKey, messages.EC_PRIVATE_KEY_TYPE_INVALID)
+      assert.isBufferLength(privateKey, 32, messages.EC_PRIVATE_KEY_LENGTH_INVALID)
+
+      return secp256k1.ecdh(publicKey, privateKey)
+    },
+
+    ecdhUnsafe: function (publicKey, privateKey, compressed) {
+      assert.isBuffer(publicKey, messages.EC_PUBLIC_KEY_TYPE_INVALID)
+      assert.isBufferLength2(publicKey, 33, 65, messages.EC_PUBLIC_KEY_LENGTH_INVALID)
+
+      assert.isBuffer(privateKey, messages.EC_PRIVATE_KEY_TYPE_INVALID)
+      assert.isBufferLength(privateKey, 32, messages.EC_PRIVATE_KEY_LENGTH_INVALID)
+
+      compressed = initCompressedValue(compressed, true)
+
+      return secp256k1.ecdhUnsafe(publicKey, privateKey, compressed)
+    }
+  }
+}
+
+
+/***/ }),
+
+/***/ "../../node_modules/secp256k1/lib/messages.json":
+/*!**********************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/secp256k1/lib/messages.json ***!
+  \**********************************************************************************/
+/*! exports provided: COMPRESSED_TYPE_INVALID, EC_PRIVATE_KEY_TYPE_INVALID, EC_PRIVATE_KEY_LENGTH_INVALID, EC_PRIVATE_KEY_RANGE_INVALID, EC_PRIVATE_KEY_TWEAK_ADD_FAIL, EC_PRIVATE_KEY_TWEAK_MUL_FAIL, EC_PRIVATE_KEY_EXPORT_DER_FAIL, EC_PRIVATE_KEY_IMPORT_DER_FAIL, EC_PUBLIC_KEYS_TYPE_INVALID, EC_PUBLIC_KEYS_LENGTH_INVALID, EC_PUBLIC_KEY_TYPE_INVALID, EC_PUBLIC_KEY_LENGTH_INVALID, EC_PUBLIC_KEY_PARSE_FAIL, EC_PUBLIC_KEY_CREATE_FAIL, EC_PUBLIC_KEY_TWEAK_ADD_FAIL, EC_PUBLIC_KEY_TWEAK_MUL_FAIL, EC_PUBLIC_KEY_COMBINE_FAIL, ECDH_FAIL, ECDSA_SIGNATURE_TYPE_INVALID, ECDSA_SIGNATURE_LENGTH_INVALID, ECDSA_SIGNATURE_PARSE_FAIL, ECDSA_SIGNATURE_PARSE_DER_FAIL, ECDSA_SIGNATURE_SERIALIZE_DER_FAIL, ECDSA_SIGN_FAIL, ECDSA_RECOVER_FAIL, MSG32_TYPE_INVALID, MSG32_LENGTH_INVALID, OPTIONS_TYPE_INVALID, OPTIONS_DATA_TYPE_INVALID, OPTIONS_DATA_LENGTH_INVALID, OPTIONS_NONCEFN_TYPE_INVALID, RECOVERY_ID_TYPE_INVALID, RECOVERY_ID_VALUE_INVALID, TWEAK_TYPE_INVALID, TWEAK_LENGTH_INVALID, default */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module) {
+
+module.exports = {"COMPRESSED_TYPE_INVALID":"compressed should be a boolean","EC_PRIVATE_KEY_TYPE_INVALID":"private key should be a Buffer","EC_PRIVATE_KEY_LENGTH_INVALID":"private key length is invalid","EC_PRIVATE_KEY_RANGE_INVALID":"private key range is invalid","EC_PRIVATE_KEY_TWEAK_ADD_FAIL":"tweak out of range or resulting private key is invalid","EC_PRIVATE_KEY_TWEAK_MUL_FAIL":"tweak out of range","EC_PRIVATE_KEY_EXPORT_DER_FAIL":"couldn't export to DER format","EC_PRIVATE_KEY_IMPORT_DER_FAIL":"couldn't import from DER format","EC_PUBLIC_KEYS_TYPE_INVALID":"public keys should be an Array","EC_PUBLIC_KEYS_LENGTH_INVALID":"public keys Array should have at least 1 element","EC_PUBLIC_KEY_TYPE_INVALID":"public key should be a Buffer","EC_PUBLIC_KEY_LENGTH_INVALID":"public key length is invalid","EC_PUBLIC_KEY_PARSE_FAIL":"the public key could not be parsed or is invalid","EC_PUBLIC_KEY_CREATE_FAIL":"private was invalid, try again","EC_PUBLIC_KEY_TWEAK_ADD_FAIL":"tweak out of range or resulting public key is invalid","EC_PUBLIC_KEY_TWEAK_MUL_FAIL":"tweak out of range","EC_PUBLIC_KEY_COMBINE_FAIL":"the sum of the public keys is not valid","ECDH_FAIL":"scalar was invalid (zero or overflow)","ECDSA_SIGNATURE_TYPE_INVALID":"signature should be a Buffer","ECDSA_SIGNATURE_LENGTH_INVALID":"signature length is invalid","ECDSA_SIGNATURE_PARSE_FAIL":"couldn't parse signature","ECDSA_SIGNATURE_PARSE_DER_FAIL":"couldn't parse DER signature","ECDSA_SIGNATURE_SERIALIZE_DER_FAIL":"couldn't serialize signature to DER format","ECDSA_SIGN_FAIL":"nonce generation function failed or private key is invalid","ECDSA_RECOVER_FAIL":"couldn't recover public key from signature","MSG32_TYPE_INVALID":"message should be a Buffer","MSG32_LENGTH_INVALID":"message length is invalid","OPTIONS_TYPE_INVALID":"options should be an Object","OPTIONS_DATA_TYPE_INVALID":"options.data should be a Buffer","OPTIONS_DATA_LENGTH_INVALID":"options.data length is invalid","OPTIONS_NONCEFN_TYPE_INVALID":"options.noncefn should be a Function","RECOVERY_ID_TYPE_INVALID":"recovery should be a Number","RECOVERY_ID_VALUE_INVALID":"recovery should have value between -1 and 4","TWEAK_TYPE_INVALID":"tweak should be a Buffer","TWEAK_LENGTH_INVALID":"tweak length is invalid"};
+
+/***/ }),
+
+/***/ "../../node_modules/secure-random/lib/secure-random.js":
+/*!*****************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/secure-random/lib/secure-random.js ***!
+  \*****************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(process, Buffer) {var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!function(globals){
+'use strict'
+
+//*** UMD BEGIN
+if (true) { //require.js / AMD
+  !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = (function() {
+    return secureRandom
+  }).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))
+} else {}
+//*** UMD END
+
+//options.type is the only valid option
+function secureRandom(count, options) {
+  options = options || {type: 'Array'}
+  //we check for process.pid to prevent browserify from tricking us
+  if (
+    typeof process != 'undefined'
+    && typeof process.pid == 'number'
+    && process.versions
+    && process.versions.node
+  ) {
+    return nodeRandom(count, options)
+  } else {
+    var crypto = window.crypto || window.msCrypto
+    if (!crypto) throw new Error("Your browser does not support window.crypto.")
+    return browserRandom(count, options)
+  }
+}
+
+function nodeRandom(count, options) {
+  var crypto = __webpack_require__(/*! crypto */ 4)
+  var buf = crypto.randomBytes(count)
+
+  switch (options.type) {
+    case 'Array':
+      return [].slice.call(buf)
+    case 'Buffer':
+      return buf
+    case 'Uint8Array':
+      var arr = new Uint8Array(count)
+      for (var i = 0; i < count; ++i) { arr[i] = buf.readUInt8(i) }
+      return arr
+    default:
+      throw new Error(options.type + " is unsupported.")
+  }
+}
+
+function browserRandom(count, options) {
+  var nativeArr = new Uint8Array(count)
+  var crypto = window.crypto || window.msCrypto
+  crypto.getRandomValues(nativeArr)
+
+  switch (options.type) {
+    case 'Array':
+      return [].slice.call(nativeArr)
+    case 'Buffer':
+      try { var b = new Buffer(1) } catch(e) { throw new Error('Buffer not supported in this environment. Use Node.js or Browserify for browser support.')}
+      return new Buffer(nativeArr)
+    case 'Uint8Array':
+      return nativeArr
+    default:
+      throw new Error(options.type + " is unsupported.")
+  }
+}
+
+secureRandom.randomArray = function(byteCount) {
+  return secureRandom(byteCount, {type: 'Array'})
+}
+
+secureRandom.randomUint8Array = function(byteCount) {
+  return secureRandom(byteCount, {type: 'Uint8Array'})
+}
+
+secureRandom.randomBuffer = function(byteCount) {
+  return secureRandom(byteCount, {type: 'Buffer'})
+}
+
+
+}(this);
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../process/browser.js */ "../../node_modules/process/browser.js"), __webpack_require__(/*! ./../../node-libs-browser/node_modules/buffer/index.js */ "../../node_modules/node-libs-browser/node_modules/buffer/index.js").Buffer))
 
 /***/ }),
 
@@ -55670,6 +63424,739 @@ function config (name) {
 
 /***/ }),
 
+/***/ "../../node_modules/util/support/isBufferBrowser.js":
+/*!**************************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/util/support/isBufferBrowser.js ***!
+  \**************************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports) {
+
+module.exports = function isBuffer(arg) {
+  return arg && typeof arg === 'object'
+    && typeof arg.copy === 'function'
+    && typeof arg.fill === 'function'
+    && typeof arg.readUInt8 === 'function';
+}
+
+/***/ }),
+
+/***/ "../../node_modules/util/util.js":
+/*!*******************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/util/util.js ***!
+  \*******************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(process) {// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+var getOwnPropertyDescriptors = Object.getOwnPropertyDescriptors ||
+  function getOwnPropertyDescriptors(obj) {
+    var keys = Object.keys(obj);
+    var descriptors = {};
+    for (var i = 0; i < keys.length; i++) {
+      descriptors[keys[i]] = Object.getOwnPropertyDescriptor(obj, keys[i]);
+    }
+    return descriptors;
+  };
+
+var formatRegExp = /%[sdj%]/g;
+exports.format = function(f) {
+  if (!isString(f)) {
+    var objects = [];
+    for (var i = 0; i < arguments.length; i++) {
+      objects.push(inspect(arguments[i]));
+    }
+    return objects.join(' ');
+  }
+
+  var i = 1;
+  var args = arguments;
+  var len = args.length;
+  var str = String(f).replace(formatRegExp, function(x) {
+    if (x === '%%') return '%';
+    if (i >= len) return x;
+    switch (x) {
+      case '%s': return String(args[i++]);
+      case '%d': return Number(args[i++]);
+      case '%j':
+        try {
+          return JSON.stringify(args[i++]);
+        } catch (_) {
+          return '[Circular]';
+        }
+      default:
+        return x;
+    }
+  });
+  for (var x = args[i]; i < len; x = args[++i]) {
+    if (isNull(x) || !isObject(x)) {
+      str += ' ' + x;
+    } else {
+      str += ' ' + inspect(x);
+    }
+  }
+  return str;
+};
+
+
+// Mark that a method should not be used.
+// Returns a modified function which warns once by default.
+// If --no-deprecation is set, then it is a no-op.
+exports.deprecate = function(fn, msg) {
+  if (typeof process !== 'undefined' && process.noDeprecation === true) {
+    return fn;
+  }
+
+  // Allow for deprecating things in the process of starting up.
+  if (typeof process === 'undefined') {
+    return function() {
+      return exports.deprecate(fn, msg).apply(this, arguments);
+    };
+  }
+
+  var warned = false;
+  function deprecated() {
+    if (!warned) {
+      if (process.throwDeprecation) {
+        throw new Error(msg);
+      } else if (process.traceDeprecation) {
+        console.trace(msg);
+      } else {
+        console.error(msg);
+      }
+      warned = true;
+    }
+    return fn.apply(this, arguments);
+  }
+
+  return deprecated;
+};
+
+
+var debugs = {};
+var debugEnviron;
+exports.debuglog = function(set) {
+  if (isUndefined(debugEnviron))
+    debugEnviron = process.env.NODE_DEBUG || '';
+  set = set.toUpperCase();
+  if (!debugs[set]) {
+    if (new RegExp('\\b' + set + '\\b', 'i').test(debugEnviron)) {
+      var pid = process.pid;
+      debugs[set] = function() {
+        var msg = exports.format.apply(exports, arguments);
+        console.error('%s %d: %s', set, pid, msg);
+      };
+    } else {
+      debugs[set] = function() {};
+    }
+  }
+  return debugs[set];
+};
+
+
+/**
+ * Echos the value of a value. Trys to print the value out
+ * in the best way possible given the different types.
+ *
+ * @param {Object} obj The object to print out.
+ * @param {Object} opts Optional options object that alters the output.
+ */
+/* legacy: obj, showHidden, depth, colors*/
+function inspect(obj, opts) {
+  // default options
+  var ctx = {
+    seen: [],
+    stylize: stylizeNoColor
+  };
+  // legacy...
+  if (arguments.length >= 3) ctx.depth = arguments[2];
+  if (arguments.length >= 4) ctx.colors = arguments[3];
+  if (isBoolean(opts)) {
+    // legacy...
+    ctx.showHidden = opts;
+  } else if (opts) {
+    // got an "options" object
+    exports._extend(ctx, opts);
+  }
+  // set default options
+  if (isUndefined(ctx.showHidden)) ctx.showHidden = false;
+  if (isUndefined(ctx.depth)) ctx.depth = 2;
+  if (isUndefined(ctx.colors)) ctx.colors = false;
+  if (isUndefined(ctx.customInspect)) ctx.customInspect = true;
+  if (ctx.colors) ctx.stylize = stylizeWithColor;
+  return formatValue(ctx, obj, ctx.depth);
+}
+exports.inspect = inspect;
+
+
+// http://en.wikipedia.org/wiki/ANSI_escape_code#graphics
+inspect.colors = {
+  'bold' : [1, 22],
+  'italic' : [3, 23],
+  'underline' : [4, 24],
+  'inverse' : [7, 27],
+  'white' : [37, 39],
+  'grey' : [90, 39],
+  'black' : [30, 39],
+  'blue' : [34, 39],
+  'cyan' : [36, 39],
+  'green' : [32, 39],
+  'magenta' : [35, 39],
+  'red' : [31, 39],
+  'yellow' : [33, 39]
+};
+
+// Don't use 'blue' not visible on cmd.exe
+inspect.styles = {
+  'special': 'cyan',
+  'number': 'yellow',
+  'boolean': 'yellow',
+  'undefined': 'grey',
+  'null': 'bold',
+  'string': 'green',
+  'date': 'magenta',
+  // "name": intentionally not styling
+  'regexp': 'red'
+};
+
+
+function stylizeWithColor(str, styleType) {
+  var style = inspect.styles[styleType];
+
+  if (style) {
+    return '\u001b[' + inspect.colors[style][0] + 'm' + str +
+           '\u001b[' + inspect.colors[style][1] + 'm';
+  } else {
+    return str;
+  }
+}
+
+
+function stylizeNoColor(str, styleType) {
+  return str;
+}
+
+
+function arrayToHash(array) {
+  var hash = {};
+
+  array.forEach(function(val, idx) {
+    hash[val] = true;
+  });
+
+  return hash;
+}
+
+
+function formatValue(ctx, value, recurseTimes) {
+  // Provide a hook for user-specified inspect functions.
+  // Check that value is an object with an inspect function on it
+  if (ctx.customInspect &&
+      value &&
+      isFunction(value.inspect) &&
+      // Filter out the util module, it's inspect function is special
+      value.inspect !== exports.inspect &&
+      // Also filter out any prototype objects using the circular check.
+      !(value.constructor && value.constructor.prototype === value)) {
+    var ret = value.inspect(recurseTimes, ctx);
+    if (!isString(ret)) {
+      ret = formatValue(ctx, ret, recurseTimes);
+    }
+    return ret;
+  }
+
+  // Primitive types cannot have properties
+  var primitive = formatPrimitive(ctx, value);
+  if (primitive) {
+    return primitive;
+  }
+
+  // Look up the keys of the object.
+  var keys = Object.keys(value);
+  var visibleKeys = arrayToHash(keys);
+
+  if (ctx.showHidden) {
+    keys = Object.getOwnPropertyNames(value);
+  }
+
+  // IE doesn't make error fields non-enumerable
+  // http://msdn.microsoft.com/en-us/library/ie/dww52sbt(v=vs.94).aspx
+  if (isError(value)
+      && (keys.indexOf('message') >= 0 || keys.indexOf('description') >= 0)) {
+    return formatError(value);
+  }
+
+  // Some type of object without properties can be shortcutted.
+  if (keys.length === 0) {
+    if (isFunction(value)) {
+      var name = value.name ? ': ' + value.name : '';
+      return ctx.stylize('[Function' + name + ']', 'special');
+    }
+    if (isRegExp(value)) {
+      return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
+    }
+    if (isDate(value)) {
+      return ctx.stylize(Date.prototype.toString.call(value), 'date');
+    }
+    if (isError(value)) {
+      return formatError(value);
+    }
+  }
+
+  var base = '', array = false, braces = ['{', '}'];
+
+  // Make Array say that they are Array
+  if (isArray(value)) {
+    array = true;
+    braces = ['[', ']'];
+  }
+
+  // Make functions say that they are functions
+  if (isFunction(value)) {
+    var n = value.name ? ': ' + value.name : '';
+    base = ' [Function' + n + ']';
+  }
+
+  // Make RegExps say that they are RegExps
+  if (isRegExp(value)) {
+    base = ' ' + RegExp.prototype.toString.call(value);
+  }
+
+  // Make dates with properties first say the date
+  if (isDate(value)) {
+    base = ' ' + Date.prototype.toUTCString.call(value);
+  }
+
+  // Make error with message first say the error
+  if (isError(value)) {
+    base = ' ' + formatError(value);
+  }
+
+  if (keys.length === 0 && (!array || value.length == 0)) {
+    return braces[0] + base + braces[1];
+  }
+
+  if (recurseTimes < 0) {
+    if (isRegExp(value)) {
+      return ctx.stylize(RegExp.prototype.toString.call(value), 'regexp');
+    } else {
+      return ctx.stylize('[Object]', 'special');
+    }
+  }
+
+  ctx.seen.push(value);
+
+  var output;
+  if (array) {
+    output = formatArray(ctx, value, recurseTimes, visibleKeys, keys);
+  } else {
+    output = keys.map(function(key) {
+      return formatProperty(ctx, value, recurseTimes, visibleKeys, key, array);
+    });
+  }
+
+  ctx.seen.pop();
+
+  return reduceToSingleString(output, base, braces);
+}
+
+
+function formatPrimitive(ctx, value) {
+  if (isUndefined(value))
+    return ctx.stylize('undefined', 'undefined');
+  if (isString(value)) {
+    var simple = '\'' + JSON.stringify(value).replace(/^"|"$/g, '')
+                                             .replace(/'/g, "\\'")
+                                             .replace(/\\"/g, '"') + '\'';
+    return ctx.stylize(simple, 'string');
+  }
+  if (isNumber(value))
+    return ctx.stylize('' + value, 'number');
+  if (isBoolean(value))
+    return ctx.stylize('' + value, 'boolean');
+  // For some reason typeof null is "object", so special case here.
+  if (isNull(value))
+    return ctx.stylize('null', 'null');
+}
+
+
+function formatError(value) {
+  return '[' + Error.prototype.toString.call(value) + ']';
+}
+
+
+function formatArray(ctx, value, recurseTimes, visibleKeys, keys) {
+  var output = [];
+  for (var i = 0, l = value.length; i < l; ++i) {
+    if (hasOwnProperty(value, String(i))) {
+      output.push(formatProperty(ctx, value, recurseTimes, visibleKeys,
+          String(i), true));
+    } else {
+      output.push('');
+    }
+  }
+  keys.forEach(function(key) {
+    if (!key.match(/^\d+$/)) {
+      output.push(formatProperty(ctx, value, recurseTimes, visibleKeys,
+          key, true));
+    }
+  });
+  return output;
+}
+
+
+function formatProperty(ctx, value, recurseTimes, visibleKeys, key, array) {
+  var name, str, desc;
+  desc = Object.getOwnPropertyDescriptor(value, key) || { value: value[key] };
+  if (desc.get) {
+    if (desc.set) {
+      str = ctx.stylize('[Getter/Setter]', 'special');
+    } else {
+      str = ctx.stylize('[Getter]', 'special');
+    }
+  } else {
+    if (desc.set) {
+      str = ctx.stylize('[Setter]', 'special');
+    }
+  }
+  if (!hasOwnProperty(visibleKeys, key)) {
+    name = '[' + key + ']';
+  }
+  if (!str) {
+    if (ctx.seen.indexOf(desc.value) < 0) {
+      if (isNull(recurseTimes)) {
+        str = formatValue(ctx, desc.value, null);
+      } else {
+        str = formatValue(ctx, desc.value, recurseTimes - 1);
+      }
+      if (str.indexOf('\n') > -1) {
+        if (array) {
+          str = str.split('\n').map(function(line) {
+            return '  ' + line;
+          }).join('\n').substr(2);
+        } else {
+          str = '\n' + str.split('\n').map(function(line) {
+            return '   ' + line;
+          }).join('\n');
+        }
+      }
+    } else {
+      str = ctx.stylize('[Circular]', 'special');
+    }
+  }
+  if (isUndefined(name)) {
+    if (array && key.match(/^\d+$/)) {
+      return str;
+    }
+    name = JSON.stringify('' + key);
+    if (name.match(/^"([a-zA-Z_][a-zA-Z_0-9]*)"$/)) {
+      name = name.substr(1, name.length - 2);
+      name = ctx.stylize(name, 'name');
+    } else {
+      name = name.replace(/'/g, "\\'")
+                 .replace(/\\"/g, '"')
+                 .replace(/(^"|"$)/g, "'");
+      name = ctx.stylize(name, 'string');
+    }
+  }
+
+  return name + ': ' + str;
+}
+
+
+function reduceToSingleString(output, base, braces) {
+  var numLinesEst = 0;
+  var length = output.reduce(function(prev, cur) {
+    numLinesEst++;
+    if (cur.indexOf('\n') >= 0) numLinesEst++;
+    return prev + cur.replace(/\u001b\[\d\d?m/g, '').length + 1;
+  }, 0);
+
+  if (length > 60) {
+    return braces[0] +
+           (base === '' ? '' : base + '\n ') +
+           ' ' +
+           output.join(',\n  ') +
+           ' ' +
+           braces[1];
+  }
+
+  return braces[0] + base + ' ' + output.join(', ') + ' ' + braces[1];
+}
+
+
+// NOTE: These type checking functions intentionally don't use `instanceof`
+// because it is fragile and can be easily faked with `Object.create()`.
+function isArray(ar) {
+  return Array.isArray(ar);
+}
+exports.isArray = isArray;
+
+function isBoolean(arg) {
+  return typeof arg === 'boolean';
+}
+exports.isBoolean = isBoolean;
+
+function isNull(arg) {
+  return arg === null;
+}
+exports.isNull = isNull;
+
+function isNullOrUndefined(arg) {
+  return arg == null;
+}
+exports.isNullOrUndefined = isNullOrUndefined;
+
+function isNumber(arg) {
+  return typeof arg === 'number';
+}
+exports.isNumber = isNumber;
+
+function isString(arg) {
+  return typeof arg === 'string';
+}
+exports.isString = isString;
+
+function isSymbol(arg) {
+  return typeof arg === 'symbol';
+}
+exports.isSymbol = isSymbol;
+
+function isUndefined(arg) {
+  return arg === void 0;
+}
+exports.isUndefined = isUndefined;
+
+function isRegExp(re) {
+  return isObject(re) && objectToString(re) === '[object RegExp]';
+}
+exports.isRegExp = isRegExp;
+
+function isObject(arg) {
+  return typeof arg === 'object' && arg !== null;
+}
+exports.isObject = isObject;
+
+function isDate(d) {
+  return isObject(d) && objectToString(d) === '[object Date]';
+}
+exports.isDate = isDate;
+
+function isError(e) {
+  return isObject(e) &&
+      (objectToString(e) === '[object Error]' || e instanceof Error);
+}
+exports.isError = isError;
+
+function isFunction(arg) {
+  return typeof arg === 'function';
+}
+exports.isFunction = isFunction;
+
+function isPrimitive(arg) {
+  return arg === null ||
+         typeof arg === 'boolean' ||
+         typeof arg === 'number' ||
+         typeof arg === 'string' ||
+         typeof arg === 'symbol' ||  // ES6 symbol
+         typeof arg === 'undefined';
+}
+exports.isPrimitive = isPrimitive;
+
+exports.isBuffer = __webpack_require__(/*! ./support/isBuffer */ "../../node_modules/util/support/isBufferBrowser.js");
+
+function objectToString(o) {
+  return Object.prototype.toString.call(o);
+}
+
+
+function pad(n) {
+  return n < 10 ? '0' + n.toString(10) : n.toString(10);
+}
+
+
+var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep',
+              'Oct', 'Nov', 'Dec'];
+
+// 26 Feb 16:19:34
+function timestamp() {
+  var d = new Date();
+  var time = [pad(d.getHours()),
+              pad(d.getMinutes()),
+              pad(d.getSeconds())].join(':');
+  return [d.getDate(), months[d.getMonth()], time].join(' ');
+}
+
+
+// log is just a thin wrapper to console.log that prepends a timestamp
+exports.log = function() {
+  console.log('%s - %s', timestamp(), exports.format.apply(exports, arguments));
+};
+
+
+/**
+ * Inherit the prototype methods from one constructor into another.
+ *
+ * The Function.prototype.inherits from lang.js rewritten as a standalone
+ * function (not on Function.prototype). NOTE: If this file is to be loaded
+ * during bootstrapping this function needs to be rewritten using some native
+ * functions as prototype setup using normal JavaScript does not work as
+ * expected during bootstrapping (see mirror.js in r114903).
+ *
+ * @param {function} ctor Constructor function which needs to inherit the
+ *     prototype.
+ * @param {function} superCtor Constructor function to inherit prototype from.
+ */
+exports.inherits = __webpack_require__(/*! inherits */ "../../node_modules/inherits/inherits_browser.js");
+
+exports._extend = function(origin, add) {
+  // Don't do anything if add isn't an object
+  if (!add || !isObject(add)) return origin;
+
+  var keys = Object.keys(add);
+  var i = keys.length;
+  while (i--) {
+    origin[keys[i]] = add[keys[i]];
+  }
+  return origin;
+};
+
+function hasOwnProperty(obj, prop) {
+  return Object.prototype.hasOwnProperty.call(obj, prop);
+}
+
+var kCustomPromisifiedSymbol = typeof Symbol !== 'undefined' ? Symbol('util.promisify.custom') : undefined;
+
+exports.promisify = function promisify(original) {
+  if (typeof original !== 'function')
+    throw new TypeError('The "original" argument must be of type Function');
+
+  if (kCustomPromisifiedSymbol && original[kCustomPromisifiedSymbol]) {
+    var fn = original[kCustomPromisifiedSymbol];
+    if (typeof fn !== 'function') {
+      throw new TypeError('The "util.promisify.custom" argument must be of type Function');
+    }
+    Object.defineProperty(fn, kCustomPromisifiedSymbol, {
+      value: fn, enumerable: false, writable: false, configurable: true
+    });
+    return fn;
+  }
+
+  function fn() {
+    var promiseResolve, promiseReject;
+    var promise = new Promise(function (resolve, reject) {
+      promiseResolve = resolve;
+      promiseReject = reject;
+    });
+
+    var args = [];
+    for (var i = 0; i < arguments.length; i++) {
+      args.push(arguments[i]);
+    }
+    args.push(function (err, value) {
+      if (err) {
+        promiseReject(err);
+      } else {
+        promiseResolve(value);
+      }
+    });
+
+    try {
+      original.apply(this, args);
+    } catch (err) {
+      promiseReject(err);
+    }
+
+    return promise;
+  }
+
+  Object.setPrototypeOf(fn, Object.getPrototypeOf(original));
+
+  if (kCustomPromisifiedSymbol) Object.defineProperty(fn, kCustomPromisifiedSymbol, {
+    value: fn, enumerable: false, writable: false, configurable: true
+  });
+  return Object.defineProperties(
+    fn,
+    getOwnPropertyDescriptors(original)
+  );
+}
+
+exports.promisify.custom = kCustomPromisifiedSymbol
+
+function callbackifyOnRejected(reason, cb) {
+  // `!reason` guard inspired by bluebird (Ref: https://goo.gl/t5IS6M).
+  // Because `null` is a special error value in callbacks which means "no error
+  // occurred", we error-wrap so the callback consumer can distinguish between
+  // "the promise rejected with null" or "the promise fulfilled with undefined".
+  if (!reason) {
+    var newReason = new Error('Promise was rejected with a falsy value');
+    newReason.reason = reason;
+    reason = newReason;
+  }
+  return cb(reason);
+}
+
+function callbackify(original) {
+  if (typeof original !== 'function') {
+    throw new TypeError('The "original" argument must be of type Function');
+  }
+
+  // We DO NOT return the promise as it gives the user a false sense that
+  // the promise is actually somehow related to the callback's execution
+  // and that the callback throwing will reject the promise.
+  function callbackified() {
+    var args = [];
+    for (var i = 0; i < arguments.length; i++) {
+      args.push(arguments[i]);
+    }
+
+    var maybeCb = args.pop();
+    if (typeof maybeCb !== 'function') {
+      throw new TypeError('The last argument must be of type Function');
+    }
+    var self = this;
+    var cb = function() {
+      return maybeCb.apply(self, arguments);
+    };
+    // In true node style we process the callback on `nextTick` with all the
+    // implications (stack, `uncaughtException`, `async_hooks`)
+    original.apply(this, args)
+      .then(function(ret) { process.nextTick(cb, null, ret) },
+            function(rej) { process.nextTick(callbackifyOnRejected, rej, cb) });
+  }
+
+  Object.setPrototypeOf(callbackified, Object.getPrototypeOf(original));
+  Object.defineProperties(callbackified,
+                          getOwnPropertyDescriptors(original));
+  return callbackified;
+}
+exports.callbackify = callbackify;
+
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../process/browser.js */ "../../node_modules/process/browser.js")))
+
+/***/ }),
+
 /***/ "../../node_modules/uuid/index.js":
 /*!********************************************************************!*\
   !*** /home/dev/ezpay-browser-extension/node_modules/uuid/index.js ***!
@@ -59975,6 +68462,109 @@ function whitelist(str, chars) {
 
 module.exports = exports.default;
 module.exports.default = exports.default;
+
+/***/ }),
+
+/***/ "../../node_modules/varuint-bitcoin/index.js":
+/*!*******************************************************************************!*\
+  !*** /home/dev/ezpay-browser-extension/node_modules/varuint-bitcoin/index.js ***!
+  \*******************************************************************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var Buffer = __webpack_require__(/*! safe-buffer */ "../../node_modules/safe-buffer/index.js").Buffer
+
+// Number.MAX_SAFE_INTEGER
+var MAX_SAFE_INTEGER = 9007199254740991
+
+function checkUInt53 (n) {
+  if (n < 0 || n > MAX_SAFE_INTEGER || n % 1 !== 0) throw new RangeError('value out of range')
+}
+
+function encode (number, buffer, offset) {
+  checkUInt53(number)
+
+  if (!buffer) buffer = Buffer.allocUnsafe(encodingLength(number))
+  if (!Buffer.isBuffer(buffer)) throw new TypeError('buffer must be a Buffer instance')
+  if (!offset) offset = 0
+
+  // 8 bit
+  if (number < 0xfd) {
+    buffer.writeUInt8(number, offset)
+    encode.bytes = 1
+
+  // 16 bit
+  } else if (number <= 0xffff) {
+    buffer.writeUInt8(0xfd, offset)
+    buffer.writeUInt16LE(number, offset + 1)
+    encode.bytes = 3
+
+  // 32 bit
+  } else if (number <= 0xffffffff) {
+    buffer.writeUInt8(0xfe, offset)
+    buffer.writeUInt32LE(number, offset + 1)
+    encode.bytes = 5
+
+  // 64 bit
+  } else {
+    buffer.writeUInt8(0xff, offset)
+    buffer.writeUInt32LE(number >>> 0, offset + 1)
+    buffer.writeUInt32LE((number / 0x100000000) | 0, offset + 5)
+    encode.bytes = 9
+  }
+
+  return buffer
+}
+
+function decode (buffer, offset) {
+  if (!Buffer.isBuffer(buffer)) throw new TypeError('buffer must be a Buffer instance')
+  if (!offset) offset = 0
+
+  var first = buffer.readUInt8(offset)
+
+  // 8 bit
+  if (first < 0xfd) {
+    decode.bytes = 1
+    return first
+
+  // 16 bit
+  } else if (first === 0xfd) {
+    decode.bytes = 3
+    return buffer.readUInt16LE(offset + 1)
+
+  // 32 bit
+  } else if (first === 0xfe) {
+    decode.bytes = 5
+    return buffer.readUInt32LE(offset + 1)
+
+  // 64 bit
+  } else {
+    decode.bytes = 9
+    var lo = buffer.readUInt32LE(offset + 1)
+    var hi = buffer.readUInt32LE(offset + 5)
+    var number = hi * 0x0100000000 + lo
+    checkUInt53(number)
+
+    return number
+  }
+}
+
+function encodingLength (number) {
+  checkUInt53(number)
+
+  return (
+    number < 0xfd ? 1
+  : number <= 0xffff ? 3
+  : number <= 0xffffffff ? 5
+  : 9
+  )
+}
+
+module.exports = { encode: encode, decode: decode, encodingLength: encodingLength }
+
 
 /***/ }),
 
@@ -70406,9 +78996,61 @@ function extend() {
 
 /***/ }),
 
+/***/ "../lib/btcUtils.js":
+/*!**************************!*\
+  !*** ../lib/btcUtils.js ***!
+  \**************************/
+/*! exports provided: default */
+/*! ModuleConcatenation bailout: Module uses injected variables (Buffer) */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* WEBPACK VAR INJECTION */(function(Buffer) {/* harmony import */ var crypto__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! crypto */ "../../node_modules/crypto-browserify/index.js");
+/* harmony import */ var crypto__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(crypto__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var bip39__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! bip39 */ "../../node_modules/bip39/index.js");
+/* harmony import */ var bip39__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(bip39__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var bip32__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! bip32 */ "../../node_modules/bip32/index.js");
+/* harmony import */ var bip32__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(bip32__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var coinkey__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! coinkey */ "../../node_modules/coinkey/lib/coinkey.js");
+/* harmony import */ var coinkey__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(coinkey__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var coininfo__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! coininfo */ "../../node_modules/coininfo/lib/coininfo.js");
+/* harmony import */ var coininfo__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(coininfo__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var bitcoinjs_lib__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! bitcoinjs-lib */ "../../node_modules/bitcoinjs-lib/src/index.js");
+/* harmony import */ var bitcoinjs_lib__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(bitcoinjs_lib__WEBPACK_IMPORTED_MODULE_5__);
+
+
+
+
+
+
+var ethUtils = {
+  getBitcoinAccountAtIndex: function getBitcoinAccountAtIndex(mnemonic, typeCoinInfo) {
+    var index = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+    var seed = bip39__WEBPACK_IMPORTED_MODULE_1___default.a.mnemonicToSeed(mnemonic);
+    var node = bip32__WEBPACK_IMPORTED_MODULE_2___default.a.fromSeed(seed);
+    var child = node.derivePath("m/44'/195'/".concat(index, "'/0/0"));
+    var privateKey = child.privateKey.toString('hex'); // const privateKeyHex = privateKey.substring(2)
+
+    var coinInfo = coininfo__WEBPACK_IMPORTED_MODULE_4___default()(typeCoinInfo);
+    var key = new coinkey__WEBPACK_IMPORTED_MODULE_3___default.a(new Buffer(privateKey, 'hex'), {
+      "private": coinInfo.versions["private"],
+      "public": coinInfo.versions["public"]
+    });
+    return {
+      privateKey: privateKey,
+      address: key.publicAddress
+    };
+  }
+};
+/* harmony default export */ __webpack_exports__["default"] = (ethUtils);
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../node_modules/node-libs-browser/node_modules/buffer/index.js */ "../../node_modules/node-libs-browser/node_modules/buffer/index.js").Buffer))
+
+/***/ }),
+
 /***/ "./index.js":
 /*!*******************************!*\
-  !*** ./index.js + 17 modules ***!
+  !*** ./index.js + 19 modules ***!
   \*******************************/
 /*! no exports provided */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/asyncToGenerator.js (<- Module is not an ECMAScript module) */
@@ -70438,6 +79080,7 @@ function extend() {
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/tronweb/dist/TronWeb.node.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/uuid/v4.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/web3/src/index.js (<- Module is not an ECMAScript module) */
+/*! ModuleConcatenation bailout: Cannot concat with ../lib/btcUtils.js (<- Module uses injected variables (Buffer)) */
 /*! ModuleConcatenation bailout: Cannot concat with ./package.json (<- Module is not an ECMAScript module) */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -71319,32 +79962,56 @@ var NodeService = {
     '6739be94-ee43-46af-9a62-690cf0947282': {
       type: 'NTY',
       endPoint: 'https://rpc.nexty.io'
+    },
+    '6739be94-ee43-46af-9a62-690cf0947283': {
+      type: 'BTC',
+      endPoint: ''
     }
   },
   _tokens: {
     'f0b1e38e-7bee-485e-9d3f-69410bf30683': {
       node: 'f0b1e38e-7bee-485e-9d3f-69410bf30681',
+      name: 'Tron',
       symbol: 'TRX',
       decimal: 6,
       logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1958.png'
     },
     'f0b1e38e-7bee-485e-9d3f-69410bf30684': {
       node: '0f22e40f-a004-4c5a-99ef-004c8e6769bf',
+      name: 'Tron Test',
       symbol: 'TRX',
       decimal: 6,
       logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1958.png'
     },
     'f0b1e38e-7bee-485e-9d3f-69410bf30685': {
       node: '6739be94-ee43-46af-9a62-690cf0947280',
+      name: 'Ethereum',
       symbol: 'ETH',
       decimal: 18,
       logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png'
     },
     'f0b1e38e-7bee-485e-9d3f-69410bf30686': {
       node: '6739be94-ee43-46af-9a62-690cf0947282',
+      name: 'Nexty',
       symbol: 'NTY',
       decimal: 18,
       logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/2714.png'
+    },
+    'f0b1e38e-7bee-485e-9d3f-69410bf30687': {
+      node: '6739be94-ee43-46af-9a62-690cf0947283',
+      name: 'Bitcoin',
+      symbol: 'BTC',
+      decimal: 8,
+      typeCoinInfo: 'BTC',
+      logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1.png'
+    },
+    'f0b1e38e-7bee-485e-9d3f-69410bf30688': {
+      node: '6739be94-ee43-46af-9a62-690cf0947283',
+      name: 'Litecoin',
+      symbol: 'LTC-TEST',
+      decimal: 8,
+      typeCoinInfo: 'LTC-TEST',
+      logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/2.png'
     }
   },
   _selectedNode: 'f0b1e38e-7bee-485e-9d3f-69410bf30681',
@@ -72082,7 +80749,8 @@ var CHAIN_TYPE = {
   ETH: 'ETH',
   BTC: 'BTC',
   LTC: 'LTC',
-  NTY: 'NTY'
+  NTY: 'NTY',
+  ETH_RINKEBY: 'ETH_RINKEBY'
 };
 var VALIDATION_STATE = {
   NONE: 'no-state',
@@ -72225,7 +80893,7 @@ function (_Account) {
 
     classCallCheck_default()(this, TronAccount);
 
-    _this = possibleConstructorReturn_default()(this, getPrototypeOf_default()(TronAccount).call(this, chain, accountType, importData, name, symbol, decimal, logo, accountIndex = 0));
+    _this = possibleConstructorReturn_default()(this, getPrototypeOf_default()(TronAccount).call(this, chain, accountType, importData, name, symbol, decimal, logo, accountIndex));
     _this.selectedBankRecordId = 0;
     _this.dealCurrencyPage = 0;
     _this.energy = 0;
@@ -73626,7 +82294,29 @@ function (_Account) {
 }(WalletService_Account);
 
 /* harmony default export */ var WalletService_TronAccount = (TronAccount_TronAccount);
+// CONCATENATED MODULE: ../lib/ethUtils.js
+
+
+
+
+var ethUtils_web3 = new src_default.a();
+var ethUtils = {
+  getEthereumAccountAtIndex: function getEthereumAccountAtIndex(mnemonic) {
+    var index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+    var seed = bip39_default.a.mnemonicToSeed(mnemonic);
+    var node = bip32_default.a.fromSeed(seed);
+    var child = node.derivePath("m/44'/195'/".concat(index, "'/0/0"));
+    var privateKey = child.privateKey.toString('hex');
+    var account = ethUtils_web3.eth.accounts.privateKeyToAccount('0x' + privateKey);
+    return {
+      privateKey: account.privateKey,
+      address: account.address
+    };
+  }
+};
+/* harmony default export */ var lib_ethUtils = (ethUtils);
 // CONCATENATED MODULE: ./services/WalletService/EthereumAccount.js
+
 
 
 
@@ -73653,7 +82343,7 @@ function (_Account) {
 
     classCallCheck_default()(this, EthereumAccount);
 
-    _this = possibleConstructorReturn_default()(this, getPrototypeOf_default()(EthereumAccount).call(this, chain, accountType, importData, name, symbol, decimal, logo, accountIndex = 0));
+    _this = possibleConstructorReturn_default()(this, getPrototypeOf_default()(EthereumAccount).call(this, chain, accountType, importData, name, symbol, decimal, logo, accountIndex));
     if (accountType == ACCOUNT_TYPE.MNEMONIC) _this._importMnemonic(importData);else _this._importPrivateKey(importData);
     return _this;
   }
@@ -73676,7 +82366,7 @@ function (_Account) {
     value: function getAccountAtIndex() {
       var index = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
       if (this.type !== ACCOUNT_TYPE.MNEMONIC) throw new Error('Deriving account keys at a specific index requires a mnemonic account');
-      return utils.getEthereumAccountAtIndex(this.mnemonic, index);
+      return lib_ethUtils.getEthereumAccountAtIndex(this.mnemonic, index);
     }
   }, {
     key: "_importPrivateKey",
@@ -73695,6 +82385,79 @@ function (_Account) {
 }(WalletService_Account);
 
 /* harmony default export */ var WalletService_EthereumAccount = (EthereumAccount_EthereumAccount);
+// EXTERNAL MODULE: ../lib/btcUtils.js
+var btcUtils = __webpack_require__("../lib/btcUtils.js");
+
+// CONCATENATED MODULE: ./services/WalletService/BitcoinAccount.js
+
+
+
+
+
+
+
+
+
+
+
+var BitcoinAccount_logger = new logger_Logger('WalletService/BitcoinAccount');
+
+
+var BitcoinAccount_BitcoinAccount =
+/*#__PURE__*/
+function (_Account) {
+  inherits_default()(BitcoinAccount, _Account);
+
+  function BitcoinAccount(chain, accountType, importData, name, symbol, decimal, logo, typeCoinInfo) {
+    var _this;
+
+    var accountIndex = arguments.length > 8 && arguments[8] !== undefined ? arguments[8] : 0;
+
+    classCallCheck_default()(this, BitcoinAccount);
+
+    _this = possibleConstructorReturn_default()(this, getPrototypeOf_default()(BitcoinAccount).call(this, chain, accountType, importData, name, symbol, decimal, logo, accountIndex));
+    _this.typeCoinInfo = typeCoinInfo;
+    if (accountType == ACCOUNT_TYPE.MNEMONIC) _this._importMnemonic(importData);else _this._importPrivateKey(importData);
+    return _this;
+  }
+
+  createClass_default()(BitcoinAccount, [{
+    key: "_importMnemonic",
+    value: function _importMnemonic(mnemonic) {
+      if (!utils.validateMnemonic(mnemonic)) throw new Error('INVALID_MNEMONIC');
+      this.mnemonic = mnemonic;
+
+      var _this$getAccountAtInd = this.getAccountAtIndex(this.accountIndex),
+          privateKey = _this$getAccountAtInd.privateKey,
+          address = _this$getAccountAtInd.address;
+
+      this.privateKey = privateKey;
+      this.address = address;
+    }
+  }, {
+    key: "getAccountAtIndex",
+    value: function getAccountAtIndex() {
+      var index = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+      if (this.type !== ACCOUNT_TYPE.MNEMONIC) throw new Error('Deriving account keys at a specific index requires a mnemonic account');
+      return btcUtils["default"].getBitcoinAccountAtIndex(this.mnemonic, this.typeCoinInfo, index);
+    }
+  }, {
+    key: "_importPrivateKey",
+    value: function _importPrivateKey(privateKey) {
+      try {
+        this.privateKey = privateKey;
+        this.address = TronWeb.address.fromPrivateKey(privateKey);
+      } catch (ex) {
+        // eslint-disable-line
+        throw new Error('INVALID_PRIVATE_KEY');
+      }
+    }
+  }]);
+
+  return BitcoinAccount;
+}(WalletService_Account);
+
+/* harmony default export */ var WalletService_BitcoinAccount = (BitcoinAccount_BitcoinAccount);
 // CONCATENATED MODULE: ./services/WalletService/Chain.js
 
 
@@ -73725,6 +82488,7 @@ var Chain_Chain = function Chain(params) {
 function WalletService_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { keys.push.apply(keys, Object.getOwnPropertySymbols(object)); } if (enumerableOnly) keys = keys.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); return keys; }
 
 function WalletService_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { WalletService_ownKeys(source, true).forEach(function (key) { defineProperty_default()(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { WalletService_ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
 
 
 
@@ -73931,6 +82695,12 @@ function (_EventEmitter) {
       WalletService_logger.info('User has set a password');
 
       this._setState(APP_STATE.READY);
+
+      if (!services_StorageService.hasAccounts) {
+        WalletService_logger.info('Wallet does not have any accounts');
+
+        this._createDefaultAccount();
+      }
     }
   }, {
     key: "_loadAccounts",
@@ -73951,8 +82721,10 @@ function (_EventEmitter) {
           accountObj = new WalletService_TronAccount(account.chain, account.type, account.mnemonic || account.privateKey, account.name, account.symbol, account.decimal, account.logo, account.accountIndex);
           accountObj.loadCache();
           accountObj.update([], [], 0);
-        } else if (node.type === CHAIN_TYPE.NTY) {
+        } else if (node.type === CHAIN_TYPE.NTY || node.type === CHAIN_TYPE.ETH) {
           accountObj = new WalletService_EthereumAccount(account.chain, account.type, account.mnemonic || account.privateKey, account.name, account.symbol, account.decimal, account.logo, account.accountIndex);
+        } else if (node.type === CHAIN_TYPE.BTC) {
+          accountObj = new WalletService_BitcoinAccount(account.chain, account.type, account.mnemonic || account.privateKey, account.name, account.symbol, account.decimal, account.logo, account.typeCoinInfo, account.accountIndex);
         }
 
         _this3.accounts[address] = accountObj;
@@ -74046,13 +82818,23 @@ function (_EventEmitter) {
       var tokens = services_NodeService.getTokens();
       var token = tokens['f0b1e38e-7bee-485e-9d3f-69410bf30686'];
       var token2 = tokens['f0b1e38e-7bee-485e-9d3f-69410bf30683'];
+      var token3 = tokens['f0b1e38e-7bee-485e-9d3f-69410bf30687'];
+      var token4 = tokens['f0b1e38e-7bee-485e-9d3f-69410bf30685'];
       this.addAccount(WalletService_objectSpread({}, token, {
         mnemonic: utils.generateMnemonic(),
-        name: 'Nexty Account 2'
+        accountName: 'Nexty Account 1'
       }));
       this.addAccount(WalletService_objectSpread({}, token2, {
         mnemonic: utils.generateMnemonic(),
-        name: 'Tron Account 2'
+        accountName: 'Tron Account 1'
+      }));
+      this.addAccount(WalletService_objectSpread({}, token3, {
+        mnemonic: utils.generateMnemonic(),
+        accountName: 'Bitcoin Account 1'
+      }));
+      this.addAccount(WalletService_objectSpread({}, token4, {
+        mnemonic: utils.generateMnemonic(),
+        accountName: 'Ethereum Account 1'
       }));
     }
   }, {
@@ -74071,8 +82853,10 @@ function (_EventEmitter) {
 
                 if (node.type === CHAIN_TYPE.TRON) {
                   this.addTronAccount(params);
-                } else if (node.type === CHAIN_TYPE.NTY) {
+                } else if (node.type === CHAIN_TYPE.NTY || node.type === CHAIN_TYPE.ETH || node.type === CHAIN_TYPE.ETH_RINKEBY) {
                   this.addEthereumAccount(params);
+                } else if (node.type === CHAIN_TYPE.BTC) {
+                  this.addBitcoinAccount(params);
                 }
 
               case 3:
@@ -74100,7 +82884,7 @@ function (_EventEmitter) {
           while (1) {
             switch (_context6.prev = _context6.next) {
               case 0:
-                WalletService_logger.info("Adding Tron account '".concat(params.name, "' from popup"));
+                WalletService_logger.info("Adding Tron account '".concat(params.accountName, "' from popup"));
                 trc10tokens = axios_default.a.get('https://apilist.tronscan.org/api/token?showAll=1&limit=4000', {
                   timeout: 10000
                 });
@@ -74136,7 +82920,7 @@ function (_EventEmitter) {
                 });
 
               case 5:
-                account = new WalletService_TronAccount(params.node, ACCOUNT_TYPE.MNEMONIC, params.mnemonic, params.name, params.symbol, params.decimal, params.logo);
+                account = new WalletService_TronAccount(params.node, ACCOUNT_TYPE.MNEMONIC, params.mnemonic, params.accountName, params.symbol, params.decimal, params.logo);
                 WalletService_logger.info("Add account '".concat(account, "'"));
                 address = account.address;
                 this.accounts[address] = account;
@@ -74169,8 +82953,8 @@ function (_EventEmitter) {
           while (1) {
             switch (_context7.prev = _context7.next) {
               case 0:
-                WalletService_logger.info("Adding Ethereum account '".concat(params.name, "' from popup"));
-                account = new WalletService_EthereumAccount(params.node, ACCOUNT_TYPE.MNEMONIC, params.mnemonic, params.name, params.symbol, params.decimal, params.logo);
+                WalletService_logger.info("Adding Ethereum account '".concat(params.accountName, "' from popup"));
+                account = new WalletService_EthereumAccount(params.node, ACCOUNT_TYPE.MNEMONIC, params.mnemonic, params.accountName, params.symbol, params.decimal, params.logo);
                 WalletService_logger.info("Add account '".concat(account, "'"));
                 address = account.address;
                 this.accounts[address] = account;
@@ -74193,14 +82977,50 @@ function (_EventEmitter) {
       return addEthereumAccount;
     }()
   }, {
+    key: "addBitcoinAccount",
+    value: function () {
+      var _addBitcoinAccount = asyncToGenerator_default()(
+      /*#__PURE__*/
+      regenerator_default.a.mark(function _callee8(params) {
+        var account, address;
+        return regenerator_default.a.wrap(function _callee8$(_context8) {
+          while (1) {
+            switch (_context8.prev = _context8.next) {
+              case 0:
+                WalletService_logger.info("Adding Bitcoin account '".concat(params.accountName, "' from popup"));
+                account = new WalletService_BitcoinAccount(params.node, ACCOUNT_TYPE.MNEMONIC, params.mnemonic, params.accountName, params.symbol, params.decimal, params.logo, params.typeCoinInfo);
+                WalletService_logger.info("Add account '".concat(account, "'"));
+                address = account.address;
+                this.accounts[address] = account;
+                services_StorageService.saveAccount(account); // this.emit('setAccounts', this.getAccounts());
+
+                return _context8.abrupt("return", true);
+
+              case 7:
+              case "end":
+                return _context8.stop();
+            }
+          }
+        }, _callee8, this);
+      }));
+
+      function addBitcoinAccount(_x5) {
+        return _addBitcoinAccount.apply(this, arguments);
+      }
+
+      return addBitcoinAccount;
+    }()
+  }, {
     key: "getAccounts",
     value: function getAccounts() {
       var nodes = services_NodeService.getNodes().nodes;
+      console.log('xxx', this.accounts);
       var accounts = Object.entries(this.accounts).reduce(function (accounts, _ref6) {
         var _ref7 = slicedToArray_default()(_ref6, 2),
             address = _ref7[0],
             account = _ref7[1];
 
+        console.log('xxx', account);
         accounts[address] = {
           name: account.name,
           logo: account.logo,
@@ -74602,6 +83422,18 @@ module.exports = {"name":"@ezpay/background","main":"index.js","author":"HoangNo
 /***/ }),
 
 /***/ 3:
+/*!************************!*\
+  !*** crypto (ignored) ***!
+  \************************/
+/*! no static exports found */
+/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
+/***/ (function(module, exports) {
+
+/* (ignored) */
+
+/***/ }),
+
+/***/ 4:
 /*!************************!*\
   !*** crypto (ignored) ***!
   \************************/

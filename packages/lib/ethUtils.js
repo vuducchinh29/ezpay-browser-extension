@@ -12,7 +12,7 @@ const ethUtils = {
         const child = node.derivePath(`m/44'/195'/${ index }'/0/0`);
         const privateKey = child.privateKey.toString('hex');
 
-        const account = web3.eth.accounts.privateKeyToAccount(privateKey);
+        const account = web3.eth.accounts.privateKeyToAccount('0x' + privateKey);
 
         return {
             privateKey: account.privateKey,
