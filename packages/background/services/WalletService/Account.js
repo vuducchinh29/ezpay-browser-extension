@@ -6,8 +6,9 @@ import { BigNumber } from 'bignumber.js';
 const logger = new Logger('WalletService/Account');
 
 class Account {
-    constructor(chain, accountType, importData, name, symbol, decimal, logo, accountIndex = 0) {
+    constructor(chain, token, accountType, importData, name, symbol, decimal, logo, accountIndex = 0) {
         this.chain = chain;
+        this.token = token;
         this.type = accountType;
         this.accountIndex = accountIndex;
 

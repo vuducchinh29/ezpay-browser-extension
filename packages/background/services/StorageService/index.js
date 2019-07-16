@@ -9,6 +9,7 @@ const StorageService = {
     // We could instead scope the data so we don't need this array
     storageKeys: [
         'accounts',
+        'tokens',
         'nodes',
         'transactions',
         'selectedAccount',
@@ -50,6 +51,7 @@ const StorageService = {
     },
     pendingTransactions: {},
     accounts: {},
+    tokens: {},
     transactions: {},
     tokenCache: {},
     selectedAccount: false,
@@ -193,11 +195,37 @@ const StorageService = {
         this.save('nodes');
     },
 
+    getTokens() {
+        const tokens = {};
+
+        Object.keys(this.tokens).forEach(tokenId => {
+            tokens[ tokenId ] = {
+                ...this.tokens[ tokenId ]
+            };
+        });
+
+        return tokens;
+    },
+
     selectNode(nodeID) {
         logger.info('Saving selected node', nodeID);
 
         this.nodes.selectedNode = nodeID;
         this.save('nodes');
+    },
+
+    deleteToken(tokenID) {
+        logger.info('Deleting token', tokenID);
+
+        delete this.tokens[ tokenID ];
+        this.save('tokens');
+    },
+
+    saveToken(tokenID, token) {
+        logger.info('Saving token', token);
+
+        this.tokens[ tokenID ] = token;
+        this.save('tokens');
     },
 
     saveAccount(account) {

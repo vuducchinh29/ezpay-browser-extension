@@ -40,6 +40,7 @@ const NodeService = {
             name: 'Tron',
             symbol: 'TRX',
             decimal: 6,
+            isShow: true,
             logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1958.png'
         },
         'f0b1e38e-7bee-485e-9d3f-69410bf30684': {
@@ -47,6 +48,7 @@ const NodeService = {
             name: 'Tron Test',
             symbol: 'TRX',
             decimal: 6,
+            isShow: false,
             logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1958.png'
         },
         'f0b1e38e-7bee-485e-9d3f-69410bf30685': {
@@ -54,6 +56,7 @@ const NodeService = {
             name: 'Ethereum',
             symbol: 'ETH',
             decimal: 18,
+            isShow: true,
             logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png'
         },
         'f0b1e38e-7bee-485e-9d3f-69410bf30686': {
@@ -61,6 +64,7 @@ const NodeService = {
             name: 'Nexty',
             symbol: 'NTY',
             decimal: 18,
+            isShow: true,
             logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/2714.png'
         },
         'f0b1e38e-7bee-485e-9d3f-69410bf30687': {
@@ -69,6 +73,7 @@ const NodeService = {
             symbol: 'BTC',
             decimal: 8,
             typeCoinInfo: 'BTC',
+            isShow: true,
             logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1.png'
         },
         'f0b1e38e-7bee-485e-9d3f-69410bf30688': {
@@ -77,6 +82,7 @@ const NodeService = {
             symbol: 'LTC-TEST',
             decimal: 8,
             typeCoinInfo: 'LTC-TEST',
+            isShow: false,
             logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/2.png'
         },
     },

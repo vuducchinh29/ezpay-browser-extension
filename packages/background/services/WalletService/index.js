@@ -29,19 +29,92 @@ class Wallet extends EventEmitter {
         this.selectedChain = false;
         this.chains = {};
         this.accounts = {};
+        this.tokens = {};
 
         this._start()
     }
 
     async _start() {
         await this._checkStorage();
-        await this._initChains();
+        await this._saveTokens();
+        this._loadTokens();
+        // await this._initChains();
         this._loadAccounts();
     }
 
     async _checkStorage() {
         if(await StorageService.dataExists() || StorageService.needsMigrating)
             this._setState(APP_STATE.PASSWORD_SET); // initstatus APP_STATE.PASSWORD_SET
+    }
+
+    _saveTokens() {
+        const tokens = NodeService.getTokens()
+
+        Object.entries(tokens).forEach(([ tokenId, token ]) => {
+            StorageService.saveToken(tokenId, token)
+        })
+    }
+
+    _loadTokens() {
+        const tokens = StorageService.getTokens();
+        console.log('tokens', tokens)
+        Object.entries(tokens).forEach(([ tokenId, token ]) => {
+            this.tokens[tokenId] = token
+        })
+    }
+
+    _loadAccounts() {
+        const accounts = StorageService.getAccounts();
+        const nodes = NodeService.getNodes().nodes;
+
+        Object.entries(accounts).forEach(([ address, account ]) => {
+            let node = nodes[account.chain]
+            let accountObj
+
+            if (node.type === CHAIN_TYPE.TRON) {
+                accountObj = new TronAccount(
+                    account.chain,
+                    account.token,
+                    account.type,
+                    account.mnemonic || account.privateKey,
+                    account.name,
+                    account.symbol,
+                    account.decimal,
+                    account.logo,
+                    account.accountIndex
+                );
+
+                accountObj.loadCache();
+                accountObj.update([], [], 0);
+            } else if (node.type === CHAIN_TYPE.NTY || node.type === CHAIN_TYPE.ETH) {
+                accountObj = new EthereumAccount(
+                    account.chain,
+                    account.token,
+                    account.type,
+                    account.mnemonic || account.privateKey,
+                    account.name,
+                    account.symbol,
+                    account.decimal,
+                    account.logo,
+                    account.accountIndex
+                );
+            } else if (node.type === CHAIN_TYPE.BTC) {
+                accountObj = new BitcoinAccount(
+                    account.chain,
+                    account.token,
+                    account.type,
+                    account.mnemonic || account.privateKey,
+                    account.name,
+                    account.symbol,
+                    account.decimal,
+                    account.logo,
+                    account.typeCoinInfo,
+                    account.accountIndex
+                );
+            }
+
+            this.accounts[ address ] = accountObj;
+        });
     }
 
     _initChains() {
@@ -119,57 +192,6 @@ class Wallet extends EventEmitter {
         }
     }
 
-    _loadAccounts() {
-        const accounts = StorageService.getAccounts();
-        const nodes = NodeService.getNodes().nodes;
-
-        Object.entries(accounts).forEach(([ address, account ]) => {
-            let node = nodes[account.chain]
-            let accountObj
-
-            if (node.type === CHAIN_TYPE.TRON) {
-                accountObj = new TronAccount(
-                    account.chain,
-                    account.type,
-                    account.mnemonic || account.privateKey,
-                    account.name,
-                    account.symbol,
-                    account.decimal,
-                    account.logo,
-                    account.accountIndex
-                );
-
-                accountObj.loadCache();
-                accountObj.update([], [], 0);
-            } else if (node.type === CHAIN_TYPE.NTY || node.type === CHAIN_TYPE.ETH) {
-                accountObj = new EthereumAccount(
-                    account.chain,
-                    account.type,
-                    account.mnemonic || account.privateKey,
-                    account.name,
-                    account.symbol,
-                    account.decimal,
-                    account.logo,
-                    account.accountIndex
-                );
-            } else if (node.type === CHAIN_TYPE.BTC) {
-                accountObj = new BitcoinAccount(
-                    account.chain,
-                    account.type,
-                    account.mnemonic || account.privateKey,
-                    account.name,
-                    account.symbol,
-                    account.decimal,
-                    account.logo,
-                    account.typeCoinInfo,
-                    account.accountIndex
-                );
-            }
-
-            this.accounts[ address ] = accountObj;
-        });
-    }
-
     async unlockWallet(password) {
         if(this.state !== APP_STATE.PASSWORD_SET) {
             logger.error('Attempted to unlock wallet whilst not in PASSWORD_SET state');
@@ -203,30 +225,39 @@ class Wallet extends EventEmitter {
 
     _createDefaultAccount() {
         const tokens = NodeService.getTokens()
-        const token = tokens['f0b1e38e-7bee-485e-9d3f-69410bf30686']
-        const token2 = tokens['f0b1e38e-7bee-485e-9d3f-69410bf30683']
-        const token3 = tokens['f0b1e38e-7bee-485e-9d3f-69410bf30687']
-        const token4 = tokens['f0b1e38e-7bee-485e-9d3f-69410bf30685']
+        const id = 'f0b1e38e-7bee-485e-9d3f-69410bf30686'
+        const id1 = 'f0b1e38e-7bee-485e-9d3f-69410bf30683'
+        const id2 = 'f0b1e38e-7bee-485e-9d3f-69410bf30687'
+        const id3 = 'f0b1e38e-7bee-485e-9d3f-69410bf30685'
+
+        const token = tokens[id]
+        const token1 = tokens[id1]
+        const token2 = tokens[id2]
+        const token3 = tokens[id3]
 
         this.addAccount({
             ...token,
+            token: id,
             mnemonic: Utils.generateMnemonic(),
             accountName: 'Nexty Account 1'
         })
         this.addAccount({
-            ...token2,
+            ...token1,
+            token: id1,
             mnemonic: Utils.generateMnemonic(),
             accountName: 'Tron Account 1'
         })
 
         this.addAccount({
-            ...token3,
+            ...token2,
+            token: id2,
             mnemonic: Utils.generateMnemonic(),
             accountName: 'Bitcoin Account 1'
         })
 
         this.addAccount({
-            ...token4,
+            ...token3,
+            token: id3,
             mnemonic: Utils.generateMnemonic(),
             accountName: 'Ethereum Account 1'
         })
@@ -261,6 +292,7 @@ class Wallet extends EventEmitter {
 
         const account = new TronAccount(
             params.node,
+            params.token,
             ACCOUNT_TYPE.MNEMONIC,
             params.mnemonic,
             params.accountName,
@@ -286,6 +318,7 @@ class Wallet extends EventEmitter {
 
         const account = new EthereumAccount(
             params.node,
+            params.token,
             ACCOUNT_TYPE.MNEMONIC,
             params.mnemonic,
             params.accountName,
@@ -311,6 +344,7 @@ class Wallet extends EventEmitter {
 
         const account = new BitcoinAccount(
             params.node,
+            params.token,
             ACCOUNT_TYPE.MNEMONIC,
             params.mnemonic,
             params.accountName,
@@ -334,7 +368,8 @@ class Wallet extends EventEmitter {
 
     getAccounts() {
         const nodes = NodeService.getNodes().nodes;
-        console.log('xxx', this.accounts)
+        const tokens = NodeService.getTokens()
+
         const accounts = Object.entries(this.accounts).reduce((accounts, [ address, account ]) => {
             console.log('xxx', account)
             accounts[ address ] = {
@@ -343,6 +378,7 @@ class Wallet extends EventEmitter {
                 decimal: account.decimal,
                 symbol: account.symbol,
                 chain: nodes[account.chain],
+                token: tokens[account.token],
                 balance: account.balance + account.frozenBalance || 0,
                 // energyUsed: account.energyUsed,
                 // totalEnergyWeight: account.totalEnergyWeight,

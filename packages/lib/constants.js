@@ -23,6 +23,11 @@ export const ACCOUNT_TYPE = {
     PRIVATE_KEY: 1
 };
 
+export const SECURITY_MODE = {
+    EASY: 'EASY',
+    SECURE: 'SECURE'
+}
+
 export const CHAIN_TYPE = {
     TRON: 'TRON',
     ETH: 'ETH',

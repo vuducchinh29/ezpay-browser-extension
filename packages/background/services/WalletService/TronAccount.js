@@ -15,8 +15,8 @@ import axios from 'axios';
 BigNumber.config({ EXPONENTIAL_AT: [-20, 30] });
 const logger = new Logger('WalletService/TronAccount');
 class TronAccount extends Account {
-    constructor(chain, accountType, importData, name, symbol, decimal, logo, accountIndex = 0) {
-        super(chain, accountType, importData, name, symbol, decimal, logo, accountIndex);
+    constructor(chain, token, accountType, importData, name, symbol, decimal, logo, accountIndex = 0) {
+        super(chain, token, accountType, importData, name, symbol, decimal, logo, accountIndex);
 
         this.selectedBankRecordId = 0;
         this.dealCurrencyPage = 0;

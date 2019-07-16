@@ -79974,6 +79974,7 @@ var NodeService = {
       name: 'Tron',
       symbol: 'TRX',
       decimal: 6,
+      isShow: true,
       logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1958.png'
     },
     'f0b1e38e-7bee-485e-9d3f-69410bf30684': {
@@ -79981,6 +79982,7 @@ var NodeService = {
       name: 'Tron Test',
       symbol: 'TRX',
       decimal: 6,
+      isShow: false,
       logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1958.png'
     },
     'f0b1e38e-7bee-485e-9d3f-69410bf30685': {
@@ -79988,6 +79990,7 @@ var NodeService = {
       name: 'Ethereum',
       symbol: 'ETH',
       decimal: 18,
+      isShow: true,
       logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png'
     },
     'f0b1e38e-7bee-485e-9d3f-69410bf30686': {
@@ -79995,6 +79998,7 @@ var NodeService = {
       name: 'Nexty',
       symbol: 'NTY',
       decimal: 18,
+      isShow: true,
       logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/2714.png'
     },
     'f0b1e38e-7bee-485e-9d3f-69410bf30687': {
@@ -80003,6 +80007,7 @@ var NodeService = {
       symbol: 'BTC',
       decimal: 8,
       typeCoinInfo: 'BTC',
+      isShow: true,
       logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1.png'
     },
     'f0b1e38e-7bee-485e-9d3f-69410bf30688': {
@@ -80011,6 +80016,7 @@ var NodeService = {
       symbol: 'LTC-TEST',
       decimal: 8,
       typeCoinInfo: 'LTC-TEST',
+      isShow: false,
       logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/2.png'
     }
   },
@@ -80188,7 +80194,7 @@ function StorageService_objectSpread(target) { for (var i = 1; i < arguments.len
 var StorageService_logger = new logger_Logger('StorageService');
 var StorageService = {
   // We could instead scope the data so we don't need this array
-  storageKeys: ['accounts', 'nodes', 'transactions', 'selectedAccount', 'prices', 'pendingTransactions', 'tokenCache', 'setting', 'language', 'dappList', 'allDapps', 'allTokens', 'authorizeDapps'],
+  storageKeys: ['accounts', 'tokens', 'nodes', 'transactions', 'selectedAccount', 'prices', 'pendingTransactions', 'tokenCache', 'setting', 'language', 'dappList', 'allDapps', 'allTokens', 'authorizeDapps'],
   storage: extensionizer_default.a.storage.local,
   prices: {
     priceList: {
@@ -80215,6 +80221,7 @@ var StorageService = {
   },
   pendingTransactions: {},
   accounts: {},
+  tokens: {},
   transactions: {},
   tokenCache: {},
   selectedAccount: false,
@@ -80422,10 +80429,29 @@ var StorageService = {
     this.nodes.nodeList[nodeID] = node;
     this.save('nodes');
   },
+  getTokens: function getTokens() {
+    var _this3 = this;
+
+    var tokens = {};
+    Object.keys(this.tokens).forEach(function (tokenId) {
+      tokens[tokenId] = StorageService_objectSpread({}, _this3.tokens[tokenId]);
+    });
+    return tokens;
+  },
   selectNode: function selectNode(nodeID) {
     StorageService_logger.info('Saving selected node', nodeID);
     this.nodes.selectedNode = nodeID;
     this.save('nodes');
+  },
+  deleteToken: function deleteToken(tokenID) {
+    StorageService_logger.info('Deleting token', tokenID);
+    delete this.tokens[tokenID];
+    this.save('tokens');
+  },
+  saveToken: function saveToken(tokenID, token) {
+    StorageService_logger.info('Saving token', token);
+    this.tokens[tokenID] = token;
+    this.save('tokens');
   },
   saveAccount: function saveAccount(account) {
     delete account.tronWeb;
@@ -80539,7 +80565,7 @@ var StorageService = {
     this.save('prices');
   },
   save: function save() {
-    var _this3 = this;
+    var _this4 = this;
 
     for (var _len = arguments.length, keys = new Array(_len), _key = 0; _key < _len; _key++) {
       keys[_key] = arguments[_key];
@@ -80549,7 +80575,7 @@ var StorageService = {
     if (!keys.length) keys = this.storageKeys;
     StorageService_logger.info("Writing storage for keys ".concat(keys.join(', ')));
     keys.forEach(function (key) {
-      return _this3.storage.set(defineProperty_default()({}, key, utils.encrypt(_this3[key], _this3.password)));
+      return _this4.storage.set(defineProperty_default()({}, key, utils.encrypt(_this4[key], _this4.password)));
     });
     StorageService_logger.info('Storage saved');
   },
@@ -80688,12 +80714,13 @@ var StorageService = {
 
 var Account_logger = new logger_Logger('WalletService/Account');
 
-var Account_Account = function Account(chain, accountType, importData, name, symbol, decimal, logo) {
-  var accountIndex = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : 0;
+var Account_Account = function Account(chain, token, accountType, importData, name, symbol, decimal, logo) {
+  var accountIndex = arguments.length > 8 && arguments[8] !== undefined ? arguments[8] : 0;
 
   classCallCheck_default()(this, Account);
 
   this.chain = chain;
+  this.token = token;
   this.type = accountType;
   this.accountIndex = accountIndex;
   this.address = false;
@@ -80743,6 +80770,10 @@ var APP_STATE = {
 var ACCOUNT_TYPE = {
   MNEMONIC: 0,
   PRIVATE_KEY: 1
+};
+var SECURITY_MODE = {
+  EASY: 'EASY',
+  SECURE: 'SECURE'
 };
 var CHAIN_TYPE = {
   TRON: 'TRON',
@@ -80886,14 +80917,14 @@ var TronAccount_TronAccount =
 function (_Account) {
   inherits_default()(TronAccount, _Account);
 
-  function TronAccount(chain, accountType, importData, name, symbol, decimal, logo) {
+  function TronAccount(chain, token, accountType, importData, name, symbol, decimal, logo) {
     var _this;
 
-    var accountIndex = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : 0;
+    var accountIndex = arguments.length > 8 && arguments[8] !== undefined ? arguments[8] : 0;
 
     classCallCheck_default()(this, TronAccount);
 
-    _this = possibleConstructorReturn_default()(this, getPrototypeOf_default()(TronAccount).call(this, chain, accountType, importData, name, symbol, decimal, logo, accountIndex));
+    _this = possibleConstructorReturn_default()(this, getPrototypeOf_default()(TronAccount).call(this, chain, token, accountType, importData, name, symbol, decimal, logo, accountIndex));
     _this.selectedBankRecordId = 0;
     _this.dealCurrencyPage = 0;
     _this.energy = 0;
@@ -82336,14 +82367,14 @@ var EthereumAccount_EthereumAccount =
 function (_Account) {
   inherits_default()(EthereumAccount, _Account);
 
-  function EthereumAccount(chain, accountType, importData, name, symbol, decimal, logo) {
+  function EthereumAccount(chain, token, accountType, importData, name, symbol, decimal, logo) {
     var _this;
 
-    var accountIndex = arguments.length > 7 && arguments[7] !== undefined ? arguments[7] : 0;
+    var accountIndex = arguments.length > 8 && arguments[8] !== undefined ? arguments[8] : 0;
 
     classCallCheck_default()(this, EthereumAccount);
 
-    _this = possibleConstructorReturn_default()(this, getPrototypeOf_default()(EthereumAccount).call(this, chain, accountType, importData, name, symbol, decimal, logo, accountIndex));
+    _this = possibleConstructorReturn_default()(this, getPrototypeOf_default()(EthereumAccount).call(this, chain, token, accountType, importData, name, symbol, decimal, logo, accountIndex));
     if (accountType == ACCOUNT_TYPE.MNEMONIC) _this._importMnemonic(importData);else _this._importPrivateKey(importData);
     return _this;
   }
@@ -82408,14 +82439,14 @@ var BitcoinAccount_BitcoinAccount =
 function (_Account) {
   inherits_default()(BitcoinAccount, _Account);
 
-  function BitcoinAccount(chain, accountType, importData, name, symbol, decimal, logo, typeCoinInfo) {
+  function BitcoinAccount(chain, token, accountType, importData, name, symbol, decimal, logo, typeCoinInfo) {
     var _this;
 
-    var accountIndex = arguments.length > 8 && arguments[8] !== undefined ? arguments[8] : 0;
+    var accountIndex = arguments.length > 9 && arguments[9] !== undefined ? arguments[9] : 0;
 
     classCallCheck_default()(this, BitcoinAccount);
 
-    _this = possibleConstructorReturn_default()(this, getPrototypeOf_default()(BitcoinAccount).call(this, chain, accountType, importData, name, symbol, decimal, logo, accountIndex));
+    _this = possibleConstructorReturn_default()(this, getPrototypeOf_default()(BitcoinAccount).call(this, chain, token, accountType, importData, name, symbol, decimal, logo, accountIndex));
     _this.typeCoinInfo = typeCoinInfo;
     if (accountType == ACCOUNT_TYPE.MNEMONIC) _this._importMnemonic(importData);else _this._importPrivateKey(importData);
     return _this;
@@ -82520,6 +82551,7 @@ function (_EventEmitter) {
     _this.selectedChain = false;
     _this.chains = {};
     _this.accounts = {};
+    _this.tokens = {};
 
     _this._start();
 
@@ -82541,12 +82573,15 @@ function (_EventEmitter) {
 
               case 2:
                 _context.next = 4;
-                return this._initChains();
+                return this._saveTokens();
 
               case 4:
+                this._loadTokens(); // await this._initChains();
+
+
                 this._loadAccounts();
 
-              case 5:
+              case 6:
               case "end":
                 return _context.stop();
             }
@@ -82606,15 +82641,70 @@ function (_EventEmitter) {
       return _checkStorage;
     }()
   }, {
-    key: "_initChains",
-    value: function _initChains() {
+    key: "_saveTokens",
+    value: function _saveTokens() {
+      var tokens = services_NodeService.getTokens();
+      Object.entries(tokens).forEach(function (_ref) {
+        var _ref2 = slicedToArray_default()(_ref, 2),
+            tokenId = _ref2[0],
+            token = _ref2[1];
+
+        services_StorageService.saveToken(tokenId, token);
+      });
+    }
+  }, {
+    key: "_loadTokens",
+    value: function _loadTokens() {
       var _this2 = this;
 
+      var tokens = services_StorageService.getTokens();
+      console.log('tokens', tokens);
+      Object.entries(tokens).forEach(function (_ref3) {
+        var _ref4 = slicedToArray_default()(_ref3, 2),
+            tokenId = _ref4[0],
+            token = _ref4[1];
+
+        _this2.tokens[tokenId] = token;
+      });
+    }
+  }, {
+    key: "_loadAccounts",
+    value: function _loadAccounts() {
+      var _this3 = this;
+
+      var accounts = services_StorageService.getAccounts();
       var nodes = services_NodeService.getNodes().nodes;
-      Object.entries(nodes).forEach(function (_ref) {
-        var _ref2 = slicedToArray_default()(_ref, 2),
-            key = _ref2[0],
-            node = _ref2[1];
+      Object.entries(accounts).forEach(function (_ref5) {
+        var _ref6 = slicedToArray_default()(_ref5, 2),
+            address = _ref6[0],
+            account = _ref6[1];
+
+        var node = nodes[account.chain];
+        var accountObj;
+
+        if (node.type === CHAIN_TYPE.TRON) {
+          accountObj = new WalletService_TronAccount(account.chain, account.token, account.type, account.mnemonic || account.privateKey, account.name, account.symbol, account.decimal, account.logo, account.accountIndex);
+          accountObj.loadCache();
+          accountObj.update([], [], 0);
+        } else if (node.type === CHAIN_TYPE.NTY || node.type === CHAIN_TYPE.ETH) {
+          accountObj = new WalletService_EthereumAccount(account.chain, account.token, account.type, account.mnemonic || account.privateKey, account.name, account.symbol, account.decimal, account.logo, account.accountIndex);
+        } else if (node.type === CHAIN_TYPE.BTC) {
+          accountObj = new WalletService_BitcoinAccount(account.chain, account.token, account.type, account.mnemonic || account.privateKey, account.name, account.symbol, account.decimal, account.logo, account.typeCoinInfo, account.accountIndex);
+        }
+
+        _this3.accounts[address] = accountObj;
+      });
+    }
+  }, {
+    key: "_initChains",
+    value: function _initChains() {
+      var _this4 = this;
+
+      var nodes = services_NodeService.getNodes().nodes;
+      Object.entries(nodes).forEach(function (_ref7) {
+        var _ref8 = slicedToArray_default()(_ref7, 2),
+            key = _ref8[0],
+            node = _ref8[1];
 
         var ezWeb;
 
@@ -82631,7 +82721,7 @@ function (_EventEmitter) {
           logo: node.logo,
           ezWeb: ezWeb
         });
-        _this2.chains[key] = chain;
+        _this4.chains[key] = chain;
       });
     }
   }, {
@@ -82701,34 +82791,6 @@ function (_EventEmitter) {
 
         this._createDefaultAccount();
       }
-    }
-  }, {
-    key: "_loadAccounts",
-    value: function _loadAccounts() {
-      var _this3 = this;
-
-      var accounts = services_StorageService.getAccounts();
-      var nodes = services_NodeService.getNodes().nodes;
-      Object.entries(accounts).forEach(function (_ref3) {
-        var _ref4 = slicedToArray_default()(_ref3, 2),
-            address = _ref4[0],
-            account = _ref4[1];
-
-        var node = nodes[account.chain];
-        var accountObj;
-
-        if (node.type === CHAIN_TYPE.TRON) {
-          accountObj = new WalletService_TronAccount(account.chain, account.type, account.mnemonic || account.privateKey, account.name, account.symbol, account.decimal, account.logo, account.accountIndex);
-          accountObj.loadCache();
-          accountObj.update([], [], 0);
-        } else if (node.type === CHAIN_TYPE.NTY || node.type === CHAIN_TYPE.ETH) {
-          accountObj = new WalletService_EthereumAccount(account.chain, account.type, account.mnemonic || account.privateKey, account.name, account.symbol, account.decimal, account.logo, account.accountIndex);
-        } else if (node.type === CHAIN_TYPE.BTC) {
-          accountObj = new WalletService_BitcoinAccount(account.chain, account.type, account.mnemonic || account.privateKey, account.name, account.symbol, account.decimal, account.logo, account.typeCoinInfo, account.accountIndex);
-        }
-
-        _this3.accounts[address] = accountObj;
-      });
     }
   }, {
     key: "unlockWallet",
@@ -82816,23 +82878,31 @@ function (_EventEmitter) {
     key: "_createDefaultAccount",
     value: function _createDefaultAccount() {
       var tokens = services_NodeService.getTokens();
-      var token = tokens['f0b1e38e-7bee-485e-9d3f-69410bf30686'];
-      var token2 = tokens['f0b1e38e-7bee-485e-9d3f-69410bf30683'];
-      var token3 = tokens['f0b1e38e-7bee-485e-9d3f-69410bf30687'];
-      var token4 = tokens['f0b1e38e-7bee-485e-9d3f-69410bf30685'];
+      var id = 'f0b1e38e-7bee-485e-9d3f-69410bf30686';
+      var id1 = 'f0b1e38e-7bee-485e-9d3f-69410bf30683';
+      var id2 = 'f0b1e38e-7bee-485e-9d3f-69410bf30687';
+      var id3 = 'f0b1e38e-7bee-485e-9d3f-69410bf30685';
+      var token = tokens[id];
+      var token1 = tokens[id1];
+      var token2 = tokens[id2];
+      var token3 = tokens[id3];
       this.addAccount(WalletService_objectSpread({}, token, {
+        token: id,
         mnemonic: utils.generateMnemonic(),
         accountName: 'Nexty Account 1'
       }));
-      this.addAccount(WalletService_objectSpread({}, token2, {
+      this.addAccount(WalletService_objectSpread({}, token1, {
+        token: id1,
         mnemonic: utils.generateMnemonic(),
         accountName: 'Tron Account 1'
       }));
-      this.addAccount(WalletService_objectSpread({}, token3, {
+      this.addAccount(WalletService_objectSpread({}, token2, {
+        token: id2,
         mnemonic: utils.generateMnemonic(),
         accountName: 'Bitcoin Account 1'
       }));
-      this.addAccount(WalletService_objectSpread({}, token4, {
+      this.addAccount(WalletService_objectSpread({}, token3, {
+        token: id3,
         mnemonic: utils.generateMnemonic(),
         accountName: 'Ethereum Account 1'
       }));
@@ -82894,19 +82964,19 @@ function (_EventEmitter) {
                 _context6.next = 5;
                 return Promise.all([trc10tokens, trc20tokens]).then(function (res) {
                   var t = [];
-                  res[0].data.data.concat(res[1].data.tokens).forEach(function (_ref5) {
-                    var abbr = _ref5.abbr,
-                        name = _ref5.name,
-                        _ref5$imgUrl = _ref5.imgUrl,
-                        imgUrl = _ref5$imgUrl === void 0 ? false : _ref5$imgUrl,
-                        _ref5$tokenID = _ref5.tokenID,
-                        tokenID = _ref5$tokenID === void 0 ? false : _ref5$tokenID,
-                        _ref5$contractAddress = _ref5.contractAddress,
-                        contractAddress = _ref5$contractAddress === void 0 ? false : _ref5$contractAddress,
-                        _ref5$decimal = _ref5.decimal,
-                        decimal = _ref5$decimal === void 0 ? false : _ref5$decimal,
-                        _ref5$precision = _ref5.precision,
-                        precision = _ref5$precision === void 0 ? false : _ref5$precision;
+                  res[0].data.data.concat(res[1].data.tokens).forEach(function (_ref9) {
+                    var abbr = _ref9.abbr,
+                        name = _ref9.name,
+                        _ref9$imgUrl = _ref9.imgUrl,
+                        imgUrl = _ref9$imgUrl === void 0 ? false : _ref9$imgUrl,
+                        _ref9$tokenID = _ref9.tokenID,
+                        tokenID = _ref9$tokenID === void 0 ? false : _ref9$tokenID,
+                        _ref9$contractAddress = _ref9.contractAddress,
+                        contractAddress = _ref9$contractAddress === void 0 ? false : _ref9$contractAddress,
+                        _ref9$decimal = _ref9.decimal,
+                        decimal = _ref9$decimal === void 0 ? false : _ref9$decimal,
+                        _ref9$precision = _ref9.precision,
+                        precision = _ref9$precision === void 0 ? false : _ref9$precision;
                     if (contractAddress && contractAddress === CONTRACT_ADDRESS.USDT) return;
                     t.push({
                       tokenId: tokenID ? tokenID.toString() : contractAddress,
@@ -82920,7 +82990,7 @@ function (_EventEmitter) {
                 });
 
               case 5:
-                account = new WalletService_TronAccount(params.node, ACCOUNT_TYPE.MNEMONIC, params.mnemonic, params.accountName, params.symbol, params.decimal, params.logo);
+                account = new WalletService_TronAccount(params.node, params.token, ACCOUNT_TYPE.MNEMONIC, params.mnemonic, params.accountName, params.symbol, params.decimal, params.logo);
                 WalletService_logger.info("Add account '".concat(account, "'"));
                 address = account.address;
                 this.accounts[address] = account;
@@ -82954,7 +83024,7 @@ function (_EventEmitter) {
             switch (_context7.prev = _context7.next) {
               case 0:
                 WalletService_logger.info("Adding Ethereum account '".concat(params.accountName, "' from popup"));
-                account = new WalletService_EthereumAccount(params.node, ACCOUNT_TYPE.MNEMONIC, params.mnemonic, params.accountName, params.symbol, params.decimal, params.logo);
+                account = new WalletService_EthereumAccount(params.node, params.token, ACCOUNT_TYPE.MNEMONIC, params.mnemonic, params.accountName, params.symbol, params.decimal, params.logo);
                 WalletService_logger.info("Add account '".concat(account, "'"));
                 address = account.address;
                 this.accounts[address] = account;
@@ -82988,7 +83058,7 @@ function (_EventEmitter) {
             switch (_context8.prev = _context8.next) {
               case 0:
                 WalletService_logger.info("Adding Bitcoin account '".concat(params.accountName, "' from popup"));
-                account = new WalletService_BitcoinAccount(params.node, ACCOUNT_TYPE.MNEMONIC, params.mnemonic, params.accountName, params.symbol, params.decimal, params.logo, params.typeCoinInfo);
+                account = new WalletService_BitcoinAccount(params.node, params.token, ACCOUNT_TYPE.MNEMONIC, params.mnemonic, params.accountName, params.symbol, params.decimal, params.logo, params.typeCoinInfo);
                 WalletService_logger.info("Add account '".concat(account, "'"));
                 address = account.address;
                 this.accounts[address] = account;
@@ -83014,11 +83084,11 @@ function (_EventEmitter) {
     key: "getAccounts",
     value: function getAccounts() {
       var nodes = services_NodeService.getNodes().nodes;
-      console.log('xxx', this.accounts);
-      var accounts = Object.entries(this.accounts).reduce(function (accounts, _ref6) {
-        var _ref7 = slicedToArray_default()(_ref6, 2),
-            address = _ref7[0],
-            account = _ref7[1];
+      var tokens = services_NodeService.getTokens();
+      var accounts = Object.entries(this.accounts).reduce(function (accounts, _ref10) {
+        var _ref11 = slicedToArray_default()(_ref10, 2),
+            address = _ref11[0],
+            account = _ref11[1];
 
         console.log('xxx', account);
         accounts[address] = {
@@ -83027,6 +83097,7 @@ function (_EventEmitter) {
           decimal: account.decimal,
           symbol: account.symbol,
           chain: nodes[account.chain],
+          token: tokens[account.token],
           balance: account.balance + account.frozenBalance || 0 // energyUsed: account.energyUsed,
           // totalEnergyWeight: account.totalEnergyWeight,
           // TotalEnergyLimit: account.TotalEnergyLimit,
