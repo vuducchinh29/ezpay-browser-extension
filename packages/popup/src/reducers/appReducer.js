@@ -18,6 +18,7 @@ export const setLanguage = createAction('setLanguage');
 export const setSetting = createAction('setSetting');
 export const setVersion = createAction('setVersion');
 export const setDappList = createAction('setDappList');
+export const setToken = createAction('setToken');
 export const setAuthorizeDapps = createAction('setAuthorizeDapps');
 
 export const appReducer = createReducer({
@@ -28,6 +29,7 @@ export const appReducer = createReducer({
         selected: false
     },
     tokens: {},
+    selectedToken: {},
     prices: {
         priceList: {},
         usdtPriceList:{},
@@ -51,6 +53,9 @@ export const appReducer = createReducer({
     [ setPriceList ]: (state, { payload }) => {
         state.prices.priceList = payload[0];
         state.prices.usdtPriceList = payload[1];
+    },
+    [ setToken ]: (state, { payload }) => {
+        state.selectedToken = payload
     },
     [ setCurrency ]: (state, { payload }) => {
         state.prices.selected = payload;

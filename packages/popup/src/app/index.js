@@ -33,7 +33,7 @@ class App extends React.Component {
                 dom = <HomeController />;
                 break;
             case APP_STATE.CREATING_TOKEN:
-                dom = <CreateTokenController />;
+                dom = <CreateTokenController onCancel={ () => PopupAPI.changeState(APP_STATE.READY) } />;
                 break;
             case APP_STATE.ACCOUNTS:
                 dom = <AccountController onCancel={ () => PopupAPI.changeState(APP_STATE.READY) } />;

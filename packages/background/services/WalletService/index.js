@@ -375,7 +375,6 @@ class Wallet extends EventEmitter {
         const tokens = NodeService.getTokens()
 
         const accounts = Object.entries(this.accounts).reduce((accounts, [ address, account ]) => {
-            console.log('xxx', account)
             accounts[ address ] = {
                 name: account.name,
                 logo: account.logo,
@@ -428,6 +427,12 @@ class Wallet extends EventEmitter {
             return logger.error(`Attempted to change app state to ${ appState }. Only 'restoring' and 'creating' is permitted`);
 
         this._setState(appState);
+    }
+
+    selectToken(tokenId) {
+        const token = this.tokens[ tokenId ]
+        token.id = tokenId
+        this.emit('selectToken', token)
     }
 }
 

@@ -40,6 +40,7 @@ const background = {
 
         duplex.on('changeState', this.walletService.changeState);
         duplex.on('resetState', this.walletService.resetState);
+        duplex.on('selectToken', this.walletService.selectToken);
     },
 
     bindWalletEvents() {
@@ -53,6 +54,10 @@ const background = {
 
         this.walletService.on('setAccounts', accounts => (
             BackgroundAPI.setAccounts(accounts)
+        ));
+
+        this.walletService.on('selectToken', token => (
+            BackgroundAPI.selectToken(token)
         ));
     },
 

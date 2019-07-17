@@ -24,13 +24,13 @@ import {
     setSetting,
     setVersion,
     setDappList,
-    setAuthorizeDapps
+    setAuthorizeDapps,
+    setToken
 } from 'reducers/appReducer';
 
 import {
     setAccount,
     setAccounts,
-    setToken,
     setSelectedBankRecordId,
     changeDealCurrencyPage,
     setAirdropInfo
@@ -119,10 +119,6 @@ export const app = {
             )
         });
 
-        // this.duplex.on('setSelectedToken', token => this.store.dispatch(
-        //     setToken(token)
-        // ));
-
         this.duplex.on('setAccount', account => this.store.dispatch(
             setAccount(account)
         ));
@@ -137,6 +133,10 @@ export const app = {
 
         this.duplex.on('setSetting', setting => this.store.dispatch(
             setSetting(setting)
+        ));
+
+        this.duplex.on('setSelectToken', token => this.store.dispatch(
+            setToken(token)
         ));
 
     },

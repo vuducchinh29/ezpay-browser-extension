@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import Header from '../Header';
 import { PopupAPI } from '@ezpay/lib/api';
 import {APP_STATE} from '@ezpay/lib/constants';
+import _ from 'lodash'
 
 import './style.scss';
 
@@ -22,7 +23,8 @@ class Controller extends React.Component {
     }
 
     render() {
-        const { accounts, tokens, onCancel } = this.props;
+        const { accounts, tokens, onCancel, selectedToken } = this.props;
+        // const accs = _.find(accounts, {chain:})
 
         return (
             <div className='createTokenContainer'>
@@ -56,4 +58,5 @@ class Controller extends React.Component {
 export default connect(state => ({
     accounts: state.accounts.accounts,
     tokens: state.app.tokens,
+    selectedToken: state.app.selectedToken,
 }))(Controller);

@@ -64,6 +64,10 @@ export default {
         this.duplex.send('selectAccount', address, false);
     },
 
+    selectToken(tokenId) {
+        this.duplex.send('selectToken', tokenId, false);
+    },
+
     deleteAccount() {
         this.duplex.send('deleteAccount', {}, false);
     },

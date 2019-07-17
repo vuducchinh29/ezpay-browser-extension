@@ -22,11 +22,11 @@ class Controller extends React.Component {
     }
 
     render() {
-        const { accounts, tokens } = this.props;
+        const { accounts, tokens, onCancel } = this.props;
 
         return (
             <div className='createTokenContainer'>
-                <Header />
+                <Header onCancel={onCancel}/>
                 <div className="accounts scroll">
                     {
                         Object.entries(accounts).map(([ address, account ]) => {

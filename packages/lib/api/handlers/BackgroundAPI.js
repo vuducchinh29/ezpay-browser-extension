@@ -50,6 +50,10 @@ export default {
         this.duplex.send('popup', 'setSelectedToken', token, false);
     },
 
+    selectToken(token) {
+        this.duplex.send('popup', 'setSelectToken', token, false);
+    },
+
     setLanguage(language) {
         this.duplex.send('popup', 'setLanguage', language, false);
     },

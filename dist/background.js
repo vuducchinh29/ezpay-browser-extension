@@ -83094,7 +83094,6 @@ function (_EventEmitter) {
             address = _ref11[0],
             account = _ref11[1];
 
-        console.log('xxx', account);
         accounts[address] = {
           name: account.name,
           logo: account.logo,
@@ -83125,6 +83124,13 @@ function (_EventEmitter) {
 
       this._setState(appState);
     }
+  }, {
+    key: "selectToken",
+    value: function selectToken(tokenId) {
+      var token = this.tokens[tokenId];
+      token.id = tokenId;
+      this.emit('selectToken', token);
+    }
   }]);
 
   return Wallet;
@@ -83151,6 +83157,7 @@ var appReducer_setLanguage = Object(redux_starter_kit_umd["createAction"])('setL
 var setSetting = Object(redux_starter_kit_umd["createAction"])('setSetting');
 var setVersion = Object(redux_starter_kit_umd["createAction"])('setVersion');
 var setDappList = Object(redux_starter_kit_umd["createAction"])('setDappList');
+var setToken = Object(redux_starter_kit_umd["createAction"])('setToken');
 var setAuthorizeDapps = Object(redux_starter_kit_umd["createAction"])('setAuthorizeDapps');
 var appReducer = Object(redux_starter_kit_umd["createReducer"])({
   appState: APP_STATE.UNINITIALISED,
@@ -83160,6 +83167,7 @@ var appReducer = Object(redux_starter_kit_umd["createReducer"])({
     selected: false
   },
   tokens: {},
+  selectedToken: {},
   prices: {
     priceList: {},
     usdtPriceList: {},
@@ -83182,32 +83190,35 @@ var appReducer = Object(redux_starter_kit_umd["createReducer"])({
   var payload = _ref2.payload;
   state.prices.priceList = payload[0];
   state.prices.usdtPriceList = payload[1];
-}), defineProperty_default()(_createReducer, setCurrency, function (state, _ref3) {
+}), defineProperty_default()(_createReducer, setToken, function (state, _ref3) {
   var payload = _ref3.payload;
-  state.prices.selected = payload;
-}), defineProperty_default()(_createReducer, setNodes, function (state, _ref4) {
+  state.selectedToken = payload;
+}), defineProperty_default()(_createReducer, setCurrency, function (state, _ref4) {
   var payload = _ref4.payload;
-  state.nodes = payload;
-}), defineProperty_default()(_createReducer, setTokens, function (state, _ref5) {
+  state.prices.selected = payload;
+}), defineProperty_default()(_createReducer, setNodes, function (state, _ref5) {
   var payload = _ref5.payload;
-  state.tokens = payload;
-}), defineProperty_default()(_createReducer, setPage, function (state, _ref6) {
+  state.nodes = payload;
+}), defineProperty_default()(_createReducer, setTokens, function (state, _ref6) {
   var payload = _ref6.payload;
-  state.currentPage = payload;
-}), defineProperty_default()(_createReducer, appReducer_setLanguage, function (state, _ref7) {
+  state.tokens = payload;
+}), defineProperty_default()(_createReducer, setPage, function (state, _ref7) {
   var payload = _ref7.payload;
-  state.language = payload;
-}), defineProperty_default()(_createReducer, setSetting, function (state, _ref8) {
+  state.currentPage = payload;
+}), defineProperty_default()(_createReducer, appReducer_setLanguage, function (state, _ref8) {
   var payload = _ref8.payload;
-  state.setting = payload;
-}), defineProperty_default()(_createReducer, setVersion, function (state, _ref9) {
+  state.language = payload;
+}), defineProperty_default()(_createReducer, setSetting, function (state, _ref9) {
   var payload = _ref9.payload;
-  state.version = payload;
-}), defineProperty_default()(_createReducer, setDappList, function (state, _ref10) {
+  state.setting = payload;
+}), defineProperty_default()(_createReducer, setVersion, function (state, _ref10) {
   var payload = _ref10.payload;
-  state.dappList = payload;
-}), defineProperty_default()(_createReducer, setAuthorizeDapps, function (state, _ref11) {
+  state.version = payload;
+}), defineProperty_default()(_createReducer, setDappList, function (state, _ref11) {
   var payload = _ref11.payload;
+  state.dappList = payload;
+}), defineProperty_default()(_createReducer, setAuthorizeDapps, function (state, _ref12) {
+  var payload = _ref12.payload;
   state.authorizeDapps = payload;
 }), _createReducer));
 // CONCATENATED MODULE: ../lib/api/handlers/PopupAPI.js
@@ -83265,6 +83276,9 @@ var appReducer = Object(redux_starter_kit_umd["createReducer"])({
   },
   selectAccount: function selectAccount(address) {
     this.duplex.send('selectAccount', address, false);
+  },
+  selectToken: function selectToken(tokenId) {
+    this.duplex.send('selectToken', tokenId, false);
   },
   deleteAccount: function deleteAccount() {
     this.duplex.send('deleteAccount', {}, false);
@@ -83339,6 +83353,9 @@ var appReducer = Object(redux_starter_kit_umd["createReducer"])({
   setSelectedToken: function setSelectedToken(token) {
     this.duplex.send('popup', 'setSelectedToken', token, false);
   },
+  selectToken: function selectToken(token) {
+    this.duplex.send('popup', 'setSelectToken', token, false);
+  },
   setLanguage: function setLanguage(language) {
     this.duplex.send('popup', 'setLanguage', language, false);
   },
@@ -83409,6 +83426,7 @@ var background = {
     duplex.on('getTokens', this.walletService.getTokens);
     duplex.on('changeState', this.walletService.changeState);
     duplex.on('resetState', this.walletService.resetState);
+    duplex.on('selectToken', this.walletService.selectToken);
   },
   bindWalletEvents: function bindWalletEvents() {
     var _this2 = this;
@@ -83421,6 +83439,9 @@ var background = {
     });
     this.walletService.on('setAccounts', function (accounts) {
       return api_BackgroundAPI.setAccounts(accounts);
+    });
+    this.walletService.on('selectToken', function (token) {
+      return api_BackgroundAPI.selectToken(token);
     });
   },
   bindTabDuplex: function bindTabDuplex() {

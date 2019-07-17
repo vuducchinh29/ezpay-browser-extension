@@ -21,7 +21,8 @@ class Controller extends React.Component {
         const accounts = await PopupAPI.getAccounts();
     }
 
-    detailToken() {
+    detailToken(tokenId) {
+        PopupAPI.selectToken(tokenId)
         PopupAPI.changeState(APP_STATE.ACCOUNTS)
     }
 
@@ -39,7 +40,7 @@ class Controller extends React.Component {
                             }
 
                             return (
-                                <div onClick={this.detailToken.bind(this)} className='item'>
+                                <div onClick={ this.detailToken.bind(this, tokenId) } className='item'>
                                     <img src={token.logo} />
                                     <div className='content'>
                                         <div className={'title'}>{token.name}</div>
