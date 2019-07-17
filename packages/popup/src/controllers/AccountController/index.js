@@ -24,7 +24,6 @@ class Controller extends React.Component {
 
     render() {
         const { accounts, tokens, onCancel, selectedToken } = this.props;
-        // const accs = _.find(accounts, {chain:})
 
         return (
             <div className='createTokenContainer'>
@@ -32,6 +31,9 @@ class Controller extends React.Component {
                 <div className="accounts scroll">
                     {
                         Object.entries(accounts).map(([ address, account ]) => {
+                            if (account.token.id !== selectedToken.id) {
+                                return null
+                            }
                             return (
                                 <div className='item'>
                                     <img src={account.logo} />

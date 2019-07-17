@@ -375,13 +375,16 @@ class Wallet extends EventEmitter {
         const tokens = NodeService.getTokens()
 
         const accounts = Object.entries(this.accounts).reduce((accounts, [ address, account ]) => {
+            let token = tokens[account.token]
+            token.id = account.token
+
             accounts[ address ] = {
                 name: account.name,
                 logo: account.logo,
                 decimal: account.decimal,
                 symbol: account.symbol,
                 chain: nodes[account.chain],
-                token: tokens[account.token],
+                token: token,
                 balance: account.balance + account.frozenBalance || 0,
                 // energyUsed: account.energyUsed,
                 // totalEnergyWeight: account.totalEnergyWeight,
