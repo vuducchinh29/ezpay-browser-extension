@@ -435,7 +435,13 @@ class Wallet extends EventEmitter {
     selectToken(tokenId) {
         const token = this.tokens[ tokenId ]
         token.id = tokenId
+
+        StorageService.setSelectedToken(token)
         this.emit('selectToken', token)
+    }
+
+    getSelectedToken() {
+        return StorageService.getSelectedToken();
     }
 }
 

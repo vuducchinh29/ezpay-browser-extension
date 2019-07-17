@@ -27,7 +27,7 @@ class Controller extends React.Component {
 
         return (
             <div className='createTokenContainer'>
-                <Header onCancel={ onCancel } />
+                <Header onCancel={ onCancel } title={ selectedToken.name } />
                 <div className="accounts scroll">
                     {
                         Object.entries(accounts).map(([ address, account ]) => {

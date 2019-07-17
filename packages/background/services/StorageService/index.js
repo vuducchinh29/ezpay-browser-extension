@@ -10,6 +10,7 @@ const StorageService = {
     storageKeys: [
         'accounts',
         'tokens',
+        'selectedToken',
         'nodes',
         'transactions',
         'selectedAccount',
@@ -249,6 +250,10 @@ const StorageService = {
         logger.info('Saving selectedToken', token);
         this.selectedToken = token;
         this.save('selectedToken');
+    },
+
+    getSelectedToken() {
+        return this.selectedToken
     },
 
     setLanguage(language){

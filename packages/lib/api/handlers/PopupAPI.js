@@ -88,6 +88,10 @@ export default {
         return this.duplex.send('getSelectedAccount');
     },
 
+    getSelectedToken() {
+        return this.duplex.send('getSelectedToken');
+    },
+
     getAccountDetails(address) {
         return this.duplex.send('getAccountDetails', address);
     },

@@ -41,6 +41,7 @@ const background = {
         duplex.on('changeState', this.walletService.changeState);
         duplex.on('resetState', this.walletService.resetState);
         duplex.on('selectToken', this.walletService.selectToken);
+        duplex.on('getSelectedToken', this.walletService.getSelectedToken);
     },
 
     bindWalletEvents() {
