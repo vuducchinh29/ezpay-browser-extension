@@ -10,6 +10,7 @@ import {
 
 export const setAppState = createAction('setAppState');
 export const setNodes = createAction('setNodes');
+export const setTokens = createAction('setTokens');
 export const setPage = createAction('setPage');
 export const setPriceList = createAction('setPriceList');
 export const setCurrency = createAction('setCurrency');
@@ -26,6 +27,7 @@ export const appReducer = createReducer({
         nodes: {},
         selected: false
     },
+    tokens: {},
     prices: {
         priceList: {},
         usdtPriceList:{},
@@ -55,6 +57,9 @@ export const appReducer = createReducer({
     },
     [ setNodes ]: (state, { payload }) => {
         state.nodes = payload;
+    },
+    [ setTokens ]: (state, { payload }) => {
+        state.tokens = payload;
     },
     [ setPage ]: (state, { payload }) => {
         state.currentPage = payload;

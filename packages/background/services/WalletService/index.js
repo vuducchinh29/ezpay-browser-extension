@@ -57,7 +57,7 @@ class Wallet extends EventEmitter {
 
     _loadTokens() {
         const tokens = StorageService.getTokens();
-        console.log('tokens', tokens)
+
         Object.entries(tokens).forEach(([ tokenId, token ]) => {
             this.tokens[tokenId] = token
         })
@@ -366,6 +366,10 @@ class Wallet extends EventEmitter {
         return true;
     }
 
+    getTokens() {
+        return this.tokens
+    }
+
     getAccounts() {
         const nodes = NodeService.getNodes().nodes;
         const tokens = NodeService.getTokens()
@@ -395,6 +399,35 @@ class Wallet extends EventEmitter {
 
         this.emit('setAccounts', accounts);
         return accounts;
+    }
+
+    changeState(appState) {
+        const stateAry = [
+            APP_STATE.PASSWORD_SET,
+            APP_STATE.RESTORING,
+            APP_STATE.CREATING_TOKEN,
+            APP_STATE.RECEIVE,
+            APP_STATE.SEND,
+            APP_STATE.TRANSACTIONS,
+            APP_STATE.SETTING,
+            APP_STATE.ADD_TRC20_TOKEN,
+            APP_STATE.READY,
+            APP_STATE.TRONBANK,
+            APP_STATE.TRONBANK_RECORD,
+            APP_STATE.TRONBANK_DETAIL,
+            APP_STATE.TRONBANK_HELP,
+            APP_STATE.USDT_INCOME_RECORD,
+            APP_STATE.USDT_ACTIVITY_DETAIL,
+            APP_STATE.DAPP_LIST,
+            APP_STATE.ASSET_MANAGE,
+            APP_STATE.TRANSACTION_DETAIL,
+            APP_STATE.DAPP_WHITELIST,
+            APP_STATE.ACCOUNTS
+        ];
+        if(!stateAry.includes(appState))
+            return logger.error(`Attempted to change app state to ${ appState }. Only 'restoring' and 'creating' is permitted`);
+
+        this._setState(appState);
     }
 }
 

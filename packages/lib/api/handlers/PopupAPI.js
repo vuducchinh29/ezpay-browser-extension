@@ -72,6 +72,10 @@ export default {
         return this.duplex.send('getAccounts');
     },
 
+    getTokens() {
+        return this.duplex.send('getTokens');
+    },
+
     exportAccount() {
         return this.duplex.send('exportAccount');
     },

@@ -5,9 +5,8 @@ export const APP_STATE = {
 
     // Wallet is unlocked
     UNLOCKED: 2, // [x] User is given two options - restore account or create new account
-    CREATING: 3, // [x] Shown if a user is creating a new account (startup or in general). Next step is READY
+    CREATING_TOKEN: 3, // [x] Shown if a user is creating a new account (startup or in general). Next step is READY
     RESTORING: 4, // [x] Shown when the user is restoring (or in general importing) an account. Next step is READY
-
     // Wallet is functional
     READY: 5, // [x] User is logged in (and at least 1 account exists)
     REQUESTING_CONFIRMATION: 6, // [x] Shown if confirmations are queued
@@ -16,7 +15,8 @@ export const APP_STATE = {
     TRANSACTIONS: 9, //[x] Show transactions record
     SETTING: 10, //[x] Show setting
     USDT_INCOME_RECORD: 11, //[X] income record for usdt
-}; // User can delete *all* accounts. This will set the appState to UNLOCKED.
+    ACCOUNTS: 12
+};
 
 export const ACCOUNT_TYPE = {
     MNEMONIC: 0,

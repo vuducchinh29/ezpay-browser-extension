@@ -36,6 +36,10 @@ const background = {
         duplex.on('setPassword', this.walletService.setPassword);
         duplex.on('unlockWallet', this.walletService.unlockWallet);
         duplex.on('getAccounts', this.walletService.getAccounts);
+        duplex.on('getTokens', this.walletService.getTokens);
+
+        duplex.on('changeState', this.walletService.changeState);
+        duplex.on('resetState', this.walletService.resetState);
     },
 
     bindWalletEvents() {

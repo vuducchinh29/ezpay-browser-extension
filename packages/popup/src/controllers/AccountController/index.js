@@ -21,29 +21,21 @@ class Controller extends React.Component {
         const accounts = await PopupAPI.getAccounts();
     }
 
-    detailToken() {
-        PopupAPI.changeState(APP_STATE.ACCOUNTS)
-    }
-
     render() {
-        const { accounts, tokens } = this.props;
+        const { accounts, tokens, onCancel } = this.props;
 
         return (
-            <div className='homeContainer'>
-                <Header />
+            <div className='createTokenContainer'>
+                <Header onCancel={ onCancel } />
                 <div className="accounts scroll">
                     {
-                        Object.entries(tokens).map(([ tokenId, token ]) => {
-                            if (!token.isShow) {
-                                return null
-                            }
-
+                        Object.entries(accounts).map(([ address, account ]) => {
                             return (
-                                <div onClick={this.detailToken.bind(this)} className='item'>
-                                    <img src={token.logo} />
+                                <div className='item'>
+                                    <img src={account.logo} />
                                     <div className='content'>
-                                        <div className={'title'}>{token.name}</div>
-                                        <div className='desc'>{token.balance || 0} {token.symbol}</div>
+                                        <div className={'title'}>{account.name}</div>
+                                        <div className='desc'>{account.balance || 0} {account.symbol}</div>
                                     </div>
                                 </div>
                             )
@@ -52,7 +44,7 @@ class Controller extends React.Component {
                     <div onClick={ () => PopupAPI.changeState(APP_STATE.CREATING_TOKEN) } className='item'>
                         <img src={'../src/assets/images/create-token.png'} />
                         <div className='content'>
-                            <div className={'title'}>Create Token</div>
+                            <div className={'title'}>Create Account</div>
                         </div>
                     </div>
                 </div>

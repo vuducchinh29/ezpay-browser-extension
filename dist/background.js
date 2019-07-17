@@ -79975,7 +79975,7 @@ var NodeService = {
       symbol: 'TRX',
       decimal: 6,
       isShow: true,
-      logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1958.png'
+      logo: '../src/assets/images/tron.png'
     },
     'f0b1e38e-7bee-485e-9d3f-69410bf30684': {
       node: '0f22e40f-a004-4c5a-99ef-004c8e6769bf',
@@ -79991,7 +79991,7 @@ var NodeService = {
       symbol: 'ETH',
       decimal: 18,
       isShow: true,
-      logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png'
+      logo: '../src/assets/images/eth.png'
     },
     'f0b1e38e-7bee-485e-9d3f-69410bf30686': {
       node: '6739be94-ee43-46af-9a62-690cf0947282',
@@ -79999,7 +79999,7 @@ var NodeService = {
       symbol: 'NTY',
       decimal: 18,
       isShow: true,
-      logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/2714.png'
+      logo: '../src/assets/images/nty.png'
     },
     'f0b1e38e-7bee-485e-9d3f-69410bf30687': {
       node: '6739be94-ee43-46af-9a62-690cf0947283',
@@ -80008,7 +80008,7 @@ var NodeService = {
       decimal: 8,
       typeCoinInfo: 'BTC',
       isShow: true,
-      logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1.png'
+      logo: '../src/assets/images/btc.png'
     },
     'f0b1e38e-7bee-485e-9d3f-69410bf30688': {
       node: '6739be94-ee43-46af-9a62-690cf0947283',
@@ -80017,7 +80017,7 @@ var NodeService = {
       decimal: 8,
       typeCoinInfo: 'LTC-TEST',
       isShow: false,
-      logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/2.png'
+      logo: '../src/assets/images/btc.png'
     }
   },
   _selectedNode: 'f0b1e38e-7bee-485e-9d3f-69410bf30681',
@@ -80746,7 +80746,7 @@ var APP_STATE = {
   // Wallet is unlocked
   UNLOCKED: 2,
   // [x] User is given two options - restore account or create new account
-  CREATING: 3,
+  CREATING_TOKEN: 3,
   // [x] Shown if a user is creating a new account (startup or in general). Next step is READY
   RESTORING: 4,
   // [x] Shown when the user is restoring (or in general importing) an account. Next step is READY
@@ -80763,10 +80763,10 @@ var APP_STATE = {
   //[x] Show transactions record
   SETTING: 10,
   //[x] Show setting
-  USDT_INCOME_RECORD: 11 //[X] income record for usdt
-
-}; // User can delete *all* accounts. This will set the appState to UNLOCKED.
-
+  USDT_INCOME_RECORD: 11,
+  //[X] income record for usdt
+  ACCOUNTS: 12
+};
 var ACCOUNT_TYPE = {
   MNEMONIC: 0,
   PRIVATE_KEY: 1
@@ -82658,7 +82658,6 @@ function (_EventEmitter) {
       var _this2 = this;
 
       var tokens = services_StorageService.getTokens();
-      console.log('tokens', tokens);
       Object.entries(tokens).forEach(function (_ref3) {
         var _ref4 = slicedToArray_default()(_ref3, 2),
             tokenId = _ref4[0],
@@ -83081,6 +83080,11 @@ function (_EventEmitter) {
       return addBitcoinAccount;
     }()
   }, {
+    key: "getTokens",
+    value: function getTokens() {
+      return this.tokens;
+    }
+  }, {
     key: "getAccounts",
     value: function getAccounts() {
       var nodes = services_NodeService.getNodes().nodes;
@@ -83113,6 +83117,14 @@ function (_EventEmitter) {
       this.emit('setAccounts', accounts);
       return accounts;
     }
+  }, {
+    key: "changeState",
+    value: function changeState(appState) {
+      var stateAry = [APP_STATE.PASSWORD_SET, APP_STATE.RESTORING, APP_STATE.CREATING_TOKEN, APP_STATE.RECEIVE, APP_STATE.SEND, APP_STATE.TRANSACTIONS, APP_STATE.SETTING, APP_STATE.ADD_TRC20_TOKEN, APP_STATE.READY, APP_STATE.TRONBANK, APP_STATE.TRONBANK_RECORD, APP_STATE.TRONBANK_DETAIL, APP_STATE.TRONBANK_HELP, APP_STATE.USDT_INCOME_RECORD, APP_STATE.USDT_ACTIVITY_DETAIL, APP_STATE.DAPP_LIST, APP_STATE.ASSET_MANAGE, APP_STATE.TRANSACTION_DETAIL, APP_STATE.DAPP_WHITELIST, APP_STATE.ACCOUNTS];
+      if (!stateAry.includes(appState)) return WalletService_logger.error("Attempted to change app state to ".concat(appState, ". Only 'restoring' and 'creating' is permitted"));
+
+      this._setState(appState);
+    }
   }]);
 
   return Wallet;
@@ -83131,6 +83143,7 @@ var _createReducer;
 
 var setAppState = Object(redux_starter_kit_umd["createAction"])('setAppState');
 var setNodes = Object(redux_starter_kit_umd["createAction"])('setNodes');
+var setTokens = Object(redux_starter_kit_umd["createAction"])('setTokens');
 var setPage = Object(redux_starter_kit_umd["createAction"])('setPage');
 var setPriceList = Object(redux_starter_kit_umd["createAction"])('setPriceList');
 var setCurrency = Object(redux_starter_kit_umd["createAction"])('setCurrency');
@@ -83146,6 +83159,7 @@ var appReducer = Object(redux_starter_kit_umd["createReducer"])({
     nodes: {},
     selected: false
   },
+  tokens: {},
   prices: {
     priceList: {},
     usdtPriceList: {},
@@ -83174,23 +83188,26 @@ var appReducer = Object(redux_starter_kit_umd["createReducer"])({
 }), defineProperty_default()(_createReducer, setNodes, function (state, _ref4) {
   var payload = _ref4.payload;
   state.nodes = payload;
-}), defineProperty_default()(_createReducer, setPage, function (state, _ref5) {
+}), defineProperty_default()(_createReducer, setTokens, function (state, _ref5) {
   var payload = _ref5.payload;
-  state.currentPage = payload;
-}), defineProperty_default()(_createReducer, appReducer_setLanguage, function (state, _ref6) {
+  state.tokens = payload;
+}), defineProperty_default()(_createReducer, setPage, function (state, _ref6) {
   var payload = _ref6.payload;
-  state.language = payload;
-}), defineProperty_default()(_createReducer, setSetting, function (state, _ref7) {
+  state.currentPage = payload;
+}), defineProperty_default()(_createReducer, appReducer_setLanguage, function (state, _ref7) {
   var payload = _ref7.payload;
-  state.setting = payload;
-}), defineProperty_default()(_createReducer, setVersion, function (state, _ref8) {
+  state.language = payload;
+}), defineProperty_default()(_createReducer, setSetting, function (state, _ref8) {
   var payload = _ref8.payload;
-  state.version = payload;
-}), defineProperty_default()(_createReducer, setDappList, function (state, _ref9) {
+  state.setting = payload;
+}), defineProperty_default()(_createReducer, setVersion, function (state, _ref9) {
   var payload = _ref9.payload;
-  state.dappList = payload;
-}), defineProperty_default()(_createReducer, setAuthorizeDapps, function (state, _ref10) {
+  state.version = payload;
+}), defineProperty_default()(_createReducer, setDappList, function (state, _ref10) {
   var payload = _ref10.payload;
+  state.dappList = payload;
+}), defineProperty_default()(_createReducer, setAuthorizeDapps, function (state, _ref11) {
+  var payload = _ref11.payload;
   state.authorizeDapps = payload;
 }), _createReducer));
 // CONCATENATED MODULE: ../lib/api/handlers/PopupAPI.js
@@ -83254,6 +83271,9 @@ var appReducer = Object(redux_starter_kit_umd["createReducer"])({
   },
   getAccounts: function getAccounts() {
     return this.duplex.send('getAccounts');
+  },
+  getTokens: function getTokens() {
+    return this.duplex.send('getTokens');
   },
   exportAccount: function exportAccount() {
     return this.duplex.send('exportAccount');
@@ -83386,6 +83406,9 @@ var background = {
     duplex.on('setPassword', this.walletService.setPassword);
     duplex.on('unlockWallet', this.walletService.unlockWallet);
     duplex.on('getAccounts', this.walletService.getAccounts);
+    duplex.on('getTokens', this.walletService.getTokens);
+    duplex.on('changeState', this.walletService.changeState);
+    duplex.on('resetState', this.walletService.resetState);
   },
   bindWalletEvents: function bindWalletEvents() {
     var _this2 = this;

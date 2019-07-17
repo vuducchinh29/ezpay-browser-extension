@@ -41,7 +41,7 @@ const NodeService = {
             symbol: 'TRX',
             decimal: 6,
             isShow: true,
-            logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1958.png'
+            logo: '../src/assets/images/tron.png'
         },
         'f0b1e38e-7bee-485e-9d3f-69410bf30684': {
             node: '0f22e40f-a004-4c5a-99ef-004c8e6769bf',
@@ -57,7 +57,7 @@ const NodeService = {
             symbol: 'ETH',
             decimal: 18,
             isShow: true,
-            logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png'
+            logo: '../src/assets/images/eth.png'
         },
         'f0b1e38e-7bee-485e-9d3f-69410bf30686': {
             node: '6739be94-ee43-46af-9a62-690cf0947282',
@@ -65,7 +65,7 @@ const NodeService = {
             symbol: 'NTY',
             decimal: 18,
             isShow: true,
-            logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/2714.png'
+            logo: '../src/assets/images/nty.png'
         },
         'f0b1e38e-7bee-485e-9d3f-69410bf30687': {
             node: '6739be94-ee43-46af-9a62-690cf0947283',
@@ -74,7 +74,7 @@ const NodeService = {
             decimal: 8,
             typeCoinInfo: 'BTC',
             isShow: true,
-            logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/1.png'
+            logo: '../src/assets/images/btc.png'
         },
         'f0b1e38e-7bee-485e-9d3f-69410bf30688': {
             node: '6739be94-ee43-46af-9a62-690cf0947283',
@@ -83,7 +83,7 @@ const NodeService = {
             decimal: 8,
             typeCoinInfo: 'LTC-TEST',
             isShow: false,
-            logo: 'https://s2.coinmarketcap.com/static/img/coins/64x64/2.png'
+            logo: '../src/assets/images/btc.png'
         },
     },
 

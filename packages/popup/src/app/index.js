@@ -6,6 +6,8 @@ import { APP_STATE } from '@ezpay/lib/constants';
 import { PopupAPI } from '@ezpay/lib/api';
 import RegistrationController from '@ezpay/popup/src/controllers/RegistrationController';
 import HomeController from '@ezpay/popup/src/controllers/HomeController';
+import CreateTokenController from '@ezpay/popup/src/controllers/CreateTokenController';
+import AccountController from '@ezpay/popup/src/controllers/AccountController';
 import LoginController from '@ezpay/popup/src/controllers/LoginController';
 
 import 'assets/styles/global.scss';
@@ -17,7 +19,7 @@ class App extends React.Component {
     }
 
     render() {
-        const { appState,language } = this.props;
+        const { appState, language, app, accounts } = this.props;
         let dom = null;
 
         switch(appState) {
@@ -29,6 +31,12 @@ class App extends React.Component {
                 break;
             case APP_STATE.READY:
                 dom = <HomeController />;
+                break;
+            case APP_STATE.CREATING_TOKEN:
+                dom = <CreateTokenController />;
+                break;
+            case APP_STATE.ACCOUNTS:
+                dom = <AccountController onCancel={ () => PopupAPI.changeState(APP_STATE.READY) } />;
                 break;
             default:
                 dom = <div className='unsupportedState' onClick={ () => PopupAPI.resetState(APP_STATE.USDT_INCOME_RECORD) }>

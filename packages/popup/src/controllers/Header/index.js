@@ -14,9 +14,13 @@ class Header extends React.Component {
     }
 
     render() {
+        const {
+            onCancel
+        } = this.props;
 
         return (
             <div className='header'>
+                <div className="back" onClick={ onCancel }></div>
                 <div className='titleContainer'>
                     EZpay
                 </div>

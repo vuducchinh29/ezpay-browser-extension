@@ -18,6 +18,7 @@ import {
     setAppState,
     setCurrency,
     setNodes,
+    setTokens,
     setPriceList,
     setLanguage,
     setSetting,
@@ -79,12 +80,14 @@ export const app = {
             nodes,
             language,
             accounts,
+            tokens,
             // selectedAccount,
         ] = await Promise.all([
             PopupAPI.requestState(),
             PopupAPI.getNodes(),
             PopupAPI.getLanguage(),
             PopupAPI.getAccounts(),
+            PopupAPI.getTokens(),
             // PopupAPI.getSelectedAccount(),
         ]);
         const lang = navigator.language || navigator.browserLanguage;
@@ -100,6 +103,7 @@ export const app = {
         this.store.dispatch(setNodes(nodes));
         this.store.dispatch(setLanguage(language));
         this.store.dispatch(setAccounts(accounts));
+        this.store.dispatch(setTokens(tokens));
         // this.store.dispatch(setCurrency(prices.selected));
         // this.store.dispatch(setSetting(setting));
         // if(selectedAccount)
