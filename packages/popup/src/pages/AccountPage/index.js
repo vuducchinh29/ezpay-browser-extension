@@ -36,7 +36,6 @@ class Controller extends React.Component {
                             }
                             return (
                                 <div className='item'>
-                                    <img src={account.logo} />
                                     <div className='content'>
                                         <div className={'title'}>{account.name}</div>
                                         <div className='desc'>{account.balance || 0} {account.symbol}</div>
@@ -45,8 +44,8 @@ class Controller extends React.Component {
                             )
                         })
                     }
-                    <div onClick={ () => PopupAPI.changeState(APP_STATE.CREATING_ACCOUNT) } className='item'>
-                        <img src={'../src/assets/images/create-token.png'} />
+                    <div onClick={ () => PopupAPI.changeState(APP_STATE.CREATING_ACCOUNT) } className='item-create'>
+                        <img src={'../src/assets/images/create-account.png'} />
                         <div className='content'>
                             <div className={'title'}>Create Account</div>
                         </div>

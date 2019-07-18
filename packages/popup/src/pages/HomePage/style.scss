@@ -1,6 +1,41 @@
-.accounts {
+.tokens {
     flex: 1 1;
     padding: 10px 10px 10px 14px;
+
+    .item-create-token {
+        cursor: pointer;
+        height: 82px;
+        display: flex;
+        width: 100%;
+        padding-left: 35px;
+        padding-right: 35px;
+        background-color: #fff;
+        border-radius: 4px;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 8px;
+        transition: all .2s ease-in-out;
+
+        img {
+            height: 45px;
+            margin-top: 10px;
+        }
+
+        .content {
+            margin-left: 8px;
+            flex: 1 1;
+            display: flex;
+            flex-direction: row;
+            overflow: hidden;
+
+            .title {
+                flex-direction: row;
+                align-items: center;
+                font-size: 16px;
+                color: #787878;
+            }
+        }
+    }
 
     .item {
         cursor: pointer;

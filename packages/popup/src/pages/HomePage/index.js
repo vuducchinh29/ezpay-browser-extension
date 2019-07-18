@@ -32,7 +32,7 @@ class Controller extends React.Component {
         return (
             <div className='container'>
                 <Header />
-                <div className="accounts scroll">
+                <div className="tokens scroll">
                     {
                         Object.entries(tokens).map(([ tokenId, token ]) => {
                             if (!token.isShow) {
@@ -50,7 +50,7 @@ class Controller extends React.Component {
                             )
                         })
                     }
-                    <div onClick={ () => PopupAPI.changeState(APP_STATE.CREATING_TOKEN) } className='item'>
+                    <div onClick={ () => PopupAPI.changeState(APP_STATE.CREATING_TOKEN) } className='item-create-token'>
                         <img src={'../src/assets/images/create-token.png'} />
                         <div className='content'>
                             <div className={'title'}>Create Token</div>
