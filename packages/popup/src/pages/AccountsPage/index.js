@@ -22,6 +22,10 @@ class Controller extends React.Component {
         const accounts = await PopupAPI.getAccounts();
     }
 
+    goToDetail(address) {
+        PopupAPI.changeState(APP_STATE.ACCOUNT_DETAIL)
+    }
+
     render() {
         const { accounts, tokens, onCancel, selectedToken } = this.props;
 
@@ -35,7 +39,7 @@ class Controller extends React.Component {
                                 return null
                             }
                             return (
-                                <div className='item'>
+                                <div onClick={ this.goToDetail.bind(this, address) } className='item'>
                                     <div className='content'>
                                         <div className={'title'}>{account.name}</div>
                                         <div className='desc'>{account.balance || 0} {account.symbol}</div>

@@ -7,7 +7,8 @@ import { PopupAPI } from '@ezpay/lib/api';
 import RegistrationPage from '@ezpay/popup/src/pages/RegistrationPage';
 import HomePage from '@ezpay/popup/src/pages/HomePage';
 import CreateTokenPage from '@ezpay/popup/src/pages/CreateTokenPage';
-import AccountPage from '@ezpay/popup/src/pages/AccountPage';
+import AccountsPage from '@ezpay/popup/src/pages/AccountsPage';
+import AccountDetailPage from '@ezpay/popup/src/pages/AccountDetailPage';
 import LoginPage from '@ezpay/popup/src/pages/LoginPage';
 import CreateAccountPage from '@ezpay/popup/src/pages/CreateAccountPage';
 
@@ -37,10 +38,13 @@ class App extends React.Component {
                 dom = <CreateTokenPage onCancel={ () => PopupAPI.changeState(APP_STATE.READY) } />;
                 break;
             case APP_STATE.ACCOUNTS:
-                dom = <AccountPage onCancel={ () => PopupAPI.changeState(APP_STATE.READY) } />;
+                dom = <AccountsPage onCancel={ () => PopupAPI.changeState(APP_STATE.READY) } />;
                 break;
             case APP_STATE.CREATING_ACCOUNT:
                 dom = <CreateAccountPage onCancel={ () => PopupAPI.changeState(APP_STATE.ACCOUNTS) } />;
+                break;
+            case APP_STATE.ACCOUNT_DETAIL:
+                dom = <AccountDetailPage onCancel={ () => PopupAPI.changeState(APP_STATE.ACCOUNTS) } />;
                 break;
             default:
                 dom = <div className='unsupportedState' onClick={ () => PopupAPI.resetState(APP_STATE.USDT_INCOME_RECORD) }>
