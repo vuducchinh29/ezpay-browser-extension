@@ -15,7 +15,8 @@ export const APP_STATE = {
     TRANSACTIONS: 9, //[x] Show transactions record
     SETTING: 10, //[x] Show setting
     USDT_INCOME_RECORD: 11, //[X] income record for usdt
-    ACCOUNTS: 12
+    ACCOUNTS: 12,
+    CREATING_ACCOUNT: 13,
 };
 
 export const ACCOUNT_TYPE = {

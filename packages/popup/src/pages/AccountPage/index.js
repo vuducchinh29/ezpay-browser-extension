@@ -26,7 +26,7 @@ class Controller extends React.Component {
         const { accounts, tokens, onCancel, selectedToken } = this.props;
 
         return (
-            <div className='createTokenContainer'>
+            <div className='container'>
                 <Header onCancel={ onCancel } title={ selectedToken.name } />
                 <div className="accounts scroll">
                     {
@@ -45,7 +45,7 @@ class Controller extends React.Component {
                             )
                         })
                     }
-                    <div onClick={ () => PopupAPI.changeState(APP_STATE.CREATING_TOKEN) } className='item'>
+                    <div onClick={ () => PopupAPI.changeState(APP_STATE.CREATING_ACCOUNT) } className='item'>
                         <img src={'../src/assets/images/create-token.png'} />
                         <div className='content'>
                             <div className={'title'}>Create Account</div>

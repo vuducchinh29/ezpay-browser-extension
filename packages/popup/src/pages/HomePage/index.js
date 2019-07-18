@@ -30,7 +30,7 @@ class Controller extends React.Component {
         const { accounts, tokens } = this.props;
 
         return (
-            <div className='homeContainer'>
+            <div className='container'>
                 <Header />
                 <div className="accounts scroll">
                     {

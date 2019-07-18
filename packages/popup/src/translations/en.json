@@ -47,6 +47,10 @@
     "PASSWORD_TIP.NOT_FORGOT":"Remember the password, you can't retrieve it if you forget it.",
     "INPUT.PASSWORD": "Local passcode",
     "INPUT.REPEAT_PASSWORD": "Repeat local passcode",
+    "INPUT.ACCOUNT_NAME": "Account name",
 
-    "LOGIN.PASSWORD.BACK":"Welcome back"
+    "LOGIN.PASSWORD.BACK":"Welcome back",
+    "CREATION_CRITERIA.HAS_LENGTH": "Contains at least <strong>three</strong> characters",
+    "CREATION_CRITERIA.IS_ALPHANUMERIC": "Contains only <strong>alphanumeric</strong> characters, along with optional spaces",
+    "CREATION_CRITERIA.IS_UNIQUE": "Is <strong>not in use</strong> by any of your other accounts"
 }

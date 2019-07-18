@@ -431,7 +431,8 @@ class Wallet extends EventEmitter {
             APP_STATE.ASSET_MANAGE,
             APP_STATE.TRANSACTION_DETAIL,
             APP_STATE.DAPP_WHITELIST,
-            APP_STATE.ACCOUNTS
+            APP_STATE.ACCOUNTS,
+            APP_STATE.CREATING_ACCOUNT
         ];
         if(!stateAry.includes(appState))
             return logger.error(`Attempted to change app state to ${ appState }. Only 'restoring' and 'creating' is permitted`);

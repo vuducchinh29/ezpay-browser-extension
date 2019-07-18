@@ -30,7 +30,7 @@ class Controller extends React.Component {
         const { accounts, tokens, onCancel } = this.props;
 
         return (
-            <div className='createTokenContainer'>
+            <div className='container'>
                 <Header onCancel={onCancel}/>
                 <div className="tokens scroll">
                     {

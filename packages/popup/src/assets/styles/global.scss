@@ -27,6 +27,15 @@ html, body {
     background: #353A4E;
 }
 
+.container {
+    width: 360px;
+    height: 600px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: #F2F2F2;
+}
+
 #root {
     display: flex;
     flex: 1;

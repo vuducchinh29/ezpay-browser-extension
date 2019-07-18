@@ -1,76 +1,67 @@
-.createTokenContainer {
-    width: 360px;
-    height: 600px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    background: #F2F2F2;
+.tokens {
+    flex: 1 1;
+    padding: 10px 10px 10px 14px;
 
-    .tokens {
-        flex: 1 1;
-        padding: 10px 10px 10px 14px;
+    .item {
+        cursor: pointer;
+        height: 82px;
+        width: 100%;
+        padding-left: 35px;
+        padding-right: 35px;
+        background-color: #fff;
+        border-radius: 4px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin-top: 8px;
+        transition: all .2s ease-in-out;
 
-        .item {
-            cursor: pointer;
-            height: 82px;
-            width: 100%;
-            padding-left: 35px;
-            padding-right: 35px;
-            background-color: #fff;
-            border-radius: 4px;
+        .img-logo {
+            height: 50px;
+        }
+
+        .icon-tick {
+            height: 15px;
+        }
+
+        .content {
+            margin-left: 8px;
+            flex: 1 1;
             display: flex;
-            flex-direction: row;
-            align-items: center;
-            margin-top: 8px;
-            transition: all .2s ease-in-out;
+            flex-direction: column;
+            overflow: hidden;
 
-            .img-logo {
-                height: 50px;
+            .title.isHot {
+                justify-content: flex-start;
             }
 
-            .icon-tick {
-                height: 15px;
+            .title {
+                flex-direction: row;
+                align-items: center;
+                height: 26px;
+                font-size: 18px;
+                color: #787878;
+                text-align: right;
+                font-weight: bold;
             }
 
-            .content {
-                margin-left: 8px;
-                flex: 1 1;
-                display: flex;
-                flex-direction: column;
+            .desc {
+                height: 20px;
+                line-height: 26px;
+                font-size: 20px;
+                color: #787878;
                 overflow: hidden;
-
-                .title.isHot {
-                    justify-content: flex-start;
-                }
-
-                .title {
-                    flex-direction: row;
-                    align-items: center;
-                    height: 26px;
-                    font-size: 18px;
-                    color: #787878;
-                    text-align: right;
-                    font-weight: bold;
-                }
-
-                .desc {
-                    height: 20px;
-                    line-height: 26px;
-                    font-size: 20px;
-                    color: #787878;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                    text-align: right;
-                    font-weight: bold;
-                }
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                text-align: right;
+                font-weight: bold;
             }
         }
-
-        .item:first-child {
-            margin-top: 0;
-        }
-
-
     }
+
+    .item:first-child {
+        margin-top: 0;
+    }
+
+
 }
