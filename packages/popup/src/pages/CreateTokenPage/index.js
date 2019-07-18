@@ -1,7 +1,7 @@
 import React from 'react';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import { connect } from 'react-redux';
-import Header from '../Header';
+import Header from '../Layout/Header';
 import { PopupAPI } from '@ezpay/lib/api';
 import {APP_STATE} from '@ezpay/lib/constants';
 

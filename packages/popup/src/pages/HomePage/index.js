@@ -1,10 +1,9 @@
 import React from 'react';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import { connect } from 'react-redux';
-import Header from '../Header';
+import Header from '../Layout/Header';
 import { PopupAPI } from '@ezpay/lib/api';
 import {APP_STATE} from '@ezpay/lib/constants';
-import _ from 'lodash'
 
 import './style.scss';
 
@@ -22,24 +21,30 @@ class Controller extends React.Component {
         const accounts = await PopupAPI.getAccounts();
     }
 
+    detailToken(tokenId) {
+        PopupAPI.selectToken(tokenId)
+        PopupAPI.changeState(APP_STATE.ACCOUNTS)
+    }
+
     render() {
-        const { accounts, tokens, onCancel, selectedToken } = this.props;
+        const { accounts, tokens } = this.props;
 
         return (
-            <div className='createTokenContainer'>
-                <Header onCancel={ onCancel } title={ selectedToken.name } />
+            <div className='homeContainer'>
+                <Header />
                 <div className="accounts scroll">
                     {
-                        Object.entries(accounts).map(([ address, account ]) => {
-                            if (account.token.id !== selectedToken.id) {
+                        Object.entries(tokens).map(([ tokenId, token ]) => {
+                            if (!token.isShow) {
                                 return null
                             }
+
                             return (
-                                <div className='item'>
-                                    <img src={account.logo} />
+                                <div onClick={ this.detailToken.bind(this, tokenId) } className='item'>
+                                    <img src={token.logo} />
                                     <div className='content'>
-                                        <div className={'title'}>{account.name}</div>
-                                        <div className='desc'>{account.balance || 0} {account.symbol}</div>
+                                        <div className={'title'}>{token.name}</div>
+                                        <div className='desc'>{token.balance || 0} {token.symbol}</div>
                                     </div>
                                 </div>
                             )
@@ -48,7 +53,7 @@ class Controller extends React.Component {
                     <div onClick={ () => PopupAPI.changeState(APP_STATE.CREATING_TOKEN) } className='item'>
                         <img src={'../src/assets/images/create-token.png'} />
                         <div className='content'>
-                            <div className={'title'}>Create Account</div>
+                            <div className={'title'}>Create Token</div>
                         </div>
                     </div>
                 </div>
@@ -60,5 +65,4 @@ class Controller extends React.Component {
 export default connect(state => ({
     accounts: state.accounts.accounts,
     tokens: state.app.tokens,
-    selectedToken: state.app.selectedToken,
 }))(Controller);

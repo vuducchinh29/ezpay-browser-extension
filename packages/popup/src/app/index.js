@@ -4,11 +4,11 @@ import { connect } from 'react-redux';
 
 import { APP_STATE } from '@ezpay/lib/constants';
 import { PopupAPI } from '@ezpay/lib/api';
-import RegistrationController from '@ezpay/popup/src/controllers/RegistrationController';
-import HomeController from '@ezpay/popup/src/controllers/HomeController';
-import CreateTokenController from '@ezpay/popup/src/controllers/CreateTokenController';
-import AccountController from '@ezpay/popup/src/controllers/AccountController';
-import LoginController from '@ezpay/popup/src/controllers/LoginController';
+import RegistrationPage from '@ezpay/popup/src/pages/RegistrationPage';
+import HomePage from '@ezpay/popup/src/pages/HomePage';
+import CreateTokenPage from '@ezpay/popup/src/pages/CreateTokenPage';
+import AccountPage from '@ezpay/popup/src/pages/AccountPage';
+import LoginPage from '@ezpay/popup/src/pages/LoginPage';
 
 import 'assets/styles/global.scss';
 
@@ -24,19 +24,19 @@ class App extends React.Component {
 
         switch(appState) {
             case APP_STATE.UNINITIALISED:
-                dom = <RegistrationController language={language} />;
+                dom = <RegistrationPage language={language} />;
                 break;
             case APP_STATE.PASSWORD_SET:
-                dom = <LoginController />;
+                dom = <LoginPage />;
                 break;
             case APP_STATE.READY:
-                dom = <HomeController />;
+                dom = <HomePage />;
                 break;
             case APP_STATE.CREATING_TOKEN:
-                dom = <CreateTokenController onCancel={ () => PopupAPI.changeState(APP_STATE.READY) } />;
+                dom = <CreateTokenPage onCancel={ () => PopupAPI.changeState(APP_STATE.READY) } />;
                 break;
             case APP_STATE.ACCOUNTS:
-                dom = <AccountController onCancel={ () => PopupAPI.changeState(APP_STATE.READY) } />;
+                dom = <AccountPage onCancel={ () => PopupAPI.changeState(APP_STATE.READY) } />;
                 break;
             default:
                 dom = <div className='unsupportedState' onClick={ () => PopupAPI.resetState(APP_STATE.USDT_INCOME_RECORD) }>
