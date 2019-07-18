@@ -139,6 +139,9 @@ export const app = {
             setToken(token)
         ));
 
+        this.duplex.on('setSelectedTokens', tokens => this.store.dispatch(
+            setTokens(tokens)
+        ));
     },
 
     render() {

@@ -115,4 +115,8 @@ export default {
     unlockWallet(password) {
         return this.duplex.send('unlockWallet', password);
     },
+
+    toggleSelectToken(tokenId) {
+        return this.duplex.send('toggleSelectToken', tokenId);
+    }
 }

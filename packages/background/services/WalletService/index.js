@@ -48,10 +48,13 @@ class Wallet extends EventEmitter {
     }
 
     _saveTokens() {
-        const tokens = NodeService.getTokens()
+        const tokensConfig = NodeService.getTokens();
+        const tokensStorage = StorageService.getTokens();
 
-        Object.entries(tokens).forEach(([ tokenId, token ]) => {
-            StorageService.saveToken(tokenId, token)
+        Object.entries(tokensConfig).forEach(([ tokenId, token ]) => {
+            if (!tokensStorage[tokenId]) {
+                StorageService.saveToken(tokenId, token)
+            }
         })
     }
 
@@ -220,6 +223,8 @@ class Wallet extends EventEmitter {
         }
 
         this._loadAccounts()
+        await this._saveTokens();
+        this._loadTokens();
         this._setState(APP_STATE.READY);
     }
 
@@ -444,6 +449,15 @@ class Wallet extends EventEmitter {
 
     getSelectedToken() {
         return StorageService.getSelectedToken();
+    }
+
+    async toggleSelectToken(tokenId) {
+        const token = this.tokens[tokenId]
+        token.isShow = !token.isShow
+        this.tokens[tokenId] = token
+
+        this.emit('setSelectedTokens', this.tokens)
+        StorageService.saveToken(tokenId, token)
     }
 }
 

@@ -21,32 +21,33 @@ class Controller extends React.Component {
         const accounts = await PopupAPI.getAccounts();
     }
 
+    async toggleSelectToken(tokenId) {
+        await PopupAPI.toggleSelectToken(tokenId);
+        PopupAPI.getTokens();
+    }
+
     render() {
         const { accounts, tokens, onCancel } = this.props;
 
         return (
             <div className='createTokenContainer'>
                 <Header onCancel={onCancel}/>
-                <div className="accounts scroll">
+                <div className="tokens scroll">
                     {
-                        Object.entries(accounts).map(([ address, account ]) => {
+                        Object.entries(tokens).map(([ tokenId, token ]) => {
                             return (
-                                <div className='item'>
-                                    <img src={account.logo} />
+                                <div onClick={ this.toggleSelectToken.bind(this, tokenId) } className='item'>
+                                    <img className="img-logo" src={token.logo} />
                                     <div className='content'>
-                                        <div className={'title'}>{account.name}</div>
-                                        <div className='desc'>{account.balance || 0} {account.symbol}</div>
+                                        <div className={'title'}>{token.name} {
+                                            token.isShow ? (<img className="icon-tick" src={'../src/assets/images/tick.png'} />) : ''
+                                        }</div>
+                                        <div className='desc'>{token.balance || 0} {token.symbol}</div>
                                     </div>
                                 </div>
                             )
                         })
                     }
-                    <div onClick={ () => PopupAPI.changeState(APP_STATE.CREATING_TOKEN) } className='item'>
-                        <img src={'../src/assets/images/create-token.png'} />
-                        <div className='content'>
-                            <div className={'title'}>Create Account</div>
-                        </div>
-                    </div>
                 </div>
             </div>
         );

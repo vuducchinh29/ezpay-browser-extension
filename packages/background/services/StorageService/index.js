@@ -285,7 +285,8 @@ const StorageService = {
 
             const {
                 accounts,
-                currentAccount
+                currentAccount,
+                tokens
             } = decrypted;
 
             return {
@@ -293,7 +294,8 @@ const StorageService = {
                     privateKey,
                     name
                 })),
-                selectedAccount: currentAccount
+                selectedAccount: currentAccount,
+                tokens: tokens
             };
         } catch(ex) {
             logger.info('Failed to migrate (wrong password?):', ex);

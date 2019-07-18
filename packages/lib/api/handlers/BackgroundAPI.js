@@ -79,6 +79,9 @@ export default {
 
     setAuthorizeDapps(dappList) {
         this.duplex.send('popup', 'setAuthorizeDapps',dappList ,false);
-    }
+    },
 
+    setSelectedTokens(tokens) {
+        this.duplex.send('popup', 'setSelectedTokens',tokens ,false);
+    }
 };
