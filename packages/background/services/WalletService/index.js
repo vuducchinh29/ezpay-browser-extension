@@ -261,6 +261,8 @@ class Wallet extends EventEmitter {
             mnemonic: Utils.generateMnemonic(),
             accountName: 'Ethereum Account 1'
         })
+
+        this.emit('setAccounts', this.getAccounts());
     }
 
     async addAccount(params) {
