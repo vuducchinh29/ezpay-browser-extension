@@ -5,6 +5,7 @@ import Header from '../Layout/Header';
 import { PopupAPI } from '@ezpay/lib/api';
 import AccountName from 'components/AccountName';
 import {APP_STATE, CREATION_STAGE} from '@ezpay/lib/constants';
+import Utils from '@ezpay/lib/utils';
 
 import './style.scss';
 
@@ -23,16 +24,19 @@ class Controller extends React.Component {
     }
 
     handleNameSubmit(name) {
-        console.log('name', name)
-        this.setState({
-            stage: CREATION_STAGE.WRITING_PHRASE,
-            walletName: name.trim()
-        });
+        const { selectedToken } = this.props;
+
+        PopupAPI.addAccount({
+            name: name,
+            mnemonic: Utils.generateMnemonic(),
+            tokenId: selectedToken.id
+        })
+
+        PopupAPI.changeState(APP_STATE.ACCOUNTS)
     }
 
     render() {
         const { accounts, selectedToken, onCancel } = this.props;
-        console.log('selectedToken', selectedToken)
 
         return (
             <div className='container'>

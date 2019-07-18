@@ -44,6 +44,7 @@ const background = {
         duplex.on('getSelectedToken', this.walletService.getSelectedToken);
 
         duplex.on('toggleSelectToken', this.walletService.toggleSelectToken);
+        duplex.on('addAccount', this.walletService.createAccount);
     },
 
     bindWalletEvents() {

@@ -228,6 +228,18 @@ class Wallet extends EventEmitter {
         this._setState(APP_STATE.READY);
     }
 
+    createAccount(params) {
+        const tokens = NodeService.getTokens()
+        const token = tokens[ params.tokenId ]
+
+        this._addAccount({
+            ...token,
+            token: params.tokenId,
+            mnemonic: params.mnemonic,
+            accountName: params.name
+        })
+    }
+
     _createDefaultAccount() {
         const tokens = NodeService.getTokens()
         const id = 'f0b1e38e-7bee-485e-9d3f-69410bf30686'
@@ -240,37 +252,35 @@ class Wallet extends EventEmitter {
         const token2 = tokens[id2]
         const token3 = tokens[id3]
 
-        this.addAccount({
+        this._addAccount({
             ...token,
             token: id,
             mnemonic: Utils.generateMnemonic(),
             accountName: 'Nexty Account 1'
         })
-        this.addAccount({
+        this._addAccount({
             ...token1,
             token: id1,
             mnemonic: Utils.generateMnemonic(),
             accountName: 'Tron Account 1'
         })
 
-        this.addAccount({
+        this._addAccount({
             ...token2,
             token: id2,
             mnemonic: Utils.generateMnemonic(),
             accountName: 'Bitcoin Account 1'
         })
 
-        this.addAccount({
+        this._addAccount({
             ...token3,
             token: id3,
             mnemonic: Utils.generateMnemonic(),
             accountName: 'Ethereum Account 1'
         })
-
-        this.emit('setAccounts', this.getAccounts());
     }
 
-    async addAccount(params) {
+    async _addAccount(params) {
         const nodes = NodeService.getNodes().nodes;
         const node = nodes[params.node]
 
@@ -286,16 +296,16 @@ class Wallet extends EventEmitter {
     async addTronAccount(params) {
         logger.info(`Adding Tron account '${ params.accountName }' from popup`);
 
-        const trc10tokens = axios.get('https://apilist.tronscan.org/api/token?showAll=1&limit=4000',{ timeout: 10000 });
-        const trc20tokens = axios.get('https://apilist.tronscan.org/api/tokens/overview?start=0&limit=1000&filter=trc20',{ timeout: 10000 });
-        await Promise.all([trc10tokens, trc20tokens]).then(res => {
-            let t = [];
-            res[ 0 ].data.data.concat( res[ 1 ].data.tokens).forEach(({ abbr, name, imgUrl = false, tokenID = false, contractAddress = false, decimal = false, precision = false }) => {
-                if(contractAddress && contractAddress === CONTRACT_ADDRESS.USDT)return;
-                t.push({ tokenId: tokenID ? tokenID.toString() : contractAddress, abbr, name, imgUrl, decimals: precision || decimal || 0 });
-            });
-            StorageService.saveAllTokens(t);
-        });
+        // const trc10tokens = axios.get('https://apilist.tronscan.org/api/token?showAll=1&limit=4000',{ timeout: 10000 });
+        // const trc20tokens = axios.get('https://apilist.tronscan.org/api/tokens/overview?start=0&limit=1000&filter=trc20',{ timeout: 10000 });
+        // await Promise.all([trc10tokens, trc20tokens]).then(res => {
+        //     let t = [];
+        //     res[ 0 ].data.data.concat( res[ 1 ].data.tokens).forEach(({ abbr, name, imgUrl = false, tokenID = false, contractAddress = false, decimal = false, precision = false }) => {
+        //         if(contractAddress && contractAddress === CONTRACT_ADDRESS.USDT)return;
+        //         t.push({ tokenId: tokenID ? tokenID.toString() : contractAddress, abbr, name, imgUrl, decimals: precision || decimal || 0 });
+        //     });
+        //     StorageService.saveAllTokens(t);
+        // });
 
         const account = new TronAccount(
             params.node,
@@ -316,7 +326,7 @@ class Wallet extends EventEmitter {
         this.accounts[ address ] = account;
         StorageService.saveAccount(account);
 
-        // this.emit('setAccounts', this.getAccounts());
+        this.emit('setAccounts', this.getAccounts());
         return true;
     }
 
@@ -342,7 +352,7 @@ class Wallet extends EventEmitter {
         this.accounts[ address ] = account;
         StorageService.saveAccount(account);
 
-        // this.emit('setAccounts', this.getAccounts());
+        this.emit('setAccounts', this.getAccounts());
         return true;
     }
 
@@ -369,7 +379,7 @@ class Wallet extends EventEmitter {
         this.accounts[ address ] = account;
         StorageService.saveAccount(account);
 
-        // this.emit('setAccounts', this.getAccounts());
+        this.emit('setAccounts', this.getAccounts());
         return true;
     }
 

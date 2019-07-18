@@ -56,8 +56,8 @@ export default {
         return this.duplex.send('importAccount', { privateKey, name });
     },
 
-    addAccount(mnemonic, name) {
-        return this.duplex.send('addAccount', { mnemonic, name });
+    addAccount(params) {
+        return this.duplex.send('addAccount', params, false);
     },
 
     selectAccount(address) {
