@@ -93,6 +93,16 @@ const Utils = {
         return JSON.parse(decrypted);
     },
 
+    miniAddressSummary(address) {
+        if (!address) return ''
+        return address ? address.slice(0, 4) + '...' + address.slice(-4) : '...'
+    },
+
+    addressSummary(address, firstSegLength = 10, lastSegLength = 4, includeHex = true) {
+        if (!address) return ''
+        return address ? address.slice(0, firstSegLength) + '...' + address.slice(address.length - lastSegLength) : '...'
+    },
+
     requestHandler(target) {
         return new Proxy(target, {
             get(target, prop) {

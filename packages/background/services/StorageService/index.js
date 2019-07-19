@@ -285,7 +285,7 @@ const StorageService = {
 
             const {
                 accounts,
-                currentAccount,
+                selectedAccount,
                 tokens
             } = decrypted;
 
@@ -294,7 +294,7 @@ const StorageService = {
                     privateKey,
                     name
                 })),
-                selectedAccount: currentAccount,
+                selectedAccount: selectedAccount,
                 tokens: tokens
             };
         } catch(ex) {

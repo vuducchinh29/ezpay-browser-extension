@@ -30,6 +30,7 @@ class Wallet extends EventEmitter {
         this.chains = {};
         this.accounts = {};
         this.tokens = {};
+        this.selectedAccount = false;
 
         this._start()
     }
@@ -37,7 +38,7 @@ class Wallet extends EventEmitter {
     async _start() {
         await this._checkStorage();
         await this._saveTokens();
-        this._loadTokens();
+        this._loadData();
         // await this._initChains();
         this._loadAccounts();
     }
@@ -58,12 +59,14 @@ class Wallet extends EventEmitter {
         })
     }
 
-    _loadTokens() {
+    _loadData() {
         const tokens = StorageService.getTokens();
+        this.selectAccount(StorageService.selectedAccount);
 
         Object.entries(tokens).forEach(([ tokenId, token ]) => {
             this.tokens[tokenId] = token
         })
+
     }
 
     _loadAccounts() {
@@ -195,6 +198,41 @@ class Wallet extends EventEmitter {
         }
     }
 
+    migrate(password) {
+        if(!StorageService.needsMigrating) {
+            logger.info('No migration required');
+            return false;
+        }
+
+        StorageService.authenticate(password);
+
+        const {
+            error = false,
+            accounts,
+            selectedAccount
+        } = StorageService.migrate();
+
+        if(error)
+            return false;
+
+        localStorage.setItem('EZPAY_WALLET.bak', localStorage.getItem('EZPAY_WALLET'));
+        localStorage.removeItem('EZPAY_WALLET');
+
+        // accounts.forEach(account => (
+        //     this.importAccount(account)
+        // ));
+
+        this.selectAccount(selectedAccount);
+
+        // Force "Reboot" TronLink
+        this.state = APP_STATE.PASSWORD_SET;
+        StorageService.ready = false;
+
+        this.unlockWallet(StorageService.password);
+
+        return true;
+    }
+
     async unlockWallet(password) {
         if(this.state !== APP_STATE.PASSWORD_SET) {
             logger.error('Attempted to unlock wallet whilst not in PASSWORD_SET state');
@@ -224,7 +262,7 @@ class Wallet extends EventEmitter {
 
         this._loadAccounts()
         await this._saveTokens();
-        this._loadTokens();
+        this._loadData();
         this._setState(APP_STATE.READY);
     }
 
@@ -470,6 +508,39 @@ class Wallet extends EventEmitter {
 
         this.emit('setSelectedTokens', this.tokens)
         StorageService.saveToken(tokenId, token)
+    }
+
+    selectAccount(address) {
+        StorageService.selectAccount(address);
+        // NodeService.setAddress();
+        this.selectedAccount = address;
+        this.emit('setAccount', address);
+    }
+
+    getAccountDetails(address) {
+        if(!address) {
+            return {
+                tokens: {
+                },
+                type: false,
+                name: false,
+                address: false,
+                balance: 0,
+                transactions: {
+                    cached: [],
+                    uncached: 0
+                }
+            };
+        }
+
+        return this.accounts[ address ].getDetails();
+    }
+
+     getSelectedAccount() {
+        if(!this.selectedAccount)
+            return false;
+
+        return this.getAccountDetails(this.selectedAccount);
     }
 }
 

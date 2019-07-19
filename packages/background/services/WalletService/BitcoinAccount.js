@@ -57,6 +57,23 @@ class BitcoinAccount extends Account {
             throw new Error('INVALID_PRIVATE_KEY');
         }
     }
+
+    getDetails() {
+        return {
+            chain: this.chain,
+            token: this.token,
+            symbol: this.symbol,
+            decimal: this.decimal,
+            logo: this.logo,
+            tokens: this.tokens,
+            type: this.type,
+            name: this.name,
+            address: this.address,
+            balance: this.balance,
+            transactions: this.transactions,
+            lastUpdated: this.lastUpdated
+        };
+    }
 }
 
 export default BitcoinAccount;

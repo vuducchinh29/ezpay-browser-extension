@@ -18,6 +18,12 @@ const ethUtils = {
             privateKey: account.privateKey,
             address: account.address
         };
+    },
+
+    isValidAddress(address) {
+        var prefixed = ethUtil.addHexPrefix(address)
+        if (address === '0x0000000000000000000000000000000000000000') return false
+        return (isAllOneCase(prefixed) && ethUtil.isValidAddress(prefixed)) || ethUtil.isValidChecksumAddress(prefixed)
     }
 };
 

@@ -23,6 +23,7 @@ class Controller extends React.Component {
     }
 
     goToDetail(address) {
+        PopupAPI.selectAccount(address)
         PopupAPI.changeState(APP_STATE.ACCOUNT_DETAIL)
     }
 

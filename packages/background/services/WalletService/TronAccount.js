@@ -514,6 +514,11 @@ class TronAccount extends Account {
 
     getDetails() {
         return {
+            chain: this.chain,
+            token: this.token,
+            symbol: this.symbol,
+            decimal: this.decimal,
+            logo: this.logo,
             tokens: this.tokens,
             type: this.type,
             name: this.name,

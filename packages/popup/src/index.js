@@ -82,13 +82,15 @@ export const app = {
             accounts,
             tokens,
             selectedToken,
+            selectedAccount
         ] = await Promise.all([
             PopupAPI.requestState(),
             PopupAPI.getNodes(),
             PopupAPI.getLanguage(),
             PopupAPI.getAccounts(),
             PopupAPI.getTokens(),
-            PopupAPI.getSelectedToken()
+            PopupAPI.getSelectedToken(),
+            PopupAPI.getSelectedAccount()
         ]);
         const lang = navigator.language || navigator.browserLanguage;
         if ( lang.indexOf('zh') > -1 ) {
@@ -106,8 +108,8 @@ export const app = {
         this.store.dispatch(setTokens(tokens));
         this.store.dispatch(setToken(selectedToken));
         // this.store.dispatch(setSetting(setting));
-        // if(selectedAccount)
-        //     this.store.dispatch(setAccount(selectedAccount));
+        if(selectedAccount)
+            this.store.dispatch(setAccount(selectedAccount));
 
         logger.info('Set application state');
     },
