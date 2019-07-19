@@ -40,10 +40,15 @@ class Controller extends React.Component {
                                 return null
                             }
                             return (
-                                <div onClick={ this.goToDetail.bind(this, address) } className='item'>
+                                <div className='item'>
                                     <div className='content'>
-                                        <div className={'title'}>{account.name}</div>
-                                        <div className='desc'>{account.balance || 0} {account.symbol}</div>
+                                        <div onClick={ this.goToDetail.bind(this, address) } className={'title'}>{account.name}</div>
+                                        <div onClick={ this.goToDetail.bind(this, address) } className='desc'>{account.balance || 0} {account.symbol}</div>
+                                    </div>
+                                    <div className="action">
+                                        <button className="button">Receive <img src={'../src/assets/images/receive.png'} /></button>
+                                        <button className="button">History <img src={'../src/assets/images/history.png'} /></button>
+                                        <button className="button">Send <img src={'../src/assets/images/send.png'} /></button>
                                     </div>
                                 </div>
                             )
