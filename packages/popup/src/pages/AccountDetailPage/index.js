@@ -6,13 +6,18 @@ import { PopupAPI } from '@ezpay/lib/api';
 import {APP_STATE} from '@ezpay/lib/constants';
 import _ from 'lodash'
 import Utils from '@ezpay/lib/utils';
+import Button from 'components/Button';
 
 import './style.scss';
 
 class Controller extends React.Component {
     state = {
         subTitle: false,
-        callbacks: []
+        callbacks: [],
+        mnemonic: false,
+        privateKey: false,
+        showBackUp: false,
+        showDelete: false
     };
 
     constructor() {
@@ -23,11 +28,32 @@ class Controller extends React.Component {
         const accounts = await PopupAPI.getAccounts();
     }
 
+    onButtonClick() {
+
+    }
+
+    async onExport() {
+        const {
+            mnemonic,
+            privateKey
+        } = await PopupAPI.exportAccount();
+
+        this.setState({
+            mnemonic,
+            privateKey,
+            showBackUp: true
+        });
+    }
+
     render() {
         const { accounts, account, onCancel, selectedToken } = this.props;
+        const { mnemonic, privateKey }  = this.state;
 
         return (
             <div className='container'>
+                {
+                    this.renderBackup(mnemonic, privateKey)
+                }
                 <Header onCancel={ onCancel } title={ account.name } />
                 <div className="account-detail">
                     <div className="row">
@@ -42,9 +68,75 @@ class Controller extends React.Component {
                         <div className="title">Balance:</div>
                         <div className="content">{ account.balance || 0 }</div>
                     </div>
+                    <div className="row-btn">
+                        <div className="button">
+                            <Button
+                                type="primary"
+                                id='BUTTON.EXPORT_PRIVATE_KEY'
+                                onClick={ this.onExport.bind(this) }
+                            />
+                        </div>
+                    </div>
+                    <div className="row-btn">
+                        <div className="button">
+                            <Button
+                                type="delete"
+                                id='BUTTON.DELETE'
+                                onClick={ this.onButtonClick.bind(this) }
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
         );
+    }
+
+    renderBackup(mnemonic, privateKey) {
+        const { showBackUp } = this.state;
+        const dom = showBackUp
+            ?
+            <div className='popUp'>
+                <div className='backUp'>
+                    <div className='title'>
+                        <FormattedMessage id='ACCOUNTS.EXPORT' />
+                    </div>
+                    {
+                        mnemonic
+                            ?
+                            <div className='option'>
+                                <FormattedMessage id='ACCOUNTS.EXPORT.MNEMONIC' />
+                                <div className='block'>
+                                    {
+                                        mnemonic.split(' ').map(v => <div className='cell'>{v}</div>)
+                                    }
+                                </div>
+                            </div>
+                            :
+                            null
+                    }
+                    {
+                        privateKey
+                            ?
+                            <div className='option' style={{marginBottom:20}}>
+                                <FormattedMessage id='ACCOUNTS.EXPORT.PRIVATE_KEY' />
+                                <div className='block'>
+                                    { privateKey }
+                                </div>
+                            </div>
+                            :
+                            null
+                    }
+                    <div className='buttonRow'>
+                        <Button
+                            id='BUTTON.CLOSE'
+                            onClick={ () => {this.setState({showBackUp:false})} }
+                            tabIndex={ 1 }
+                        />
+                    </div>
+                </div>
+            </div>
+            : null;
+        return dom;
     }
 }
 

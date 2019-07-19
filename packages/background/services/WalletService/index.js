@@ -542,6 +542,18 @@ class Wallet extends EventEmitter {
 
         return this.getAccountDetails(this.selectedAccount);
     }
+
+    exportAccount() {
+        const {
+            mnemonic,
+            privateKey
+        } = this.accounts[ this.selectedAccount ];
+
+        return {
+            mnemonic: mnemonic || false,
+            privateKey
+        };
+    }
 }
 
 export default Wallet;

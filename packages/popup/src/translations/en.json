@@ -28,6 +28,11 @@
     "BUTTON.WHITELIST": "Whitelist",
     "BUTTON.ADD_NODE": "Add node",
     "BUTTON.CLOSE": "Close",
+    "BUTTON.EXPORT_PRIVATE_KEY": "Export private key",
+
+    "ACCOUNTS.EXPORT": "Export Account",
+    "ACCOUNTS.EXPORT.MNEMONIC": "Mnemonic Phrase",
+    "ACCOUNTS.EXPORT.PRIVATE_KEY": "Private Key",
 
     "TITLES.ACCOUNTS": "Accounts",
     "TITLES.TRANSACTIONS": "Transaction History",

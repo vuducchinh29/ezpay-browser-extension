@@ -38,15 +38,23 @@
     }
 
     &.primary {
-        background: #636ACC;
+        background: linear-gradient(90deg, #EF6245 0%, #F88138 73.09%);
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+        border-radius: 8px;
 
         &.is-valid:not(.is-loading):hover {
             //background: #454c67;
         }
-    
+
         &.is-valid:not(.is-loading):focus {
             //background: #474d64;
         }
+    }
+
+    &.delete {
+        background: linear-gradient(90deg, #3F434A 0%, #535353 73.09%);
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+        border-radius: 8px;
     }
 
     &.success {
@@ -75,7 +83,7 @@
 
     &.white {
         background: #FFFFFF;
-        
+
         span {
             color: #000000;
         }

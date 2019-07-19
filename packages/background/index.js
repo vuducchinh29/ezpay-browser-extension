@@ -47,6 +47,7 @@ const background = {
         duplex.on('addAccount', this.walletService.createAccount);
         duplex.on('selectAccount', this.walletService.selectAccount);
         duplex.on('getSelectedAccount', this.walletService.getSelectedAccount);
+        duplex.on('exportAccount', this.walletService.exportAccount);
     },
 
     bindWalletEvents() {
