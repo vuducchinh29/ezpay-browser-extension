@@ -3,7 +3,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import { connect } from 'react-redux';
 import Header from '../Layout/Header';
 import { PopupAPI } from '@ezpay/lib/api';
-import {APP_STATE} from '@ezpay/lib/constants';
+import {APP_STATE, BUTTON_TYPE} from '@ezpay/lib/constants';
 import _ from 'lodash'
 import Utils from '@ezpay/lib/utils';
 import Button from 'components/Button';
@@ -28,8 +28,10 @@ class Controller extends React.Component {
         const accounts = await PopupAPI.getAccounts();
     }
 
-    onButtonClick() {
-
+    async onDelete() {
+        this.setState({
+            showDelete: true
+        });
     }
 
     async onExport() {
@@ -53,6 +55,9 @@ class Controller extends React.Component {
             <div className='container'>
                 {
                     this.renderBackup(mnemonic, privateKey)
+                }
+                {
+                    this.renderDeleteAccount()
                 }
                 <Header onCancel={ onCancel } title={ account.name } />
                 <div className="account-detail">
@@ -82,7 +87,7 @@ class Controller extends React.Component {
                             <Button
                                 type="delete"
                                 id='BUTTON.DELETE'
-                                onClick={ this.onButtonClick.bind(this) }
+                                onClick={ this.onDelete.bind(this) }
                             />
                         </div>
                     </div>
@@ -130,6 +135,38 @@ class Controller extends React.Component {
                         <Button
                             id='BUTTON.CLOSE'
                             onClick={ () => {this.setState({showBackUp:false})} }
+                            tabIndex={ 1 }
+                        />
+                    </div>
+                </div>
+            </div>
+            : null;
+        return dom;
+    }
+
+    renderDeleteAccount() {
+        const { showDelete } = this.state;
+        const dom = showDelete
+            ?
+            <div className='popUp'>
+                <div className='deleteAccount'>
+                    <div className='title'>
+                        <FormattedMessage id='ACCOUNTS.CONFIRM_DELETE' />
+                    </div>
+                    <div className='img'></div>
+                    <div className='txt'>
+                        <FormattedMessage id='ACCOUNTS.CONFIRM_DELETE.BODY' />
+                    </div>
+                    <div className='buttonRow'>
+                        <Button
+                            id='BUTTON.CANCEL'
+                            type={ BUTTON_TYPE.DANGER }
+                            onClick={ () => {this.setState({showDelete:false})} }
+                            tabIndex={ 1 }
+                        />
+                        <Button
+                            id='BUTTON.CONFIRM'
+                            onClick={()=>{PopupAPI.deleteAccount(); this.props.onCancel();}}
                             tabIndex={ 1 }
                         />
                     </div>

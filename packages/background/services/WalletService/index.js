@@ -554,6 +554,13 @@ class Wallet extends EventEmitter {
             privateKey
         };
     }
+
+    deleteAccount() {
+        delete this.accounts[ this.selectedAccount ];
+        StorageService.deleteAccount(this.selectedAccount);
+
+        this.emit('setAccounts', this.getAccounts());
+    }
 }
 
 export default Wallet;
