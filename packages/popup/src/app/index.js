@@ -11,8 +11,12 @@ import AccountsPage from '@ezpay/popup/src/pages/AccountsPage';
 import AccountDetailPage from '@ezpay/popup/src/pages/AccountDetailPage';
 import LoginPage from '@ezpay/popup/src/pages/LoginPage';
 import CreateAccountPage from '@ezpay/popup/src/pages/CreateAccountPage';
+import ReceivePage from '@ezpay/popup/src/pages/ReceivePage';
 
+import 'antd-mobile/dist/antd-mobile.css';
+import 'react-custom-scroll/dist/customScroll.css';
 import 'assets/styles/global.scss';
+import 'react-toast-mobile/lib/react-toast-mobile.css';
 
 import enMessages from '@ezpay/popup/src/translations/en.json';
 class App extends React.Component {
@@ -45,6 +49,9 @@ class App extends React.Component {
                 break;
             case APP_STATE.ACCOUNT_DETAIL:
                 dom = <AccountDetailPage onCancel={ () => PopupAPI.changeState(APP_STATE.ACCOUNTS) } />;
+                break;
+            case APP_STATE.RECEIVE:
+                dom = <ReceivePage onCancel={ () => PopupAPI.changeState(APP_STATE.ACCOUNTS) } />;
                 break;
             default:
                 dom = <div className='unsupportedState' onClick={ () => PopupAPI.resetState(APP_STATE.USDT_INCOME_RECORD) }>

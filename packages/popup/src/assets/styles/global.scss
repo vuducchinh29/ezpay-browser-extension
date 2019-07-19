@@ -27,6 +27,21 @@ html, body {
     background: #353A4E;
 }
 
+// toast
+.am-toast-notice-content .am-toast-text{
+    background-color: rgba(0,0,0,0.50);
+    font-family: PingFangSC-Semibold;
+    font-size: 14px;
+    letter-spacing: 0;
+    padding: 10px 24px;
+}
+
+// button
+.am-button.am-button-disabled{
+    color: #fff;
+    opacity: 1;
+}
+
 .container {
     width: 360px;
     height: 600px;
@@ -1251,6 +1266,7 @@ html, body {
                     height: 14px;
                     width: 14px;
                     content: "";
+                    background-image: url('../images/icon-copy.svg');
                     margin-right: 4px;
                 }
             }

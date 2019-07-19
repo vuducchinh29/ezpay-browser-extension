@@ -27,6 +27,11 @@ class Controller extends React.Component {
         PopupAPI.changeState(APP_STATE.ACCOUNT_DETAIL)
     }
 
+    gotToReceive(address) {
+        PopupAPI.selectAccount(address)
+        PopupAPI.changeState(APP_STATE.RECEIVE)
+    }
+
     render() {
         const { accounts, tokens, onCancel, selectedToken } = this.props;
 
@@ -46,7 +51,7 @@ class Controller extends React.Component {
                                         <div onClick={ this.goToDetail.bind(this, address) } className='desc'>{account.balance || 0} {account.symbol}</div>
                                     </div>
                                     <div className="action">
-                                        <button className="button">Receive <img src={'../src/assets/images/receive.png'} /></button>
+                                        <button onClick={ this.gotToReceive.bind(this, address) } className="button">Receive <img src={'../src/assets/images/receive.png'} /></button>
                                         <button className="button">History <img src={'../src/assets/images/history.png'} /></button>
                                         <button className="button">Send <img src={'../src/assets/images/send.png'} /></button>
                                     </div>
