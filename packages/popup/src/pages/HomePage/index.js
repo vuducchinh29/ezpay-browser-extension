@@ -53,7 +53,7 @@ class Controller extends React.Component {
                     <div onClick={ () => PopupAPI.changeState(APP_STATE.CREATING_TOKEN) } className='item-create-token'>
                         <img src={'../src/assets/images/create-token.png'} />
                         <div className='content'>
-                            <div className={'title'}>Create Token</div>
+                            <div className={'title'}>Add Token</div>
                         </div>
                     </div>
                 </div>

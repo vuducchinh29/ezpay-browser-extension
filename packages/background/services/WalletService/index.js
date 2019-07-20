@@ -518,7 +518,7 @@ class Wallet extends EventEmitter {
     }
 
     getAccountDetails(address) {
-        if(!address) {
+        if(!address || !this.accounts[ address ]) {
             return {
                 tokens: {
                 },
@@ -558,6 +558,7 @@ class Wallet extends EventEmitter {
     deleteAccount() {
         delete this.accounts[ this.selectedAccount ];
         StorageService.deleteAccount(this.selectedAccount);
+        this.selectedAccount = null;
 
         this.emit('setAccounts', this.getAccounts());
     }
