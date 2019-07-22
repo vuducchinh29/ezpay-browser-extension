@@ -21,7 +21,7 @@ class Header extends React.Component {
 
         return (
             <div className='header'>
-                <div className="back" onClick={ onCancel }></div>
+                {onCancel && <div className="back" onClick={ onCancel }></div>}
                 <div className='titleContainer'>
                     {title || 'EZpay'}
                 </div>

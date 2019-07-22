@@ -65,5 +65,10 @@
     "CREATION_CRITERIA.IS_ALPHANUMERIC": "Contains only <strong>alphanumeric</strong> characters, along with optional spaces",
     "CREATION_CRITERIA.IS_UNIQUE": "Is <strong>not in use</strong> by any of your other accounts",
     "TOAST.COPY":"Copied",
-    "TOAST.ADDED":"added"
+    "TOAST.ADDED":"added",
+
+    "SEND.ADDRESS": "Enter address",
+    "SEND.RECIPIENT.PLACEHOLDER": "Address",
+    "SEND.AMOUNT": "Amount",
+    "SEND.AMOUNT.PLACEHOLDER": "Amount"
 }
