@@ -32,6 +32,10 @@ class Wallet extends EventEmitter {
         this.tokens = {};
         this.selectedAccount = false;
 
+        this.timer = {};
+        this.isPolling = false;
+        this.shouldPoll = false;
+
         this._start()
     }
 
@@ -69,6 +73,64 @@ class Wallet extends EventEmitter {
 
     }
 
+    startPolling() {
+        if(this.isPolling && this.shouldPoll)
+            return;
+
+        if(this.isPolling && !this.shouldPoll)
+            return this.shouldPoll = true;
+
+        logger.info('Started polling');
+
+        this.shouldPoll = true;
+        this._pollAccounts();
+    }
+
+    stopPolling() {
+        this.shouldPoll = false;
+    }
+
+    async _pollAccounts() {
+        clearTimeout(this.timer);
+        if(!this.shouldPoll) {
+            logger.info('Stopped polling');
+            return this.isPolling = false;
+        }
+
+        if(this.isPolling)
+            return;
+
+        this.isPolling = true;
+        const nodes = NodeService.getNodes().nodes;
+        const accounts = Object.values(this.accounts);
+
+        if(accounts.length > 0) {
+            for (const account of accounts) {
+                let node = nodes[account.chain]
+
+                if (node.type === CHAIN_TYPE.TRON || node.type === CHAIN_TYPE.TRON_SHASTA) {
+                    if (account.address === this.selectedAccount) {
+                        Promise.all([account.update([], [], 0)]).then(() => {
+                            if (account.address === this.selectedAccount) {
+                                this.emit('setAccount', this.selectedAccount);
+                            }
+                        }).catch(e => {
+                            console.log(e);
+                        });
+                    } else {
+                        await account.update([], [], 0);
+                        //continue;
+                    }
+                }
+            }
+            this.emit('setAccounts', this.getAccounts());
+        }
+        this.isPolling = false;
+        this.timer = setTimeout(() => {
+            this._pollAccounts();
+        }, 6000);
+    }
+
     _loadAccounts() {
         const accounts = StorageService.getAccounts();
         const nodes = NodeService.getNodes().nodes;
@@ -92,7 +154,6 @@ class Wallet extends EventEmitter {
 
                 accountObj.loadCache();
                 accountObj.update([], [], 0);
-                console.log('accountObj', accountObj)
             } else if (node.type === CHAIN_TYPE.NTY || node.type === CHAIN_TYPE.ETH) {
                 accountObj = new EthereumAccount(
                     account.chain,

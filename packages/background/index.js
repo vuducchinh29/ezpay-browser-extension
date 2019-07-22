@@ -23,6 +23,12 @@ const background = {
     },
 
     bindPopupDuplex() {
+        duplex.on('popup:connect', () => (
+            this.walletService.startPolling()
+        ));
+        duplex.on('popup:disconnect', () => (
+            this.walletService.stopPolling()
+        ));
         duplex.on('getSetting', this.walletService.getSetting);
         duplex.on('requestState', ({ resolve }) => resolve(
             this.walletService.state
