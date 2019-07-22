@@ -4,6 +4,7 @@ import Utils from '@ezpay/lib/utils';
 import NodeService from '../NodeService';
 import axios from 'axios';
 const logger = new Logger('StorageService');
+import _ from 'lodash'
 
 const StorageService = {
     // We could instead scope the data so we don't need this array
@@ -229,7 +230,8 @@ const StorageService = {
         this.save('tokens');
     },
 
-    saveAccount(account) {
+    saveAccount(data) {
+        const account = _.cloneDeep(data)
         delete account.tronWeb
         delete account.web3
 
