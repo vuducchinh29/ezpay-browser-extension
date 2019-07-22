@@ -36,7 +36,8 @@ export const CHAIN_TYPE = {
     BTC: 'BTC',
     LTC: 'LTC',
     NTY: 'NTY',
-    ETH_RINKEBY: 'ETH_RINKEBY'
+    ETH_RINKEBY: 'ETH_RINKEBY',
+    TRON_SHASTA: 'TRON_SHASTA'
 };
 
 export const VALIDATION_STATE = {

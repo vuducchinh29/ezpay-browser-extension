@@ -7,6 +7,7 @@ import {APP_STATE, BUTTON_TYPE} from '@ezpay/lib/constants';
 import _ from 'lodash'
 import Utils from '@ezpay/lib/utils';
 import Button from 'components/Button';
+import { BigNumber } from 'bignumber.js';
 
 import './style.scss';
 
@@ -71,7 +72,7 @@ class Controller extends React.Component {
                     </div>
                     <div className="row">
                         <div className="title">Balance:</div>
-                        <div className="content">{ account.balance || 0 }</div>
+                        <div className="content">{new BigNumber(account.balance).shiftedBy(-`${account.decimal}`).toString() || 0} {account.symbol}</div>
                     </div>
                     <div className="row-btn">
                         <div className="button">

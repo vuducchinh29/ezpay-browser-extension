@@ -237,7 +237,7 @@ class TronAccount extends Account {
      * usdtPrice            price of usdt
     */
     async update(basicTokenPriceList = [], smartTokenPriceList = [], usdtPrice = 0) {
-        if(!StorageService.allTokens.length)return;
+        // if(!StorageService.allTokens.length)return;
         const { address } = this;
         logger.info(`Requested update for ${ address }`);
         try {
@@ -245,6 +245,7 @@ class TronAccount extends Account {
             if (node === 'f0b1e38e-7bee-485e-9d3f-69410bf30681' || node === '0f22e40f-a004-4c5a-99ef-004c8e6769bf') {
                 const { data: account } = await axios.get('https://apilist.tronscan.org/api/account?address=' + address).catch(e => ( { data: {} } ));
                 const account2 = await this.tronWeb.trx.getUnconfirmedAccount(address);
+                console.log('account2', account2)
                 if (!account2.address) {
                     logger.info(`Account ${address} does not exist on the network`);
                     this.reset();
@@ -373,6 +374,7 @@ class TronAccount extends Account {
                 }
             } else {
                 const account = await this.tronWeb.trx.getUnconfirmedAccount(address);
+                console.log('account', account)
                 if (!account.address) {
                     logger.info(`Account ${address} does not exist on the network`);
                     this.reset();

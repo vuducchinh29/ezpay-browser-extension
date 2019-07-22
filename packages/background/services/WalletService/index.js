@@ -77,7 +77,7 @@ class Wallet extends EventEmitter {
             let node = nodes[account.chain]
             let accountObj
 
-            if (node.type === CHAIN_TYPE.TRON) {
+            if (node.type === CHAIN_TYPE.TRON || node.type === CHAIN_TYPE.TRON_SHASTA) {
                 accountObj = new TronAccount(
                     account.chain,
                     account.token,
@@ -92,6 +92,7 @@ class Wallet extends EventEmitter {
 
                 accountObj.loadCache();
                 accountObj.update([], [], 0);
+                console.log('accountObj', accountObj)
             } else if (node.type === CHAIN_TYPE.NTY || node.type === CHAIN_TYPE.ETH) {
                 accountObj = new EthereumAccount(
                     account.chain,
@@ -322,7 +323,7 @@ class Wallet extends EventEmitter {
         const nodes = NodeService.getNodes().nodes;
         const node = nodes[params.node]
 
-        if (node.type === CHAIN_TYPE.TRON) {
+        if (node.type === CHAIN_TYPE.TRON || node.type === CHAIN_TYPE.TRON_SHASTA) {
             this.addTronAccount(params)
         } else if (node.type === CHAIN_TYPE.NTY || node.type === CHAIN_TYPE.ETH || node.type === CHAIN_TYPE.ETH_RINKEBY) {
             this.addEthereumAccount(params)

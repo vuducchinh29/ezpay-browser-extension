@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import Header from '../Layout/Header';
 import { PopupAPI } from '@ezpay/lib/api';
 import {APP_STATE} from '@ezpay/lib/constants';
+import { BigNumber } from 'bignumber.js';
 
 import './style.scss';
 
@@ -26,6 +27,18 @@ class Controller extends React.Component {
         PopupAPI.changeState(APP_STATE.ACCOUNTS)
     }
 
+    getTotalBalance(tokenId) {
+        const { accounts, tokens } = this.props;
+
+        let total = 0
+        Object.entries(accounts).forEach(([address, account]) => {
+            if (account.token && account.token.id === tokenId) {
+                total += account.balance
+            }
+        })
+        return total
+    }
+
     render() {
         const { accounts, tokens } = this.props;
 
@@ -44,7 +57,7 @@ class Controller extends React.Component {
                                     <img src={token.logo} />
                                     <div className='content'>
                                         <div className={'title'}>{token.name}</div>
-                                        <div className='desc'>{token.balance || 0} {token.symbol}</div>
+                                        <div className='desc'>{new BigNumber(this.getTotalBalance(tokenId)).shiftedBy(-`${token.decimal}`).toString() || 0} {token.symbol}</div>
                                     </div>
                                 </div>
                             )

@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import Header from '../Layout/Header';
 import { PopupAPI } from '@ezpay/lib/api';
 import {APP_STATE} from '@ezpay/lib/constants';
+import { BigNumber } from 'bignumber.js';
 import _ from 'lodash'
 
 import './style.scss';
@@ -53,7 +54,7 @@ class Controller extends React.Component {
                                 <div className='item'>
                                     <div className='content'>
                                         <div onClick={ this.goToDetail.bind(this, address) } className={'title'}>{account.name}</div>
-                                        <div onClick={ this.goToDetail.bind(this, address) } className='desc'>{account.balance || 0} {account.symbol}</div>
+                                        <div onClick={ this.goToDetail.bind(this, address) } className='desc'>{new BigNumber(account.balance).shiftedBy(-`${account.decimal}`).toString() || 0} {account.symbol}</div>
                                     </div>
                                     <div className="action">
                                         <button onClick={ this.goToReceive.bind(this, address) } className="button">Receive <img src={'../src/assets/images/receive.png'} /></button>
