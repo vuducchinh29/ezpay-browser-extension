@@ -7,6 +7,7 @@ import { BigNumber } from 'bignumber.js';
 import Account from './Account';
 import Web3 from 'web3';
 import NodeService from '../NodeService';
+const EthereumTx = require('ethereumjs-tx').Transaction
 
 const logger = new Logger('WalletService/EthereumAccount');
 import {
@@ -82,6 +83,7 @@ class EthereumAccount extends Account {
 
     async update() {
          this.balance = await this.web3.eth.getBalance(this.address)
+         this.save();
     }
 
     loadCache() {
@@ -128,6 +130,43 @@ class EthereumAccount extends Account {
         this.balance = balance;
         this.transactions = transactions;
         this.tokens = tokens;
+    }
+
+    async sendToken({recipient, amount, gasLimit, gasPrice}) {
+        const rawTx  = {};
+
+        rawTx.from  = this.address;
+        rawTx.to = recipient;
+        rawTx.value = amount;
+
+        try {
+            rawTx.gasPrice = this.web3.utils.toWei(gasPrice.toString(), 'Gwei') * gasLimit;
+            rawTx.nonce = await this.web3.eth.getTransactionCount(rawTx.from);
+            rawTx.gas = await this.web3.eth.estimateGas(rawTx);
+
+            console.log('rawTx', rawTx);
+            const privateKey = Buffer.from(this.privateKey.toString().substring(2), 'hex')
+
+            const tx = new EthereumTx(rawTx);
+            tx.sign(privateKey);
+            const serializedTx = tx.serialize();
+            console.log('serializedTx', serializedTx);
+            this.web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'), (error, hash) => {
+                if (error) {
+                    return Promise.reject(error);
+                }
+
+                console.log('hash', hash);
+                return Promise.resolve(hash);
+            })
+        } catch(ex) {
+            logger.error('Failed to send ETH:', ex);
+            return Promise.reject(ex);
+        }
+    }
+
+    save() {
+        StorageService.saveAccount(this);
     }
 }
 

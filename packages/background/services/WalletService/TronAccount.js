@@ -575,7 +575,7 @@ class TronAccount extends Account {
         return await signedTransaction;
     }
 
-    async sendToken(recipient, amount) {
+    async sendToken({recipient, amount}) {
         try {
             const transaction = await this.tronWeb.transactionBuilder.sendTrx(
                 recipient,

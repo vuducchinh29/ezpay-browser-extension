@@ -626,11 +626,13 @@ class Wallet extends EventEmitter {
         this.emit('setAccounts', this.getAccounts());
     }
 
-    async sendToken({ recipient, amount }) {
-        await this.accounts[ this.selectedAccount ].sendToken(
+    async sendToken({ recipient, amount, gasLimit, gasPrice }) {
+        await this.accounts[ this.selectedAccount ].sendToken({
             recipient,
-            amount
-        );
+            amount,
+            gasLimit,
+            gasPrice
+        });
         this.refresh();
     }
 

@@ -121,9 +121,6 @@ export default {
     },
 
     sendToken(params) {
-        return this.duplex.send('sendToken', {
-            recipient: params.recipient,
-            amount: params.amount
-        });
+        return this.duplex.send('sendToken', params);
     }
 }

@@ -26,7 +26,9 @@ class Controller extends React.Component {
         },
         success: false,
         error: false,
-        isLoading: false
+        isLoading: false,
+        gasPrice: 10,
+        gasLimit: 21000
     };
 
     constructor() {
@@ -62,7 +64,9 @@ class Controller extends React.Component {
 
         PopupAPI.sendToken({
             recipient,
-            amount: BigNumber(amount).shiftedBy(selectedToken.decimal).toString()
+            amount: BigNumber(amount).shiftedBy(selectedToken.decimal).toString(),
+            gasPrice: this.state.gasPrice,
+            gasLimit: this.state.gasLimit
         }).then(() => {
             Toast.success('Successfully', 2, () => {
                 this.setState({
