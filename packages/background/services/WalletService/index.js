@@ -108,19 +108,17 @@ class Wallet extends EventEmitter {
             for (const account of accounts) {
                 let node = nodes[account.chain]
 
-                if (node.type === CHAIN_TYPE.TRON || node.type === CHAIN_TYPE.TRON_SHASTA) {
-                    if (account.address === this.selectedAccount) {
-                        Promise.all([account.update([], [], 0)]).then(() => {
-                            if (account.address === this.selectedAccount) {
-                                this.emit('setAccount', this.selectedAccount);
-                            }
-                        }).catch(e => {
-                            console.log(e);
-                        });
-                    } else {
-                        await account.update([], [], 0);
-                        //continue;
-                    }
+                if (account.address === this.selectedAccount) {
+                    Promise.all([account.update()]).then(() => {
+                        if (account.address === this.selectedAccount) {
+                            this.emit('setAccount', this.selectedAccount);
+                        }
+                    }).catch(e => {
+                        console.log(e);
+                    });
+                } else {
+                    await account.update();
+                    //continue;
                 }
             }
             this.emit('setAccounts', this.getAccounts());
@@ -153,8 +151,8 @@ class Wallet extends EventEmitter {
                 );
 
                 accountObj.loadCache();
-                accountObj.update([], [], 0);
-            } else if (node.type === CHAIN_TYPE.NTY || node.type === CHAIN_TYPE.ETH) {
+                accountObj.update();
+            } else if (node.type === CHAIN_TYPE.NTY || node.type === CHAIN_TYPE.ETH || node.type === CHAIN_TYPE.ETH_RINKEBY) {
                 accountObj = new EthereumAccount(
                     account.chain,
                     account.token,
@@ -166,6 +164,9 @@ class Wallet extends EventEmitter {
                     account.logo,
                     account.accountIndex
                 );
+
+                accountObj.loadCache();
+                accountObj.update();
             } else if (node.type === CHAIN_TYPE.BTC) {
                 accountObj = new BitcoinAccount(
                     account.chain,
@@ -365,12 +366,12 @@ class Wallet extends EventEmitter {
             accountName: 'Tron Account 1'
         })
 
-        this._addAccount({
-            ...token2,
-            token: id2,
-            mnemonic: Utils.generateMnemonic(),
-            accountName: 'Bitcoin Account 1'
-        })
+        // this._addAccount({
+        //     ...token2,
+        //     token: id2,
+        //     mnemonic: Utils.generateMnemonic(),
+        //     accountName: 'Bitcoin Account 1'
+        // })
 
         this._addAccount({
             ...token3,
@@ -502,7 +503,7 @@ class Wallet extends EventEmitter {
                 symbol: account.symbol,
                 chain: nodes[account.chain],
                 token: token,
-                balance: account.balance + account.frozenBalance || 0,
+                balance: account.balance || 0,
                 // energyUsed: account.energyUsed,
                 // totalEnergyWeight: account.totalEnergyWeight,
                 // TotalEnergyLimit: account.TotalEnergyLimit,

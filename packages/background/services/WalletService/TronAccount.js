@@ -143,6 +143,11 @@ class TronAccount extends Account {
             return logger.warn('Attempted to load cache for an account that does not exist');
 
         const {
+            chain,
+            token,
+            symbol,
+            decimal,
+            logo,
             type,
             name,
             balance,
@@ -174,6 +179,12 @@ class TronAccount extends Account {
 
             delete this.transactions[ txID ];
         });
+
+        this.chain = chain;
+        this.token = token;
+        this.symbol = symbol;
+        this.decimal = decimal;
+        this.logo = logo;
 
         this.type = type;
         this.name = name;

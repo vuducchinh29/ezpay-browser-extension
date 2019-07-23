@@ -85,6 +85,14 @@ const NodeService = {
             isShow: false,
             logo: '../src/assets/images/btc.png'
         },
+        'f0b1e38e-7bee-485e-9d3f-69410bf30689': {
+            node: '6739be94-ee43-46af-9a62-690cf0947281',
+            name: 'Rinkeby',
+            symbol: 'ETH',
+            decimal: 18,
+            isShow: true,
+            logo: '../src/assets/images/eth.png'
+        },
     },
 
     _selectedNode: 'f0b1e38e-7bee-485e-9d3f-69410bf30681',
