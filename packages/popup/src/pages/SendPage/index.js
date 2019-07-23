@@ -7,6 +7,7 @@ import {APP_STATE, VALIDATION_STATE} from '@ezpay/lib/constants';
 import { Toast } from 'antd-mobile';
 import Input from '@ezpay/popup/src/components/Input';
 import Button from '@ezpay/popup/src/components/Button';
+import { BigNumber } from 'bignumber.js';
 import _ from 'lodash'
 
 import './style.scss';
@@ -37,8 +38,6 @@ class Controller extends React.Component {
     }
 
     onRecipientChange(value) {
-        console.log('onRecipientChange', value)
-
         this.setState({
             recipient: {
                 value: value
@@ -47,12 +46,35 @@ class Controller extends React.Component {
     }
 
     onAmountChange(value) {
-        console.log('onAmountChange', value)
-
         this.setState({
             amount: {
                 value: value
             }
+        });
+    }
+
+    onSend() {
+        const { selectedToken } = this.props
+        BigNumber.config({ EXPONENTIAL_AT: [-20,30] })
+
+        const { value: recipient } = this.state.recipient
+        const { value: amount } = this.state.amount
+
+        PopupAPI.sendToken({
+            recipient,
+            amount: BigNumber(amount).shiftedBy(selectedToken.decimal).toString()
+        }).then(() => {
+            Toast.success('Successfully', 2, () => {
+                this.setState({
+                    loading: false
+                });
+            }, true);
+        }).catch(error => {
+            Toast.fail(JSON.stringify(error), 3, () => {
+                this.setState({
+                    loading: false
+                });
+            }, true);
         });
     }
 
@@ -62,7 +84,8 @@ class Controller extends React.Component {
             recipient,
             amount,
             success,
-            isLoading
+            isLoading,
+            loading
         } = this.state;
 
         return (
@@ -100,7 +123,9 @@ class Controller extends React.Component {
                     <div className="div-button">
                         <Button
                             id='ACCOUNT.SEND'
+                            isLoading={ loading }
                             tabIndex={ 3 }
+                            onClick={ () => this.onSend() }
                         />
                     </div>
                 </div>
@@ -110,5 +135,6 @@ class Controller extends React.Component {
 }
 
 export default connect(state => ({
-    account: state.accounts.selected
+    account: state.accounts.selected,
+    selectedToken: state.app.selectedToken,
 }))(Controller);

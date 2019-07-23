@@ -44,18 +44,18 @@ class TronAccount extends Account {
             balance: 0,
             price: 0
         };
-        if(accountType == ACCOUNT_TYPE.MNEMONIC)
-            this._importMnemonic(importData);
-        else this._importPrivateKey(importData);
 
         const nodes = NodeService.getNodes().nodes
         const node = nodes[chain]
-
         this.tronWeb = new TronWeb(
             node.endPoint,
             node.endPoint,
             node.endPoint
         );
+
+        if(accountType == ACCOUNT_TYPE.MNEMONIC)
+            this._importMnemonic(importData);
+        else this._importPrivateKey(importData);
 
         this.loadCache();
     }
@@ -117,12 +117,16 @@ class TronAccount extends Account {
 
         this.privateKey = privateKey;
         this.address = address;
+
+        this.tronWeb.setAddress(this.address)
     }
 
     _importPrivateKey(privateKey) {
         try {
             this.privateKey = privateKey;
             this.address = TronWeb.address.fromPrivateKey(privateKey);
+
+            this.tronWeb.setAddress(this.address)
         } catch (ex) { // eslint-disable-line
             throw new Error('INVALID_PRIVATE_KEY');
         }
@@ -571,7 +575,7 @@ class TronAccount extends Account {
         return await signedTransaction;
     }
 
-    async sendTrx(recipient, amount) {
+    async sendToken(recipient, amount) {
         try {
             const transaction = await this.tronWeb.transactionBuilder.sendTrx(
                 recipient,

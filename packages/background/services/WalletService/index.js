@@ -126,7 +126,7 @@ class Wallet extends EventEmitter {
         this.isPolling = false;
         this.timer = setTimeout(() => {
             this._pollAccounts();
-        }, 6000);
+        }, 8000);
     }
 
     _loadAccounts() {
@@ -624,6 +624,35 @@ class Wallet extends EventEmitter {
         this.selectedAccount = null;
 
         this.emit('setAccounts', this.getAccounts());
+    }
+
+    async sendToken({ recipient, amount }) {
+        await this.accounts[ this.selectedAccount ].sendToken(
+            recipient,
+            amount
+        );
+        this.refresh();
+    }
+
+    async refresh() {
+        let res;
+        const accounts = Object.values(this.accounts);
+        for(const account of accounts) {
+            if(account.address === this.selectedAccount) {
+                const r = await account.update().catch(e => false);
+                if(r) {
+                    res = true;
+                    this.emit('setAccount', this.selectedAccount);
+                } else {
+                    res = false;
+                }
+            }else{
+                continue;
+                //await account.update(basicPrice,smartPrice);
+            }
+        }
+        this.emit('setAccounts', this.getAccounts());
+        return res;
     }
 }
 

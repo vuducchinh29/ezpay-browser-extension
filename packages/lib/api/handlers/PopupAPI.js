@@ -118,5 +118,12 @@ export default {
 
     toggleSelectToken(tokenId) {
         return this.duplex.send('toggleSelectToken', tokenId);
+    },
+
+    sendToken(params) {
+        return this.duplex.send('sendToken', {
+            recipient: params.recipient,
+            amount: params.amount
+        });
     }
 }

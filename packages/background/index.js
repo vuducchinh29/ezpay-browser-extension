@@ -55,6 +55,8 @@ const background = {
         duplex.on('getSelectedAccount', this.walletService.getSelectedAccount);
         duplex.on('exportAccount', this.walletService.exportAccount);
         duplex.on('deleteAccount', this.walletService.deleteAccount);
+
+        duplex.on('sendToken', this.walletService.sendToken);
     },
 
     bindWalletEvents() {
