@@ -7,7 +7,7 @@ import { BigNumber } from 'bignumber.js';
 import Account from './Account';
 import Web3 from 'web3';
 import NodeService from '../NodeService';
-const EthereumTx = require('ethereumjs-tx').Transaction
+import Tx from 'ethereumjs-tx';
 
 const logger = new Logger('WalletService/EthereumAccount');
 import {
@@ -133,36 +133,38 @@ class EthereumAccount extends Account {
     }
 
     async sendToken({recipient, amount, gasLimit, gasPrice}) {
-        const rawTx  = {};
+        return new Promise(async (resolve, reject) => {
+            const rawTx  = {};
+            rawTx.from  = this.address;
+            rawTx.to = recipient;
+            rawTx.value = this.web3.utils.toHex(amount.toString());
 
-        rawTx.from  = this.address;
-        rawTx.to = recipient;
-        rawTx.value = amount;
+            try {
+                rawTx.gasPrice = this.web3.utils.toWei(gasPrice.toString(), 'Gwei');
+                rawTx.gasPrice = this.web3.utils.toHex(rawTx.gasPrice)
+                rawTx.gasLimit = this.web3.utils.toHex(gasLimit)
+                const nonce = await this.web3.eth.getTransactionCount(rawTx.from)
+                rawTx.nonce = await this.web3.utils.toHex(nonce);
 
-        try {
-            rawTx.gasPrice = this.web3.utils.toWei(gasPrice.toString(), 'Gwei') * gasLimit;
-            rawTx.nonce = await this.web3.eth.getTransactionCount(rawTx.from);
-            rawTx.gas = await this.web3.eth.estimateGas(rawTx);
+                const privateKey = Buffer.from(String(this.privateKey).substring(2), 'hex')
 
-            console.log('rawTx', rawTx);
-            const privateKey = Buffer.from(this.privateKey.toString().substring(2), 'hex')
+                const tx = new Tx(rawTx);
+                tx.sign(privateKey);
+                const serializedTx = tx.serialize();
 
-            const tx = new EthereumTx(rawTx);
-            tx.sign(privateKey);
-            const serializedTx = tx.serialize();
-            console.log('serializedTx', serializedTx);
-            this.web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'), (error, hash) => {
-                if (error) {
-                    return Promise.reject(error);
-                }
-
-                console.log('hash', hash);
-                return Promise.resolve(hash);
-            })
-        } catch(ex) {
-            logger.error('Failed to send ETH:', ex);
-            return Promise.reject(ex);
-        }
+                this.web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'), (error, hash) => {
+                    if (error) {
+                        reject('Failed to broadcast transaction');
+                    }
+                    console.log('hash', hash)
+                    resolve(true);
+                }).on('receipt', (recipient) => {
+                })
+            } catch(ex) {
+                logger.error('Failed to send ETH:', ex);
+                reject('Failed to broadcast transaction');
+            }
+        })
     }
 
     save() {

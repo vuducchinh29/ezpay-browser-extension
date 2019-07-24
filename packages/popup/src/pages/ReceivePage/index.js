@@ -43,7 +43,7 @@ class Controller extends React.Component {
                             { account.address }
                         </div>
                         <div>
-                            <CopyToClipboard text={ account.address } onCopy={ () => { Toast.info('Copied', 2); }}>
+                            <CopyToClipboard text={ account.address } onCopy={ () => { Toast.info('Copied', 1); }}>
                                 <a className="copyAddressBtn">
                                     <FormattedMessage id="ACCOUNT.RECEIVE.BUTTON" />
                                 </a>

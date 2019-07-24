@@ -27,7 +27,7 @@ class Controller extends React.Component {
         success: false,
         error: false,
         isLoading: false,
-        gasPrice: 10,
+        gasPrice: 50,
         gasLimit: 21000
     };
 
