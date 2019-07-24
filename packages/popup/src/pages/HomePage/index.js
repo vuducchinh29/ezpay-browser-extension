@@ -33,7 +33,7 @@ class Controller extends React.Component {
         let total = 0
         Object.entries(accounts).forEach(([address, account]) => {
             if (account.token && account.token.id === tokenId) {
-                total += account.balance
+                total = BigNumber(total).plus(account.balance)
             }
         })
         return total
