@@ -8,7 +8,6 @@ import extensionizer from 'extensionizer';
 import Utils from '@ezpay/lib/utils';
 import StorageService from '../StorageService';
 import NodeService from '../NodeService';
-import Chain from './Chain';
 import TronWeb from 'tronweb';
 import Web3 from 'web3';
 
@@ -43,7 +42,6 @@ class Wallet extends EventEmitter {
         await this._checkStorage();
         await this._saveTokens();
         this._loadData();
-        // await this._initChains();
         this._loadAccounts();
     }
 
@@ -152,6 +150,7 @@ class Wallet extends EventEmitter {
 
                 accountObj.loadCache();
                 accountObj.update();
+                this.selectedAccount = address;
             } else if (node.type === CHAIN_TYPE.NTY || node.type === CHAIN_TYPE.ETH || node.type === CHAIN_TYPE.ETH_RINKEBY) {
                 accountObj = new EthereumAccount(
                     account.chain,
@@ -183,34 +182,6 @@ class Wallet extends EventEmitter {
             }
 
             this.accounts[ address ] = accountObj;
-        });
-    }
-
-    _initChains() {
-        const nodes = NodeService.getNodes().nodes;
-
-        Object.entries(nodes).forEach(([key, node]) => {
-            let ezWeb;
-
-            if (node.type === CHAIN_TYPE.TRON) {
-                ezWeb = new TronWeb(
-                    node.endPoint,
-                    node.endPoint,
-                    node.endPoint
-                );
-            } else if (node.type === CHAIN_TYPE.ETH) {
-                ezWeb = new Web3(node.endPoint)
-            }
-
-            const chain = new Chain({
-                type: node.type,
-                endPoint: node.endPoint,
-                decimal: node.decimal,
-                logo: node.logo,
-                ezWeb: ezWeb
-            });
-
-            this.chains[ key ] = chain;
         });
     }
 
@@ -323,10 +294,19 @@ class Wallet extends EventEmitter {
             return this._setState(APP_STATE.READY);
         }
 
-        this._loadAccounts()
+        const node = 'https://api.shasta.trongrid.io';
+
+        this.emit('setNode', {
+            fullNode: node,
+            solidityNode: node,
+            eventServer: node
+        });
+
+        this._loadAccounts();
         await this._saveTokens();
         this._loadData();
         this._setState(APP_STATE.READY);
+        this.emit('setAccount', this.selectedAccount);
     }
 
     createAccount(params) {

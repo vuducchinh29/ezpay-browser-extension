@@ -6,6 +6,7 @@ import Utils from '@ezpay/lib/utils';
 
 import { BackgroundAPI } from '@ezpay/lib/api';
 import { version } from './package.json';
+import { CONFIRMATION_TYPE } from '@ezpay/lib/constants';
 
 const duplex = new MessageDuplex.Host();
 const logger = new Logger('background');
@@ -68,6 +69,10 @@ const background = {
             this.walletService.getAccountDetails(address)
         ));
 
+        this.walletService.on('setNode', node => (
+            BackgroundAPI.setNode(node)
+        ));
+
         this.walletService.on('setAccounts', accounts => (
             BackgroundAPI.setAccounts(accounts)
         ));
@@ -83,14 +88,156 @@ const background = {
 
     bindTabDuplex() {
         duplex.on('tabRequest', async ({ hostname, resolve, data: { action, data, uuid } }) => {
+            // Abstract this so we can just do resolve(data) or reject(data)
+            // and it will map to { success, data, uuid }
+
             switch(action) {
                 case 'init': {
-                    console.log('initxxx');
+                    const response = {
+                        address: false,
+                        node: {
+                            fullNode: false,
+                            solidityNode: false,
+                            eventServer: false
+                        }
+                    };
+
+                    if(StorageService.ready) {
+                        // const node = NodeService.getCurrentNode();
+                        const node = 'https://api.shasta.trongrid.io';
+
+                        response.address = this.walletService.selectedAccount;
+                        response.node = {
+                            fullNode: node,
+                            solidityNode: node,
+                            eventServer: node
+                        };
+                    }
+
+                    resolve({
+                        success: true,
+                        data: response,
+                        uuid
+                    });
+
                     break;
                 } case 'sign': {
-                    console.log('signxxx');
+                    if(!this.walletService.selectedAccount) {
+                        return resolve({
+                            success: false,
+                            data: 'User has not unlocked wallet',
+                            uuid
+                        });
+                    }
+
+                    try {
+                        const {
+                            transaction,
+                            input
+                        } = data;
+
+                        const {
+                            selectedAccount
+                        } = this.walletService;
+
+                        const tronWeb = NodeService.tronWeb;
+                        const account = this.walletService.getAccount(selectedAccount);
+
+                        if(typeof input === 'string') {
+                            const signedTransaction = await account.sign(input);
+
+                            return this.walletService.queueConfirmation({
+                                type: CONFIRMATION_TYPE.STRING,
+                                hostname,
+                                signedTransaction,
+                                input
+                            }, uuid, resolve);
+                        }
+
+                        const contractType = transaction.raw_data.contract[ 0 ].type;
+                        const contractAddress = TronWeb.address.fromHex(input.contract_address);
+                        const {
+                            mapped,
+                            error
+                        } = await transactionBuilder(tronWeb, contractType, input); // NodeService.getCurrentNode()
+
+                        if(error) {
+                            return resolve({
+                                success: false,
+                                data: 'Invalid transaction provided',
+                                uuid
+                            });
+                        }
+
+                        const signedTransaction = await account.sign(
+                            mapped.transaction ||
+                            mapped
+                        );
+
+                        const whitelist = this.walletService.contractWhitelist[ input.contract_address ];
+
+                        if(contractType === 'TriggerSmartContract') {
+                            const value = input.call_value || 0;
+
+                            ga('send', 'event', {
+                                eventCategory: 'Smart Contract',
+                                eventAction: 'Used Smart Contract',
+                                eventLabel: contractAddress,
+                                eventValue: value,
+                                referrer: hostname,
+                                userId: Utils.hash(input.owner_address)
+                            });
+                        }
+
+                        if(contractType === 'TriggerSmartContract' && whitelist) {
+                            const expiration = whitelist[ hostname ];
+
+                            if(expiration === -1 || expiration >= Date.now()) {
+                                logger.info('Automatically signing transaction', signedTransaction);
+
+                                return resolve({
+                                    success: true,
+                                    data: signedTransaction,
+                                    uuid
+                                });
+                            }
+                        }
+
+                        const authorizeDapps = this.walletService.getAuthorizeDapps();
+                        if( contractType === 'TriggerSmartContract' && authorizeDapps.hasOwnProperty(contractAddress)){
+                            logger.info('Automatically signing transaction', signedTransaction);
+
+                            return resolve({
+                                success: true,
+                                data: signedTransaction,
+                                uuid
+                            });
+                        }
+
+                        this.walletService.queueConfirmation({
+                            type: CONFIRMATION_TYPE.TRANSACTION,
+                            hostname,
+                            signedTransaction,
+                            contractType,
+                            input
+                        }, uuid, resolve);
+                    } catch(ex) {
+                        logger.error('Failed to sign transaction:', ex);
+
+                        return resolve({
+                            success: false,
+                            data: 'Invalid transaction provided',
+                            uuid
+                        });
+                    }
                     break;
-                }
+                } default:
+                    resolve({
+                        success: false,
+                        data: 'Unknown method called',
+                        uuid
+                    });
+                    break;
             }
         });
     }

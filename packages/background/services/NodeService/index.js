@@ -70,9 +70,9 @@ const NodeService = {
         'f0b1e38e-7bee-485e-9d3f-69410bf30687': {
             node: '6739be94-ee43-46af-9a62-690cf0947283',
             name: 'Bitcoin',
-            symbol: 'BTC',
+            symbol: 'BTC-TEST',
             decimal: 8,
-            typeCoinInfo: 'BTC',
+            typeCoinInfo: 'BTC-TEST',
             isShow: true,
             logo: '../src/assets/images/btc.png'
         },
