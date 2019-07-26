@@ -62,6 +62,8 @@ const background = {
 
         duplex.on('sendToken', this.walletService.sendToken);
         duplex.on('getConfirmations', this.walletService.getConfirmations);
+        duplex.on('acceptConfirmation', this.walletService.acceptConfirmation);
+        duplex.on('rejectConfirmation', this.walletService.rejectConfirmation);
     },
 
     bindWalletEvents() {

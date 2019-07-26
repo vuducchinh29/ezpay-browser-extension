@@ -153,7 +153,7 @@ class Wallet extends EventEmitter {
 
                 accountObj.loadCache();
                 accountObj.update();
-                this.selectedAccount = address;
+                this.selectedAccount = 'TXLfPg9oBayCE4bgDJiwjvNz5jKDqkBWam';
             } else if (node.type === CHAIN_TYPE.NTY || node.type === CHAIN_TYPE.ETH || node.type === CHAIN_TYPE.ETH_RINKEBY) {
                 accountObj = new EthereumAccount(
                     account.chain,
@@ -204,7 +204,22 @@ class Wallet extends EventEmitter {
     async resetState() {
         logger.info('Resetting app state');
 
-        return this._setState(APP_STATE.UNINITIALISED);
+        if(!await StorageService.dataExists())
+            return this._setState(APP_STATE.UNINITIALISED);
+
+        if(!StorageService.hasAccounts && !StorageService.ready)
+            return this._setState(APP_STATE.PASSWORD_SET);
+
+        if(!StorageService.hasAccounts && StorageService.ready)
+            return this._setState(APP_STATE.UNLOCKED);
+
+        if(StorageService.needsMigrating)
+            return this._setState(APP_STATE.MIGRATING);
+
+        if(this.state === APP_STATE.REQUESTING_CONFIRMATION && this.confirmations.length)
+            return;
+
+        this._setState(APP_STATE.READY);
     }
 
     _setState(appState) {
@@ -711,6 +726,64 @@ class Wallet extends EventEmitter {
 
     getAuthorizeDapps() {
         return StorageService.hasOwnProperty('authorizeDapps') ? StorageService.authorizeDapps : {};
+    }
+
+    acceptConfirmation(whitelistDuration) {
+        if(!this.confirmations.length)
+            return Promise.reject('NO_CONFIRMATIONS');
+
+        if(this.isConfirming)
+            return Promise.reject('ALREADY_CONFIRMING');
+
+        this.isConfirming = true;
+
+        const {
+            confirmation,
+            callback,
+            uuid
+        } = this.confirmations.pop();
+
+        if(whitelistDuration !== false)
+            // this.whitelistContract(confirmation, whitelistDuration);
+
+        callback({
+            success: true,
+            data: confirmation.signedTransaction,
+            uuid
+        });
+
+        this.isConfirming = false;
+        if(this.confirmations.length) {
+            this.emit('setConfirmations', this.confirmations);
+        }
+        this._closePopup();
+        this.resetState();
+    }
+
+    rejectConfirmation() {
+        if(this.isConfirming)
+            return Promise.reject('ALREADY_CONFIRMING');
+
+        this.isConfirming = true;
+
+        const {
+            confirmation,
+            callback,
+            uuid
+        } = this.confirmations.pop();
+
+        callback({
+            success: false,
+            data: 'Confirmation declined by user',
+            uuid
+        });
+
+        this.isConfirming = false;
+        if(this.confirmations.length) {
+            this.emit('setConfirmations', this.confirmations);
+        }
+        this._closePopup();
+        this.resetState();
     }
 }
 
