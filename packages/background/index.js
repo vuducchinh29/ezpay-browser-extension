@@ -2,7 +2,10 @@ import Logger from '@ezpay/lib/logger';
 import MessageDuplex from '@ezpay/lib/MessageDuplex';
 import WalletService from './services/WalletService';
 import NodeService from './services/NodeService';
+import StorageService from './services/StorageService';
 import Utils from '@ezpay/lib/utils';
+import TronWeb from 'tronweb';
+import transactionBuilder from '@ezpay/lib/transactionBuilder';
 
 import { BackgroundAPI } from '@ezpay/lib/api';
 import { version } from './package.json';
@@ -58,6 +61,7 @@ const background = {
         duplex.on('deleteAccount', this.walletService.deleteAccount);
 
         duplex.on('sendToken', this.walletService.sendToken);
+        duplex.on('getConfirmations', this.walletService.getConfirmations);
     },
 
     bindWalletEvents() {
@@ -83,6 +87,10 @@ const background = {
 
         this.walletService.on('setSelectedTokens', tokens => (
             BackgroundAPI.setSelectedTokens(tokens)
+        ));
+
+        this.walletService.on('setConfirmations', confirmations => (
+            BackgroundAPI.setConfirmations(confirmations)
         ));
     },
 
@@ -113,7 +121,7 @@ const background = {
                             eventServer: node
                         };
                     }
-
+                    console.log('response', response)
                     resolve({
                         success: true,
                         data: response,
@@ -140,8 +148,8 @@ const background = {
                             selectedAccount
                         } = this.walletService;
 
-                        const tronWeb = NodeService.tronWeb;
                         const account = this.walletService.getAccount(selectedAccount);
+                        const tronWeb = account.tronWeb;
 
                         if(typeof input === 'string') {
                             const signedTransaction = await account.sign(input);
@@ -179,14 +187,14 @@ const background = {
                         if(contractType === 'TriggerSmartContract') {
                             const value = input.call_value || 0;
 
-                            ga('send', 'event', {
-                                eventCategory: 'Smart Contract',
-                                eventAction: 'Used Smart Contract',
-                                eventLabel: contractAddress,
-                                eventValue: value,
-                                referrer: hostname,
-                                userId: Utils.hash(input.owner_address)
-                            });
+                            // ga('send', 'event', {
+                            //     eventCategory: 'Smart Contract',
+                            //     eventAction: 'Used Smart Contract',
+                            //     eventLabel: contractAddress,
+                            //     eventValue: value,
+                            //     referrer: hostname,
+                            //     userId: Utils.hash(input.owner_address)
+                            // });
                         }
 
                         if(contractType === 'TriggerSmartContract' && whitelist) {

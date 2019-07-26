@@ -82,7 +82,8 @@ export const app = {
             accounts,
             tokens,
             selectedToken,
-            selectedAccount
+            selectedAccount,
+            confirmations
         ] = await Promise.all([
             PopupAPI.requestState(),
             PopupAPI.getNodes(),
@@ -90,7 +91,8 @@ export const app = {
             PopupAPI.getAccounts(),
             PopupAPI.getTokens(),
             PopupAPI.getSelectedToken(),
-            PopupAPI.getSelectedAccount()
+            PopupAPI.getSelectedAccount(),
+            PopupAPI.getConfirmations()
         ]);
         const lang = navigator.language || navigator.browserLanguage;
         if ( lang.indexOf('zh') > -1 ) {
@@ -107,6 +109,7 @@ export const app = {
         this.store.dispatch(setAccounts(accounts));
         this.store.dispatch(setTokens(tokens));
         this.store.dispatch(setToken(selectedToken));
+        this.store.dispatch(setConfirmations(confirmations));
         // this.store.dispatch(setSetting(setting));
         if(selectedAccount)
             this.store.dispatch(setAccount(selectedAccount));
@@ -143,6 +146,10 @@ export const app = {
 
         this.duplex.on('setSelectedTokens', tokens => this.store.dispatch(
             setTokens(tokens)
+        ));
+
+        this.duplex.on('setConfirmations', confirmations => this.store.dispatch(
+            setConfirmations(confirmations)
         ));
     },
 

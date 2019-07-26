@@ -34,6 +34,9 @@ class Wallet extends EventEmitter {
         this.timer = {};
         this.isPolling = false;
         this.shouldPoll = false;
+        this.popup = false;
+        this.contractWhitelist = {};
+        this.confirmations = [];
 
         this._start()
     }
@@ -374,6 +377,10 @@ class Wallet extends EventEmitter {
         }
     }
 
+    getAccount(address) {
+        return this.accounts[ address ];
+    }
+
     async addTronAccount(params) {
         logger.info(`Adding Tron account '${ params.accountName }' from popup`);
 
@@ -635,6 +642,75 @@ class Wallet extends EventEmitter {
         }
         this.emit('setAccounts', this.getAccounts());
         return res;
+    }
+
+    queueConfirmation(confirmation, uuid, callback) {
+        this.confirmations.push({
+            confirmation,
+            callback,
+            uuid
+        });
+
+        if(this.state === APP_STATE.PASSWORD_SET) {
+            this.emit('setConfirmations', this.confirmations);
+            this._openPopup();
+            return;
+        }
+
+        if(this.state !== APP_STATE.REQUESTING_CONFIRMATION)
+            this._setState(APP_STATE.REQUESTING_CONFIRMATION);
+
+        logger.info('Added confirmation to queue', confirmation);
+
+        this.emit('setConfirmations', this.confirmations);
+        this._openPopup();
+    }
+
+    getConfirmations() {
+        return this.confirmations;
+    }
+
+    async _openPopup() {
+        if(this.popup && this.popup.closed)
+            this.popup = false;
+
+        if(this.popup && await this._updateWindow())
+            return;
+
+        if(typeof chrome !== 'undefined') {
+            return extensionizer.windows.create({
+                url: 'packages/popup/build/index.html',
+                type: 'popup',
+                width: 360,
+                height: 600,
+                left: 25,
+                top: 25
+            }, window => this.popup = window);
+        }
+
+        this.popup = await extensionizer.windows.create({
+            url: 'packages/popup/build/index.html',
+            type: 'popup',
+            width: 360,
+            height: 600,
+            left: 25,
+            top: 25
+        });
+    }
+
+    _closePopup() {
+        if(this.confirmations.length)
+            return;
+
+        if(!this.popup)
+            return;
+
+        extensionizer.windows.remove(this.popup.id);
+        this.popup = false;
+    }
+
+    getAuthorizeDapps() {
+        return StorageService.hasOwnProperty('authorizeDapps') ? StorageService.authorizeDapps : {};
     }
 }
 
