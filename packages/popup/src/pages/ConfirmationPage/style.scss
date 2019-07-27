@@ -1,0 +1,71 @@
+.confirmationController {
+    padding:0 30px !important;
+    background-color: #505160;
+    justify-content: center !important;
+    .greyModal{
+        &.confirmModal{
+            background-color: #fff;
+            border-radius:2px;
+            padding: 20px;
+            .modalDesc{
+                color: #505160;
+                margin-bottom: 4px;
+                strong{
+                    color: #636ACC;
+                    font-weight:normal;
+                }
+            }
+        }
+    }
+
+    .meta {
+        font-size: 13px;
+        .metaLine {
+            display: flex;
+            flex-direction: row;
+            height: 40px;
+            border-bottom:1px solid #EFEFEF;
+            span{
+                line-height:40px;
+            }
+            span:first-of-type {
+                flex: 1;
+                font-weight: 500;
+            }
+
+            span.value {
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                padding-left: 20px;
+            }
+
+        }
+    }
+
+    .parameters {
+        background: #FFFFFF;
+        margin-bottom: 20px;
+        padding: 15px;
+        font-size: 13px;
+        border-radius: 4px;
+        max-height: 200px;
+        word-break: break-all;
+        overflow-y: auto;
+    }
+
+    .customButton{
+        &.danger{
+            border: 1px solid #636ACC;
+            border-radius: 2px;
+            span{
+                color: #636ACC !important;
+            }
+            background-color: #fff;
+            &:hover{
+                background-color: #fff !important;
+            }
+        }
+    }
+
+}
