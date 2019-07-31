@@ -7,14 +7,21 @@
         height: 62px;
         display: flex;
         width: 100%;
-        padding-left: 35px;
-        padding-right: 35px;
+        padding-left: 20px;
+        padding-right: 20px;
         background-color: #fff;
-        border-radius: 4px;
-        flex-direction: column;
-        align-items: center;
+        border-radius: 5px;
         margin-top: 8px;
         transition: all .2s ease-in-out;
+        justify-content: space-between;
+
+        .create-account {
+            text-align: center;
+        }
+
+        .import-account {
+            text-align: center;
+        }
 
         img {
             height: 30px;

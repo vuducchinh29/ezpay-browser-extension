@@ -11,6 +11,7 @@ import AccountsPage from '@ezpay/popup/src/pages/AccountsPage';
 import AccountDetailPage from '@ezpay/popup/src/pages/AccountDetailPage';
 import LoginPage from '@ezpay/popup/src/pages/LoginPage';
 import CreateAccountPage from '@ezpay/popup/src/pages/CreateAccountPage';
+import RestoreAccountPage from '@ezpay/popup/src/pages/RestoreAccountPage';
 import ReceivePage from '@ezpay/popup/src/pages/ReceivePage';
 import SendPage from '@ezpay/popup/src/pages/SendPage';
 import ConfirmationPage from '@ezpay/popup/src/pages/ConfirmationPage';
@@ -48,6 +49,9 @@ class App extends React.Component {
                 break;
             case APP_STATE.CREATING_ACCOUNT:
                 dom = <CreateAccountPage onCancel={ () => PopupAPI.changeState(APP_STATE.ACCOUNTS) } />;
+                break;
+            case APP_STATE.RESTORING:
+                dom = <RestoreAccountPage onCancel={ () => PopupAPI.changeState(APP_STATE.ACCOUNTS) } />;
                 break;
             case APP_STATE.ACCOUNT_DETAIL:
                 dom = <AccountDetailPage onCancel={ () => PopupAPI.changeState(APP_STATE.ACCOUNTS) } />;

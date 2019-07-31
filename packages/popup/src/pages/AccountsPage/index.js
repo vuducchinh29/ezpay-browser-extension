@@ -65,10 +65,18 @@ class Controller extends React.Component {
                             )
                         })
                     }
-                    <div onClick={ () => PopupAPI.changeState(APP_STATE.CREATING_ACCOUNT) } className='item-create'>
-                        <img src={'../src/assets/images/create-account.png'} />
-                        <div className='content'>
-                            <div className={'title'}>Create Account</div>
+                    <div className='item-create'>
+                        <div onClick={ () => PopupAPI.changeState(APP_STATE.CREATING_ACCOUNT) } className="create-account">
+                            <img src={'../src/assets/images/create-account.png'} />
+                            <div className='content'>
+                                <div className={'title'}>Create Account</div>
+                            </div>
+                        </div>
+                        <div onClick={ () => PopupAPI.changeState(APP_STATE.RESTORING) } className="import-account">
+                            <img src={'../src/assets/images/create-account.png'} />
+                            <div className='content'>
+                                <div className={'title'}>Import Account</div>
+                            </div>
                         </div>
                     </div>
                 </div>
