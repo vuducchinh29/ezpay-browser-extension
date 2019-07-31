@@ -18,12 +18,12 @@ const pageHook = {
         this._bindEventChannel();
         this._bindEvents();
 
-        this.request('init').then(({ address, node }) => {
-            if(address)
-                this.setAddress(address);
+        this.request('init').then(({ tron, eth }) => {
+            if(tron.address)
+                this.setAddress(tron.address);
 
-            if(node.fullNode)
-                this.setNode(node);
+            if(tron.node && tron.node.fullNode)
+                this.setNode(tron.node);
 
             logger.info('ezPay initiated');
         }).catch(err => {

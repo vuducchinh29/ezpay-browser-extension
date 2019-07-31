@@ -38,6 +38,11 @@ class Wallet extends EventEmitter {
         this.contractWhitelist = {};
         this.confirmations = [];
 
+        this.currentNodeWeb3 = false;
+        this.currentAccountWeb3 = false;
+        this.currentNodeTronWeb = false;
+        this.currentAccountTronWeb = false;
+
         this._start()
     }
 
@@ -46,6 +51,49 @@ class Wallet extends EventEmitter {
         await this._saveTokens();
         this._loadData();
         this._loadAccounts();
+    }
+
+    async unlockWallet(password) {
+        if(this.state !== APP_STATE.PASSWORD_SET) {
+            logger.error('Attempted to unlock wallet whilst not in PASSWORD_SET state');
+            return Promise.reject('ERRORS.NOT_LOCKED');
+        }
+
+        if(StorageService.needsMigrating) {
+            const success = this.migrate(password);
+
+            if(!success)
+                return Promise.reject('ERRORS.INVALID_PASSWORD');
+
+            return;
+        }
+
+        const unlockFailed = await StorageService.unlock(password);
+        if(unlockFailed) {
+            logger.error(`Failed to unlock wallet: ${ unlockFailed }`);
+            return Promise.reject(unlockFailed);
+        }
+
+        if(!StorageService.hasAccounts) {
+            this._createDefaultAccount()
+            logger.info('Wallet does not have any accounts');
+            return this._setState(APP_STATE.READY);
+        }
+
+        const node = 'https://api.shasta.trongrid.io';
+
+        this.emit('setNode', {
+            fullNode: node,
+            solidityNode: node,
+            eventServer: node
+        });
+
+        this._loadAccounts();
+        await this._saveTokens();
+        this._loadData();
+        this._setState(APP_STATE.READY);
+        this.emit('setAccount', this.selectedAccount);
+        this._setCurrentDappConfig()
     }
 
     async _checkStorage() {
@@ -72,6 +120,13 @@ class Wallet extends EventEmitter {
             this.tokens[tokenId] = token
         })
 
+    }
+
+    _setCurrentDappConfig() {
+        this.currentNodeWeb3 = 'https://rpc.nexty.io';
+        this.currentAccountWeb3 = '0x4a9ee9b4B3A4E62511ED85324f5D01B721268A06';
+        this.currentNodeTronWeb = 'https://api.shasta.trongrid.io';
+        this.currentAccountTronWeb = 'TYgbx22LXpA92Hd4aiyRPKc8gmcJTsmAYW';
     }
 
     startPolling() {
@@ -283,48 +338,6 @@ class Wallet extends EventEmitter {
         this.unlockWallet(StorageService.password);
 
         return true;
-    }
-
-    async unlockWallet(password) {
-        if(this.state !== APP_STATE.PASSWORD_SET) {
-            logger.error('Attempted to unlock wallet whilst not in PASSWORD_SET state');
-            return Promise.reject('ERRORS.NOT_LOCKED');
-        }
-
-        if(StorageService.needsMigrating) {
-            const success = this.migrate(password);
-
-            if(!success)
-                return Promise.reject('ERRORS.INVALID_PASSWORD');
-
-            return;
-        }
-
-        const unlockFailed = await StorageService.unlock(password);
-        if(unlockFailed) {
-            logger.error(`Failed to unlock wallet: ${ unlockFailed }`);
-            return Promise.reject(unlockFailed);
-        }
-
-        if(!StorageService.hasAccounts) {
-            this._createDefaultAccount()
-            logger.info('Wallet does not have any accounts');
-            return this._setState(APP_STATE.READY);
-        }
-
-        const node = 'https://api.shasta.trongrid.io';
-
-        this.emit('setNode', {
-            fullNode: node,
-            solidityNode: node,
-            eventServer: node
-        });
-
-        this._loadAccounts();
-        await this._saveTokens();
-        this._loadData();
-        this._setState(APP_STATE.READY);
-        this.emit('setAccount', this.selectedAccount);
     }
 
     createAccount(params) {
@@ -784,6 +797,15 @@ class Wallet extends EventEmitter {
         }
         this._closePopup();
         this.resetState();
+    }
+
+    getConfigDapp() {
+        return {
+            currentNodeWeb3: this.currentNodeWeb3,
+            currentAccountWeb3: this.currentAccountWeb3,
+            currentNodeTronWeb: this.currentNodeTronWeb,
+            currentAccountTronWeb: this.currentAccountTronWeb
+        }
     }
 }
 

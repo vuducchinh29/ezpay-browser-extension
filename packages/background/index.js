@@ -104,26 +104,36 @@ const background = {
             switch(action) {
                 case 'init': {
                     const response = {
-                        address: false,
-                        node: {
-                            fullNode: false,
-                            solidityNode: false,
-                            eventServer: false
+                        tron: {
+                            address: false,
+                            node: {
+                                fullNode: false,
+                                solidityNode: false,
+                                eventServer: false
+                            }
+                        },
+                        eth: {
+                            address: false,
+                            node: {
+                                endPoint: null
+                            }
                         }
                     };
 
                     if(StorageService.ready) {
-                        // const node = NodeService.getCurrentNode();
-                        const node = 'https://api.shasta.trongrid.io';
+                        const config = this.walletService.getConfigDapp();
 
-                        response.address = this.walletService.selectedAccount;
-                        response.node = {
-                            fullNode: node,
-                            solidityNode: node,
-                            eventServer: node
+                        response.tron.address = config.currentAccountTronWeb;
+                        response.tron.node = {
+                            fullNode: config.currentNodeTronWeb,
+                            solidityNode: config.currentNodeTronWeb,
+                            eventServer: config.currentNodeTronWeb
                         };
+
+                        response.eth.address = config.currentNodeWeb3;
+                        response.eth.node.endPoint = config.currentAccountWeb3;
                     }
-                    console.log('response', response)
+
                     resolve({
                         success: true,
                         data: response,
