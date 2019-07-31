@@ -6,6 +6,7 @@ import { PopupAPI } from '@ezpay/lib/api';
 import {APP_STATE, CONFIRMATION_TYPE, BUTTON_TYPE} from '@ezpay/lib/constants';
 import { BigNumber } from 'bignumber.js';
 import Button from '@ezpay/popup/src/components/Button';
+import Dropdown from 'react-dropdown';
 import _ from 'lodash'
 import TronWeb from 'tronweb';
 import {
@@ -14,12 +15,17 @@ import {
     injectIntl
 } from 'react-intl';
 
+import 'react-dropdown/style.css';
 import './style.scss';
 
 class Controller extends React.Component {
     state = {
         subTitle: false,
-        callbacks: []
+        callbacks: [],
+        token: '',
+        account: '',
+        node: '',
+        accounts: []
     };
 
     constructor() {
@@ -171,10 +177,46 @@ class Controller extends React.Component {
         );
     }
 
+    onChangeToken(selected) {
+        const { accounts} = this.props;
+        const items = [];
+
+        Object.entries(accounts).forEach(([ address, account ]) => {
+            if (account.token.id === selected.value) {
+                items.push({
+                    value: address,
+                    label: account.name
+                })
+            }
+        });
+
+        this.setState({
+            account: '',
+            token: selected,
+            accounts: items
+        });
+    }
+
+    onChangeAcount(selected) {
+        this.setState({
+            account: selected
+        });
+    }
+
     render() {
-        const { confirmation } = this.props;
+        const { confirmation, accounts, tokens, nodes } = this.props;
         const type = confirmation.type
-        console.log('confirmation', confirmation)
+        const selected = '';
+        const optionsToken = [];
+
+        Object.entries(tokens).forEach(([ tokenId, token ]) => {
+            if (token.isShow) {
+                optionsToken.push({
+                    value: tokenId,
+                    label: token.name
+                })
+            }
+        })
 
         return (
             <div className='insetContainer confirmationController'>
@@ -192,6 +234,20 @@ class Controller extends React.Component {
                             this.renderTransaction() : null
                         )
                     }
+                    <div className="">
+                        <Dropdown
+                            className='dropdown'
+                            options={ optionsToken }
+                            value={ this.state.token }
+                            onChange={ this.onChangeToken.bind(this) }
+                        />
+                        <Dropdown
+                            className='dropdown'
+                            options={ this.state.accounts }
+                            value={ this.state.account }
+                            onChange={ this.onChangeAcount.bind(this) }
+                        />
+                    </div>
                     <div className='buttonRow'>
                         <Button
                             id='BUTTON.REJECT'
@@ -212,5 +268,8 @@ class Controller extends React.Component {
 }
 
 export default connect(state => ({
-    confirmation: state.confirmations[ 0 ]
+    confirmation: state.confirmations[ 0 ],
+    accounts: state.accounts.accounts,
+    tokens: state.app.tokens,
+    nodes: state.app.nodes.nodes
 }))(Controller);
