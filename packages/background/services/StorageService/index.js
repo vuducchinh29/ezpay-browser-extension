@@ -139,34 +139,34 @@ const StorageService = {
         return false;
     },
 
-    hasAccount(address) {
+    hasAccount(id) {
         // This is the most disgusting piece of code I've ever written.
-        return (address in this.accounts);
+        return (id in this.accounts);
     },
 
-    selectAccount(address) {
-        logger.info(`Storing selected account: ${ address }`);
+    selectAccount(id) {
+        logger.info(`Storing selected account: ${ id }`);
 
-        this.selectedAccount = address;
+        this.selectedAccount = id;
         this.save('selectedAccount');
     },
 
     getAccounts() {
         const accounts = {};
 
-        Object.keys(this.accounts).forEach(address => {
-            accounts[ address ] = {
-                transactions: this.transactions[ address ] || [],
-                ...this.accounts[ address ]
+        Object.keys(this.accounts).forEach(id => {
+            accounts[ id ] = {
+                transactions: this.transactions[ id ] || [],
+                ...this.accounts[ id ]
             };
         });
 
         return accounts;
     },
 
-    getAccount(address) {
-        const account = this.accounts[ address ];
-        const transactions = this.transactions[ address ] || [];
+    getAccount(id) {
+        const account = this.accounts[ id ];
+        const transactions = this.transactions[ id ] || [];
 
         return {
             transactions,
@@ -174,11 +174,11 @@ const StorageService = {
         };
     },
 
-    deleteAccount(address) {
-        logger.info('Deleting account', address);
+    deleteAccount(id) {
+        logger.info('Deleting account', id);
 
-        delete this.accounts[ address ];
-        delete this.transactions[ address ];
+        delete this.accounts[ id ];
+        delete this.transactions[ id ];
 
         this.save('accounts', 'transactions');
     },
@@ -242,8 +242,8 @@ const StorageService = {
             ...remaining // eslint-disable-line
         } = account;
 
-        this.transactions[ account.address ] = transactions;
-        this.accounts[ account.address ] = remaining;
+        this.transactions[ account.id ] = transactions;
+        this.accounts[ account.id ] = remaining;
 
         this.save('transactions', 'accounts');
     },
@@ -315,16 +315,16 @@ const StorageService = {
         logger.info('Set storage password');
     },
 
-    addPendingTransaction(address, txID) {
-        if(!(address in this.pendingTransactions))
-            this.pendingTransactions[ address ] = [];
+    addPendingTransaction(id, txID) {
+        if(!(id in this.pendingTransactions))
+            this.pendingTransactions[ id ] = [];
 
-        if(this.pendingTransactions[ address ].some(tx => tx.txID === txID))
+        if(this.pendingTransactions[ id ].some(tx => tx.txID === txID))
             return;
 
-        logger.info('Adding pending transaction:', { address, txID });
+        logger.info('Adding pending transaction:', { id, txID });
 
-        this.pendingTransactions[ address ].push({
+        this.pendingTransactions[ id ].push({
             nextCheck: Date.now() + 5000,
             txID
         });
@@ -332,18 +332,18 @@ const StorageService = {
         this.save('pendingTransactions');
     },
 
-    removePendingTransaction(address, txID) {
-        if(!(address in this.pendingTransactions))
+    removePendingTransaction(id, txID) {
+        if(!(id in this.pendingTransactions))
             return;
 
-        logger.info('Removing pending transaction:', { address, txID });
+        logger.info('Removing pending transaction:', { id, txID });
 
-        this.pendingTransactions[ address ] = this.pendingTransactions[ address ].filter(transaction => (
+        this.pendingTransactions[ id ] = this.pendingTransactions[ id ].filter(transaction => (
             transaction.txID !== txID
         ));
 
-        if(!this.pendingTransactions[ address ].length)
-            delete this.pendingTransactions[ address ];
+        if(!this.pendingTransactions[ id ].length)
+            delete this.pendingTransactions[ id ];
 
         this.save('pendingTransactions');
     },

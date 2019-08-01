@@ -96,7 +96,7 @@ class PrivateKeyImport extends React.Component {
 
                     <div className='buttonRow'>
                         <Button
-                            id='BUTTON.CONTINUE'
+                            id='BUTTON.IMPORT'
                             isValid={ isValid }
                             isLoading={ loading }
                             onClick={ () => isValid && this.onSubmit() }

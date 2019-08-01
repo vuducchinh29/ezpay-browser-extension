@@ -22,6 +22,7 @@ class Controller extends React.Component {
 
     constructor() {
         super();
+        this.changeStage = this.changeStage.bind(this);
     }
 
     async omponentDidMount() {
@@ -35,7 +36,14 @@ class Controller extends React.Component {
         });
     }
 
+    changeStage(newStage) {
+        this.setState({
+            stage: newStage
+        });
+    }
+
     render() {
+        const { onCancel } = this.props;
         const {
             stage,
             walletName
@@ -43,10 +51,13 @@ class Controller extends React.Component {
         switch(stage) {
             case RESTORATION_STAGE.SETTING_NAME:
                 return (
-                    <AccountName
-                        onSubmit={ this.handleNameSubmit }
-                        onCancel={ () => PopupAPI.resetState() }
-                    />
+                    <div className='container'>
+                        <Header onCancel={onCancel}/>
+                        <AccountName
+                            onSubmit={ this.handleNameSubmit.bind(this) }
+                            onCancel={ () => PopupAPI.resetState() }
+                        />
+                    </div>
                 );
             case RESTORATION_STAGE.CHOOSING_TYPE:
                 return (

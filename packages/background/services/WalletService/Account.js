@@ -2,6 +2,7 @@ import Logger from '@ezpay/lib/logger';
 import Utils from '@ezpay/lib/utils';
 import axios from 'axios';
 import { BigNumber } from 'bignumber.js';
+import randomUUID from 'uuid/v4';
 
 const logger = new Logger('WalletService/Account');
 
@@ -22,6 +23,7 @@ class Account {
         this.tokens = {};
         this.updatingTransactions = false;
         this.balance = 0;
+        this.id = randomUUID();
     }
 }
 

@@ -60,6 +60,7 @@ class BitcoinAccount extends Account {
 
     getDetails() {
         return {
+            id: this.id,
             chain: this.chain,
             token: this.token,
             symbol: this.symbol,

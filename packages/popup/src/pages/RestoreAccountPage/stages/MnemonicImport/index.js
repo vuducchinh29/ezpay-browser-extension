@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import NodeService from '@ezpay/background/services/NodeService';
 import { PopupAPI } from '@ezpay/lib/api';
+import { APP_STATE } from '@ezpay/lib/constants';
 
 import './style.scss';
 // NodeService.init();
@@ -67,7 +68,7 @@ class MnemonicImport extends React.Component {
         const { formatMessage } = this.props.intl;
         const addresses = [];
         for(let i = 0; i < 5; i++) {
-            let account = Utils.getAccountAtIndex(
+            let account = Utils.getTronAccountAtIndex(
                 mnemonic,
                 i
             );
@@ -129,7 +130,7 @@ class MnemonicImport extends React.Component {
                 walletName
             );
         }
-        PopupAPI.resetState();
+        PopupAPI.changeState(APP_STATE.ACCOUNTS);
     }
 
     renderAccounts() {
@@ -167,7 +168,7 @@ class MnemonicImport extends React.Component {
                                     <div className={ `checkbox ${ isSelected ? 'isSelected' : '' }` }>&nbsp;</div>
                                     <span className="address">
                                         <span>{ `${address.substr(0,10)}...${address.substr(-10)}` }</span>
-                                        <span><FormattedMessage id="COMMON.BALANCE" /> <FormattedMessage id="ACCOUNT.BALANCE" values={{amount:balance/1000000}} /></span>
+                                        {/*<span><FormattedMessage id="COMMON.BALANCE" /> <FormattedMessage id="ACCOUNT.BALANCE" values={{amount:balance/1000000}} /></span>*/}
                                     </span>
                                 </div>
                             );
@@ -223,7 +224,7 @@ class MnemonicImport extends React.Component {
                     </div>
                     <div className='buttonRow'>
                         <Button
-                            id='BUTTON.CONTINUE'
+                            id='BUTTON.IMPORT'
                             isValid={ isValid }
                             onClick={ () => isValid && this.changeStage(IMPORT_STAGE.SELECTING_ACCOUNTS) }
                             tabIndex={ 2 }

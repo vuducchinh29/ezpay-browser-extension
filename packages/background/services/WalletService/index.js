@@ -164,9 +164,9 @@ class Wallet extends EventEmitter {
             for (const account of accounts) {
                 let node = nodes[account.chain]
 
-                if (account.address === this.selectedAccount) {
+                if (account.id === this.selectedAccount) {
                     Promise.all([account.update()]).then(() => {
-                        if (account.address === this.selectedAccount) {
+                        if (account.id === this.selectedAccount) {
                             this.emit('setAccount', this.selectedAccount);
                         }
                     }).catch(e => {
@@ -189,7 +189,7 @@ class Wallet extends EventEmitter {
         const accounts = StorageService.getAccounts();
         const nodes = NodeService.getNodes().nodes;
 
-        Object.entries(accounts).forEach(([ address, account ]) => {
+        Object.entries(accounts).forEach(([ id, account ]) => {
             let node = nodes[account.chain]
             let accountObj
 
@@ -239,7 +239,7 @@ class Wallet extends EventEmitter {
                 );
             }
 
-            this.accounts[ address ] = accountObj;
+            this.accounts[ id ] = accountObj;
         });
     }
 
@@ -325,9 +325,9 @@ class Wallet extends EventEmitter {
         localStorage.setItem('EZPAY_WALLET.bak', localStorage.getItem('EZPAY_WALLET'));
         localStorage.removeItem('EZPAY_WALLET');
 
-        // accounts.forEach(account => (
-        //     this.importAccount(account)
-        // ));
+        accounts.forEach(account => (
+            this.importAccount(account)
+        ));
 
         this.selectAccount(selectedAccount);
 
@@ -395,6 +395,7 @@ class Wallet extends EventEmitter {
     async _addAccount(params) {
         const nodes = NodeService.getNodes().nodes;
         const node = nodes[params.node]
+        params.type = ACCOUNT_TYPE.MNEMONIC;
 
         if (node.type === CHAIN_TYPE.TRON || node.type === CHAIN_TYPE.TRON_SHASTA) {
             this.addTronAccount(params)
@@ -405,28 +406,17 @@ class Wallet extends EventEmitter {
         }
     }
 
-    getAccount(address) {
-        return this.accounts[ address ];
+    getAccount(id) {
+        return this.accounts[ id ];
     }
 
     async addTronAccount(params) {
         logger.info(`Adding Tron account '${ params.accountName }' from popup`);
 
-        // const trc10tokens = axios.get('https://apilist.tronscan.org/api/token?showAll=1&limit=4000',{ timeout: 10000 });
-        // const trc20tokens = axios.get('https://apilist.tronscan.org/api/tokens/overview?start=0&limit=1000&filter=trc20',{ timeout: 10000 });
-        // await Promise.all([trc10tokens, trc20tokens]).then(res => {
-        //     let t = [];
-        //     res[ 0 ].data.data.concat( res[ 1 ].data.tokens).forEach(({ abbr, name, imgUrl = false, tokenID = false, contractAddress = false, decimal = false, precision = false }) => {
-        //         if(contractAddress && contractAddress === CONTRACT_ADDRESS.USDT)return;
-        //         t.push({ tokenId: tokenID ? tokenID.toString() : contractAddress, abbr, name, imgUrl, decimals: precision || decimal || 0 });
-        //     });
-        //     StorageService.saveAllTokens(t);
-        // });
-
         const account = new TronAccount(
             params.node,
             params.token,
-            ACCOUNT_TYPE.MNEMONIC,
+            params.type,
             params.mnemonic,
             params.accountName,
             params.symbol,
@@ -436,10 +426,10 @@ class Wallet extends EventEmitter {
         logger.info(`Add account '${ account }'`);
 
         const {
-            address
+            id
         } = account;
 
-        this.accounts[ address ] = account;
+        this.accounts[ id ] = account;
         StorageService.saveAccount(account);
 
         this.emit('setAccounts', this.getAccounts());
@@ -452,7 +442,7 @@ class Wallet extends EventEmitter {
         const account = new EthereumAccount(
             params.node,
             params.token,
-            ACCOUNT_TYPE.MNEMONIC,
+            params.type,
             params.mnemonic,
             params.accountName,
             params.symbol,
@@ -462,10 +452,10 @@ class Wallet extends EventEmitter {
         logger.info(`Add account '${ account }'`);
 
         const {
-            address
+            id
         } = account;
 
-        this.accounts[ address ] = account;
+        this.accounts[ id ] = account;
         StorageService.saveAccount(account);
 
         this.emit('setAccounts', this.getAccounts());
@@ -478,7 +468,7 @@ class Wallet extends EventEmitter {
         const account = new BitcoinAccount(
             params.node,
             params.token,
-            ACCOUNT_TYPE.MNEMONIC,
+            params.type,
             params.mnemonic,
             params.accountName,
             params.symbol,
@@ -489,10 +479,10 @@ class Wallet extends EventEmitter {
         logger.info(`Add account '${ account }'`);
 
         const {
-            address
+            id
         } = account;
 
-        this.accounts[ address ] = account;
+        this.accounts[ id ] = account;
         StorageService.saveAccount(account);
 
         this.emit('setAccounts', this.getAccounts());
@@ -507,11 +497,12 @@ class Wallet extends EventEmitter {
         const nodes = NodeService.getNodes().nodes;
         const tokens = NodeService.getTokens()
 
-        const accounts = Object.entries(this.accounts).reduce((accounts, [ address, account ]) => {
+        const accounts = Object.entries(this.accounts).reduce((accounts, [ id, account ]) => {
             let token = tokens[account.token]
             token.id = account.token
 
-            accounts[ address ] = {
+            accounts[ id ] = {
+                address: account.address,
                 name: account.name,
                 logo: account.logo,
                 decimal: account.decimal,
@@ -588,16 +579,17 @@ class Wallet extends EventEmitter {
         StorageService.saveToken(tokenId, token)
     }
 
-    selectAccount(address) {
-        StorageService.selectAccount(address);
+    selectAccount(id) {
+        StorageService.selectAccount(id);
         // NodeService.setAddress();
-        this.selectedAccount = address;
-        this.emit('setAccount', address);
+        this.selectedAccount = id;
+        this.emit('setAccount', id);
     }
 
-    getAccountDetails(address) {
-        if(!address || !this.accounts[ address ]) {
+    getAccountDetails(id) {
+        if(!id || !this.accounts[ id ]) {
             return {
+                id: id,
                 tokens: {
                 },
                 type: false,
@@ -611,7 +603,7 @@ class Wallet extends EventEmitter {
             };
         }
 
-        return this.accounts[ address ].getDetails();
+        return this.accounts[ id ].getDetails();
     }
 
      getSelectedAccount() {
@@ -655,7 +647,7 @@ class Wallet extends EventEmitter {
         let res;
         const accounts = Object.values(this.accounts);
         for(const account of accounts) {
-            if(account.address === this.selectedAccount) {
+            if(account.id === this.selectedAccount) {
                 const r = await account.update().catch(e => false);
                 if(r) {
                     res = true;
@@ -805,6 +797,32 @@ class Wallet extends EventEmitter {
             currentAccountWeb3: this.currentAccountWeb3,
             currentNodeTronWeb: this.currentNodeTronWeb,
             currentAccountTronWeb: this.currentAccountTronWeb
+        }
+    }
+
+    async importAccount({ privateKey, name }) {
+        logger.info(`Importing account '${ name }' from popup`);
+
+        const token = this.getSelectedToken();
+        const nodes = NodeService.getNodes().nodes;
+        const node = nodes[ token.node ]
+
+        const params = {};
+        params.node = token.node;
+        params.token = token.id;
+        params.type = ACCOUNT_TYPE.PRIVATE_KEY;
+        params.mnemonic = privateKey;
+        params.accountName = name;
+        params.symbol = token.symbol;
+        params.decimal = token.decimal;
+        params.logo = token.logo;
+
+        if (node.type === CHAIN_TYPE.TRON || node.type === CHAIN_TYPE.TRON_SHASTA) {
+            this.addTronAccount(params)
+        } else if (node.type === CHAIN_TYPE.NTY || node.type === CHAIN_TYPE.ETH || node.type === CHAIN_TYPE.ETH_RINKEBY) {
+            this.addEthereumAccount(params)
+        } else if (node.type === CHAIN_TYPE.BTC) {
+            this.addBitcoinAccount(params)
         }
     }
 }

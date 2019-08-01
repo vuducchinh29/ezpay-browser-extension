@@ -96,5 +96,43 @@
     "SEND.ADDRESS": "Enter address",
     "SEND.RECIPIENT.PLACEHOLDER": "Address",
     "SEND.AMOUNT": "Amount",
-    "SEND.AMOUNT.PLACEHOLDER": "Amount"
+    "SEND.AMOUNT.PLACEHOLDER": "Amount",
+
+    "CHOOSING_TYPE.TITLE":"Choosing type",
+    "CHOOSING_TYPE.MNEMONIC.TITLE": "Mnemonic phrase",
+    "CHOOSING_TYPE.MNEMONIC.NO_OPTIONS": "All your accounts have been imported.",
+    "CHOOSING_TYPE.PRIVATE_KEY.TITLE": "Private key",
+    "CHOOSING_TYPE.KEY_STORE.TITLE": "Import Keystore files",
+
+    "CREATION.CREATE.TITLE": "Create Account",
+    "CREATION.CREATE.CONFIRM.MNEMONIC.TITLE": "Confirm mnemonic phrase",
+    "CREATION.CREATE.CONFIRM.MNEMONIC.DIALOG": "Mnemonic error",
+    "CREATION.CREATE.TIP":"Recommend new users to use",
+    "CREATION.RESTORE.TITLE": "Restore Account",
+    "CREATION.RESTORE.TIP":"Recommend for users with existing Tron accounts",
+    "CREATION.RESTORE.PRIVATE_KEY.TITLE": "Import by private key",
+    "CREATION.RESTORE.MNEMONIC.TITLE": "Import by mnemonic phrase",
+    "CREATION.RESTORE.MNEMONIC.RELATED_TO.ACCOUNT.TITLE": "Select account",
+    "CREATION.RESTORE.KEY_STORE.TITLE": "Keystore files",
+    "CREATION.RESTORE.KEY_STORE.UPLOAD_DESC": "Temporarily only supports TXT files exported by tronscan",
+    "CREATION.RESTORE.KEY_STORE.SELECT_FILE": "Choose file",
+    "CREATION.RESTORE.KEY_STORE.INPUT_PASSWORD": "Input password",
+    "CREATION.RESTORE.KEY_STORE.EXCEPTION": "Import failed. Please check if the file matches the password",
+
+    "CREATION_CRITERIA.HAS_LENGTH": "Contains at least <strong>four</strong> characters",
+    "CREATION_CRITERIA.IS_ALPHANUMERIC": "Contains only <strong>alphanumeric</strong> characters, along with optional spaces",
+    "CREATION_CRITERIA.IS_UNIQUE": "Is <strong>not in use</strong> by any of your other accounts",
+
+    "WRITING_PHRASE": "Please copy down the mnemonic for your new account below. You will have to confirm the mnemonic on the next screen",
+    "CONFIRMING_PHRASE": "You must now confirm your mnemonic phrase. Select the words below in the correct order to finalise your account creation",
+    "ACCOUNT_NAME.DESC": "Please choose a memorable name for your new account",
+    "MNEMONIC_IMPORT.DESC": "Please enter your mnemonic phrase below. This will either be 12, 16 or 24 words in length (separated by spaces)",
+    "MNEMONIC_IMPORT.SELECTION": "Select the accounts you would like to import below",
+    "PRIVATE_KEY_IMPORT.DESC": "Please enter your private key below. This can only contain hexadecimal characters",
+
+    "EXCEPTION.FORMAT_ERROR":"Incorrect format",
+    "EXCEPTION.ACCOUNT_EXIST":"The address already exists. Please do not add again.",
+    "EXCEPTION.ADD_NODE.NAME":"More than 4 characters are required.",
+    "EXCEPTION.ADD_NODE.NODE_URL":"Incorrect format. Please start with http:// or https://",
+    "EXCEPTION.SEND.ADDRESS_FORMAT_ERROR":"Incorrect address format"
 }

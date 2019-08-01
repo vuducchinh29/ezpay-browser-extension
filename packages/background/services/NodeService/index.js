@@ -67,24 +67,24 @@ const NodeService = {
             isShow: true,
             logo: '../src/assets/images/nty.png'
         },
-        'f0b1e38e-7bee-485e-9d3f-69410bf30687': {
-            node: '6739be94-ee43-46af-9a62-690cf0947283',
-            name: 'Bitcoin',
-            symbol: 'BTC-TEST',
-            decimal: 8,
-            typeCoinInfo: 'BTC-TEST',
-            isShow: true,
-            logo: '../src/assets/images/btc.png'
-        },
-        'f0b1e38e-7bee-485e-9d3f-69410bf30688': {
-            node: '6739be94-ee43-46af-9a62-690cf0947283',
-            name: 'Litecoin',
-            symbol: 'LTC-TEST',
-            decimal: 8,
-            typeCoinInfo: 'LTC-TEST',
-            isShow: false,
-            logo: '../src/assets/images/btc.png'
-        },
+        // 'f0b1e38e-7bee-485e-9d3f-69410bf30687': {
+        //     node: '6739be94-ee43-46af-9a62-690cf0947283',
+        //     name: 'Bitcoin',
+        //     symbol: 'BTC-TEST',
+        //     decimal: 8,
+        //     typeCoinInfo: 'BTC-TEST',
+        //     isShow: true,
+        //     logo: '../src/assets/images/btc.png'
+        // },
+        // 'f0b1e38e-7bee-485e-9d3f-69410bf30688': {
+        //     node: '6739be94-ee43-46af-9a62-690cf0947283',
+        //     name: 'Litecoin',
+        //     symbol: 'LTC-TEST',
+        //     decimal: 8,
+        //     typeCoinInfo: 'LTC-TEST',
+        //     isShow: false,
+        //     logo: '../src/assets/images/btc.png'
+        // },
         'f0b1e38e-7bee-485e-9d3f-69410bf30689': {
             node: '6739be94-ee43-46af-9a62-690cf0947281',
             name: 'Rinkeby',

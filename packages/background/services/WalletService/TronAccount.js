@@ -481,7 +481,6 @@ class TronAccount extends Account {
             ]);
             logger.info(`Account ${address} successfully updated`);
             this.save();
-            console.log(this.address, '@@@@@@@@@@@@@@@@@@');
         } catch(error) {
             console.log(error);
         }
@@ -531,6 +530,7 @@ class TronAccount extends Account {
 
     getDetails() {
         return {
+            id: this.id,
             chain: this.chain,
             token: this.token,
             symbol: this.symbol,

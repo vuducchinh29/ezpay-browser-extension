@@ -25,9 +25,9 @@ const ChoosingType = props => {
                 <div className='option' onClick={ () => onSubmit(RESTORATION_STAGE.IMPORT_PRIVATE_KEY) }>
                     <FormattedMessage id='CHOOSING_TYPE.PRIVATE_KEY.TITLE' />
                 </div>
-                <div className='option' onClick={ () => onSubmit(RESTORATION_STAGE.IMPORT_KEY_STORE) }>
+                {/*<div className='option' onClick={ () => onSubmit(RESTORATION_STAGE.IMPORT_KEY_STORE) }>
                     <FormattedMessage id='CHOOSING_TYPE.KEY_STORE.TITLE' />
-                </div>
+                </div>*/}
             </div>
         </div>
     );

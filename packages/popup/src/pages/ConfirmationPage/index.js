@@ -181,10 +181,10 @@ class Controller extends React.Component {
         const { accounts} = this.props;
         const items = [];
 
-        Object.entries(accounts).forEach(([ address, account ]) => {
+        Object.entries(accounts).forEach(([ id, account ]) => {
             if (account.token.id === selected.value) {
                 items.push({
-                    value: address,
+                    value: id,
                     label: account.name
                 })
             }

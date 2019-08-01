@@ -12,6 +12,7 @@ export const setAirdropInfo = createAction('setAirdropInfo');
 
 export const accountsReducer = createReducer({
     selected: {
+        id: false,
         tokens: {
             basic: {},
             smart: {}
