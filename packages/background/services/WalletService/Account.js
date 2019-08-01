@@ -7,7 +7,8 @@ import randomUUID from 'uuid/v4';
 const logger = new Logger('WalletService/Account');
 
 class Account {
-    constructor(chain, token, accountType, importData, name, symbol, decimal, logo, accountIndex = 0) {
+    constructor(id, chain, token, accountType, importData, name, symbol, decimal, logo, accountIndex = 0) {
+        this.id = id;
         this.chain = chain;
         this.token = token;
         this.type = accountType;
@@ -23,7 +24,6 @@ class Account {
         this.tokens = {};
         this.updatingTransactions = false;
         this.balance = 0;
-        this.id = randomUUID();
     }
 }
 

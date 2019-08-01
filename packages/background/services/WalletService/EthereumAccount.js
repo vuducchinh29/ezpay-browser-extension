@@ -16,8 +16,8 @@ import {
 } from '@ezpay/lib/constants';
 
 class EthereumAccount extends Account {
-    constructor(chain, token, accountType, importData, name, symbol, decimal, logo, accountIndex = 0) {
-        super(chain, token, accountType, importData, name, symbol, decimal, logo, accountIndex);
+    constructor(id, chain, token, accountType, importData, name, symbol, decimal, logo, accountIndex = 0) {
+        super(id, chain, token, accountType, importData, name, symbol, decimal, logo, accountIndex);
 
         const nodes = NodeService.getNodes().nodes
         const node = nodes[chain]
@@ -88,7 +88,7 @@ class EthereumAccount extends Account {
     }
 
     loadCache() {
-        if(!StorageService.hasAccount(this.address))
+        if(!StorageService.hasAccount(this.id))
             return logger.warn('Attempted to load cache for an account that does not exist');
 
         const {
@@ -102,7 +102,7 @@ class EthereumAccount extends Account {
             balance,
             transactions,
             tokens,
-        } = StorageService.getAccount(this.address);
+        } = StorageService.getAccount(this.id);
 
         // Old TRC10 structure are no longer compatible
         //tokens.basic = {};

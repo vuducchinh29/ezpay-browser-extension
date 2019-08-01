@@ -10,6 +10,7 @@ import StorageService from '../StorageService';
 import NodeService from '../NodeService';
 import TronWeb from 'tronweb';
 import Web3 from 'web3';
+import randomUUID from 'uuid/v4';
 
 import {
     APP_STATE,
@@ -195,6 +196,7 @@ class Wallet extends EventEmitter {
 
             if (node.type === CHAIN_TYPE.TRON || node.type === CHAIN_TYPE.TRON_SHASTA) {
                 accountObj = new TronAccount(
+                    account.id,
                     account.chain,
                     account.token,
                     account.type,
@@ -208,9 +210,9 @@ class Wallet extends EventEmitter {
 
                 accountObj.loadCache();
                 accountObj.update();
-                this.selectedAccount = 'TXLfPg9oBayCE4bgDJiwjvNz5jKDqkBWam';
             } else if (node.type === CHAIN_TYPE.NTY || node.type === CHAIN_TYPE.ETH || node.type === CHAIN_TYPE.ETH_RINKEBY) {
                 accountObj = new EthereumAccount(
+                    account.id,
                     account.chain,
                     account.token,
                     account.type,
@@ -226,6 +228,7 @@ class Wallet extends EventEmitter {
                 accountObj.update();
             } else if (node.type === CHAIN_TYPE.BTC) {
                 accountObj = new BitcoinAccount(
+                    account.id,
                     account.chain,
                     account.token,
                     account.type,
@@ -325,9 +328,9 @@ class Wallet extends EventEmitter {
         localStorage.setItem('EZPAY_WALLET.bak', localStorage.getItem('EZPAY_WALLET'));
         localStorage.removeItem('EZPAY_WALLET');
 
-        accounts.forEach(account => (
-            this.importAccount(account)
-        ));
+        // accounts.forEach(account => (
+        //     this.importAccount(account)
+        // ));
 
         this.selectAccount(selectedAccount);
 
@@ -414,6 +417,7 @@ class Wallet extends EventEmitter {
         logger.info(`Adding Tron account '${ params.accountName }' from popup`);
 
         const account = new TronAccount(
+            randomUUID(),
             params.node,
             params.token,
             params.type,
@@ -440,6 +444,7 @@ class Wallet extends EventEmitter {
         logger.info(`Adding Ethereum account '${ params.accountName }' from popup`);
 
         const account = new EthereumAccount(
+            randomUUID(),
             params.node,
             params.token,
             params.type,
@@ -466,6 +471,7 @@ class Wallet extends EventEmitter {
         logger.info(`Adding Bitcoin account '${ params.accountName }' from popup`);
 
         const account = new BitcoinAccount(
+            randomUUID(),
             params.node,
             params.token,
             params.type,

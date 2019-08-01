@@ -13,8 +13,8 @@ import {
 } from '@ezpay/lib/constants';
 
 class BitcoinAccount extends Account {
-    constructor(chain, token, accountType, importData, name, symbol, decimal, logo, typeCoinInfo, accountIndex = 0) {
-        super(chain, token, accountType, importData, name, symbol, decimal, logo, accountIndex);
+    constructor(id, chain, token, accountType, importData, name, symbol, decimal, logo, typeCoinInfo, accountIndex = 0) {
+        super(id, chain, token, accountType, importData, name, symbol, decimal, logo, accountIndex);
 
         this.typeCoinInfo = typeCoinInfo
 

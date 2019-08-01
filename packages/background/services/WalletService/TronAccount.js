@@ -15,8 +15,8 @@ import axios from 'axios';
 BigNumber.config({ EXPONENTIAL_AT: [-20, 30] });
 const logger = new Logger('WalletService/TronAccount');
 class TronAccount extends Account {
-    constructor(chain, token, accountType, importData, name, symbol, decimal, logo, accountIndex = 0) {
-        super(chain, token, accountType, importData, name, symbol, decimal, logo, accountIndex);
+    constructor(id, chain, token, accountType, importData, name, symbol, decimal, logo, accountIndex = 0) {
+        super(id, chain, token, accountType, importData, name, symbol, decimal, logo, accountIndex);
 
         this.selectedBankRecordId = 0;
         this.dealCurrencyPage = 0;
@@ -143,7 +143,7 @@ class TronAccount extends Account {
     }
 
     loadCache() {
-        if(!StorageService.hasAccount(this.address))
+        if(!StorageService.hasAccount(this.id))
             return logger.warn('Attempted to load cache for an account that does not exist');
 
         const {
@@ -166,7 +166,7 @@ class TronAccount extends Account {
             energyUsed,
             lastUpdated,
             asset
-        } = StorageService.getAccount(this.address);
+        } = StorageService.getAccount(this.id);
 
         // Old TRC10 structure are no longer compatible
         //tokens.basic = {};
