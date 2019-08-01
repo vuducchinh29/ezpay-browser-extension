@@ -1,12 +1,13 @@
 import React from 'react';
 import Button from '@ezpay/popup/src/components/Button';
 import Utils from '@ezpay/lib/utils';
+import EthUtils from '@ezpay/lib/ethUtils';
 import Toast, { T } from 'react-toast-mobile';
 import { connect } from 'react-redux';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import NodeService from '@ezpay/background/services/NodeService';
 import { PopupAPI } from '@ezpay/lib/api';
-import { APP_STATE } from '@ezpay/lib/constants';
+import { APP_STATE, CHAIN_TYPE } from '@ezpay/lib/constants';
 
 import './style.scss';
 // NodeService.init();
@@ -66,9 +67,19 @@ class MnemonicImport extends React.Component {
 
         const { mnemonic } = this.state;
         const { formatMessage } = this.props.intl;
+        const { selectedToken, nodes } = this.props
         const addresses = [];
+        const node = nodes[ selectedToken.node ]
+        let getAccount;
+
+        if (node.type === CHAIN_TYPE.TRON || node.type === CHAIN_TYPE.TRON_SHASTA) {
+            getAccount = Utils.getTronAccountAtIndex
+        } else if (node.type === CHAIN_TYPE.NTY || node.type === CHAIN_TYPE.ETH || node.type === CHAIN_TYPE.ETH_RINKEBY) {
+            getAccount = EthUtils.getEthereumAccountAtIndex
+        }
+
         for(let i = 0; i < 5; i++) {
-            let account = Utils.getTronAccountAtIndex(
+            let account = getAccount(
                 mnemonic,
                 i
             );
@@ -248,6 +259,8 @@ class MnemonicImport extends React.Component {
 
 export default injectIntl(
     connect(state => ({
-        accounts: state.accounts.accounts
+        accounts: state.accounts.accounts,
+        selectedToken: state.app.selectedToken,
+        nodes: state.app.nodes.nodes
     }))(MnemonicImport)
 );
