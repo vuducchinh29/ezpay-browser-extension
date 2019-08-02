@@ -824,11 +824,11 @@ class Wallet extends EventEmitter {
         params.logo = token.logo;
 
         if (node.type === CHAIN_TYPE.TRON || node.type === CHAIN_TYPE.TRON_SHASTA) {
-            this.addTronAccount(params)
+            return this.addTronAccount(params)
         } else if (node.type === CHAIN_TYPE.NTY || node.type === CHAIN_TYPE.ETH || node.type === CHAIN_TYPE.ETH_RINKEBY) {
-            this.addEthereumAccount(params)
+            return this.addEthereumAccount(params)
         } else if (node.type === CHAIN_TYPE.BTC) {
-            this.addBitcoinAccount(params)
+            return this.addBitcoinAccount(params)
         }
     }
 }

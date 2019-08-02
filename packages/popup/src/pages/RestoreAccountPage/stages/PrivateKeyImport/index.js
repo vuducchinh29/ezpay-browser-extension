@@ -1,12 +1,15 @@
 import React from 'react';
 import Button from '@ezpay/popup/src/components/Button';
 import TronWeb from 'tronweb';
+import Web3 from 'web3';
 
 import { connect } from 'react-redux';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import { PopupAPI } from '@ezpay/lib/api';
+import { APP_STATE, CHAIN_TYPE } from '@ezpay/lib/constants';
 
 import './style.scss';
+const web3 = new Web3();
 
 class PrivateKeyImport extends React.Component {
     state = {
@@ -24,8 +27,16 @@ class PrivateKeyImport extends React.Component {
     }
 
     onChange({ target: { value } }) {
-        const { accounts } = this.props;
-        const address = TronWeb.address.fromPrivateKey(value);
+        const { selectedToken, nodes, accounts } = this.props
+        const node = nodes[ selectedToken.node ]
+        let address;
+
+        if (node.type === CHAIN_TYPE.TRON || node.type === CHAIN_TYPE.TRON_SHASTA) {
+            address = TronWeb.address.fromPrivateKey(value);
+        } else if (node.type === CHAIN_TYPE.NTY || node.type === CHAIN_TYPE.ETH || node.type === CHAIN_TYPE.ETH_RINKEBY) {
+            address = web3.eth.accounts.privateKeyToAccount(value);
+        }
+
         let isValid = false;
         let error = '';
         if(address) {
@@ -58,7 +69,7 @@ class PrivateKeyImport extends React.Component {
 
         if(res) {
             this.setState({ loading: false });
-            PopupAPI.resetState();
+            PopupAPI.changeState(APP_STATE.ACCOUNTS);
         }
     }
 
@@ -110,5 +121,7 @@ class PrivateKeyImport extends React.Component {
 }
 
 export default injectIntl(connect(state => ({
-    accounts: state.accounts.accounts
+    accounts: state.accounts.accounts,
+    selectedToken: state.app.selectedToken,
+    nodes: state.app.nodes.nodes
 }))(PrivateKeyImport));
