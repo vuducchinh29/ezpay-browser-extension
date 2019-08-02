@@ -23,7 +23,9 @@ const StorageService = {
         'dappList',
         'allDapps',
         'allTokens',
-        'authorizeDapps'
+        'authorizeDapps',
+        'securityMode',
+        'layoutMode'
     ],
 
     storage: extensionizer.storage.local,
@@ -77,6 +79,8 @@ const StorageService = {
     allDapps: [],
     allTokens : [],
     authorizeDapps: {},
+    securityMode: 'easy', // secure
+    layoutMode: 'light', // dark
     get needsMigrating() {
         return localStorage.hasOwnProperty('EZPAY_WALLET');
     },
@@ -262,6 +266,16 @@ const StorageService = {
         logger.info('Saving language', language);
         this.language = language;
         this.save('language');
+    },
+
+    setSecurityMode(mode) {
+        this.securityMode = mode;
+        this.save('securityMode');
+    },
+
+    setLayoutMode(mode) {
+        this.layoutMode = mode;
+        this.save('layoutMode');
     },
 
     setSetting(setting){

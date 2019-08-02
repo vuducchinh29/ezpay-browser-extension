@@ -83,5 +83,13 @@ export default {
 
     setSelectedTokens(tokens) {
         this.duplex.send('popup', 'setSelectedTokens',tokens ,false);
+    },
+
+    setSecurityMode(mode) {
+        this.duplex.send('popup', 'setSecurityMode', mode ,false);
+    },
+
+    setLayoutMode(mode) {
+        this.duplex.send('popup', 'setLayoutMode', mode ,false);
     }
 };

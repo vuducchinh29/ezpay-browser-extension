@@ -112,6 +112,22 @@ export default {
         this.duplex.send('setLanguage', language, false);
     },
 
+    getSecurityMode() {
+        return this.duplex.send('getSecurityMode');
+    },
+
+    setSecurityMode(mode) {
+        this.duplex.send('setSecurityMode', mode, false);
+    },
+
+    getLayoutMode() {
+        return this.duplex.send('getLayoutMode');
+    },
+
+    setLayoutMode(mode) {
+        this.duplex.send('setLayoutMode', mode, false);
+    },
+
     unlockWallet(password) {
         return this.duplex.send('unlockWallet', password);
     },

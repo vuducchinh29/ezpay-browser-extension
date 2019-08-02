@@ -25,7 +25,9 @@ import {
     setVersion,
     setDappList,
     setAuthorizeDapps,
-    setToken
+    setToken,
+    setSecurityMode,
+    setLayoutMode
 } from 'reducers/appReducer';
 
 import {
@@ -83,7 +85,9 @@ export const app = {
             tokens,
             selectedToken,
             selectedAccount,
-            confirmations
+            confirmations,
+            securityMode,
+            layoutMode
         ] = await Promise.all([
             PopupAPI.requestState(),
             PopupAPI.getNodes(),
@@ -92,7 +96,9 @@ export const app = {
             PopupAPI.getTokens(),
             PopupAPI.getSelectedToken(),
             PopupAPI.getSelectedAccount(),
-            PopupAPI.getConfirmations()
+            PopupAPI.getConfirmations(),
+            PopupAPI.getSecurityMode(),
+            PopupAPI.getLayoutMode()
         ]);
         const lang = navigator.language || navigator.browserLanguage;
         if ( lang.indexOf('zh') > -1 ) {
@@ -110,6 +116,8 @@ export const app = {
         this.store.dispatch(setTokens(tokens));
         this.store.dispatch(setToken(selectedToken));
         this.store.dispatch(setConfirmations(confirmations));
+        this.store.dispatch(setSecurityMode(securityMode));
+        this.store.dispatch(setLayoutMode(layoutMode));
         // this.store.dispatch(setSetting(setting));
         if(selectedAccount)
             this.store.dispatch(setAccount(selectedAccount));
@@ -134,6 +142,14 @@ export const app = {
 
         this.duplex.on('setLanguage', language => this.store.dispatch(
             setLanguage(language)
+        ));
+
+        this.duplex.on('setSecurityMode', mode => this.store.dispatch(
+            setSecurityMode(mode)
+        ));
+
+        this.duplex.on('setLayoutMode', mode => this.store.dispatch(
+            setLayoutMode(mode)
         ));
 
         this.duplex.on('setSetting', setting => this.store.dispatch(

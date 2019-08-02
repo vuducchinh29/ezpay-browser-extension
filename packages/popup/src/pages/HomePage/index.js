@@ -44,7 +44,7 @@ class Controller extends React.Component {
 
         return (
             <div className='container'>
-                <Header />
+                <Header showAction={true} />
                 <div className="tokens scroll">
                     {
                         Object.entries(tokens).map(([ tokenId, token ]) => {

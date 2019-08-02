@@ -42,6 +42,11 @@ const background = {
         // language
         duplex.on('getLanguage', this.walletService.getLanguage);
         duplex.on('setLanguage', this.walletService.setLanguage);
+        duplex.on('getSecurityMode', this.walletService.getSecurityMode);
+        duplex.on('setSecurityMode', this.walletService.setSecurityMode);
+        duplex.on('getLayoutMode', this.walletService.getLayoutMode);
+        duplex.on('setLayoutMode', this.walletService.setLayoutMode);
+
         duplex.on('resetState', this.walletService.resetState);
         duplex.on('setPassword', this.walletService.setPassword);
         duplex.on('unlockWallet', this.walletService.unlockWallet);
@@ -95,6 +100,14 @@ const background = {
 
         this.walletService.on('setConfirmations', confirmations => (
             BackgroundAPI.setConfirmations(confirmations)
+        ));
+
+        this.walletService.on('setSecurityMode', mode => (
+            BackgroundAPI.setSecurityMode(mode)
+        ));
+
+        this.walletService.on('setLayoutMode', mode => (
+            BackgroundAPI.setLayoutMode(mode)
         ));
     },
 

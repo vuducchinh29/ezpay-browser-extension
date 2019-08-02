@@ -15,6 +15,8 @@ export const setPage = createAction('setPage');
 export const setPriceList = createAction('setPriceList');
 export const setCurrency = createAction('setCurrency');
 export const setLanguage = createAction('setLanguage');
+export const setSecurityMode = createAction('setSecurityMode');
+export const setLayoutMode = createAction('setLayoutMode');
 export const setSetting = createAction('setSetting');
 export const setVersion = createAction('setVersion');
 export const setDappList = createAction('setDappList');
@@ -71,6 +73,12 @@ export const appReducer = createReducer({
     },
     [ setLanguage ]: (state, { payload }) => {
         state.language = payload;
+    },
+    [ setSecurityMode ]: (state, { payload }) => {
+        state.securityMode = payload;
+    },
+    [ setLayoutMode ]: (state, { payload }) => {
+        state.layoutMode = payload;
     },
     [ setSetting ]: (state, { payload }) => {
         state.setting = payload;

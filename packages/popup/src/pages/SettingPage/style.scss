@@ -1,0 +1,97 @@
+.settingPage {
+    margin: 10px 20px;
+
+    .option {
+        display: flex;
+        justify-content: space-between;
+        line-height: 52px;
+        color: #515060;
+        cursor: pointer;
+        font-size: 16px;
+
+        .txt {
+            flex: 1 1;
+            display: flex;
+            flex-direction: column;
+            border-bottom: 1px solid #efefef;
+            justify-content: space-between;
+
+            .span {
+                display: flex;
+                justify-content: space-between;
+                font-size: 14px;
+                color: #515060;
+
+                .unit {
+                    font-size: 14px;
+                    color: #888998;
+                    flex: 1 1;
+                    text-align: right;
+                }
+            }
+        }
+
+        .settingWrap {
+            width: 300px;
+            height: 0;
+            overflow: hidden;
+            transition: all .2s ease-in-out;
+
+            .unit {
+                height: 20px;
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: flex-start;
+                margin-top: 10px;
+                font-size: 14px;
+            }
+
+            .unit:before {
+                content: "";
+                margin-right: 14px;
+                width: 14px;
+                height: 14px;
+                border: 1px solid #c2c8d5;
+                border-radius: 100%;
+            }
+
+            .unit.selected:before {
+                width: 16px;
+                height: 16px;
+                background-image: url('../../assets/images/icon-selected.svg');
+                border: none;
+            }
+
+            .input-group {
+                width: 250px;
+                display: flex;
+                flex-direction: column;
+                margin-bottom: 10px;
+
+                label {
+                    height: 20px;
+                    line-height: 20px;
+                    font-size: 14px;
+                    color: #888998;
+                }
+
+                .input {
+                    height: 36px;
+                    line-height: 36px;
+                    margin-top: 10px;
+                    background-color: #f7f8fa;
+                    border-radius: 2px;
+                }
+            }
+        }
+    }
+
+    .option:nth-child(1).active .settingWrap {
+        height: 80px;
+    }
+
+    .option:nth-child(2).active .settingWrap {
+        height: 80px;
+    }
+}

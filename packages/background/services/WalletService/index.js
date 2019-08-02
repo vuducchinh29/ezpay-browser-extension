@@ -251,6 +251,24 @@ class Wallet extends EventEmitter {
         this.emit('setLanguage', language);
     }
 
+    setSecurityMode(mode) {
+        StorageService.setSecurityMode(mode);
+        this.emit('setSecurityMode', mode);
+    }
+
+    getSecurityMode() {
+        return StorageService.securityMode;
+    }
+
+    setLayoutMode(mode) {
+        StorageService.setLayoutMode(mode);
+        this.emit('setLayoutMode', mode);
+    }
+
+    getLayoutMode() {
+        return StorageService.layoutMode;
+    }
+
     getSetting() {
         return StorageService.getSetting();
     }
