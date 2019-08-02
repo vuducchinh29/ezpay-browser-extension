@@ -21,12 +21,12 @@ class EthereumAccount extends Account {
 
         const nodes = NodeService.getNodes().nodes
         const node = nodes[chain]
+        this.web3 = new Web3(node.endPoint);
 
         if(accountType == ACCOUNT_TYPE.MNEMONIC)
             this._importMnemonic(importData);
         else this._importPrivateKey(importData);
 
-        this.web3 = new Web3(node.endPoint);
         this.loadCache();
     }
 
@@ -58,7 +58,7 @@ class EthereumAccount extends Account {
     _importPrivateKey(privateKey) {
         try {
             this.privateKey = privateKey;
-            this.address = TronWeb.address.fromPrivateKey(privateKey);
+            this.address = this.web3.eth.accounts.privateKeyToAccount(privateKey).address;
         } catch (ex) { // eslint-disable-line
             throw new Error('INVALID_PRIVATE_KEY');
         }
