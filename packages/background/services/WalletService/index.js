@@ -256,8 +256,8 @@ class Wallet extends EventEmitter {
         this.emit('setSecurityMode', mode);
     }
 
-    getSecurityMode() {
-        return StorageService.securityMode;
+    async getSecurityMode() {
+        return await StorageService.getSecurityMode();
     }
 
     setLayoutMode(mode) {
@@ -265,8 +265,8 @@ class Wallet extends EventEmitter {
         this.emit('setLayoutMode', mode);
     }
 
-    getLayoutMode() {
-        return StorageService.layoutMode;
+    async getLayoutMode() {
+        return await StorageService.getLayoutMode();
     }
 
     getSetting() {

@@ -23,9 +23,7 @@ const StorageService = {
         'dappList',
         'allDapps',
         'allTokens',
-        'authorizeDapps',
-        'securityMode',
-        'layoutMode'
+        'authorizeDapps'
     ],
 
     storage: extensionizer.storage.local,
@@ -102,6 +100,18 @@ const StorageService = {
 
     async dataExists() {
         return !!(await this.getStorage('accounts'));
+    },
+
+    async getLayoutMode() {
+        this.layoutMode = await this.getStorage('layoutMode');
+        this.layoutMode = this.layoutMode  || 'light';
+        return this.layoutMode;
+    },
+
+    async getSecurityMode() {
+        this.securityMode = await this.getStorage('securityMode');
+        this.securityMode = this.securityMode  || 'easy';
+        return this.securityMode;
     },
 
     lock() {
@@ -270,12 +280,12 @@ const StorageService = {
 
     setSecurityMode(mode) {
         this.securityMode = mode;
-        this.save('securityMode');
+        this.saveWithoutEncrypt('securityMode');
     },
 
     setLayoutMode(mode) {
         this.layoutMode = mode;
-        this.save('layoutMode');
+        this.saveWithoutEncrypt('layoutMode');
     },
 
     setSetting(setting){
@@ -404,6 +414,18 @@ const StorageService = {
         ));
 
         logger.info('Storage saved');
+    },
+
+    saveWithoutEncrypt(...keys) {
+        if (!keys) {
+            return;
+        }
+
+        keys.forEach(key => (
+            this.storage.set({
+                [ key ]: this[ key ]
+            })
+        ));
     },
 
     async cacheToken(tokenID) {
