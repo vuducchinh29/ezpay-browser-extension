@@ -29,7 +29,7 @@ class App extends React.Component {
     }
 
     render() {
-        const { appState, language, app, accounts } = this.props;
+        const { appState, language, securityMode, layoutMode } = this.props;
         let dom = null;
 
         switch(appState) {
@@ -37,37 +37,37 @@ class App extends React.Component {
                 dom = <RegistrationPage language={language} />;
                 break;
             case APP_STATE.PASSWORD_SET:
-                dom = <LoginPage />;
+                dom = <LoginPage securityMode={securityMode} layoutMode={layoutMode} />;
                 break;
             case APP_STATE.READY:
-                dom = <HomePage />;
+                dom = <HomePage securityMode={securityMode} layoutMode={layoutMode} />;
                 break;
             case APP_STATE.CREATING_TOKEN:
-                dom = <CreateTokenPage onCancel={ () => PopupAPI.changeState(APP_STATE.READY) } />;
+                dom = <CreateTokenPage securityMode={securityMode} layoutMode={layoutMode} onCancel={ () => PopupAPI.changeState(APP_STATE.READY) } />;
                 break;
             case APP_STATE.ACCOUNTS:
-                dom = <AccountsPage onCancel={ () => PopupAPI.changeState(APP_STATE.READY) } />;
+                dom = <AccountsPage securityMode={securityMode} layoutMode={layoutMode} onCancel={ () => PopupAPI.changeState(APP_STATE.READY) } />;
                 break;
             case APP_STATE.CREATING_ACCOUNT:
-                dom = <CreateAccountPage onCancel={ () => PopupAPI.changeState(APP_STATE.ACCOUNTS) } />;
+                dom = <CreateAccountPage securityMode={securityMode} layoutMode={layoutMode} onCancel={ () => PopupAPI.changeState(APP_STATE.ACCOUNTS) } />;
                 break;
             case APP_STATE.RESTORING:
-                dom = <RestoreAccountPage onCancel={ () => PopupAPI.changeState(APP_STATE.ACCOUNTS) } />;
+                dom = <RestoreAccountPage securityMode={securityMode} layoutMode={layoutMode} onCancel={ () => PopupAPI.changeState(APP_STATE.ACCOUNTS) } />;
                 break;
             case APP_STATE.ACCOUNT_DETAIL:
-                dom = <AccountDetailPage onCancel={ () => PopupAPI.changeState(APP_STATE.ACCOUNTS) } />;
+                dom = <AccountDetailPage securityMode={securityMode} layoutMode={layoutMode} onCancel={ () => PopupAPI.changeState(APP_STATE.ACCOUNTS) } />;
                 break;
             case APP_STATE.RECEIVE:
-                dom = <ReceivePage onCancel={ () => PopupAPI.changeState(APP_STATE.ACCOUNTS) } />;
+                dom = <ReceivePage securityMode={securityMode} layoutMode={layoutMode} onCancel={ () => PopupAPI.changeState(APP_STATE.ACCOUNTS) } />;
                 break;
             case APP_STATE.SEND:
-                dom = <SendPage onCancel={ () => PopupAPI.changeState(APP_STATE.ACCOUNTS) } />;
+                dom = <SendPage securityMode={securityMode} layoutMode={layoutMode} onCancel={ () => PopupAPI.changeState(APP_STATE.ACCOUNTS) } />;
                 break;
             case APP_STATE.REQUESTING_CONFIRMATION:
-                dom = <ConfirmationPage />;
+                dom = <ConfirmationPage securityMode={securityMode} layoutMode={layoutMode} />;
                 break;
             case APP_STATE.SETTING:
-                dom = <SettingPage onCancel={ () => PopupAPI.changeState(APP_STATE.READY) } />;
+                dom = <SettingPage securityMode={securityMode} layoutMode={layoutMode} onCancel={ () => PopupAPI.changeState(APP_STATE.READY) } />;
                 break;
             default:
                 dom = <div className='unsupportedState' onClick={ () => PopupAPI.resetState(APP_STATE.USDT_INCOME_RECORD) }>
@@ -85,5 +85,7 @@ class App extends React.Component {
 
 export default connect(state => ({
     language: state.app.language,
-    appState: state.app.appState
+    appState: state.app.appState,
+    securityMode: state.app.securityMode,
+    layoutMode: state.app.layoutMode
 }))(App);

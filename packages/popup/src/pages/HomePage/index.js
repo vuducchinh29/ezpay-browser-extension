@@ -39,11 +39,24 @@ class Controller extends React.Component {
         return total
     }
 
+    getCssClassName() {
+        const { layoutMode, securityMode } = this.props;
+        let className = '';
+
+        if (layoutMode === 'dark') {
+            className = 'easy-dark';
+        } else {
+            className = 'easy-light';
+        }
+
+        return className
+    }
+
     render() {
         const { accounts, tokens } = this.props;
 
         return (
-            <div className='container'>
+            <div className={`container ${this.getCssClassName()}`}>
                 <Header showAction={true} />
                 <div className="tokens scroll">
                     {
@@ -53,7 +66,7 @@ class Controller extends React.Component {
                             }
 
                             return (
-                                <div onClick={ this.detailToken.bind(this, tokenId) } className='item'>
+                                <div onClick={ this.detailToken.bind(this, tokenId) } className={`item ${this.getCssClassName()}-item`}>
                                     <img src={token.logo} />
                                     <div className='content'>
                                         <div className={'title'}>{token.name}</div>
@@ -63,10 +76,10 @@ class Controller extends React.Component {
                             )
                         })
                     }
-                    <div onClick={ () => PopupAPI.changeState(APP_STATE.CREATING_TOKEN) } className='item-create-token'>
+                    <div onClick={ () => PopupAPI.changeState(APP_STATE.CREATING_TOKEN) } className={`item-create-token ${this.getCssClassName()}-item`}>
                         <img src={'../src/assets/images/create-token.png'} />
                         <div className='content'>
-                            <div className={'title'}>Add Token</div>
+                            <div className={'title-add-token'}>Add token</div>
                         </div>
                     </div>
                 </div>

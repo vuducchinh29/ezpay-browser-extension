@@ -35,14 +35,28 @@ class Controller extends React.Component {
         PopupAPI.changeState(APP_STATE.ACCOUNTS)
     }
 
+    getCssClassName() {
+        const { layoutMode, securityMode } = this.props;
+        let className = '';
+
+        if (layoutMode === 'dark') {
+            className = 'easy-dark';
+        } else {
+            className = 'easy-light';
+        }
+
+        return className
+    }
+
     render() {
         const { accounts, selectedToken, onCancel } = this.props;
 
         return (
-            <div className='container'>
+            <div className={`container ${this.getCssClassName()}`}>
                 <Header onCancel={onCancel} title={'Create account ' + selectedToken.name} />
                 <div className="">
                     <AccountName
+                        cssMode={this.getCssClassName()}
                         onSubmit={ this.handleNameSubmit.bind(this) }
                     />
                 </div>

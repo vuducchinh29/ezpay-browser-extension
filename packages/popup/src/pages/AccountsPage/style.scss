@@ -2,6 +2,10 @@
     flex: 1 1;
     padding: 10px 10px 10px 14px;
 
+    .easy-dark-item {
+        background: #3D3D3D !important;
+    }
+
     .item-create {
         cursor: pointer;
         height: 62px;
@@ -39,7 +43,7 @@
                 flex-direction: row;
                 align-items: center;
                 font-size: 16px;
-                color: #787878;
+                color: #EF6245;
             }
         }
     }
@@ -56,7 +60,7 @@
         padding-left: 25px;
         padding-right: 25px;
         background-color: #fff;
-        border-radius: 4px;
+        border-radius: 10px;
         margin-top: 8px;
         transition: all .2s ease-in-out;
 

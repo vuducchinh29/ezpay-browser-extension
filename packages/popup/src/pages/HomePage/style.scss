@@ -28,13 +28,17 @@
             flex-direction: row;
             overflow: hidden;
 
-            .title {
+            .title-add-token {
                 flex-direction: row;
                 align-items: center;
                 font-size: 16px;
-                color: #787878;
+                color: #EF6245;
             }
         }
+    }
+
+    .easy-dark-item {
+        background: #3D3D3D !important;
     }
 
     .item {
@@ -44,7 +48,7 @@
         padding-left: 35px;
         padding-right: 35px;
         background-color: #fff;
-        border-radius: 4px;
+        border-radius: 10px;
         display: flex;
         flex-direction: row;
         align-items: center;

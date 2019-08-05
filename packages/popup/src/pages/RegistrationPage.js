@@ -111,16 +111,16 @@ class RegistrationController extends React.Component {
         return (
             <div className='insetContainer logoWrap'>
                 <div className="setLanguage">
-                    <div className={"language "+fliterLanguage.key}>
+                    {/*<div className={"language "+fliterLanguage.key}>
                         {
                             fliterLanguage.name
                         }
                         <div className="drop">
-                            {/*{
+                            {
                                 languages.map(({key,name})=><div onClick={ ()=>PopupAPI.setLanguage(key) } className={"item "+key}>{name}</div>)
-                            }*/}
+                            }
                         </div>
-                    </div>
+                    </div>*/}
                 </div>
                 <div className='pageHeader hasBottomMargin'>
                     <div className="pageHeaderLogoWrap">

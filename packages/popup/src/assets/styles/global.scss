@@ -42,6 +42,18 @@ html, body {
     opacity: 1;
 }
 
+.easy-dark {
+    background: #2D3035 !important;
+}
+
+.easy-dark-input {
+    background: #4A4A4A !important;
+}
+
+.easy-dark-button {
+    background: #3D3D3D !important;
+}
+
 .dropdown {
     .Dropdown-control {
         box-shadow: none !important;
@@ -1678,7 +1690,7 @@ html, body {
             }
             .customInput{
                 background: #F7F8FA;
-                border-radius: 2px;
+                border-radius: 10px;
             }
             .customButton.primary{
                 background: linear-gradient(90deg, #EF6245 0%, #F88138 73.09%);
@@ -1688,8 +1700,7 @@ html, body {
         &.registrationModel{
             .customInput{
                 background: #fff;
-                border-bottom:1px solid #F0F0F0;
-                border-radius: 2px;
+                border-radius: 10px;
                 input{
                     text-align: left;
                 }
@@ -1702,7 +1713,7 @@ html, body {
                 text-align:center;
             }
             .criteria{
-                background-color: #fff;
+                background-color: transparent;
                 padding:4px 0;
                 .statusIcon{
                     width: 20px;

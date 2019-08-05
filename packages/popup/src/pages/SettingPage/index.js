@@ -61,12 +61,25 @@ class Controller extends React.Component {
         }
     }
 
+    getCssClassName() {
+        const { layoutMode, securityMode } = this.props;
+        let className = '';
+
+        if (layoutMode === 'dark') {
+            className = 'easy-dark';
+        } else {
+            className = 'easy-light';
+        }
+
+        return className
+    }
+
     render() {
         const { accounts, tokens, onCancel, securityMode, layoutMode } = this.props;
         const { languages, securityModes, layoutModes } = this.state;
 
         return (
-            <div className='container'>
+            <div className={`container ${this.getCssClassName()}`}>
                 <Header onCancel={ onCancel } title={ 'Setting' } />
                 <div className="settingPage" ref="cell">
                     <div className="optionsWrap">

@@ -61,7 +61,8 @@ class AccountName extends React.Component {
     render() {
         const {
             onCancel = () => {},
-            onSubmit = () => {}
+            onSubmit = () => {},
+            cssMode
         } = this.props;
 
         const {
@@ -85,7 +86,7 @@ class AccountName extends React.Component {
                 <div className='greyModal registrationModel'>
                     <div className='inputGroup hasBottomMargin'>
                         <Input
-                            className="accountName"
+                            className={`accountName ${cssMode}-input`}
                             placeholder='INPUT.ACCOUNT_NAME'
                             status={ isValid }
                             value={ name }
