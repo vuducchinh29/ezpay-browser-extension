@@ -54,6 +54,10 @@ html, body {
     background: #3D3D3D !important;
 }
 
+.easy-dark-item {
+    background: #3D3D3D !important;
+}
+
 .dropdown {
     .Dropdown-control {
         box-shadow: none !important;
@@ -1280,11 +1284,11 @@ html, body {
             &>.desc{
                 margin:50px 0 30px;
                 font-size: 12px;
-                color: #888998;
+                color: #EF6245;
             }
             &>.address{
                 font-size: 14px;
-                color: #505160;
+                color: #EF6245;
                 margin-top: 28px;
                 user-select: text;
             }
@@ -1292,20 +1296,13 @@ html, body {
                 cursor: pointer;
                 width: 150px;
                 height: 40px;
-                border: 1px solid #505160;
+                border: 1px solid #EF6245;
                 display: flex;
                 align-items: center;
                 justify-content: center;
                 font-size: 14px;
-                color: #505160;
+                color: #EF6245;
                 margin-top: 14px;
-                &:before{
-                    height: 14px;
-                    width: 14px;
-                    content: "";
-                    background-image: url('../images/icon-copy.svg');
-                    margin-right: 4px;
-                }
             }
             .input-group{
                 display: flex;

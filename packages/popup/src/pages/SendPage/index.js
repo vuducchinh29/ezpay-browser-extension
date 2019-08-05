@@ -82,6 +82,19 @@ class Controller extends React.Component {
         });
     }
 
+    getCssClassName() {
+        const { layoutMode, securityMode } = this.props;
+        let className = '';
+
+        if (layoutMode === 'dark') {
+            className = 'easy-dark';
+        } else {
+            className = 'easy-light';
+        }
+
+        return className
+    }
+
     render() {
         const { onCancel, account } = this.props;
         const {
@@ -93,10 +106,10 @@ class Controller extends React.Component {
         } = this.state;
 
         return (
-            <div className='container'>
+            <div className={`container ${this.getCssClassName()}`}>
                 <Header onCancel={ onCancel } title={ account.name } />
                 <div className="send">
-                    <div className="address">
+                    <div className={`address ${this.getCssClassName()}-item`}>
                         <div className="label">
                             <FormattedMessage id='SEND.ADDRESS' />
                         </div>
@@ -110,7 +123,7 @@ class Controller extends React.Component {
                             />
                         </div>
                     </div>
-                    <div className="amount">
+                    <div className={`amount ${this.getCssClassName()}-item`}>
                         <div className="label">
                             <FormattedMessage id='SEND.AMOUNT' />
                         </div>
