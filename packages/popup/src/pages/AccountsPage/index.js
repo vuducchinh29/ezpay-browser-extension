@@ -73,7 +73,7 @@ class Controller extends React.Component {
                             </div>
                         </div>
                         <div onClick={ () => PopupAPI.changeState(APP_STATE.RESTORING) } className="import-account">
-                            <img src={'../src/assets/images/create-account.png'} />
+                            <img src={'../src/assets/images/import-account.png'} />
                             <div className='content'>
                                 <div className={'title'}>Import Account</div>
                             </div>

@@ -21,7 +21,7 @@ class Controller extends React.Component {
             languages: [
                 { name: 'English', key: 'en', selected: true },
                 { name: '中文', key: 'zh', selected: false },
-                { name: '日本語', key: 'ja', selected: false },
+                { name: '日本語', key: 'ja', selected: false }
             ],
             securityModes: [
                 { name: 'Easy', key: 'easy', selected: true },
@@ -93,7 +93,7 @@ class Controller extends React.Component {
                                     <span>Layout</span>
                                     <div className="unit">
                                         {
-                                            layoutModes.filter(({key})=>key === 'light')[0].name
+                                            layoutModes.filter(({key})=>key === layoutMode)[0].name
                                         }
                                     </div>
                                 </div>
@@ -110,7 +110,7 @@ class Controller extends React.Component {
                                     <span>Security</span>
                                     <div className="unit">
                                         {
-                                            securityModes.filter(({key})=>key === 'easy')[0].name
+                                            securityModes.filter(({key})=>key === securityMode)[0].name
                                         }
                                     </div>
                                 </div>
@@ -119,6 +119,11 @@ class Controller extends React.Component {
                                         securityModes.map(({name,selected,key})=><div key={name} onClick={(e)=>{e.stopPropagation();PopupAPI.setSecurityMode(key);}} className={"unit"+(key === securityMode?" selected":"")}>{name}</div>)
                                     }
                                 </div>
+                            </div>
+                        </div>
+                        <div className="option" onClick={ () =>{PopupAPI.lockWallet()} }>
+                            <div className="txt">
+                                <FormattedMessage id="SETTING.TITLE.LOCK" />
                             </div>
                         </div>
                     </div>

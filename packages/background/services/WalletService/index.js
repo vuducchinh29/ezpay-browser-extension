@@ -849,6 +849,13 @@ class Wallet extends EventEmitter {
             return this.addBitcoinAccount(params)
         }
     }
+
+    async lockWallet() {
+        StorageService.lock();
+        this.accounts = {};
+        this.selectedAccount = false;
+        this._setState(APP_STATE.PASSWORD_SET);
+    }
 }
 
 export default Wallet;

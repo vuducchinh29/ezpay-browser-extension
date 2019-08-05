@@ -138,5 +138,9 @@ export default {
 
     sendToken(params) {
         return this.duplex.send('sendToken', params);
+    },
+
+    lockWallet() {
+        return this.duplex.send('lockWallet');
     }
 }
