@@ -48,12 +48,25 @@ class Controller extends React.Component {
         });
     }
 
+    getCssClassName() {
+        const { layoutMode, securityMode } = this.props;
+        let className = '';
+
+        if (layoutMode === 'dark') {
+            className = 'easy-dark';
+        } else {
+            className = 'easy-light';
+        }
+
+        return className
+    }
+
     render() {
         const { accounts, account, onCancel, selectedToken } = this.props;
         const { mnemonic, privateKey }  = this.state;
 
         return (
-            <div className='container'>
+            <div className={`container ${this.getCssClassName()}`}>
                 {
                     this.renderBackup(mnemonic, privateKey)
                 }
@@ -61,7 +74,7 @@ class Controller extends React.Component {
                     this.renderDeleteAccount()
                 }
                 <Header onCancel={ onCancel } title={ account.name } />
-                <div className="account-detail">
+                <div className={`account-detail ${this.getCssClassName()}-account-detail`}>
                     <div className="row">
                         <div className="title">Name:</div>
                         <div className="content">{ account.name }</div>
@@ -154,7 +167,6 @@ class Controller extends React.Component {
                     <div className='title'>
                         <FormattedMessage id='ACCOUNTS.CONFIRM_DELETE' />
                     </div>
-                    <div className='img'></div>
                     <div className='txt'>
                         <FormattedMessage id='ACCOUNTS.CONFIRM_DELETE.BODY' />
                     </div>
