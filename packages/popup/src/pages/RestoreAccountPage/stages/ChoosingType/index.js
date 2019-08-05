@@ -29,7 +29,7 @@ const ChoosingType = props => {
     return (
         <div className={`insetContainer choosingType ${getCssClassName()}`}>
             <Header onCancel={ onCancel } title={ 'Choosing type' } />
-            <div className='greyModal'>
+            <div className={`greyModal ${getCssClassName()}`}>
                 <div className='option' onClick={ () => onSubmit(RESTORATION_STAGE.IMPORT_MNEMONIC) }>
                     <FormattedMessage id='CHOOSING_TYPE.MNEMONIC.TITLE' />
                 </div>

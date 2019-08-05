@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import { FormattedMessage, injectIntl } from 'react-intl';
 import { PopupAPI } from '@ezpay/lib/api';
 import { APP_STATE, CHAIN_TYPE } from '@ezpay/lib/constants';
+import Header from '../../../Layout/Header';
 
 import './style.scss';
 const web3 = new Web3();
@@ -73,6 +74,19 @@ class PrivateKeyImport extends React.Component {
         }
     }
 
+    getCssClassName() {
+        const { layoutMode, securityMode } = this.props;
+        let className = '';
+
+        if (layoutMode === 'dark') {
+            className = 'easy-dark';
+        } else {
+            className = 'easy-light';
+        }
+
+        return className
+    }
+
     render() {
         const { onCancel } = this.props;
         const { formatMessage } = this.props.intl;
@@ -84,12 +98,9 @@ class PrivateKeyImport extends React.Component {
         } = this.state;
 
         return (
-            <div className='insetContainer privateKeyImport'>
-                <div className='pageHeader'>
-                    <div className="back" onClick={ onCancel }></div>
-                    <FormattedMessage id="CREATION.RESTORE.PRIVATE_KEY.TITLE" />
-                </div>
-                <div className={'greyModal'+(!isValid && error?' error':'')}>
+            <div className={`insetContainer privateKeyImport ${this.getCssClassName()}`}>
+                <Header onCancel={ onCancel } title={ 'Import by private key' } />
+                <div className={'greyModal'+(!isValid && error?' error':'') + ` ${this.getCssClassName()}`}>
                     <div className='modalDesc hasBottomMargin'>
                         <FormattedMessage id='PRIVATE_KEY_IMPORT.DESC' />
                     </div>

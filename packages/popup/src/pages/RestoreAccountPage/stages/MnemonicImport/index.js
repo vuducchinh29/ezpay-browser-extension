@@ -8,6 +8,7 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import NodeService from '@ezpay/background/services/NodeService';
 import { PopupAPI } from '@ezpay/lib/api';
 import { APP_STATE, CHAIN_TYPE } from '@ezpay/lib/constants';
+import Header from '../../../Layout/Header';
 
 import './style.scss';
 // NodeService.init();
@@ -145,6 +146,8 @@ class MnemonicImport extends React.Component {
     }
 
     renderAccounts() {
+        const { onCancel } = this.props;
+
         const {
             addresses,
             selected,
@@ -154,12 +157,9 @@ class MnemonicImport extends React.Component {
         const isValid = !!selected.length;
 
         return (
-            <div className='insetContainer mnemonicImport'>
-                <div className='pageHeader'>
-                    <div className="back" onClick={ () => this.changeStage(IMPORT_STAGE.ENTERING_MNEMONIC) }></div>
-                    <FormattedMessage id="CREATION.RESTORE.MNEMONIC.RELATED_TO.ACCOUNT.TITLE" />
-                </div>
-                <div className='greyModal'>
+            <div className={`insetContainer mnemonicImport ${this.getCssClassName()}`}>
+                <Header onCancel={ onCancel } title={ 'Select account' } />
+                <div className={`greyModal ${this.getCssClassName()}`}>
                     <div className='modalDesc'>
                         <FormattedMessage id='MNEMONIC_IMPORT.SELECTION' />
                     </div>
@@ -211,12 +211,9 @@ class MnemonicImport extends React.Component {
         } = this.state;
 
         return (
-            <div className='insetContainer mnemonicImport'>
-                <div className='pageHeader'>
-                    <div className="back" onClick={ onCancel }></div>
-                    <FormattedMessage id="CREATION.RESTORE.MNEMONIC.TITLE" />
-                </div>
-                <div className={'greyModal'+(!isValid && error?' error':'')}>
+            <div className={`insetContainer mnemonicImport ${this.getCssClassName()}`}>
+                <Header onCancel={ onCancel } title={ 'Import by mnemonic phrase' } />
+                <div className={'greyModal'+(!isValid && error?' error':'') + ` ${this.getCssClassName()}`}>
                     <Toast />
                     <div className='modalDesc'>
                         <FormattedMessage id='MNEMONIC_IMPORT.DESC' />
@@ -245,6 +242,19 @@ class MnemonicImport extends React.Component {
                 </div>
             </div>
         );
+    }
+
+    getCssClassName() {
+        const { layoutMode, securityMode } = this.props;
+        let className = '';
+
+        if (layoutMode === 'dark') {
+            className = 'easy-dark';
+        } else {
+            className = 'easy-light';
+        }
+
+        return className
     }
 
     render() {

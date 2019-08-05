@@ -85,6 +85,8 @@ class Controller extends React.Component {
             case RESTORATION_STAGE.IMPORT_PRIVATE_KEY:
                 return (
                     <PrivateKeyImport
+                        securityMode={securityMode}
+                        layoutMode={layoutMode}
                         name={ walletName }
                         onCancel={ () => this.changeStage(RESTORATION_STAGE.CHOOSING_TYPE) }
                     />
@@ -92,6 +94,8 @@ class Controller extends React.Component {
             case RESTORATION_STAGE.IMPORT_MNEMONIC:
                 return (
                     <MnemonicImport
+                        securityMode={securityMode}
+                        layoutMode={layoutMode}
                         name={ walletName }
                         onCancel={ () => this.changeStage(RESTORATION_STAGE.CHOOSING_TYPE) }
                     />
