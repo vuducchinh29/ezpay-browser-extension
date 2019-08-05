@@ -42,8 +42,21 @@ class Controller extends React.Component {
         });
     }
 
+    getCssClassName() {
+        const { layoutMode, securityMode } = this.props;
+        let className = '';
+
+        if (layoutMode === 'dark') {
+            className = 'easy-dark';
+        } else {
+            className = 'easy-light';
+        }
+
+        return className
+    }
+
     render() {
-        const { onCancel } = this.props;
+        const { onCancel, securityMode, layoutMode } = this.props;
         const {
             stage,
             walletName
@@ -51,9 +64,10 @@ class Controller extends React.Component {
         switch(stage) {
             case RESTORATION_STAGE.SETTING_NAME:
                 return (
-                    <div className='container'>
+                    <div className={`container ${this.getCssClassName()}`}>
                         <Header onCancel={onCancel}/>
                         <AccountName
+                            cssMode={this.getCssClassName()}
                             onSubmit={ this.handleNameSubmit.bind(this) }
                             onCancel={ () => PopupAPI.resetState() }
                         />
@@ -62,6 +76,8 @@ class Controller extends React.Component {
             case RESTORATION_STAGE.CHOOSING_TYPE:
                 return (
                     <ChoosingType
+                        securityMode={securityMode}
+                        layoutMode={layoutMode}
                         onSubmit={ importType => this.changeStage(importType) }
                         onCancel={ () => this.changeStage(RESTORATION_STAGE.SETTING_NAME) }
                     />

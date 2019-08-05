@@ -1,4 +1,5 @@
 import React from 'react';
+import Header from '../../../Layout/Header';
 
 import { FormattedMessage } from 'react-intl';
 
@@ -12,12 +13,22 @@ const ChoosingType = props => {
         onCancel
     } = props;
 
+    const getCssClassName = () => {
+        const { layoutMode, securityMode } = props;
+        let className = '';
+
+        if (layoutMode === 'dark') {
+            className = 'easy-dark';
+        } else {
+            className = 'easy-light';
+        }
+
+        return className
+    };
+
     return (
-        <div className='insetContainer choosingType'>
-            <div className='pageHeader'>
-                <div className='back' onClick={ onCancel }></div>
-                <FormattedMessage id="CHOOSING_TYPE.TITLE" />
-            </div>
+        <div className={`insetContainer choosingType ${getCssClassName()}`}>
+            <Header onCancel={ onCancel } title={ 'Choosing type' } />
             <div className='greyModal'>
                 <div className='option' onClick={ () => onSubmit(RESTORATION_STAGE.IMPORT_MNEMONIC) }>
                     <FormattedMessage id='CHOOSING_TYPE.MNEMONIC.TITLE' />
