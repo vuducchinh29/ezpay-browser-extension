@@ -39,25 +39,12 @@ class Controller extends React.Component {
         return total
     }
 
-    getCssClassName() {
-        const { layoutMode, securityMode } = this.props;
-        let className = '';
-
-        if (layoutMode === 'dark') {
-            className = 'easy-dark';
-        } else {
-            className = 'easy-light';
-        }
-
-        return className
-    }
-
     render() {
-        const { accounts, tokens } = this.props;
+        const { accounts, tokens, modeCssName } = this.props;
 
         return (
-            <div className={`container ${this.getCssClassName()}`}>
-                <Header showAction={true} />
+            <div className={`container ${modeCssName}`}>
+                <Header showAction={true} modeCssName={modeCssName} />
                 <div className="tokens scroll">
                     {
                         Object.entries(tokens).map(([ tokenId, token ]) => {
@@ -66,7 +53,7 @@ class Controller extends React.Component {
                             }
 
                             return (
-                                <div onClick={ this.detailToken.bind(this, tokenId) } className={`item ${this.getCssClassName()}-item`}>
+                                <div onClick={ this.detailToken.bind(this, tokenId) } className={`item ${modeCssName}-item`}>
                                     <img src={token.logo} />
                                     <div className='content'>
                                         <div className={'title'}>{token.name}</div>
@@ -76,7 +63,7 @@ class Controller extends React.Component {
                             )
                         })
                     }
-                    <div onClick={ () => PopupAPI.changeState(APP_STATE.CREATING_TOKEN) } className={`item-create-token ${this.getCssClassName()}-item`}>
+                    <div onClick={ () => PopupAPI.changeState(APP_STATE.CREATING_TOKEN) } className={`item-create-token ${modeCssName}-item`}>
                         <img src={'../src/assets/images/create-token.png'} />
                         <div className='content'>
                             <div className={'title-add-token'}>Add token</div>

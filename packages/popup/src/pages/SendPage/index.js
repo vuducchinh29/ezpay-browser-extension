@@ -82,21 +82,8 @@ class Controller extends React.Component {
         });
     }
 
-    getCssClassName() {
-        const { layoutMode, securityMode } = this.props;
-        let className = '';
-
-        if (layoutMode === 'dark') {
-            className = 'easy-dark';
-        } else {
-            className = 'easy-light';
-        }
-
-        return className
-    }
-
     render() {
-        const { onCancel, account } = this.props;
+        const { onCancel, account, modeCssName } = this.props;
         const {
             recipient,
             amount,
@@ -106,10 +93,10 @@ class Controller extends React.Component {
         } = this.state;
 
         return (
-            <div className={`container ${this.getCssClassName()}`}>
-                <Header onCancel={ onCancel } title={ account.name } />
+            <div className={`container ${modeCssName}`}>
+                <Header onCancel={ onCancel } title={ account.name } modeCssName={modeCssName} />
                 <div className="send">
-                    <div className={`address ${this.getCssClassName()}-item`}>
+                    <div className={`address ${modeCssName}-item`}>
                         <div className="label">
                             <FormattedMessage id='SEND.ADDRESS' />
                         </div>
@@ -123,7 +110,7 @@ class Controller extends React.Component {
                             />
                         </div>
                     </div>
-                    <div className={`amount ${this.getCssClassName()}-item`}>
+                    <div className={`amount ${modeCssName}-item`}>
                         <div className="label">
                             <FormattedMessage id='SEND.AMOUNT' />
                         </div>
@@ -139,6 +126,7 @@ class Controller extends React.Component {
                     </div>
                     <div className="div-button">
                         <Button
+                            className={modeCssName}
                             id='ACCOUNT.SEND'
                             isLoading={ loading }
                             tabIndex={ 3 }

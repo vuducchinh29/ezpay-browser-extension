@@ -48,20 +48,8 @@ class LoginController extends React.Component {
             }));
     }
 
-    getCssClassName() {
-        const { layoutMode, securityMode } = this.props;
-        let className = '';
-
-        if (layoutMode === 'dark') {
-            className = 'easy-dark';
-        } else {
-            className = 'easy-light';
-        }
-
-        return className
-    }
-
     render() {
+        const { layoutMode, securityMode, modeCssName } = this.props;
         const {
             password,
             loading,
@@ -70,7 +58,7 @@ class LoginController extends React.Component {
 
 
         return (
-            <div className={`insetContainer logoWrap ${this.getCssClassName()}`}>
+            <div className={`insetContainer logoWrap ${modeCssName}`}>
                 <div className='pageHeader'>
                     <div className='pageHeaderLogoWrap'>
                         <div className='logo1'></div>
@@ -89,7 +77,7 @@ class LoginController extends React.Component {
                 <div className='greyModal loginModel'>
                     <Input
                         type='password'
-                        className={`hasBottomMargin ${this.getCssClassName()}-input`}
+                        className={`hasBottomMargin ${modeCssName}-input`}
                         placeholder='INPUT.PASSWORD'
                         value={ password.value }
                         isDisabled={ loading }
@@ -99,6 +87,7 @@ class LoginController extends React.Component {
                     />
                     <div className="div-button">
                         <Button
+                            className={modeCssName}
                             id='BUTTON.LOGIN'
                             isValid={ password.isValid }
                             isLoading={ loading }

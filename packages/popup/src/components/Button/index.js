@@ -12,7 +12,8 @@ const Button = props => {
         isLoading = false,
         isValid = true,
         onClick = () => {},
-        id
+        id,
+        className
     } = props;
 
     const classes = [
@@ -28,7 +29,7 @@ const Button = props => {
         classes.push('is-loading');
 
     return (
-        <button className={ classes.join(' ') } onClick={ isValid && !isLoading && onClick }>
+        <button className={ `${classes.join(' ')} ${className}-btn` } onClick={ isValid && !isLoading && onClick }>
             { isLoading ?
                 <img className='loadingIndicator' src={ LoadingIndicator } alt='Loading indicator' /> :
                 <FormattedMessage id={ id } />

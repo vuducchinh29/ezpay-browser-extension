@@ -34,6 +34,14 @@
         background-repeat: no-repeat;
         background-position: 50%;
     }
+
+    .secure-dark-back, .secure-light-back {
+        background-image: url('../../../assets/images/icon-back-white.png') !important;
+    }
+
+    .secure-dark-titleContainer, .secure-light-titleContainer {
+        color: #fff !important;
+    }
 }
 
 .titleContainer {

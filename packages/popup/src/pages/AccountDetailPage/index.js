@@ -48,33 +48,20 @@ class Controller extends React.Component {
         });
     }
 
-    getCssClassName() {
-        const { layoutMode, securityMode } = this.props;
-        let className = '';
-
-        if (layoutMode === 'dark') {
-            className = 'easy-dark';
-        } else {
-            className = 'easy-light';
-        }
-
-        return className
-    }
-
     render() {
-        const { accounts, account, onCancel, selectedToken } = this.props;
+        const { accounts, account, onCancel, selectedToken, modeCssName } = this.props;
         const { mnemonic, privateKey }  = this.state;
 
         return (
-            <div className={`container ${this.getCssClassName()}`}>
+            <div className={`container ${modeCssName}`}>
                 {
                     this.renderBackup(mnemonic, privateKey)
                 }
                 {
                     this.renderDeleteAccount()
                 }
-                <Header onCancel={ onCancel } title={ account.name } />
-                <div className={`account-detail ${this.getCssClassName()}-account-detail`}>
+                <Header onCancel={ onCancel } title={ account.name } modeCssName={modeCssName} />
+                <div className={`account-detail ${modeCssName}-account-detail`}>
                     <div className="row">
                         <div className="title">Name:</div>
                         <div className="content">{ account.name }</div>

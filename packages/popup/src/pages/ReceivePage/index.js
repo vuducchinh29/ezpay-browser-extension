@@ -25,27 +25,14 @@ class Controller extends React.Component {
 
     }
 
-    getCssClassName() {
-        const { layoutMode, securityMode } = this.props;
-        let className = '';
-
-        if (layoutMode === 'dark') {
-            className = 'easy-dark';
-        } else {
-            className = 'easy-light';
-        }
-
-        return className
-    }
-
     render() {
-        const { onCancel, account } = this.props;
+        const { onCancel, account, modeCssName } = this.props;
 
         return (
-            <div className={`insetContainer receive ${this.getCssClassName()}`}>
-                <Header onCancel={ onCancel } title={ account.name } />
+            <div className={`insetContainer receive ${modeCssName}`}>
+                <Header onCancel={ onCancel } title={ account.name } modeCssName={modeCssName} />
                 <div className={`receive`}>
-                    <div className={`greyModal ${this.getCssClassName()}`}>
+                    <div className={`greyModal`}>
                         <div className="desc">
                             <FormattedMessage id="ACCOUNT.RECEIVE.DESC" />
                         </div>

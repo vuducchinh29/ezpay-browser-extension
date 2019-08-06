@@ -58,6 +58,16 @@ html, body {
     background: #3D3D3D !important;
 }
 
+.secure-light {
+    background-image: url('../images/bg-light.png') !important;
+    background-repeat: no-repeat !important;
+    background-size:100% auto !important;
+}
+
+.secure-dark-forgot, .secure-light-forgot {
+    color: #fff !important;
+}
+
 .dropdown {
     .Dropdown-control {
         box-shadow: none !important;
@@ -1682,12 +1692,12 @@ html, body {
             background: transparent;
             padding:0;
             input,button,.customInput{
-                height: 46px;
-                line-height: 46px;
+                height: 38px;
+                line-height: 38px;
             }
             .customInput{
                 background: #F7F8FA;
-                border-radius: 10px;
+                border-radius: 5px;
             }
             .customButton.primary{
                 background: linear-gradient(90deg, #EF6245 0%, #F88138 73.09%);
@@ -1696,7 +1706,7 @@ html, body {
         }
         &.registrationModel{
             .customInput{
-                background: #fff;
+                background: #F7F8FA;
                 border-radius: 10px;
                 input{
                     text-align: left;

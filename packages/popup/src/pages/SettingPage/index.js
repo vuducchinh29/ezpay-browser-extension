@@ -61,26 +61,13 @@ class Controller extends React.Component {
         }
     }
 
-    getCssClassName() {
-        const { layoutMode, securityMode } = this.props;
-        let className = '';
-
-        if (layoutMode === 'dark') {
-            className = 'easy-dark';
-        } else {
-            className = 'easy-light';
-        }
-
-        return className
-    }
-
     render() {
-        const { accounts, tokens, onCancel, securityMode, layoutMode } = this.props;
+        const { accounts, tokens, onCancel, securityMode, layoutMode, modeCssName } = this.props;
         const { languages, securityModes, layoutModes } = this.state;
 
         return (
-            <div className={`container ${this.getCssClassName()}`}>
-                <Header onCancel={ onCancel } title={ 'Setting' } />
+            <div className={`container ${modeCssName}`}>
+                <Header onCancel={ onCancel } title={ 'Setting' } modeCssName={modeCssName} />
                 <div className="settingPage" ref="cell">
                     <div className="optionsWrap">
                        {/* <div className="option" onClick={ ()=>{this.setting(0)} }>
@@ -100,7 +87,7 @@ class Controller extends React.Component {
                                 </div>
                             </div>
                         </div>*/}
-                        <div className="option" onClick={ ()=>{this.setting(0)} }>
+                        <div className={`option ${modeCssName}-option`} onClick={ ()=>{this.setting(0)} }>
                             <div className="txt">
                                 <div className="span">
                                     <span>Layout</span>
@@ -117,7 +104,7 @@ class Controller extends React.Component {
                                 </div>
                             </div>
                         </div>
-                        <div className="option" onClick={ ()=>{this.setting(1)} }>
+                        <div className={`option ${modeCssName}-option`} onClick={ ()=>{this.setting(1)} }>
                             <div className="txt">
                                 <div className="span">
                                     <span>Security</span>
@@ -134,7 +121,7 @@ class Controller extends React.Component {
                                 </div>
                             </div>
                         </div>
-                        <div className="option" onClick={ () =>{PopupAPI.lockWallet()} }>
+                        <div className={`option ${modeCssName}-option`} onClick={ () =>{PopupAPI.lockWallet()} }>
                             <div className="txt">
                                 <FormattedMessage id="SETTING.TITLE.LOCK" />
                             </div>

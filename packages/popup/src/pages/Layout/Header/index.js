@@ -23,21 +23,24 @@ class Header extends React.Component {
         const {
             onCancel,
             title,
-            showAction
+            showAction,
+            modeCssName
         } = this.props;
 
         return (
             <div className='header'>
-                {onCancel && <div className="back" onClick={ onCancel }></div>}
-                <div className='titleContainer'>
+                {onCancel && <div className={`back ${modeCssName}-back`} onClick={ onCancel }></div>}
+                <div className={`titleContainer ${modeCssName}-titleContainer`}>
                     {title || 'ezPay'}
                 </div>
                 {showAction && <div className="actions">
                     <div className="home">
-                        <img src={'../src/assets/images/home.png'} />
+                        {(modeCssName === 'secure-light' || modeCssName === 'secure-dark') && <img src={'../src/assets/images/home-white.png'} />}
+                        {(modeCssName !== 'secure-light' && modeCssName !== 'secure-dark') && <img src={'../src/assets/images/home.png'} />}
                     </div>
                     <div onClick={ this.goToSettingPage.bind(this) } className="setting">
-                        <img src={'../src/assets/images/setting.png'} />
+                        {(modeCssName === 'secure-light' || modeCssName === 'secure-dark') && <img src={'../src/assets/images/setting-white.png'} />}
+                        {(modeCssName !== 'secure-light' && modeCssName !== 'secure-dark') && <img src={'../src/assets/images/setting.png'} />}
                     </div>
                 </div>}
             </div>

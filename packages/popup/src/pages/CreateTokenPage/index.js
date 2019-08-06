@@ -26,30 +26,17 @@ class Controller extends React.Component {
         PopupAPI.getTokens();
     }
 
-    getCssClassName() {
-        const { layoutMode, securityMode } = this.props;
-        let className = '';
-
-        if (layoutMode === 'dark') {
-            className = 'easy-dark';
-        } else {
-            className = 'easy-light';
-        }
-
-        return className
-    }
-
     render() {
-        const { accounts, tokens, onCancel } = this.props;
+        const { accounts, tokens, onCancel, modeCssName } = this.props;
 
         return (
-            <div className={`container ${this.getCssClassName()}`}>
-                <Header onCancel={onCancel} title={'Add token'} />
+            <div className={`container ${modeCssName}`}>
+                <Header onCancel={onCancel} title={'Add token'} modeCssName={modeCssName} />
                 <div className="tokens-select scroll">
                     {
                         Object.entries(tokens).map(([ tokenId, token ]) => {
                             return (
-                                <div onClick={ this.toggleSelectToken.bind(this, tokenId) } className={`item ${this.getCssClassName()}-item`}>
+                                <div onClick={ this.toggleSelectToken.bind(this, tokenId) } className={`item ${modeCssName}-item`}>
                                     <img className="img-logo" src={token.logo} />
                                     <div className='content'>
                                         <div className={'title'}>{token.name} ({token.symbol}) {

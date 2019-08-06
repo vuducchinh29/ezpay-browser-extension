@@ -95,19 +95,6 @@ class RegistrationController extends React.Component {
             }));
     }
 
-    getCssClassName() {
-        const { layoutMode, securityMode } = this.props;
-        let className = '';
-
-        if (layoutMode === 'dark') {
-            className = 'easy-dark';
-        } else {
-            className = 'easy-light';
-        }
-
-        return className
-    }
-
     render() {
         const {
             password,
@@ -116,13 +103,14 @@ class RegistrationController extends React.Component {
             error,
             languages
         } = this.state;
-        const { language } = this.props;
+        const { language, modeCssName } = this.props;
         const arePasswordsValid =
             password.isValid === VALIDATION_STATE.VALID &&
             repeatPassword.isValid === VALIDATION_STATE.VALID;
         const fliterLanguage = languages.filter(v=>v.key===language)[0];
+
         return (
-            <div className={`insetContainer logoWrap ${this.getCssClassName()}`}>
+            <div className={`insetContainer logoWrap ${modeCssName}`}>
                 <div className="setLanguage">
                     {/*<div className={"language "+fliterLanguage.key}>
                         {
@@ -147,10 +135,11 @@ class RegistrationController extends React.Component {
                         <FormattedMessage className='modalBody' id={ error } />
                     </div>
                 ) : '' }
-                <div className={`greyModal registrationModel ${this.getCssClassName()}`}>
+                <div className={`greyModal registrationModel`}>
                     <div className='inputGroup'>
                         <Input
                             type='password'
+                            className={`${modeCssName}-input`}
                             placeholder='INPUT.PASSWORD'
                             status={ password.isValid }
                             value={ password.value }
@@ -171,6 +160,7 @@ class RegistrationController extends React.Component {
                     <div className='inputGroup'>
                         <Input
                             type='password'
+                            className={`${modeCssName}-input`}
                             placeholder='INPUT.REPEAT_PASSWORD'
                             status={ repeatPassword.isValid }
                             value={ repeatPassword.value }
@@ -190,6 +180,7 @@ class RegistrationController extends React.Component {
                     </div>
                     <div className="div-button">
                         <Button
+                            className={modeCssName}
                             id='BUTTON.CONTINUE'
                             isValid={ arePasswordsValid }
                             isLoading={ loading }
@@ -197,7 +188,7 @@ class RegistrationController extends React.Component {
                             tabIndex={ 3 }
                         />
                     </div>
-                    <div className="passwordNotForgot">
+                    <div className={`passwordNotForgot ${modeCssName}-forgot`}>
                         <FormattedMessage id='PASSWORD_TIP.NOT_FORGOT' />
                     </div>
                 </div>

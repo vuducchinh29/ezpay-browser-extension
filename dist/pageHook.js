@@ -67733,10 +67733,10 @@ var pageHook = {
     this._bindEvents();
 
     this.request('init').then(function (_ref) {
-      var address = _ref.address,
-          node = _ref.node;
-      if (address) _this.setAddress(address);
-      if (node.fullNode) _this.setNode(node);
+      var tron = _ref.tron,
+          eth = _ref.eth;
+      if (tron.address) _this.setAddress(tron.address);
+      if (tron.node && tron.node.fullNode) _this.setNode(tron.node);
       index_logger.info('ezPay initiated');
     })["catch"](function (err) {
       index_logger.info('Failed to initialise TronWeb', err);

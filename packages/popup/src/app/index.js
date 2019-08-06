@@ -28,46 +28,67 @@ class App extends React.Component {
         en: enMessages
     }
 
+    getCssClassName() {
+        const { layoutMode, securityMode } = this.props;
+        let className = '';
+
+        if (securityMode === 'easy') {
+            if (layoutMode === 'dark') {
+                className = 'easy-dark';
+            } else {
+                className = 'easy-light';
+            }
+        } else if (securityMode === 'secure') {
+            if (layoutMode === 'dark') {
+                className = 'secure-dark';
+            } else {
+                className = 'secure-light';
+            }
+        }
+
+        return className
+    }
+
     render() {
         const { appState, language, securityMode, layoutMode } = this.props;
         let dom = null;
 
         switch(appState) {
             case APP_STATE.UNINITIALISED:
-                dom = <RegistrationPage securityMode={securityMode} layoutMode={layoutMode} language={language} />;
+                dom = <RegistrationPage modeCssName={this.getCssClassName()} securityMode={securityMode} layoutMode={layoutMode} language={language} />;
                 break;
             case APP_STATE.PASSWORD_SET:
-                dom = <LoginPage securityMode={securityMode} layoutMode={layoutMode} />;
+                dom = <LoginPage modeCssName={this.getCssClassName()} securityMode={securityMode} layoutMode={layoutMode} />;
                 break;
             case APP_STATE.READY:
-                dom = <HomePage securityMode={securityMode} layoutMode={layoutMode} />;
+                dom = <HomePage modeCssName={this.getCssClassName()} securityMode={securityMode} layoutMode={layoutMode} />;
                 break;
             case APP_STATE.CREATING_TOKEN:
-                dom = <CreateTokenPage securityMode={securityMode} layoutMode={layoutMode} onCancel={ () => PopupAPI.changeState(APP_STATE.READY) } />;
+                dom = <CreateTokenPage modeCssName={this.getCssClassName()} securityMode={securityMode} layoutMode={layoutMode} onCancel={ () => PopupAPI.changeState(APP_STATE.READY) } />;
                 break;
             case APP_STATE.ACCOUNTS:
-                dom = <AccountsPage securityMode={securityMode} layoutMode={layoutMode} onCancel={ () => PopupAPI.changeState(APP_STATE.READY) } />;
+                dom = <AccountsPage modeCssName={this.getCssClassName()} securityMode={securityMode} layoutMode={layoutMode} onCancel={ () => PopupAPI.changeState(APP_STATE.READY) } />;
                 break;
             case APP_STATE.CREATING_ACCOUNT:
-                dom = <CreateAccountPage securityMode={securityMode} layoutMode={layoutMode} onCancel={ () => PopupAPI.changeState(APP_STATE.ACCOUNTS) } />;
+                dom = <CreateAccountPage modeCssName={this.getCssClassName()} securityMode={securityMode} layoutMode={layoutMode} onCancel={ () => PopupAPI.changeState(APP_STATE.ACCOUNTS) } />;
                 break;
             case APP_STATE.RESTORING:
-                dom = <RestoreAccountPage securityMode={securityMode} layoutMode={layoutMode} onCancel={ () => PopupAPI.changeState(APP_STATE.ACCOUNTS) } />;
+                dom = <RestoreAccountPage modeCssName={this.getCssClassName()} securityMode={securityMode} layoutMode={layoutMode} onCancel={ () => PopupAPI.changeState(APP_STATE.ACCOUNTS) } />;
                 break;
             case APP_STATE.ACCOUNT_DETAIL:
-                dom = <AccountDetailPage securityMode={securityMode} layoutMode={layoutMode} onCancel={ () => PopupAPI.changeState(APP_STATE.ACCOUNTS) } />;
+                dom = <AccountDetailPage modeCssName={this.getCssClassName()} securityMode={securityMode} layoutMode={layoutMode} onCancel={ () => PopupAPI.changeState(APP_STATE.ACCOUNTS) } />;
                 break;
             case APP_STATE.RECEIVE:
-                dom = <ReceivePage securityMode={securityMode} layoutMode={layoutMode} onCancel={ () => PopupAPI.changeState(APP_STATE.ACCOUNTS) } />;
+                dom = <ReceivePage modeCssName={this.getCssClassName()} securityMode={securityMode} layoutMode={layoutMode} onCancel={ () => PopupAPI.changeState(APP_STATE.ACCOUNTS) } />;
                 break;
             case APP_STATE.SEND:
-                dom = <SendPage securityMode={securityMode} layoutMode={layoutMode} onCancel={ () => PopupAPI.changeState(APP_STATE.ACCOUNTS) } />;
+                dom = <SendPage modeCssName={this.getCssClassName()} securityMode={securityMode} layoutMode={layoutMode} onCancel={ () => PopupAPI.changeState(APP_STATE.ACCOUNTS) } />;
                 break;
             case APP_STATE.REQUESTING_CONFIRMATION:
-                dom = <ConfirmationPage securityMode={securityMode} layoutMode={layoutMode} />;
+                dom = <ConfirmationPage modeCssName={this.getCssClassName()} securityMode={securityMode} layoutMode={layoutMode} />;
                 break;
             case APP_STATE.SETTING:
-                dom = <SettingPage securityMode={securityMode} layoutMode={layoutMode} onCancel={ () => PopupAPI.changeState(APP_STATE.READY) } />;
+                dom = <SettingPage modeCssName={this.getCssClassName()} securityMode={securityMode} layoutMode={layoutMode} onCancel={ () => PopupAPI.changeState(APP_STATE.READY) } />;
                 break;
             default:
                 dom = <div className='unsupportedState' onClick={ () => PopupAPI.resetState(APP_STATE.USDT_INCOME_RECORD) }>

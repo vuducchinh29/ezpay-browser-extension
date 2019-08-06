@@ -52,11 +52,11 @@ class Controller extends React.Component {
     }
 
     render() {
-        const { accounts, tokens, onCancel, selectedToken } = this.props;
+        const { accounts, tokens, onCancel, selectedToken, modeCssName } = this.props;
 
         return (
-            <div className={`container ${this.getCssClassName()}`}>
-                <Header onCancel={ onCancel } title={ selectedToken.name } />
+            <div className={`container ${modeCssName}`}>
+                <Header onCancel={ onCancel } title={ selectedToken.name } modeCssName={modeCssName} />
                 <div className="accounts scroll">
                     {
                         Object.entries(accounts).map(([ id, account ]) => {
@@ -64,21 +64,21 @@ class Controller extends React.Component {
                                 return null
                             }
                             return (
-                                <div className={`item ${this.getCssClassName()}-item`}>
+                                <div className={`item ${modeCssName}-item`}>
                                     <div className='content'>
                                         <div onClick={ this.goToDetail.bind(this, id) } className={'title'}>{account.name}</div>
                                         <div onClick={ this.goToDetail.bind(this, id) } className='desc'>{new BigNumber(account.balance).shiftedBy(-`${account.decimal}`).toString() || 0} {account.symbol}</div>
                                     </div>
                                     <div className="action">
-                                        <button onClick={ this.goToReceive.bind(this, id) } className={`button ${this.getCssClassName()}-button`}>Receive <img src={'../src/assets/images/receive.png'} /></button>
-                                        <button className={`button ${this.getCssClassName()}-button`}>History <img src={'../src/assets/images/history.png'} /></button>
-                                        <button onClick={ this.goToSend.bind(this, id) } className={`button ${this.getCssClassName()}-button`}>Send <img src={'../src/assets/images/send.png'} /></button>
+                                        <button onClick={ this.goToReceive.bind(this, id) } className={`button ${modeCssName}-button`}>Receive <img src={'../src/assets/images/receive.png'} /></button>
+                                        <button className={`button ${modeCssName}-button`}>History <img src={'../src/assets/images/history.png'} /></button>
+                                        <button onClick={ this.goToSend.bind(this, id) } className={`button ${modeCssName}-button`}>Send <img src={'../src/assets/images/send.png'} /></button>
                                     </div>
                                 </div>
                             )
                         })
                     }
-                    <div className={`item-create ${this.getCssClassName()}-item`}>
+                    <div className={`item-create ${modeCssName}-item`}>
                         <div onClick={ () => PopupAPI.changeState(APP_STATE.CREATING_ACCOUNT) } className="create-account">
                             <img src={'../src/assets/images/create-account.png'} />
                             <div className='content'>

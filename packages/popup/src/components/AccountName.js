@@ -108,6 +108,7 @@ class AccountName extends React.Component {
                     <div className="div-button">
                         <Button
                             id='BUTTON.CREATE'
+                            className={cssMode}
                             isValid={ isNameValid }
                             onClick={ () => isNameValid && onSubmit(name) }
                             tabIndex={ 2 }
