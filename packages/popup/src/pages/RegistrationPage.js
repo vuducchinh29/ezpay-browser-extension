@@ -95,6 +95,19 @@ class RegistrationController extends React.Component {
             }));
     }
 
+    getCssClassName() {
+        const { layoutMode, securityMode } = this.props;
+        let className = '';
+
+        if (layoutMode === 'dark') {
+            className = 'easy-dark';
+        } else {
+            className = 'easy-light';
+        }
+
+        return className
+    }
+
     render() {
         const {
             password,
@@ -109,7 +122,7 @@ class RegistrationController extends React.Component {
             repeatPassword.isValid === VALIDATION_STATE.VALID;
         const fliterLanguage = languages.filter(v=>v.key===language)[0];
         return (
-            <div className='insetContainer logoWrap'>
+            <div className={`insetContainer logoWrap ${this.getCssClassName()}`}>
                 <div className="setLanguage">
                     {/*<div className={"language "+fliterLanguage.key}>
                         {
@@ -134,7 +147,7 @@ class RegistrationController extends React.Component {
                         <FormattedMessage className='modalBody' id={ error } />
                     </div>
                 ) : '' }
-                <div className='greyModal registrationModel'>
+                <div className={`greyModal registrationModel ${this.getCssClassName()}`}>
                     <div className='inputGroup'>
                         <Input
                             type='password'

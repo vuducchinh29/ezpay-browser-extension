@@ -26,8 +26,15 @@ export const ACCOUNT_TYPE = {
 };
 
 export const SECURITY_MODE = {
-    EASY: 'EASY',
-    SECURE: 'SECURE'
+    EASY: 'easy',
+    SECURE: 'secure'
+};
+
+export const PASSWORD_EASY_MODE = '123456';
+
+export const LAYOUT_MODE = {
+    LIGHT: 'light',
+    DARK: 'dark'
 }
 
 export const CHAIN_TYPE = {

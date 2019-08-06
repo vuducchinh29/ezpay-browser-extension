@@ -16,7 +16,10 @@ import {
     APP_STATE,
     ACCOUNT_TYPE,
     CHAIN_TYPE,
-    CONTRACT_ADDRESS
+    CONTRACT_ADDRESS,
+    SECURITY_MODE,
+    LAYOUT_MODE,
+    PASSWORD_EASY_MODE
 } from '@ezpay/lib/constants';
 
 const logger = new Logger('WalletService');
@@ -50,8 +53,19 @@ class Wallet extends EventEmitter {
     async _start() {
         await this._checkStorage();
         await this._saveTokens();
-        this._loadData();
-        this._loadAccounts();
+        await this._loadData();
+        await this._loadAccounts();
+
+        const securityMode = await StorageService.getSecurityMode()
+        if (securityMode === SECURITY_MODE.EASY) {
+            if(this.state === APP_STATE.UNINITIALISED) {
+                await this.setPassword(PASSWORD_EASY_MODE)
+            }
+
+            if (this.state === APP_STATE.PASSWORD_SET) {
+                this.unlockWallet(PASSWORD_EASY_MODE)
+            }
+        }
     }
 
     async unlockWallet(password) {

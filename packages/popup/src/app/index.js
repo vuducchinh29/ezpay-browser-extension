@@ -34,7 +34,7 @@ class App extends React.Component {
 
         switch(appState) {
             case APP_STATE.UNINITIALISED:
-                dom = <RegistrationPage language={language} />;
+                dom = <RegistrationPage securityMode={securityMode} layoutMode={layoutMode} language={language} />;
                 break;
             case APP_STATE.PASSWORD_SET:
                 dom = <LoginPage securityMode={securityMode} layoutMode={layoutMode} />;
