@@ -268,6 +268,12 @@ class Wallet extends EventEmitter {
     setSecurityMode(mode) {
         StorageService.setSecurityMode(mode);
         this.emit('setSecurityMode', mode);
+
+        if (mode === SECURITY_MODE.SECURE) {
+            this._setState(APP_STATE.UNINITIALISED)
+        } else if (mode === SECURITY_MODE.EASY) {
+            this.setPassword(PASSWORD_EASY_MODE)
+        }
     }
 
     async getSecurityMode() {
@@ -325,8 +331,8 @@ class Wallet extends EventEmitter {
     }
 
     setPassword(password) {
-        if(this.state !== APP_STATE.UNINITIALISED)
-            return Promise.reject('ERRORS.ALREADY_INITIALISED');
+        // if(this.state !== APP_STATE.UNINITIALISED)
+        //     return Promise.reject('ERRORS.ALREADY_INITIALISED');
 
         StorageService.authenticate(password);
         StorageService.save();

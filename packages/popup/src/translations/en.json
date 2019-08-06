@@ -12,7 +12,7 @@
     "ERRORS.SEND": "Error Occurred",
 
     "BUTTON.UNKNOWN": "Unknown button type",
-    "BUTTON.CONTINUE": "Register",
+    "BUTTON.CONTINUE": "Continue",
     "BUTTON.LOGIN": "Login",
     "BUTTON.CREATE_WALLET": "Create Account",
     "BUTTON.CANCEL": "Cancel",
