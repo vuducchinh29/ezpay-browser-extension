@@ -38,7 +38,9 @@ const Input = props => {
         onChange = () => {},
         onEnter = () => {},
         validator = false,
-        intl
+        intl,
+        noMargin = false,
+        colorText
     } = props;
 
     let {
@@ -69,8 +71,14 @@ const Input = props => {
         onChange(value);
     };
 
+    let cssNoMargin = '';
+
+    if (noMargin) {
+        cssNoMargin = 'noMargin'
+    }
+
     return (
-        <div className={ `customInput ${ className }` }>
+        <div className={ `customInput ${ className } ${cssNoMargin}` }>
             { icon ? <FontAwesomeIcon icon={ icon } className='inputIcon' /> : '' }
             <input
                 className={ inputClasses.join(' ') }
@@ -80,6 +88,7 @@ const Input = props => {
                 onChange={ ({ target: { value } }) => handleChange(value) }
                 onKeyPress={ event => !isDisabled && onKeyPress(event, onEnter) }
                 readOnly={ isDisabled }
+                style={{color: colorText}}
             />
             { status ? renderStatus(status) : '' }
         </div>

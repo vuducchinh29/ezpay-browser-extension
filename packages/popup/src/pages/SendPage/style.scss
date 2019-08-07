@@ -5,7 +5,7 @@
         margin: 0 auto;
         background: #fff;
         border-radius: 10px;
-        padding: 20px 10px;
+        padding: 20px 15px;
 
         .label {
             color: #EF6245;
@@ -17,10 +17,50 @@
         margin: 20px auto;
         background: #fff;
         border-radius: 10px;
-        padding: 20px 10px;
+        padding: 20px 15px;
+        box-shadow: 0px 2px 7px rgba(0, 0, 0, 0.05);
 
         .label {
             color: #EF6245;
+        }
+
+        .text-fee {
+            margin-top: 30px;
+            color: #979797;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .fee {
+            margin-top: 15px;
+            display: flex;
+
+            button {
+                border-radius: 20px;
+                display: flex;
+                flex-direction: column;
+                padding: 5px 16px;
+                border: none;
+                font-size: 10px;
+                margin: 0 3px;
+                cursor: pointer;
+                background: #E8E8E8;
+                color: #787878;
+            }
+            .slow {
+                background: #E8E8E8;
+                color: #787878;
+            }
+
+            .selected {
+                background: #F5D7D7;
+                color: #EF6245;
+            }
+
+            .fast {
+                background: #E8E8E8;
+                color: #787878;
+            }
         }
     }
 

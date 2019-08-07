@@ -28,7 +28,12 @@ class Controller extends React.Component {
         error: false,
         isLoading: false,
         gasPrice: 50,
-        gasLimit: 21000
+        gasLimit: 21000,
+        feeSlow: 0.00008,
+        feeAverage: 0.00021,
+        feeFast: 0.00042,
+        selectedFee: 'average',
+        fee: 0.00021
     };
 
     constructor() {
@@ -82,6 +87,13 @@ class Controller extends React.Component {
         });
     }
 
+    onClickFee(value, fee) {
+        this.setState({
+            selectedFee: value,
+            fee: fee
+        })
+    }
+
     render() {
         const { onCancel, account, modeCssName } = this.props;
         const {
@@ -107,6 +119,8 @@ class Controller extends React.Component {
                                 isDisabled={ isLoading }
                                 onChange={ this.onRecipientChange.bind(this) }
                                 placeholder='SEND.RECIPIENT.PLACEHOLDER'
+                                noMargin={ true }
+                                colorText={'#ef6245'}
                             />
                         </div>
                     </div>
@@ -121,8 +135,26 @@ class Controller extends React.Component {
                                 isDisabled={ isLoading }
                                 onChange={ this.onAmountChange.bind(this) }
                                 placeholder='SEND.AMOUNT.PLACEHOLDER'
+                                noMargin={ true }
                             />
                         </div>
+                        {account.symbol === 'ETH' && <span>
+                            <div className="text-fee">Transaction fee</div>
+                            <div className="fee">
+                                <button onClick={this.onClickFee.bind(this, 'slow', this.state.feeSlow)} className={this.state.selectedFee === 'slow' ? 'selected' : ''} >
+                                    <span>Slow</span>
+                                    <span>{this.state.feeSlow} {account.symbol}</span>
+                                </button>
+                                <button onClick={this.onClickFee.bind(this, 'average', this.state.feeAverage)} className={this.state.selectedFee === 'average' ? 'selected' : ''} >
+                                    <span>Average</span>
+                                    <span>{this.state.feeAverage} {account.symbol}</span>
+                                </button>
+                                <button onClick={this.onClickFee.bind(this, 'fast', this.state.feeFast)} className={this.state.selectedFee === 'fast' ? 'selected' : ''}>
+                                    <span>Fast</span>
+                                    <span>{this.state.feeFast} {account.symbol}</span>
+                                </button>
+                            </div>
+                        </span>}
                     </div>
                     <div className="div-button">
                         <Button
