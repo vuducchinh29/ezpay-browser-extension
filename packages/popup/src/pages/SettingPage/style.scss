@@ -1,19 +1,6 @@
 .settingPage {
     margin: 10px 20px;
 
-    .secure-dark-option, .secure-light-option {
-        color: #fff !important;
-        .txt {
-            .span {
-                color: #fff !important;
-
-                .unit {
-                    color: #fff !important;
-                }
-            }
-        }
-    }
-
     .option {
         display: flex;
         justify-content: space-between;

@@ -88,7 +88,7 @@ class PrivateKeyImport extends React.Component {
     }
 
     render() {
-        const { onCancel } = this.props;
+        const { onCancel, modeCssName } = this.props;
         const { formatMessage } = this.props.intl;
         const {
             privateKey,
@@ -98,10 +98,10 @@ class PrivateKeyImport extends React.Component {
         } = this.state;
 
         return (
-            <div className={`insetContainer privateKeyImport ${this.getCssClassName()}`}>
-                <Header onCancel={ onCancel } title={ 'Import by private key' } />
-                <div className={'greyModal'+(!isValid && error?' error':'') + ` ${this.getCssClassName()}`}>
-                    <div className='modalDesc hasBottomMargin'>
+            <div className={`insetContainer privateKeyImport ${modeCssName}`}>
+                <Header onCancel={ onCancel } title={ 'Import by private key' } modeCssName={modeCssName} />
+                <div className={'greyModal'+(!isValid && error?' error':'') + ` ${modeCssName}-greyModal`}>
+                    <div className={`modalDesc hasBottomMargin ${modeCssName}-text`}>
                         <FormattedMessage id='PRIVATE_KEY_IMPORT.DESC' />
                     </div>
                     <div className="inputUnit">
@@ -118,6 +118,7 @@ class PrivateKeyImport extends React.Component {
 
                     <div className='buttonRow'>
                         <Button
+                            className={modeCssName}
                             id='BUTTON.IMPORT'
                             isValid={ isValid }
                             isLoading={ loading }

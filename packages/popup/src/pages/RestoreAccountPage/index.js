@@ -42,21 +42,8 @@ class Controller extends React.Component {
         });
     }
 
-    getCssClassName() {
-        const { layoutMode, securityMode } = this.props;
-        let className = '';
-
-        if (layoutMode === 'dark') {
-            className = 'easy-dark';
-        } else {
-            className = 'easy-light';
-        }
-
-        return className
-    }
-
     render() {
-        const { onCancel, securityMode, layoutMode } = this.props;
+        const { onCancel, securityMode, layoutMode, modeCssName, selectedToken } = this.props;
         const {
             stage,
             walletName
@@ -64,10 +51,10 @@ class Controller extends React.Component {
         switch(stage) {
             case RESTORATION_STAGE.SETTING_NAME:
                 return (
-                    <div className={`container ${this.getCssClassName()}`}>
-                        <Header onCancel={onCancel}/>
+                    <div className={`container ${modeCssName}`}>
+                        <Header onCancel={onCancel} title={ selectedToken.name } modeCssName={modeCssName} />
                         <AccountName
-                            cssMode={this.getCssClassName()}
+                            cssMode={modeCssName}
                             onSubmit={ this.handleNameSubmit.bind(this) }
                             onCancel={ () => PopupAPI.resetState() }
                         />
@@ -78,6 +65,7 @@ class Controller extends React.Component {
                     <ChoosingType
                         securityMode={securityMode}
                         layoutMode={layoutMode}
+                        modeCssName={modeCssName}
                         onSubmit={ importType => this.changeStage(importType) }
                         onCancel={ () => this.changeStage(RESTORATION_STAGE.SETTING_NAME) }
                     />
@@ -87,6 +75,7 @@ class Controller extends React.Component {
                     <PrivateKeyImport
                         securityMode={securityMode}
                         layoutMode={layoutMode}
+                        modeCssName={modeCssName}
                         name={ walletName }
                         onCancel={ () => this.changeStage(RESTORATION_STAGE.CHOOSING_TYPE) }
                     />
@@ -96,6 +85,7 @@ class Controller extends React.Component {
                     <MnemonicImport
                         securityMode={securityMode}
                         layoutMode={layoutMode}
+                        modeCssName={modeCssName}
                         name={ walletName }
                         onCancel={ () => this.changeStage(RESTORATION_STAGE.CHOOSING_TYPE) }
                     />

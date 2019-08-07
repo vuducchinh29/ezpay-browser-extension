@@ -146,7 +146,7 @@ class MnemonicImport extends React.Component {
     }
 
     renderAccounts() {
-        const { onCancel } = this.props;
+        const { onCancel, modeCssName } = this.props;
 
         const {
             addresses,
@@ -157,10 +157,10 @@ class MnemonicImport extends React.Component {
         const isValid = !!selected.length;
 
         return (
-            <div className={`insetContainer mnemonicImport ${this.getCssClassName()}`}>
-                <Header onCancel={ onCancel } title={ 'Select account' } />
-                <div className={`greyModal ${this.getCssClassName()}`}>
-                    <div className='modalDesc'>
+            <div className={`insetContainer mnemonicImport ${modeCssName}`}>
+                <Header onCancel={ onCancel } title={ 'Select account' } modeCssName={modeCssName} />
+                <div className={`greyModal ${modeCssName}-greyModal`}>
+                    <div className={`modalDesc ${modeCssName}-text`}>
                         <FormattedMessage id='MNEMONIC_IMPORT.SELECTION' />
                     </div>
                     <div className='addressList'>
@@ -187,6 +187,7 @@ class MnemonicImport extends React.Component {
                     </div>
                     <div className='buttonRow'>
                         <Button
+                            className={`${modeCssName}`}
                             id='BUTTON.IMPORT'
                             isValid={ isValid }
                             onClick={ () => isValid && this.import() }
@@ -200,7 +201,7 @@ class MnemonicImport extends React.Component {
     }
 
     renderInput() {
-        const { onCancel } = this.props;
+        const { onCancel, modeCssName } = this.props;
         const { formatMessage } = this.props.intl;
         const {
             mnemonic,
@@ -211,11 +212,11 @@ class MnemonicImport extends React.Component {
         } = this.state;
 
         return (
-            <div className={`insetContainer mnemonicImport ${this.getCssClassName()}`}>
-                <Header onCancel={ onCancel } title={ 'Import by mnemonic phrase' } />
-                <div className={'greyModal'+(!isValid && error?' error':'') + ` ${this.getCssClassName()}`}>
+            <div className={`insetContainer mnemonicImport ${modeCssName}`}>
+                <Header onCancel={ onCancel } title={ 'Import by mnemonic phrase' } modeCssName={modeCssName} />
+                <div className={'greyModal'+(!isValid && error?' error':'') + ` ${modeCssName}-greyModal`}>
                     <Toast />
-                    <div className='modalDesc'>
+                    <div className={`modalDesc ${modeCssName}-text`}>
                         <FormattedMessage id='MNEMONIC_IMPORT.DESC' />
                     </div>
                     <div className='inputUnit'>
@@ -232,6 +233,7 @@ class MnemonicImport extends React.Component {
                     </div>
                     <div className='buttonRow'>
                         <Button
+                            className={`${modeCssName}`}
                             id='BUTTON.IMPORT'
                             isValid={ isValid }
                             onClick={ () => isValid && this.changeStage(IMPORT_STAGE.SELECTING_ACCOUNTS) }
@@ -242,19 +244,6 @@ class MnemonicImport extends React.Component {
                 </div>
             </div>
         );
-    }
-
-    getCssClassName() {
-        const { layoutMode, securityMode } = this.props;
-        let className = '';
-
-        if (layoutMode === 'dark') {
-            className = 'easy-dark';
-        } else {
-            className = 'easy-light';
-        }
-
-        return className
     }
 
     render() {

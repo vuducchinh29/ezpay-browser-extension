@@ -87,7 +87,7 @@ class Controller extends React.Component {
                                 </div>
                             </div>
                         </div>*/}
-                        <div className={`option ${modeCssName}-option`} onClick={ ()=>{this.setting(0)} }>
+                        <div className="option" onClick={ ()=>{this.setting(0)} }>
                             <div className="txt">
                                 <div className="span">
                                     <span>Layout</span>
@@ -104,7 +104,7 @@ class Controller extends React.Component {
                                 </div>
                             </div>
                         </div>
-                        <div className={`option ${modeCssName}-option`} onClick={ ()=>{this.setting(1)} }>
+                        <div className="option" onClick={ ()=>{this.setting(1)} }>
                             <div className="txt">
                                 <div className="span">
                                     <span>Security</span>
@@ -121,7 +121,7 @@ class Controller extends React.Component {
                                 </div>
                             </div>
                         </div>
-                        <div className={`option ${modeCssName}-option`} onClick={ () =>{PopupAPI.lockWallet()} }>
+                        <div className="option" onClick={ () =>{PopupAPI.lockWallet()} }>
                             <div className="txt">
                                 <FormattedMessage id="SETTING.TITLE.LOCK" />
                             </div>

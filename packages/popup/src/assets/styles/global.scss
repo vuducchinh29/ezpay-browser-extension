@@ -50,11 +50,11 @@ html, body {
     background: #4A4A4A !important;
 }
 
-.easy-dark-button {
+.easy-dark-button, .secure-dark-button {
     background: #3D3D3D !important;
 }
 
-.easy-dark-item {
+.easy-dark-item, .secure-dark-item {
     background: #3D3D3D !important;
 }
 
@@ -64,8 +64,45 @@ html, body {
     background-size:100% auto !important;
 }
 
+.secure-dark {
+    background-image: url('../images/bg-dark.png') !important;
+    background-repeat: no-repeat !important;
+    background-size:100% auto !important;
+}
+
+.secure-light-text {
+    color: #fff !important;
+}
+
 .secure-dark-forgot, .secure-light-forgot {
     color: #fff !important;
+}
+
+.secure-dark-greyModal, .secure-light-greyModal {
+    background-color: transparent !important;
+
+    .option {
+        color: #fff !important;
+    }
+}
+
+.secure-dark, .secure-light {
+    .option {
+        color: #fff !important;
+        .txt {
+            .span {
+                color: #fff !important;
+
+                .unit {
+                    color: #fff !important;
+                }
+            }
+        }
+    }
+}
+
+.easy-dark-greyModal {
+    background-color: transparent !important;
 }
 
 .dropdown {
@@ -1427,7 +1464,7 @@ html, body {
                     }
                     .tipError{
                         font-size: 13px;
-                        color: #DB705C;
+                        color: #ff2800;
                         min-height: 18px;
                         line-height: 18px;
                         margin-top:5px;
@@ -1441,7 +1478,7 @@ html, body {
                     }
                     .tipError{
                         font-size: 13px;
-                        color: #DB705C;
+                        color: #ff2800;
                         min-height: 18px;
                         line-height: 18px;
                         margin-top:5px;
@@ -1707,7 +1744,7 @@ html, body {
         &.registrationModel{
             .customInput{
                 background: #F7F8FA;
-                border-radius: 10px;
+                border-radius: 5px;
                 input{
                     text-align: left;
                 }
