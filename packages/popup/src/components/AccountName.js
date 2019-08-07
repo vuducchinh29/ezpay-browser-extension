@@ -112,6 +112,7 @@ class AccountName extends React.Component {
                             isValid={ isNameValid }
                             onClick={ () => isNameValid && onSubmit(name) }
                             tabIndex={ 2 }
+                            showArrow={ true }
                         />
                     </div>
                 </div>

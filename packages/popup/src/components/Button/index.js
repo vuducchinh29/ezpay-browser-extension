@@ -1,5 +1,7 @@
 import React from 'react';
 import LoadingIndicator from 'assets/images/loader.svg';
+import arrowIcon from 'assets/images/arrow.png';
+import arrowRedIcon from 'assets/images/arrow-red.png';
 
 import { BUTTON_TYPE } from '@ezpay/lib/constants';
 import { FormattedMessage } from 'react-intl';
@@ -13,7 +15,8 @@ const Button = props => {
         isValid = true,
         onClick = () => {},
         id,
-        className
+        className,
+        showArrow = false
     } = props;
 
     const classes = [
@@ -28,11 +31,25 @@ const Button = props => {
     if(isLoading)
         classes.push('is-loading');
 
+    let hashArrow = '';
+
+    if (showArrow) {
+        hashArrow = 'hashArrow'
+    }
+
+    let icon = arrowIcon;
+    if (className === 'secure-light') {
+        icon = arrowRedIcon;
+    }
+
     return (
-        <button className={ `${classes.join(' ')} ${className}-btn` } onClick={ isValid && !isLoading && onClick }>
+        <button className={ `${classes.join(' ')} ${className}-btn ${hashArrow}` } onClick={ isValid && !isLoading && onClick }>
             { isLoading ?
                 <img className='loadingIndicator' src={ LoadingIndicator } alt='Loading indicator' /> :
                 <FormattedMessage id={ id } />
+            }
+            { (showArrow && !isLoading) &&
+                <img className='arrow-icon' src={ icon } />
             }
         </button>
     );

@@ -93,6 +93,7 @@ class LoginController extends React.Component {
                             isLoading={ loading }
                             onClick={ this.onButtonClick }
                             tabIndex={ 2 }
+                            showArrow={ true }
                         />
                     </div>
                 </div>

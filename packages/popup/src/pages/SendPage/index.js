@@ -131,6 +131,7 @@ class Controller extends React.Component {
                             isLoading={ loading }
                             tabIndex={ 3 }
                             onClick={ () => this.onSend() }
+                            showArrow={ true }
                         />
                     </div>
                 </div>

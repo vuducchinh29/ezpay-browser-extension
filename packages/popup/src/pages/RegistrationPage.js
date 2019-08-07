@@ -186,6 +186,7 @@ class RegistrationController extends React.Component {
                             isLoading={ loading }
                             onClick={ this.onButtonClick.bind(this) }
                             tabIndex={ 3 }
+                            showArrow={ true }
                         />
                     </div>
                     <div className={`passwordNotForgot ${modeCssName}-forgot`}>
