@@ -41,6 +41,8 @@ class Wallet extends EventEmitter {
         this.popup = false;
         this.contractWhitelist = {};
         this.confirmations = [];
+        this.tronAccoutDapp = false;
+        this.ethereumAccoutDapp = false;
 
         this.currentNodeWeb3 = false;
         this.currentAccountWeb3 = false;
@@ -63,8 +65,10 @@ class Wallet extends EventEmitter {
             }
 
             if (this.state === APP_STATE.PASSWORD_SET) {
-                this.unlockWallet(PASSWORD_EASY_MODE)
+                await this.unlockWallet(PASSWORD_EASY_MODE)
             }
+
+            this._setCurrentDappConfig()
         }
     }
 
@@ -142,6 +146,14 @@ class Wallet extends EventEmitter {
         this.currentAccountWeb3 = '0x4a9ee9b4B3A4E62511ED85324f5D01B721268A06';
         this.currentNodeTronWeb = 'https://api.shasta.trongrid.io';
         this.currentAccountTronWeb = 'TYgbx22LXpA92Hd4aiyRPKc8gmcJTsmAYW';
+
+        if (this.tronAccoutDapp) {
+            this.setTronDappSetting(this.tronAccoutDapp);
+        }
+
+        if (this.ethereumAccoutDapp) {
+            this.setEthereumDappSetting(this.ethereumAccoutDapp);
+        }
     }
 
     startPolling() {
@@ -224,6 +236,10 @@ class Wallet extends EventEmitter {
 
                 accountObj.loadCache();
                 accountObj.update();
+
+                if (node.type === CHAIN_TYPE.TRON && !this.tronAccoutDapp) {
+                    this.tronAccoutDapp = account.id;
+                }
             } else if (node.type === CHAIN_TYPE.NTY || node.type === CHAIN_TYPE.ETH || node.type === CHAIN_TYPE.ETH_RINKEBY) {
                 accountObj = new EthereumAccount(
                     account.id,
@@ -240,6 +256,10 @@ class Wallet extends EventEmitter {
 
                 accountObj.loadCache();
                 accountObj.update();
+
+                if (node.type === CHAIN_TYPE.ETH && !this.ethereumAccoutDapp) {
+                    this.ethereumAccoutDapp = account.id;
+                }
             } else if (node.type === CHAIN_TYPE.BTC) {
                 accountObj = new BitcoinAccount(
                     account.id,
@@ -547,6 +567,7 @@ class Wallet extends EventEmitter {
             token.id = account.token
 
             accounts[ id ] = {
+                id: id,
                 address: account.address,
                 name: account.name,
                 logo: account.logo,
@@ -595,7 +616,8 @@ class Wallet extends EventEmitter {
             APP_STATE.DAPP_WHITELIST,
             APP_STATE.ACCOUNTS,
             APP_STATE.CREATING_ACCOUNT,
-            APP_STATE.ACCOUNT_DETAIL
+            APP_STATE.ACCOUNT_DETAIL,
+            APP_STATE.ACCOUNTS_DAPP
         ];
         if(!stateAry.includes(appState))
             return logger.error(`Attempted to change app state to ${ appState }. Only 'restoring' and 'creating' is permitted`);
@@ -629,6 +651,36 @@ class Wallet extends EventEmitter {
         // NodeService.setAddress();
         this.selectedAccount = id;
         this.emit('setAccount', id);
+    }
+
+    getTronDappSetting() {
+        return StorageService.tronDappSetting;
+    }
+
+    getEthereumDappSetting() {
+        return StorageService.ethereumDappSetting;
+    }
+
+    async setTronDappSetting(id) {
+        const account = this.accounts[ id ];
+
+        if (!account) {
+            return
+        }
+
+        await StorageService.setTronDappSetting(account.id);
+        this.emit('setTronDappSetting', StorageService.tronDappSetting);
+    }
+
+    async setEthereumDappSetting(id) {
+        const account = this.accounts[ id ];
+
+        if (!account) {
+            return
+        }
+
+        await StorageService.setEthereumDappSetting(account.id);
+        this.emit('setEthereumDappSetting', StorageService.ethereumDappSetting);
     }
 
     getAccountDetails(id) {

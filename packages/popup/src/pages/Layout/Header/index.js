@@ -19,6 +19,10 @@ class Header extends React.Component {
         PopupAPI.changeState(APP_STATE.SETTING)
     }
 
+    goToAccountsDapp() {
+        PopupAPI.changeState(APP_STATE.ACCOUNTS_DAPP)
+    }
+
     render() {
         const {
             onCancel,
@@ -34,7 +38,7 @@ class Header extends React.Component {
                     {title || 'ezPay'}
                 </div>
                 {showAction && <div className="actions">
-                    <div className="home">
+                    <div className="home" onClick={ this.goToAccountsDapp.bind(this) }>
                         {(modeCssName === 'secure-light' || modeCssName === 'secure-dark') && <img src={'../src/assets/images/home-white.png'} />}
                         {(modeCssName !== 'secure-light' && modeCssName !== 'secure-dark') && <img src={'../src/assets/images/home.png'} />}
                     </div>

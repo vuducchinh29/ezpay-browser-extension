@@ -1,0 +1,84 @@
+.accounts-dapp {
+    flex: 1 1;
+    padding: 10px 10px 10px 14px;
+
+    .easy-dark-item {
+        background: #3D3D3D !important;
+    }
+
+    .item:hover {
+        .action {
+            display: flex;
+        }
+    }
+
+    .type-header {
+        font-size: 16px;
+        line-height: 25px;
+        color: #979797;
+        font-weight: bold;
+        margin: 10px 0px;
+
+        .sub-text {
+            font-weight: normal;
+            font-size: 12px;
+        }
+    }
+
+    .item {
+        cursor: pointer;
+        width: 100%;
+        padding-left: 15px;
+        padding-right: 15px;
+        background-color: #fff;
+        border-radius: 10px;
+        margin-top: 8px;
+        transition: all .2s ease-in-out;
+        box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.15);
+
+        img {
+            height: 12px;
+        }
+
+        .content {
+            padding: 15px 0px;
+            margin-left: 8px;
+            flex: 1 1;
+            display: flex;
+            flex-direction: row;
+            overflow: hidden;
+            justify-content: space-between;
+
+            .title.isHot {
+                justify-content: flex-start;
+            }
+
+            .title {
+                flex-direction: row;
+                align-items: center;
+                font-size: 16px;
+                color: #787878;
+                font-weight: bold;
+
+                .chain-name {
+                    font-weight: normal;
+                    font-size: 12px;
+                }
+            }
+
+            .desc {
+                font-size: 16px;
+                color: #787878;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                text-align: right;
+                font-weight: bold;
+            }
+        }
+    }
+
+    .item:first-child {
+        margin-top: 0;
+    }
+}

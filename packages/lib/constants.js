@@ -18,6 +18,7 @@ export const APP_STATE = {
     ACCOUNTS: 12,
     CREATING_ACCOUNT: 13,
     ACCOUNT_DETAIL: 14,
+    ACCOUNTS_DAPP: 15
 };
 
 export const ACCOUNT_TYPE = {

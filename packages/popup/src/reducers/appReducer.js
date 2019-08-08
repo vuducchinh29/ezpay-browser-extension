@@ -22,6 +22,8 @@ export const setVersion = createAction('setVersion');
 export const setDappList = createAction('setDappList');
 export const setToken = createAction('setToken');
 export const setAuthorizeDapps = createAction('setAuthorizeDapps');
+export const setEthereumDappSetting = createAction('setEthereumDappSetting');
+export const setTronDappSetting = createAction('setTronDappSetting');
 
 export const appReducer = createReducer({
     appState: APP_STATE.UNINITIALISED,
@@ -46,7 +48,9 @@ export const appReducer = createReducer({
         recommend:[],
         used:[]
     },
-    authorizeDapps: {}
+    authorizeDapps: {},
+    ethereumDappSetting: false,
+    tronDappSetting: false
 
 }, {
     [ setAppState ]: (state, { payload }) => {
@@ -92,5 +96,11 @@ export const appReducer = createReducer({
 
     [ setAuthorizeDapps ]: (state, { payload }) => {
         state.authorizeDapps = payload;
+    },
+    [ setTronDappSetting ]: (state, { payload }) => {
+        state.tronDappSetting = payload;
+    },
+    [ setEthereumDappSetting ]: (state, { payload }) => {
+        state.ethereumDappSetting = payload;
     }
 });

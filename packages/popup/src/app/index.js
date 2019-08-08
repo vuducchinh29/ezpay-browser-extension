@@ -16,6 +16,7 @@ import ReceivePage from '@ezpay/popup/src/pages/ReceivePage';
 import SendPage from '@ezpay/popup/src/pages/SendPage';
 import ConfirmationPage from '@ezpay/popup/src/pages/ConfirmationPage';
 import SettingPage from '@ezpay/popup/src/pages/SettingPage';
+import AccountsDappPage from '@ezpay/popup/src/pages/AccountsDappPage';
 
 import 'antd-mobile/dist/antd-mobile.css';
 import 'react-custom-scroll/dist/customScroll.css';
@@ -89,6 +90,9 @@ class App extends React.Component {
                 break;
             case APP_STATE.SETTING:
                 dom = <SettingPage modeCssName={this.getCssClassName()} securityMode={securityMode} layoutMode={layoutMode} onCancel={ () => PopupAPI.changeState(APP_STATE.READY) } />;
+                break;
+            case APP_STATE.ACCOUNTS_DAPP:
+                dom = <AccountsDappPage modeCssName={this.getCssClassName()} securityMode={securityMode} layoutMode={layoutMode} onCancel={ () => PopupAPI.changeState(APP_STATE.READY) } />;
                 break;
             default:
                 dom = <div className='unsupportedState' onClick={ () => PopupAPI.resetState(APP_STATE.USDT_INCOME_RECORD) }>

@@ -112,6 +112,22 @@ export default {
         this.duplex.send('setLanguage', language, false);
     },
 
+    setTronDappSetting(tronDappSetting) {
+        this.duplex.send('setTronDappSetting', tronDappSetting, false);
+    },
+
+    getTronDappSetting(tronDappSetting) {
+        return this.duplex.send('getTronDappSetting', tronDappSetting);
+    },
+
+    setEthereumDappSetting(ethereumDappSetting) {
+        this.duplex.send('setEthereumDappSetting', ethereumDappSetting, false);
+    },
+
+    getEthereumDappSetting(ethereumDappSetting) {
+        return this.duplex.send('getEthereumDappSetting', ethereumDappSetting);
+    },
+
     getSecurityMode() {
         return this.duplex.send('getSecurityMode');
     },

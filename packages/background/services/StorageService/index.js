@@ -23,7 +23,9 @@ const StorageService = {
         'dappList',
         'allDapps',
         'allTokens',
-        'authorizeDapps'
+        'authorizeDapps',
+        'ethereumDappSetting',
+        'tronDappSetting'
     ],
 
     storage: extensionizer.storage.local,
@@ -79,6 +81,8 @@ const StorageService = {
     authorizeDapps: {},
     securityMode: 'easy', // secure
     layoutMode: 'light', // dark
+    ethereumDappSetting: false,
+    tronDappSetting: false,
     get needsMigrating() {
         return localStorage.hasOwnProperty('EZPAY_WALLET');
     },
@@ -292,6 +296,16 @@ const StorageService = {
         logger.info('Saving setting', setting);
         this.setting = setting;
         this.save('setting');
+    },
+
+    setEthereumDappSetting(ethereumDappSetting) {
+        this.ethereumDappSetting = ethereumDappSetting;
+        this.save('ethereumDappSetting');
+    },
+
+    setTronDappSetting(tronDappSetting) {
+        this.tronDappSetting = tronDappSetting;
+        this.save('tronDappSetting');
     },
 
     getSetting(){

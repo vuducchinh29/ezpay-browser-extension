@@ -27,7 +27,9 @@ import {
     setAuthorizeDapps,
     setToken,
     setSecurityMode,
-    setLayoutMode
+    setLayoutMode,
+    setTronDappSetting,
+    setEthereumDappSetting
 } from 'reducers/appReducer';
 
 import {
@@ -87,7 +89,9 @@ export const app = {
             selectedAccount,
             confirmations,
             securityMode,
-            layoutMode
+            layoutMode,
+            tronDappSetting,
+            ethereumDappSetting
         ] = await Promise.all([
             PopupAPI.requestState(),
             PopupAPI.getNodes(),
@@ -98,7 +102,9 @@ export const app = {
             PopupAPI.getSelectedAccount(),
             PopupAPI.getConfirmations(),
             PopupAPI.getSecurityMode(),
-            PopupAPI.getLayoutMode()
+            PopupAPI.getLayoutMode(),
+            PopupAPI.getTronDappSetting(),
+            PopupAPI.getEthereumDappSetting()
         ]);
         const lang = navigator.language || navigator.browserLanguage;
         if ( lang.indexOf('zh') > -1 ) {
@@ -118,7 +124,9 @@ export const app = {
         this.store.dispatch(setConfirmations(confirmations));
         this.store.dispatch(setSecurityMode(securityMode));
         this.store.dispatch(setLayoutMode(layoutMode));
-        // this.store.dispatch(setSetting(setting));
+        this.store.dispatch(setTronDappSetting(tronDappSetting));
+        this.store.dispatch(setEthereumDappSetting(ethereumDappSetting));
+
         if(selectedAccount)
             this.store.dispatch(setAccount(selectedAccount));
 
@@ -166,6 +174,14 @@ export const app = {
 
         this.duplex.on('setConfirmations', confirmations => this.store.dispatch(
             setConfirmations(confirmations)
+        ));
+
+        this.duplex.on('setEthereumDappSetting', ethereumDappSetting => this.store.dispatch(
+            setEthereumDappSetting(ethereumDappSetting)
+        ));
+
+        this.duplex.on('setTronDappSetting', tronDappSetting => this.store.dispatch(
+            setTronDappSetting(tronDappSetting)
         ));
     },
 

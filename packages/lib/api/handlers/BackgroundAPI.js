@@ -91,5 +91,13 @@ export default {
 
     setLayoutMode(mode) {
         this.duplex.send('popup', 'setLayoutMode', mode ,false);
+    },
+
+    setTronDappSetting(tronDappSetting) {
+        this.duplex.send('popup', 'setTronDappSetting', tronDappSetting ,false);
+    },
+
+    setEthereumDappSetting(ethereumDappSetting) {
+        this.duplex.send('popup', 'setEthereumDappSetting', ethereumDappSetting ,false);
     }
 };

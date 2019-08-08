@@ -71,6 +71,12 @@ const background = {
         duplex.on('acceptConfirmation', this.walletService.acceptConfirmation);
         duplex.on('rejectConfirmation', this.walletService.rejectConfirmation);
 
+        duplex.on('setEthereumDappSetting', this.walletService.setEthereumDappSetting);
+        duplex.on('setTronDappSetting', this.walletService.setTronDappSetting);
+
+        duplex.on('getEthereumDappSetting', this.walletService.getEthereumDappSetting);
+        duplex.on('getTronDappSetting', this.walletService.getTronDappSetting);
+
         duplex.on('importAccount', this.walletService.importAccount);
     },
 
@@ -109,6 +115,14 @@ const background = {
 
         this.walletService.on('setLayoutMode', mode => (
             BackgroundAPI.setLayoutMode(mode)
+        ));
+
+        this.walletService.on('setEthereumDappSetting', ethereumDappSetting => (
+            BackgroundAPI.setEthereumDappSetting(ethereumDappSetting)
+        ));
+
+        this.walletService.on('setTronDappSetting', tronDappSetting => (
+            BackgroundAPI.setTronDappSetting(tronDappSetting)
         ));
     },
 
