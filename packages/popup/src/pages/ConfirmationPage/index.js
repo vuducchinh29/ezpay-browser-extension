@@ -204,7 +204,7 @@ class Controller extends React.Component {
     }
 
     render() {
-        const { confirmation, accounts, tokens, nodes } = this.props;
+        const { confirmation, accounts, tokens, nodes, modeCssName } = this.props;
         const type = confirmation.type
         const selected = '';
         const optionsToken = [];
@@ -219,7 +219,7 @@ class Controller extends React.Component {
         })
 
         return (
-            <div className='insetContainer confirmationController'>
+            <div className={`insetContainer confirmationController ${modeCssName}`}>
                 <div className='greyModal confirmModal'>
                     <Toast />
                     <FormattedMessage id='CONFIRMATIONS.HEADER' children={ text => (
@@ -234,7 +234,7 @@ class Controller extends React.Component {
                             this.renderTransaction() : null
                         )
                     }
-                    <div className="">
+                    {/*<div className="">
                         <Dropdown
                             className='dropdown'
                             options={ optionsToken }
@@ -247,7 +247,7 @@ class Controller extends React.Component {
                             value={ this.state.account }
                             onChange={ this.onChangeAcount.bind(this) }
                         />
-                    </div>
+                    </div>*/}
                     <div className='buttonRow'>
                         <Button
                             id='BUTTON.REJECT'
