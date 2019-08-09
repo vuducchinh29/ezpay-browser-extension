@@ -142,16 +142,11 @@ class Wallet extends EventEmitter {
     }
 
     _setCurrentDappConfig() {
-        this.currentNodeWeb3 = 'https://rpc.nexty.io';
-        this.currentAccountWeb3 = '0x4a9ee9b4B3A4E62511ED85324f5D01B721268A06';
-        this.currentNodeTronWeb = 'https://api.shasta.trongrid.io';
-        this.currentAccountTronWeb = 'TYgbx22LXpA92Hd4aiyRPKc8gmcJTsmAYW';
-
-        if (this.tronAccoutDapp) {
+        if (this.tronAccoutDapp && !StorageService.tronDappSetting) {
             this.setTronDappSetting(this.tronAccoutDapp);
         }
 
-        if (this.ethereumAccoutDapp) {
+        if (this.ethereumAccoutDapp && !StorageService.ethereumDappSetting) {
             this.setEthereumDappSetting(this.ethereumAccoutDapp);
         }
     }
@@ -669,7 +664,11 @@ class Wallet extends EventEmitter {
         }
 
         await StorageService.setTronDappSetting(account.id);
-        this.emit('setTronDappSetting', StorageService.tronDappSetting);
+        this.tronAccoutDapp = account.id;
+        const nodes = NodeService.getNodes().nodes;
+        account.node = nodes[ account.chain ]
+
+        this.emit('setTronDappSetting', account);
     }
 
     async setEthereumDappSetting(id) {
@@ -680,7 +679,11 @@ class Wallet extends EventEmitter {
         }
 
         await StorageService.setEthereumDappSetting(account.id);
-        this.emit('setEthereumDappSetting', StorageService.ethereumDappSetting);
+        this.ethereumAccoutDapp = account.id;
+        const nodes = NodeService.getNodes().nodes;
+        account.node = nodes[ account.chain ]
+
+        this.emit('setEthereumDappSetting', account);
     }
 
     getAccountDetails(id) {
@@ -889,11 +892,19 @@ class Wallet extends EventEmitter {
     }
 
     getConfigDapp() {
+        const ethereumAccount = this.accounts[ StorageService.ethereumDappSetting ]
+        const tronAccount = this.accounts[ StorageService.tronDappSetting ]
+        const nodes = NodeService.getNodes().nodes;
+
         return {
-            currentNodeWeb3: this.currentNodeWeb3,
-            currentAccountWeb3: this.currentAccountWeb3,
-            currentNodeTronWeb: this.currentNodeTronWeb,
-            currentAccountTronWeb: this.currentAccountTronWeb
+            ethereumAccount: {
+                address: ethereumAccount.address,
+                endPoint: nodes[ethereumAccount.chain].endPoint
+            },
+            tronAccount: {
+                address: tronAccount.address,
+                endPoint: nodes[tronAccount.chain].endPoint
+            }
         }
     }
 

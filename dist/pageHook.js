@@ -67770,15 +67770,21 @@ var pageHook = {
   _bindEvents: function _bindEvents() {
     var _this3 = this;
 
-    this.eventChannel.on('setAccount', function (address) {
-      console.log('setAccount', address);
-
+    this.eventChannel.on('setAccountTron', function (address) {
       _this3.setAddress(address);
     });
-    this.eventChannel.on('setNode', function (node) {
-      console.log('setNode', node);
-
-      _this3.setNode(node);
+    this.eventChannel.on('setNodeTron', function (node) {
+      _this3.setNode({
+        fullNode: node,
+        solidityNode: node,
+        eventServer: node
+      });
+    });
+    this.eventChannel.on('setAccountEthereum', function (address) {
+      console.log('setAccountEthereum', address);
+    });
+    this.eventChannel.on('setNodeEthereum', function (node) {
+      console.log('setNodeEthereum', node);
     });
   },
   setAddress: function setAddress(address) {

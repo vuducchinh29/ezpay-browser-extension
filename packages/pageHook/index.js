@@ -63,14 +63,24 @@ const pageHook = {
     },
 
     _bindEvents() {
-        this.eventChannel.on('setAccount', address => {
-            console.log('setAccount', address)
+        this.eventChannel.on('setAccountTron', address => {
             this.setAddress(address)
         });
 
-        this.eventChannel.on('setNode', node => {
-            console.log('setNode', node)
-            this.setNode(node)
+        this.eventChannel.on('setNodeTron', node => {
+            this.setNode({
+                fullNode: node,
+                solidityNode: node,
+                eventServer: node
+            })
+        });
+
+        this.eventChannel.on('setAccountEthereum', address => {
+            console.log('setAccountEthereum', address)
+        });
+
+        this.eventChannel.on('setNodeEthereum', node => {
+            console.log('setNodeEthereum', node)
         });
     },
 

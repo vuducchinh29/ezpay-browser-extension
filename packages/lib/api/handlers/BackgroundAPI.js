@@ -11,23 +11,10 @@ export default {
 
     setAccount(account) {
         this.duplex.send('popup', 'setAccount', account, false);
-
-        if(this.currentAccount === account)
-            return;
-
-        this.duplex.send('tab', 'tunnel', {
-            action: 'setAccount',
-            data: account.address
-        }, false);
-
-        this.currentAccount = account;
     },
 
     setNode(node) {
-        this.duplex.send('tab', 'tunnel', {
-            action: 'setNode',
-            data: node
-        }, false);
+
     },
 
     setAccounts(accounts) {
@@ -94,10 +81,30 @@ export default {
     },
 
     setTronDappSetting(tronDappSetting) {
-        this.duplex.send('popup', 'setTronDappSetting', tronDappSetting ,false);
+        this.duplex.send('popup', 'setTronDappSetting', tronDappSetting.id ,false);
+
+        this.duplex.send('tab', 'tunnel', {
+            action: 'setNodeTron',
+            data: tronDappSetting.node.endPoint
+        }, false);
+
+        this.duplex.send('tab', 'tunnel', {
+            action: 'setAccountTron',
+            data: tronDappSetting.address
+        }, false);
     },
 
     setEthereumDappSetting(ethereumDappSetting) {
-        this.duplex.send('popup', 'setEthereumDappSetting', ethereumDappSetting ,false);
+        this.duplex.send('popup', 'setEthereumDappSetting', ethereumDappSetting.id ,false);
+
+        this.duplex.send('tab', 'tunnel', {
+            action: 'setNodeEthereum',
+            data: ethereumDappSetting.node.endPoint
+        }, false);
+
+        this.duplex.send('tab', 'tunnel', {
+            action: 'setAccountEthereum',
+            data: ethereumDappSetting.address
+        }, false);
     }
 };

@@ -153,15 +153,15 @@ const background = {
                     if(StorageService.ready) {
                         const config = this.walletService.getConfigDapp();
 
-                        response.tron.address = config.currentAccountTronWeb;
+                        response.tron.address = config.tronAccount.address;
                         response.tron.node = {
-                            fullNode: config.currentNodeTronWeb,
-                            solidityNode: config.currentNodeTronWeb,
-                            eventServer: config.currentNodeTronWeb
+                            fullNode: config.tronAccount.endPoint,
+                            solidityNode: config.tronAccount.endPoint,
+                            eventServer: config.tronAccount.endPoint
                         };
 
-                        response.eth.address = config.currentNodeWeb3;
-                        response.eth.node.endPoint = config.currentAccountWeb3;
+                        response.eth.address = config.ethereumAccount.address;
+                        response.eth.node.endPoint = config.ethereumAccount.endPoint;
                     }
 
                     resolve({
@@ -172,7 +172,7 @@ const background = {
 
                     break;
                 } case 'sign': {
-                    if(!this.walletService.selectedAccount) {
+                    if(!StorageService.tronDappSetting) {
                         return resolve({
                             success: false,
                             data: 'User has not unlocked wallet',
@@ -187,10 +187,10 @@ const background = {
                         } = data;
 
                         const {
-                            selectedAccount
-                        } = this.walletService;
+                            tronDappSetting
+                        } = StorageService;
 
-                        const account = this.walletService.getAccount(selectedAccount);
+                        const account = this.walletService.getAccount(tronDappSetting);
                         const tronWeb = account.tronWeb;
 
                         if(typeof input === 'string') {
