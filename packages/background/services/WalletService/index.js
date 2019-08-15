@@ -9,7 +9,6 @@ import Utils from '@ezpay/lib/utils';
 import StorageService from '../StorageService';
 import NodeService from '../NodeService';
 import TronWeb from 'tronweb';
-import Web3 from 'web3';
 import randomUUID from 'uuid/v4';
 
 import {
@@ -142,11 +141,12 @@ class Wallet extends EventEmitter {
     }
 
     _setCurrentDappConfig() {
-        if (this.tronAccoutDapp && !StorageService.tronDappSetting) {
+        const accounts = this.accounts;
+        if (this.tronAccoutDapp && !accounts[ StorageService.tronDappSetting ]) {
             this.setTronDappSetting(this.tronAccoutDapp);
         }
 
-        if (this.ethereumAccoutDapp && !StorageService.ethereumDappSetting) {
+        if (this.ethereumAccoutDapp && !accounts[StorageService.ethereumDappSetting]) {
             this.setEthereumDappSetting(this.ethereumAccoutDapp);
         }
     }

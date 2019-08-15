@@ -9,6 +9,9 @@
     "lint": "npx eslint . --fix"
   },
   "dependencies": {
-    "tronweb": "^2.6.4"
+    "metamask-inpage-provider": "^2.0.1",
+    "post-message-stream": "^3.0.0",
+    "tronweb": "^2.6.4",
+    "web3": "0.20.7"
   }
 }
