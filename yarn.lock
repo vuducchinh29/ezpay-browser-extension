@@ -5887,6 +5887,24 @@ dir-glob@^2.0.0:
   dependencies:
     path-type "^3.0.0"
 
+dnode-protocol@~0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/dnode-protocol/-/dnode-protocol-0.2.2.tgz#51151d16fc3b5f84815ee0b9497a1061d0d1949d"
+  integrity sha1-URUdFvw7X4SBXuC5SXoQYdDRlJ0=
+  dependencies:
+    jsonify "~0.0.0"
+    traverse "~0.6.3"
+
+dnode@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/dnode/-/dnode-1.2.2.tgz#4ac3cfe26e292b3b39b8258ae7d94edc58132efa"
+  integrity sha1-SsPP4m4pKzs5uCWK59lO3FgTLvo=
+  dependencies:
+    dnode-protocol "~0.2.2"
+    jsonify "~0.0.0"
+  optionalDependencies:
+    weak "^1.0.0"
+
 dns-equal@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/dns-equal/-/dns-equal-1.0.0.tgz#b39e7f1da6eb0a75ba9c17324b34753c47e0654d"
@@ -11032,7 +11050,7 @@ nan@2.13.2:
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.13.2.tgz#f51dc7ae66ba7d5d55e1e6d4d8092e802c9aefe7"
   integrity sha512-TghvYc72wlMGMVMluVo9WRJc0mB8KxxF/gZ4YYFy7V2ZQX9l7rgbPg7vjS9mt6U5HXODVFVI2bOduCzwOMv/lw==
 
-nan@^2.0.8, nan@^2.12.1, nan@^2.13.2, nan@^2.14.0, nan@^2.2.1, nan@^2.3.3, nan@^2.9.2:
+nan@^2.0.5, nan@^2.0.8, nan@^2.12.1, nan@^2.13.2, nan@^2.14.0, nan@^2.2.1, nan@^2.3.3, nan@^2.9.2:
   version "2.14.0"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.14.0.tgz#7818f722027b2459a86f0295d434d1fc2336c52c"
   integrity sha512-INOFj37C7k3AfaNTtX8RhsTw7qRy7eLET14cROi9+5HAVbbHuIWUHEauBv5qT4Av2tWasiTY1Jw6puUNqRJXQg==
@@ -11089,6 +11107,11 @@ neo-async@^2.5.0, neo-async@^2.6.0:
   version "2.6.1"
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.1.tgz#ac27ada66167fa8849a6addd837f6b189ad2081c"
   integrity sha512-iyam8fBuCUpWeKPGpaNMetEocMt364qkCsfL9JuhjXX6dRnguRVOfk2GZaDpPjcOKiiXCPINZC1GczQ7iTq3Zw==
+
+net@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/net/-/net-1.0.2.tgz#d1757ec9a7fb2371d83cf4755ce3e27e10829388"
+  integrity sha1-0XV+yaf7I3HYPPR1XOPifhCCk4g=
 
 next-tick@^1.0.0:
   version "1.0.0"
@@ -13024,6 +13047,11 @@ qs@~6.5.2:
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.5.2.tgz#cb3ae806e8740444584ef154ce8ee98d403f3e36"
   integrity sha512-N5ZAX4/LxJmF+7wN74pUD6qAh9/wnvdQcjq9TZjevvXzSUo7bfmw91saqMjzGS2xq91/odN2dW/WOl7qQHNDGA==
 
+quasar@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/quasar/-/quasar-1.0.5.tgz#caddfac55fca0779c996dc1b3977a045ae1426e6"
+  integrity sha512-8CxBZk5Ge+jUC7nzlzrLwlZRedpBkcYjkmyBOA0QJLvCXE8K8Ro68R7Vxf7+Baplo11aBMhFX1FhHZWrSM7Y2A==
+
 query-string@^5.0.1:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/query-string/-/query-string-5.1.1.tgz#a78c012b71c17e05f2e3fa2319dd330682efb3cb"
@@ -13460,6 +13488,15 @@ react@^16.6.0:
     object-assign "^4.1.1"
     prop-types "^15.6.2"
     scheduler "^0.13.6"
+
+react@^16.9.0:
+  version "16.9.0"
+  resolved "https://registry.yarnpkg.com/react/-/react-16.9.0.tgz#40ba2f9af13bc1a38d75dbf2f4359a5185c4f7aa"
+  integrity sha512-+7LQnFBwkiw+BobzOF6N//BdoNw0ouwmSJTEm9cglOOmsg/TMiFHZLe2sEoN5M7LgJTj9oHH0gxklfnQe66S1w==
+  dependencies:
+    loose-envify "^1.1.0"
+    object-assign "^4.1.1"
+    prop-types "^15.6.2"
 
 read-cmd-shim@^1.0.1:
   version "1.0.1"
@@ -15471,7 +15508,7 @@ through2@^2.0.0, through2@^2.0.2, through2@^2.0.3:
     readable-stream "~2.3.6"
     xtend "~4.0.1"
 
-through2@^3.0.0:
+through2@^3.0.0, through2@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/through2/-/through2-3.0.1.tgz#39276e713c3302edf9e388dd9c812dd3b825bd5a"
   integrity sha512-M96dvTalPT3YbYLaKaCuwu+j06D/8Jfib0o/PxbVt6Amhv3dUAtW6rTV1jPgJSBG83I/e04Y6xkVdVhSRhi0ww==
@@ -15622,6 +15659,11 @@ tr46@^1.0.1:
   dependencies:
     punycode "^2.1.0"
 
+traverse@~0.6.3:
+  version "0.6.6"
+  resolved "https://registry.yarnpkg.com/traverse/-/traverse-0.6.6.tgz#cbdf560fd7b9af632502fed40f918c157ea97137"
+  integrity sha1-y99WD9e5r2MlAv7UD5GMFX6pcTc=
+
 trim-newlines@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/trim-newlines/-/trim-newlines-1.0.0.tgz#5887966bb582a4503a41eb524f7d35011815a613"
@@ -15641,6 +15683,22 @@ trim-right@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/trim-right/-/trim-right-1.0.1.tgz#cb2e1203067e0c8de1f614094b9fe45704ea6003"
   integrity sha1-yy4SAwZ+DI3h9hQJS5/kVwTqYAM=
+
+tronweb@2.6.8:
+  version "2.6.8"
+  resolved "https://registry.yarnpkg.com/tronweb/-/tronweb-2.6.8.tgz#b1cc96f315b0c9819c170aa6a26e1ba72c342b85"
+  integrity sha512-UbezjChj9ZBEAz72zb1sVLbkjPtlg+11iWIjowjke9zFfGg+aA3Oq/QbLtP3VhNKE+0jVTw+PUPlkn0u1bgT3A==
+  dependencies:
+    "@babel/runtime" "^7.0.0"
+    axios "^0.19.0"
+    babel-runtime "^6.26.0"
+    bignumber.js "^7.2.1"
+    elliptic "^6.4.1"
+    ethers "^4.0.7"
+    eventemitter3 "^3.1.0"
+    lodash "^4.17.14"
+    semver "^5.6.0"
+    validator "^10.7.1"
 
 tronweb@^2.6.4:
   version "2.6.4"
@@ -16191,6 +16249,14 @@ wcwidth@^1.0.0:
   integrity sha1-8LDc+RW8X/FSivrbLA4XtTLaL+g=
   dependencies:
     defaults "^1.0.3"
+
+weak@^1.0.0:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/weak/-/weak-1.0.1.tgz#ab99aab30706959aa0200cb8cf545bb9cb33b99e"
+  integrity sha1-q5mqswcGlZqgIAy4z1RbucszuZ4=
+  dependencies:
+    bindings "^1.2.1"
+    nan "^2.0.5"
 
 web3-bzz@1.0.0-beta.36:
   version "1.0.0-beta.36"

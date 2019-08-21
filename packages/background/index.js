@@ -10,7 +10,26 @@ import transactionBuilder from '@ezpay/lib/transactionBuilder';
 import { BackgroundAPI } from '@ezpay/lib/api';
 import { version } from './package.json';
 import { CONFIRMATION_TYPE } from '@ezpay/lib/constants';
-const NetworkController = require('./controllers/network')
+const NetworkController = require('./controllers/network');
+const TransactionController = require('./controllers/transactions');
+const extension = require('extensionizer');
+const {setupMultiplex} = require('./lib/stream-utils.js');
+const pump = require('pump');
+const createDnodeRemoteGetter = require('./lib/createDnodeRemoteGetter');
+const pify = require('pify');
+const Dnode = require('dnode');
+
+const {
+    ENVIRONMENT_TYPE_POPUP,
+    ENVIRONMENT_TYPE_NOTIFICATION,
+    ENVIRONMENT_TYPE_FULLSCREEN,
+} = require('./lib/enums')
+
+const metamaskInternalProcessHash = {
+    [ENVIRONMENT_TYPE_POPUP]: true,
+    [ENVIRONMENT_TYPE_NOTIFICATION]: true,
+    [ENVIRONMENT_TYPE_FULLSCREEN]: true,
+}
 
 const duplex = new MessageDuplex.Host();
 const logger = new Logger('background');
@@ -25,6 +44,9 @@ const initState = {
     },
     settings: {
         ticker: 'ETH'
+    },
+    TransactionController: {
+        transactions: []
     }
 };
 
@@ -42,8 +64,167 @@ const background = {
     },
 
     setupController() {
-        // this.networkController = new NetworkController(initState);
-        // console.log('xxx', this.networkController);
+        this.networkController = new NetworkController(initState);
+        this.initializeProvider()
+        this.provider = this.networkController.getProviderAndBlockTracker().provider
+        this.blockTracker = this.networkController.getProviderAndBlockTracker().blockTracker
+
+
+        this.txController = new TransactionController({
+            initState: initState.TransactionController || initState.TransactionManager,
+            networkStore: this.networkController.networkStore,
+            // preferencesStore: this.preferencesController.store,
+            txHistoryLimit: 40,
+            getNetwork: this.networkController.getNetworkState.bind(this),
+            // signTransaction: this.keyringController.signTransaction.bind(this.keyringController),
+            provider: this.provider,
+            blockTracker: this.blockTracker,
+            // getGasPrice: this.getGasPrice.bind(this),
+        })
+        this.txController.on('newUnapprovedTx', this.showUnapprovedTx.bind(this))
+
+        extension.runtime.onConnect.addListener(connectRemote)
+        extension.runtime.onConnectExternal.addListener(connectExternal)
+
+        function connectRemote (remotePort) {
+            const processName = remotePort.name
+            const isMetaMaskInternalProcess = metamaskInternalProcessHash[processName]
+
+            if (!isMetaMaskInternalProcess) {
+              connectExternal(remotePort)
+            }
+        }
+
+        // communication with page or other extension
+        function connectExternal (remotePort) {
+            const originDomain = urlUtil.parse(remotePort.sender.url).hostname
+            const portStream = new PortStream(remotePort)
+            console.log('portStream', portStream)
+            console.log('originDomain', originDomain)
+            this.setupUntrustedCommunication(portStream, originDomain)
+        }
+    },
+
+    setupUntrustedCommunication (connectionStream, originDomain) {
+        // setup multiplexing
+        const mux = setupMultiplex(connectionStream)
+        // connect features
+        const publicApi = this.setupPublicApi(mux.createStream('publicApi'), originDomain)
+        // this.setupProviderConnection(mux.createStream('provider'), originDomain, publicApi)
+        // this.setupPublicConfig(mux.createStream('publicConfig'), originDomain)
+    },
+
+    setupProviderConnection (outStream, origin, publicApi) {
+        const getSiteMetadata = publicApi && publicApi.getSiteMetadata
+        const engine = this.setupProviderEngine(origin, getSiteMetadata)
+
+        // setup connection
+        const providerStream = createEngineStream({ engine })
+
+        pump(
+            outStream,
+            providerStream,
+            outStream,
+            (err) => {
+            // cleanup filter polyfill middleware
+                engine._middleware.forEach((mid) => {
+                    if (mid.destroy && typeof mid.destroy === 'function') {
+                        mid.destroy()
+                    }
+                })
+                if (err) log.error(err)
+            }
+        )
+    },
+
+    setupPublicApi (outStream) {
+        const dnode = Dnode()
+        // connect dnode api to remote connection
+        pump(
+            outStream,
+            dnode,
+            outStream,
+            (err) => {
+                // report any error
+                if (err) log.error(err)
+            }
+        )
+
+        const getRemote = createDnodeRemoteGetter(dnode)
+
+        const publicApi = {
+            // wrap with an await remote
+            getSiteMetadata: async () => {
+                const remote = await getRemote()
+                return await pify(remote.getSiteMetadata)()
+            },
+        }
+        console.log('publicApi', publicApi)
+        return publicApi
+    },
+
+    showUnapprovedTx() {
+
+    },
+
+    async newUnapprovedTransaction (txParams, req) {
+        return await this.txController.newUnapprovedTransaction(txParams, req)
+    },
+
+    newUnsignedMessage (msgParams, req) {
+
+    },
+
+    newUnsignedTypedMessage (msgParams, req, version) {
+
+    },
+
+    async newUnsignedPersonalMessage (msgParams, req) {
+
+    },
+
+    async getPendingNonce (address) {
+        const { nonceDetails, releaseLock} = await this.txController.nonceTracker.getNonceLock(address)
+        const pendingNonce = nonceDetails.params.highestSuggested
+
+        releaseLock()
+        return pendingNonce
+    },
+
+    initializeProvider () {
+        const providerOpts = {
+            static: {
+                eth_syncing: false,
+                web3_clientVersion: `MetaMask/v${version}`,
+            },
+            version,
+            // account mgmt
+            getAccounts: async ({ origin }) => {
+                // // Expose no accounts if this origin has not been approved, preventing
+                // // account-requring RPC methods from completing successfully
+                // const exposeAccounts = this.providerApprovalController.shouldExposeAccounts(origin)
+                // if (origin !== 'MetaMask' && !exposeAccounts) { return [] }
+                // const isUnlocked = this.keyringController.memStore.getState().isUnlocked
+                // const selectedAddress = this.preferencesController.getSelectedAddress()
+                // // only show address if account is unlocked
+                // if (isUnlocked && selectedAddress) {
+                //     return [selectedAddress]
+                // } else {
+                //     return []
+                // }
+                return []
+              },
+              // tx signing
+              processTransaction: this.newUnapprovedTransaction.bind(this),
+              // msg signing
+              processEthSignMessage: this.newUnsignedMessage.bind(this),
+              processTypedMessage: this.newUnsignedTypedMessage.bind(this),
+              processTypedMessageV3: this.newUnsignedTypedMessage.bind(this),
+              processPersonalMessage: this.newUnsignedPersonalMessage.bind(this),
+              getPendingNonce: this.getPendingNonce.bind(this),
+        }
+        const providerProxy = this.networkController.initializeProvider(providerOpts)
+        return providerProxy
     },
 
     bindPopupDuplex() {
