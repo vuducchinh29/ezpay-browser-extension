@@ -18,6 +18,8 @@ const pump = require('pump');
 const createDnodeRemoteGetter = require('./lib/createDnodeRemoteGetter');
 const pify = require('pify');
 const Dnode = require('dnode');
+const urlUtil = require('url');
+const PortStream = require('extension-port-stream');
 
 const {
     ENVIRONMENT_TYPE_POPUP,
@@ -64,6 +66,7 @@ const background = {
     },
 
     setupController() {
+        const self = this;
         this.networkController = new NetworkController(initState);
         this.initializeProvider()
         this.provider = this.networkController.getProviderAndBlockTracker().provider
@@ -99,13 +102,12 @@ const background = {
         function connectExternal (remotePort) {
             const originDomain = urlUtil.parse(remotePort.sender.url).hostname
             const portStream = new PortStream(remotePort)
-            console.log('portStream', portStream)
-            console.log('originDomain', originDomain)
-            this.setupUntrustedCommunication(portStream, originDomain)
+
+            self.setupUntrustedCommunication(portStream, originDomain)
         }
     },
 
-    setupUntrustedCommunication (connectionStream, originDomain) {
+    setupUntrustedCommunication(connectionStream, originDomain) {
         // setup multiplexing
         const mux = setupMultiplex(connectionStream)
         // connect features
@@ -114,7 +116,7 @@ const background = {
         // this.setupPublicConfig(mux.createStream('publicConfig'), originDomain)
     },
 
-    setupProviderConnection (outStream, origin, publicApi) {
+    setupProviderConnection(outStream, origin, publicApi) {
         const getSiteMetadata = publicApi && publicApi.getSiteMetadata
         const engine = this.setupProviderEngine(origin, getSiteMetadata)
 
