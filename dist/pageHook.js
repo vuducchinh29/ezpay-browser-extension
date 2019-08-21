@@ -67807,7 +67807,11 @@ var pageHook = {
       index_logger.info('Failed to initialise TronWeb', err);
     });
   },
-  _binWeb3: function _binWeb3(addressHex, network, infuraAPIKey) {
+  _binWeb3: function _binWeb3() {
+    var addressHex = '';
+    var network = 'rinkeby';
+    var infuraAPIKey = 'f2ffee3e3500452fad9b02f935fe0032';
+
     function getChainID(name) {
       switch (name) {
         case 'mainnet':

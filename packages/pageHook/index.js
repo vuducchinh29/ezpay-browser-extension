@@ -37,7 +37,11 @@ const pageHook = {
         });
     },
 
-    _binWeb3(addressHex, network, infuraAPIKey) {
+    _binWeb3() {
+        const addressHex = '0x5DA7db20A1c65B44457Dd2Dc51a1DC7774caB2B6';
+        const network= 'mainnet';
+        const infuraAPIKey = 'f2ffee3e3500452fad9b02f935fe0032';
+
         function getChainID(name) {
             switch(name) {
                 case 'mainnet': return 1;

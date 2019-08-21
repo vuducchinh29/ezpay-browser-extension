@@ -10,9 +10,23 @@ import transactionBuilder from '@ezpay/lib/transactionBuilder';
 import { BackgroundAPI } from '@ezpay/lib/api';
 import { version } from './package.json';
 import { CONFIRMATION_TYPE } from '@ezpay/lib/constants';
+const NetworkController = require('./controllers/network')
 
 const duplex = new MessageDuplex.Host();
 const logger = new Logger('background');
+
+const initState = {
+    network: '1',
+    provider: {
+        nickname: '',
+        rpcTarget: '',
+        ticker: 'ETH',
+        type: 'mainnet'
+    },
+    settings: {
+        ticker: 'ETH'
+    }
+};
 
 const background = {
     walletService: Utils.requestHandler(
@@ -24,6 +38,12 @@ const background = {
         this.bindPopupDuplex();
         this.bindTabDuplex();
         this.bindWalletEvents();
+        this.setupController();
+    },
+
+    setupController() {
+        // this.networkController = new NetworkController(initState);
+        // console.log('xxx', this.networkController);
     },
 
     bindPopupDuplex() {
