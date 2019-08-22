@@ -20,6 +20,15 @@ const pify = require('pify');
 const Dnode = require('dnode');
 const urlUtil = require('url');
 const PortStream = require('extension-port-stream');
+const RpcEngine = require('json-rpc-engine');
+const createFilterMiddleware = require('eth-json-rpc-filters');
+const createSubscriptionManager = require('eth-json-rpc-filters/subscriptionManager');
+const createOriginMiddleware = require('./lib/createOriginMiddleware');
+const createLoggerMiddleware = require('./lib/createLoggerMiddleware');
+const providerAsMiddleware = require('eth-json-rpc-middleware/providerAsMiddleware');
+const createEngineStream = require('json-rpc-middleware-stream/engineStream');
+const ObservableStore = require('obs-store');
+const asStream = require('obs-store/lib/asStream');
 
 const {
     ENVIRONMENT_TYPE_POPUP,
@@ -112,8 +121,70 @@ const background = {
         const mux = setupMultiplex(connectionStream)
         // connect features
         const publicApi = this.setupPublicApi(mux.createStream('publicApi'), originDomain)
-        // this.setupProviderConnection(mux.createStream('provider'), originDomain, publicApi)
-        // this.setupPublicConfig(mux.createStream('publicConfig'), originDomain)
+        this.setupProviderConnection(mux.createStream('provider'), originDomain, publicApi)
+        this.setupPublicConfig(mux.createStream('publicConfig'), originDomain)
+    },
+
+    setupPublicConfig (outStream, originDomain) {
+        const configStore = this.createPublicConfigStore({
+            // check the providerApprovalController's approvedOrigins
+            checkIsEnabled: () => {return true},
+        })
+
+        const configStream = asStream(configStore)
+        console.log('xxx', configStream)
+        pump(
+            configStream,
+            outStream,
+            (err) => {
+                configStore.destroy()
+                configStream.destroy()
+                if (err) log.error(err)
+            }
+        )
+    },
+
+    createPublicConfigStore ({ checkIsEnabled }) {
+        // subset of state for metamask inpage provider
+        const publicConfigStore = new ObservableStore()
+
+        // setup memStore subscription hooks
+        // this.on('update', updatePublicConfigStore)
+        updatePublicConfigStore(this.getState())
+
+        publicConfigStore.destroy = () => {
+            this.removeEventListener && this.removeEventListener('update', updatePublicConfigStore)
+        }
+
+        function updatePublicConfigStore (memState) {
+            const publicState = selectPublicState(memState)
+            publicConfigStore.putState(publicState)
+        }
+
+        function selectPublicState ({ isUnlocked, selectedAddress, network, completedOnboarding }) {
+            const isEnabled = checkIsEnabled()
+            const isReady = isUnlocked && isEnabled
+            const result = {
+                isUnlocked,
+                isEnabled,
+                selectedAddress: isReady ? selectedAddress : undefined,
+                networkVersion: network,
+                onboardingcomplete: completedOnboarding,
+            }
+            return result
+        }
+
+        return publicConfigStore
+    },
+
+    getState() {
+        return {
+            isUnlocked: false,
+            isEnabled: true,
+            selectedAddress: '0xabc',
+            networkVersion: 1,
+            onboardingcomplete: true,
+        }
     },
 
     setupProviderConnection(outStream, origin, publicApi) {
@@ -139,6 +210,41 @@ const background = {
         )
     },
 
+    /**
+    * A method for creating a provider that is safely restricted for the requesting domain.
+    **/
+    setupProviderEngine(origin, getSiteMetadata) {
+        // setup json rpc engine stack
+        const engine = new RpcEngine()
+        const provider = this.provider
+        const blockTracker = this.blockTracker
+
+        // create filter polyfill middleware
+        const filterMiddleware = createFilterMiddleware({ provider, blockTracker })
+
+        // create subscription polyfill middleware
+        const subscriptionManager = createSubscriptionManager({ provider, blockTracker })
+        subscriptionManager.events.on('notification', (message) => engine.emit('notification', message))
+
+        // metadata
+        engine.push(createOriginMiddleware({ origin }))
+        engine.push(createLoggerMiddleware({ origin }))
+        // filter and subscription polyfills
+        engine.push(filterMiddleware)
+        engine.push(subscriptionManager.middleware)
+        // watch asset
+        // engine.push(this.preferencesController.requestWatchAsset.bind(this.preferencesController))
+        // requestAccounts
+        // engine.push(this.providerApprovalController.createMiddleware({
+        //     origin,
+        //     getSiteMetadata,
+        // }))
+        // forward to metamask primary provider
+        engine.push(providerAsMiddleware(provider))
+
+        return engine
+    },
+
     setupPublicApi (outStream) {
         const dnode = Dnode()
         // connect dnode api to remote connection
@@ -161,12 +267,12 @@ const background = {
                 return await pify(remote.getSiteMetadata)()
             },
         }
-        console.log('publicApi', publicApi)
+
         return publicApi
     },
 
     showUnapprovedTx() {
-
+        console.log('showUnapprovedTx')
     },
 
     async newUnapprovedTransaction (txParams, req) {

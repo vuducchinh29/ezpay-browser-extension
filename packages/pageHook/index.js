@@ -4,7 +4,6 @@ import Utils from '@ezpay/lib/utils';
 import RequestHandler from './handlers/RequestHandler';
 import ProxiedProvider from './handlers/ProxiedProvider';
 import TronWeb from 'tronweb';
-require('./EzKeyProvider.js');
 
 const logger = new Logger('pageHook');
 
@@ -38,112 +37,7 @@ const pageHook = {
     },
 
     _binWeb3() {
-        const addressHex = '0x5DA7db20A1c65B44457Dd2Dc51a1DC7774caB2B6';
-        const network= 'mainnet';
-        const infuraAPIKey = 'f2ffee3e3500452fad9b02f935fe0032';
 
-        function getChainID(name) {
-            switch(name) {
-                case 'mainnet': return 1;
-                case 'ropsten': return 3;
-                case 'rinkeby': return 4;
-                case 'kovan': return 42;
-            }
-            throw new Error('Unsupport network')
-        }
-
-        function getInfuraRPCURL(chainID, apiKey) {
-            switch(chainID) {
-                case 1: return 'https://mainnet.infura.io/' + apiKey;
-                case 3: return 'https://ropsten.infura.io/' + apiKey;
-                case 4: return 'https://rinkeby.infura.io/' + apiKey;
-                case 42: return 'https://kovan.infura.io/' + apiKey;
-            }
-            throw new Error('Unsupport network')
-        }
-
-        function getInfuraWSSURL(chainID, apiKey) {
-            switch(chainID) {
-                case 1: return 'wss://mainnet.infura.io/ws/' + apiKey;
-                case 3: return 'wss://ropsten.infura.io/ws/' + apiKey;
-                case 4: return 'wss://rinkeby.infura.io/ws/' + apiKey;
-                case 42: return 'wss://kovan.infura.io/ws/' + apiKey;
-            }
-            throw new Error('Unsupport network')
-        }
-
-        let chainID = getChainID(network);
-        let rpcUrl = getInfuraRPCURL(chainID, infuraAPIKey);
-        let wssUrl = getInfuraWSSURL(chainID, infuraAPIKey);
-
-        function executeCallback (id, error, value) {
-            console.log(JSON.stringify(value))
-            EzkeyProvider.executeCallback(id, error, value)
-        }
-        let EzkeyProvider = null
-
-        function init() {
-          EzkeyProvider = new Ezkey({
-            noConflict: true,
-            address: addressHex,
-            networkVersion: chainID,
-            rpcUrl,
-            getAccounts: function (cb) {
-              cb(null, [addressHex])
-            },
-            signTransaction: function (tx, cb){
-              console.log('signing a transaction', tx)
-              const { id = 8888 } = tx
-              EzkeyProvider.addCallback(id, cb)
-              const resTx = {name: 'signTransaction', id, tx}
-              // WebViewBridge.send(JSON.stringify(resTx))
-            },
-            signMessage: function (msgParams, cb) {
-              const { data } = msgParams
-              const { id = 8888 } = msgParams
-              console.log("signing a message", msgParams)
-              EzkeyProvider.addCallback(id, cb)
-              console.log("signMessage")
-              const resTx = {name: "signMessage", id, tx}
-              // WebViewBridge.send(JSON.stringify(resTx))
-            },
-            signPersonalMessage: function (msgParams, cb) {
-              const { data } = msgParams
-              const { id = 8888 } = msgParams
-              console.log("signing a personal message", msgParams)
-              EzkeyProvider.addCallback(id, cb)
-              console.log("signPersonalMessage")
-              const resTx = {name: "signPersonalMessage", id, data}
-              // WebViewBridge.send(JSON.stringify(resTx))
-            },
-            signTypedMessage: function (msgParams, cb) {
-              const { data } = msgParams
-              const { id = 8888 } = msgParams
-              console.log("signing a typed message", msgParams)
-              EzkeyProvider.addCallback(id, cb)
-              console.log("signTypedMessage")
-              const resTx = {name: "signTypedMessage", id, tx}
-              // WebViewBridge.send(JSON.stringify(resTx))
-            }
-          },
-          {
-            address: addressHex,
-            networkVersion: chainID
-          })
-        }
-
-        init();
-        window.web3 = new Web3(EzkeyProvider)
-        web3.eth.defaultAccount = addressHex
-        web3.setProvider = function () {
-          console.debug('Ezkey Wallet - overrode web3.setProvider')
-        }
-        web3.version.getNetwork = function(cb) {
-          cb(null, chainID)
-        }
-        web3.eth.getCoinbase = function(cb) {
-          return cb(null, addressHex)
-        }
     },
 
     _bindTronWeb() {

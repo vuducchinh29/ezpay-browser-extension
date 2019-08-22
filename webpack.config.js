@@ -21,6 +21,7 @@ module.exports = {
             }
         ]
     },
+    node: { crypto: true, stream: true, fs: 'empty', net: 'empty' },
     resolve: {
         modules: [ '../../node_modules' ]
     },
