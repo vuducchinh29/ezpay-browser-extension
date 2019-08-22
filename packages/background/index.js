@@ -132,7 +132,7 @@ const background = {
         })
 
         const configStream = asStream(configStore)
-        console.log('xxx', configStream)
+
         pump(
             configStream,
             outStream,
@@ -158,6 +158,7 @@ const background = {
 
         function updatePublicConfigStore (memState) {
             const publicState = selectPublicState(memState)
+            console.log('publicState', publicState)
             publicConfigStore.putState(publicState)
         }
 
@@ -179,11 +180,42 @@ const background = {
 
     getState() {
         return {
-            isUnlocked: false,
+            isUnlocked: true,
             isEnabled: true,
-            selectedAddress: '0xabc',
-            networkVersion: 1,
-            onboardingcomplete: true,
+            selectedAddress: '0x76535c6995faa57e38c61ad7cbcb3bd8219c66ce',
+            network: 1,
+            completedOnboarding: true,
+            conversionDate: 1566462382.819,
+            conversionRate: 185.36,
+            currentAccountTab: "history",
+            currentBlockGasLimit: "0x7a211d",
+            currentCurrency: "usd",
+            currentLocale: "en",
+            infuraNetworkStatus: {
+                kovan: "ok",
+                mainnet: "ok",
+                rinkeby: "ok",
+                ropsten: "ok"
+            },
+            keyringTypes: [
+                "Simple Key Pair",
+                "HD Key Tree",
+                "Trezor Hardware",
+                "Ledger Hardware"
+            ],
+            metaMetricsSendCount: 0,
+            migratedPrivacyMode: false,
+            nativeCurrency: "ETH",
+            network: "1",
+            provider: {
+                nickname: "",
+                rpcTarget: "",
+                ticker: "ETH",
+                type: "mainnet"
+            },
+            settings: {
+                ticker: 'ETH'
+            }
         }
     },
 
@@ -193,6 +225,7 @@ const background = {
 
         // setup connection
         const providerStream = createEngineStream({ engine })
+        console.log('providerStream', providerStream)
 
         pump(
             outStream,
