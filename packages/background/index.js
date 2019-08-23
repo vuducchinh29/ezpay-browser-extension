@@ -29,6 +29,31 @@ const providerAsMiddleware = require('eth-json-rpc-middleware/providerAsMiddlewa
 const createEngineStream = require('json-rpc-middleware-stream/engineStream');
 const ObservableStore = require('obs-store');
 const asStream = require('obs-store/lib/asStream');
+const PreferencesController = require('./controllers/preferences');
+const AppStateController = require('./controllers/app-state');
+const InfuraController = require('./controllers/infura');
+const RecentBlocksController = require('./controllers/recent-blocks');
+const AccountTracker = require('./lib/account-tracker');
+const OnboardingController = require('./controllers/onboarding');
+const TrezorKeyring = require('eth-trezor-keyring')
+const LedgerBridgeKeyring = require('eth-ledger-bridge-keyring')
+const HW_WALLETS_KEYRINGS = [TrezorKeyring.type, LedgerBridgeKeyring.type]
+const KeyringController = require('eth-keyring-controller')
+const TokenRatesController = require('./controllers/token-rates');
+const {Mutex} = require('await-semaphore');
+const BalancesController = require('./controllers/computed-balances');
+const MessageManager = require('./lib/message-manager')
+const PersonalMessageManager = require('./lib/personal-message-manager')
+const TypedMessageManager = require('./lib/typed-message-manager')
+const ProviderApprovalController = require('./controllers/provider-approval')
+const ComposableObservableStore = require('./lib/ComposableObservableStore');
+
+const {
+  AddressBookController,
+  CurrencyRateController,
+  ShapeShiftController,
+  PhishingController,
+} = require('gaba')
 
 const {
     ENVIRONMENT_TYPE_POPUP,
@@ -46,18 +71,84 @@ const duplex = new MessageDuplex.Host();
 const logger = new Logger('background');
 
 const initState = {
-    network: '1',
-    provider: {
-        nickname: '',
-        rpcTarget: '',
-        ticker: 'ETH',
-        type: 'mainnet'
+    AppStateController: {},
+    CachedBalancesController: {
+        cachedBalances: {
+            1: {
+                0x89abefd605e171cc5b6eb4aa9b9b7b4983f30a87: "0x0"
+            },
+            4: {
+                0x89abefd605e171cc5b6eb4aa9b9b7b4983f30a87: "0x0"
+            }
+        }
     },
-    settings: {
-        ticker: 'ETH'
+    CurrencyController: {
+        conversionDate: 1566547524.878,
+        conversionRate: 193.33,
+        currentCurrency: "usd",
+        nativeCurrency: "ETH",
+    },
+    InfuraController: {
+        infuraNetworkStatus: {
+            kovan: "ok",
+            mainnet: "ok",
+            rinkeby: "ok",
+            ropsten: "ok"
+        }
+    },
+    KeyringController: {
+        vault: '{"data":"dVdAi3XqcqObmb7i18AY2yCCPQaeyRX4NloGEFWzOmJ9DALVGS/b2Taqvgu2n+09GPt7L1oka77ce04Dxro9Py2E3Yq+SCaeI/IiHkEt9EF21llOXMHTy3lBlBH1Iqe/GJZ0G2RUIr4QqpRslZ+LZat0Y3bbZxUxU/0p8i4d8ZE36Mez1wfEHORJSv3CWc1J2Xg3YkVK9kKBPqeOkDlezbu3hMm1SNOaZOW9qFJYK8d63W13vg==","iv":"KYN+/dN7y9SF+NokZajBxg==","salt":"QppMHgzY1cflMuwCSvlJ1sNDWoZQsNDImi9vq1MnNfs="}'
+    },
+    NetworkController: {
+        network: "1",
+        provider: {nickname: "", rpcTarget: "", ticker: "ETH", type: "mainnet"},
+        settings: {ticker: "ETH"}
+    },
+    OnboardingController: {
+        seedPhraseBackedUp: true
+    },
+    PreferencesController: {
+        accountTokens: {
+            '0x89abefd605e171cc5b6eb4aa9b9b7b4983f30a87': {
+                mainnet: [],
+                rinkeby: []
+            }
+        },
+        assetImages: {},
+        completedOnboarding: true,
+        currentAccountTab: "history",
+        currentLocale: "en",
+        featureFlags: {privacyMode: true},
+        firstTimeFlowType: "create",
+        forgottenPassword: false,
+        frequentRpcListDetail: [],
+        identities: {
+            '0x89abefd605e171cc5b6eb4aa9b9b7b4983f30a87': {
+                address: "0x89abefd605e171cc5b6eb4aa9b9b7b4983f30a87",
+                name: "Account 1"
+            }
+        },
+        knownMethodData: {},
+        lostIdentities: {},
+        metaMetricsId: "0xba359264d53d48454f26f2f80d1eea26ca4d95ed166e806093482e743ef4d361",
+        metaMetricsSendCount: 0,
+        migratedPrivacyMode: false,
+        participateInMetaMetrics: true,
+        preferences: {
+            useNativeCurrencyAsPrimaryCurrency: true
+        },
+        selectedAddress: "0x89abefd605e171cc5b6eb4aa9b9b7b4983f30a87",
+        suggestedTokens: {},
+        tokens: [],
+        useBlockie: false
     },
     TransactionController: {
         transactions: []
+    },
+    config: {},
+    firstTimeInfo: {
+        date: 1566527505376,
+        version: "7.0.1"
     }
 };
 
@@ -76,24 +167,157 @@ const background = {
 
     setupController() {
         const self = this;
-        this.networkController = new NetworkController(initState);
+
+        this.activeControllerConnections = 0
+
+        // observable state store
+        // this.store = new ComposableObservableStore(initState)
+
+        // lock to ensure only one vault created at once
+        this.createVaultMutex = new Mutex()
+
+        this.networkController = new NetworkController(initState.NetworkController);
+
+         // preferences controller
+        this.preferencesController = new PreferencesController({
+          initState: initState.PreferencesController,
+          initLangCode: 'en',
+          openPopup: this.newUnapprovedTransaction.bind(this),
+          network: this.networkController,
+        })
+
+        // app-state controller
+        this.appStateController = new AppStateController({
+            preferencesStore: this.preferencesController.store,
+            onInactiveTimeout: () => this.setLocked(),
+        })
+
+        this.currencyRateController = new CurrencyRateController(undefined, initState.CurrencyController)
+
+        // infura controller
+        this.infuraController = new InfuraController({
+            initState: initState.InfuraController,
+        })
+        this.infuraController.scheduleInfuraNetworkCheck()
+
+        this.phishingController = new PhishingController()
+
         this.initializeProvider()
         this.provider = this.networkController.getProviderAndBlockTracker().provider
         this.blockTracker = this.networkController.getProviderAndBlockTracker().blockTracker
 
+        // token exchange rate tracker
+        this.tokenRatesController = new TokenRatesController({
+          currency: this.currencyRateController,
+          preferences: this.preferencesController.store,
+        })
+
+        this.recentBlocksController = new RecentBlocksController({
+          blockTracker: this.blockTracker,
+          provider: this.provider,
+          networkController: this.networkController,
+        })
+
+        // account tracker watches balances, nonces, and any code at their address.
+        this.accountTracker = new AccountTracker({
+          provider: this.provider,
+          blockTracker: this.blockTracker,
+          network: this.networkController,
+        })
+
+        // start and stop polling for balances based on activeControllerConnections
+        // this.on('controllerConnectionChanged', (activeControllerConnections) => {
+        //   if (activeControllerConnections > 0) {
+        //     this.accountTracker.start()
+        //   } else {
+        //     this.accountTracker.stop()
+        //   }
+        // })
+
+        this.onboardingController = new OnboardingController({
+          initState: initState.OnboardingController,
+        })
+
+        // ensure accountTracker updates balances after network change
+        this.networkController.on('networkDidChange', () => {
+          this.accountTracker._updateAccounts()
+        })
+
+        // key mgmt
+        const additionalKeyrings = [TrezorKeyring, LedgerBridgeKeyring]
+        this.keyringController = new KeyringController({
+          keyringTypes: additionalKeyrings,
+          initState: initState.KeyringController,
+          getNetwork: this.networkController.getNetworkState.bind(this.networkController),
+          encryptor: undefined,
+        })
+
+        this.keyringController.memStore.subscribe((s) => this._onKeyringControllerUpdate(s))
 
         this.txController = new TransactionController({
             initState: initState.TransactionController || initState.TransactionManager,
             networkStore: this.networkController.networkStore,
-            // preferencesStore: this.preferencesController.store,
+            preferencesStore: this.preferencesController.store,
             txHistoryLimit: 40,
             getNetwork: this.networkController.getNetworkState.bind(this),
-            // signTransaction: this.keyringController.signTransaction.bind(this.keyringController),
+            signTransaction: this.keyringController.signTransaction.bind(this.keyringController),
             provider: this.provider,
             blockTracker: this.blockTracker,
             // getGasPrice: this.getGasPrice.bind(this),
         })
         this.txController.on('newUnapprovedTx', this.showUnapprovedTx.bind(this))
+
+        // computed balances (accounting for pending transactions)
+        this.balancesController = new BalancesController({
+          accountTracker: this.accountTracker,
+          txController: this.txController,
+          blockTracker: this.blockTracker,
+        })
+
+        this.networkController.on('networkDidChange', () => {
+          this.balancesController.updateAllBalances()
+          this.setCurrentCurrency(this.currencyRateController.state.currentCurrency, function () {})
+        })
+        this.balancesController.updateAllBalances()
+
+        this.shapeshiftController = new ShapeShiftController(undefined, initState.ShapeShiftController)
+
+        this.networkController.lookupNetwork()
+        this.messageManager = new MessageManager()
+        this.personalMessageManager = new PersonalMessageManager()
+        this.typedMessageManager = new TypedMessageManager({ networkController: this.networkController })
+
+        this.providerApprovalController = new ProviderApprovalController({
+          closePopup: this.closePopup.bind(this),
+          keyringController: this.keyringController,
+          openPopup: this.openPopup.bind(this),
+          preferencesController: this.preferencesController,
+        })
+
+        this.memStore = new ComposableObservableStore(null, {
+          AppStateController: this.appStateController.store,
+          NetworkController: this.networkController.store,
+          AccountTracker: this.accountTracker.store,
+          TxController: this.txController.memStore,
+          BalancesController: this.balancesController.store,
+          // CachedBalancesController: this.cachedBalancesController.store,
+          TokenRatesController: this.tokenRatesController.store,
+          MessageManager: this.messageManager.memStore,
+          PersonalMessageManager: this.personalMessageManager.memStore,
+          TypesMessageManager: this.typedMessageManager.memStore,
+          KeyringController: this.keyringController.memStore,
+          PreferencesController: this.preferencesController.store,
+          RecentBlocksController: this.recentBlocksController.store,
+          AddressBookController: this.addressBookController,
+          CurrencyController: this.currencyRateController,
+          ShapeshiftController: this.shapeshiftController,
+          InfuraController: this.infuraController.store,
+          ProviderApprovalController: this.providerApprovalController.store,
+          OnboardingController: this.onboardingController.store,
+        })
+
+
+
 
         extension.runtime.onConnect.addListener(connectRemote)
         extension.runtime.onConnectExternal.addListener(connectExternal)
@@ -114,6 +338,47 @@ const background = {
 
             self.setupUntrustedCommunication(portStream, originDomain)
         }
+    },
+
+    async _onKeyringControllerUpdate (state) {
+        const {isUnlocked, keyrings} = state
+        const addresses = keyrings.reduce((acc, {accounts}) => acc.concat(accounts), [])
+
+        if (!addresses.length) {
+          return
+        }
+
+        // Ensure preferences + identities controller know about all addresses
+        this.preferencesController.addAddresses(addresses)
+        this.accountTracker.syncWithAddresses(addresses)
+
+        const wasLocked = !isUnlocked
+        if (wasLocked) {
+          const oldSelectedAddress = this.preferencesController.getSelectedAddress()
+          if (!addresses.includes(oldSelectedAddress)) {
+            const address = addresses[0]
+            await this.preferencesController.setSelectedAddress(address)
+          }
+        }
+    },
+
+    setCurrentCurrency (currencyCode, cb) {
+        const { ticker } = this.networkController.getNetworkConfig()
+        try {
+          const currencyState = {
+            nativeCurrency: ticker,
+            currentCurrency: currencyCode,
+          }
+          this.currencyRateController.update(currencyState)
+          this.currencyRateController.configure(currencyState)
+          cb(null, this.currencyRateController.state)
+        } catch (err) {
+          cb(err)
+        }
+    },
+
+    setLocked () {
+        return this.keyringController.setLocked()
     },
 
     setupUntrustedCommunication(connectionStream, originDomain) {
@@ -158,7 +423,6 @@ const background = {
 
         function updatePublicConfigStore (memState) {
             const publicState = selectPublicState(memState)
-            console.log('publicState', publicState)
             publicConfigStore.putState(publicState)
         }
 
@@ -176,6 +440,14 @@ const background = {
         }
 
         return publicConfigStore
+    },
+
+    closePopup() {
+
+    },
+
+    openPopup() {
+
     },
 
     getState() {
@@ -353,7 +625,7 @@ const background = {
                 // } else {
                 //     return []
                 // }
-                return []
+                return ['0x89abefd605e171cc5b6eb4aa9b9b7b4983f30a87']
               },
               // tx signing
               processTransaction: this.newUnapprovedTransaction.bind(this),

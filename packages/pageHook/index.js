@@ -49,6 +49,8 @@ const pageHook = {
             target: 'contentscript',
         })
 
+        console.log('metamaskStream', metamaskStream)
+
         const inpageProvider = new MetamaskInpageProvider(metamaskStream)
         inpageProvider.setMaxListeners(100)
 
@@ -65,7 +67,7 @@ const pageHook = {
             //     resolve(response.result)
             //   }
             // })
-            resolve(["0x76535c6995faa57e38c61ad7cbcb3bd8219c66ce"])
+            resolve(["0x89abefd605e171cc5b6eb4aa9b9b7b4983f30a87"])
           })
         }
 
