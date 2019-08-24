@@ -48,6 +48,7 @@ const MessageManager = require('./lib/message-manager')
 const PersonalMessageManager = require('./lib/personal-message-manager')
 const TypedMessageManager = require('./lib/typed-message-manager')
 const ProviderApprovalController = require('./controllers/provider-approval')
+const nodeify = require('./lib/nodeify')
 
 const {
   AddressBookController,
@@ -74,14 +75,7 @@ const logger = new Logger('background');
 const initState = {
     AppStateController: {},
     CachedBalancesController: {
-        cachedBalances: {
-            1: {
-                0x89abefd605e171cc5b6eb4aa9b9b7b4983f30a87: "0x0"
-            },
-            4: {
-                0x89abefd605e171cc5b6eb4aa9b9b7b4983f30a87: "0x0"
-            }
-        }
+        cachedBalances: {}
     },
     CurrencyController: {
         conversionDate: 1566547524.878,
@@ -110,6 +104,10 @@ const initState = {
     },
     PreferencesController: {
         accountTokens: {
+            '0xa6c600d08f882392312acb0a2c1455e209bb558a': {
+                mainnet: [],
+                rinkeby: []
+            },
             '0x89abefd605e171cc5b6eb4aa9b9b7b4983f30a87': {
                 mainnet: [],
                 rinkeby: []
@@ -124,9 +122,13 @@ const initState = {
         forgottenPassword: false,
         frequentRpcListDetail: [],
         identities: {
+            '0xa6c600d08f882392312acb0a2c1455e209bb558a': {
+                address: "0xa6c600d08f882392312acb0a2c1455e209bb558a",
+                name: "Account 1"
+            },
             '0x89abefd605e171cc5b6eb4aa9b9b7b4983f30a87': {
                 address: "0x89abefd605e171cc5b6eb4aa9b9b7b4983f30a87",
-                name: "Account 1"
+                name: "Account 2"
             }
         },
         knownMethodData: {},
@@ -409,37 +411,36 @@ const background = {
 
     createPublicConfigStore ({ checkIsEnabled }) {
         // subset of state for metamask inpage provider
-        const publicConfigStore = new ObservableStore()
+        this.publicConfigStore = new ObservableStore()
 
         // setup memStore subscription hooks
         // this.on('update', updatePublicConfigStore)
 
-        updatePublicConfigStore(this.getState())
+        this.updatePublicConfigStore(this.getState())
 
-        publicConfigStore.destroy = () => {
+        this.publicConfigStore.destroy = () => {
             this.removeEventListener && this.removeEventListener('update', updatePublicConfigStore)
         }
 
-        function updatePublicConfigStore (memState) {
-            const publicState = selectPublicState(memState)
-            publicConfigStore.putState(publicState)
+        return this.publicConfigStore
+    },
+
+    updatePublicConfigStore(memState) {
+        console.log('memState', memState)
+        const publicState = this.selectPublicState(memState)
+        this.publicConfigStore.putState(publicState)
+    },
+
+    selectPublicState({ isUnlocked, selectedAddress, network, completedOnboarding }) {
+        const result = {
+            isUnlocked,
+            selectedAddress,
+            isEnabled: true,
+            networkVersion: network,
+            onboardingcomplete: completedOnboarding,
         }
 
-        function selectPublicState ({ isUnlocked, selectedAddress, network, completedOnboarding }) {
-            const isEnabled = checkIsEnabled()
-            const isReady = isUnlocked && isEnabled
-            const result = {
-                isUnlocked,
-                isEnabled,
-                selectedAddress,
-                networkVersion: network,
-                onboardingcomplete: completedOnboarding,
-            }
-
-            return result
-        }
-
-        return publicConfigStore
+        return result
     },
 
     closePopup() {
@@ -466,7 +467,6 @@ const background = {
 
         // setup connection
         const providerStream = createEngineStream({ engine })
-        console.log('providerStream', providerStream)
 
         pump(
             outStream,
@@ -507,12 +507,12 @@ const background = {
         engine.push(filterMiddleware)
         engine.push(subscriptionManager.middleware)
         // watch asset
-        // engine.push(this.preferencesController.requestWatchAsset.bind(this.preferencesController))
+        engine.push(this.preferencesController.requestWatchAsset.bind(this.preferencesController))
         // requestAccounts
-        // engine.push(this.providerApprovalController.createMiddleware({
-        //     origin,
-        //     getSiteMetadata,
-        // }))
+        engine.push(this.providerApprovalController.createMiddleware({
+            origin,
+            getSiteMetadata,
+        }))
         // forward to metamask primary provider
         engine.push(providerAsMiddleware(provider))
 
@@ -582,19 +582,18 @@ const background = {
             version,
             // account mgmt
             getAccounts: async ({ origin }) => {
-                // // Expose no accounts if this origin has not been approved, preventing
-                // // account-requring RPC methods from completing successfully
-                // const exposeAccounts = this.providerApprovalController.shouldExposeAccounts(origin)
-                // if (origin !== 'MetaMask' && !exposeAccounts) { return [] }
-                // const isUnlocked = this.keyringController.memStore.getState().isUnlocked
-                // const selectedAddress = this.preferencesController.getSelectedAddress()
-                // // only show address if account is unlocked
-                // if (isUnlocked && selectedAddress) {
-                //     return [selectedAddress]
-                // } else {
-                //     return []
-                // }
-                return ['0x89abefd605e171cc5b6eb4aa9b9b7b4983f30a87']
+                // Expose no accounts if this origin has not been approved, preventing
+                // account-requring RPC methods from completing successfully
+                const exposeAccounts = this.providerApprovalController.shouldExposeAccounts(origin)
+                if (origin !== 'MetaMask' && !exposeAccounts) { return [] }
+                const isUnlocked = this.keyringController.memStore.getState().isUnlocked
+                const selectedAddress = this.preferencesController.getSelectedAddress()
+                // only show address if account is unlocked
+                if (isUnlocked && selectedAddress) {
+                    return [selectedAddress]
+                } else {
+                    return []
+                }
               },
               // tx signing
               processTransaction: this.newUnapprovedTransaction.bind(this),
@@ -700,9 +699,12 @@ const background = {
             BackgroundAPI.setLayoutMode(mode)
         ));
 
-        this.walletService.on('setEthereumDappSetting', ethereumDappSetting => (
+        this.walletService.on('setEthereumDappSetting', async (ethereumDappSetting) => {
             BackgroundAPI.setEthereumDappSetting(ethereumDappSetting)
-        ));
+            const setSelectedAddress = nodeify(this.preferencesController.setSelectedAddress, this.preferencesController)
+            await setSelectedAddress(ethereumDappSetting.address)
+            this.updatePublicConfigStore(this.getState())
+        });
 
         this.walletService.on('setTronDappSetting', tronDappSetting => (
             BackgroundAPI.setTronDappSetting(tronDappSetting)

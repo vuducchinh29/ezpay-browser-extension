@@ -59,15 +59,14 @@ const pageHook = {
 
         inpageProvider.enable = function ({ force } = {}) {
           return new Promise((resolve, reject) => {
-            // inpageProvider.sendAsync({ method: 'eth_requestAccounts', params: [force] }, (error, response) => {
-            //   if (error || response.error) {
+            inpageProvider.sendAsync({ method: 'eth_requestAccounts', params: [force] }, (error, response) => {
+              if (error || response.error) {
 
-            //     reject(error || response.error)
-            //   } else {
-            //     resolve(response.result)
-            //   }
-            // })
-            resolve(["0x89abefd605e171cc5b6eb4aa9b9b7b4983f30a87"])
+                reject(error || response.error)
+              } else {
+                resolve(response.result)
+              }
+            })
           })
         }
 
@@ -129,7 +128,6 @@ const pageHook = {
           },
         })
 
-        console.log('inpageProvider', inpageProvider);
         // Work around for web3@1.0 deleting the bound `sendAsync` but not the unbound
         // `sendAsync` method on the prototype, causing `this` reference issues
         const proxiedInpageProvider = new Proxy(inpageProvider, {
@@ -162,6 +160,7 @@ const pageHook = {
 
         // set web3 defaultAccount
         inpageProvider.publicConfigStore.subscribe(function (state) {
+            console.log('selectedAddressxxx', state.selectedAddress)
           web3.eth.defaultAccount = state.selectedAddress
         })
 
@@ -218,6 +217,7 @@ const pageHook = {
 
         this.eventChannel.on('setAccountEthereum', address => {
             console.log('setAccountEthereum', address)
+            web3.eth.defaultAccount = address
             // this.setAddressWeb3(address);
         });
 
