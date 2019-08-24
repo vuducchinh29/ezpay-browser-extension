@@ -86,357 +86,6 @@
 /************************************************************************/
 /******/ ({
 
-/***/ "../../node_modules/@babel/runtime/helpers/arrayWithoutHoles.js":
-/*!**************************************************************************************************!*\
-  !*** /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/arrayWithoutHoles.js ***!
-  \**************************************************************************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports) {
-
-function _arrayWithoutHoles(arr) {
-  if (Array.isArray(arr)) {
-    for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) {
-      arr2[i] = arr[i];
-    }
-
-    return arr2;
-  }
-}
-
-module.exports = _arrayWithoutHoles;
-
-/***/ }),
-
-/***/ "../../node_modules/@babel/runtime/helpers/assertThisInitialized.js":
-/*!******************************************************************************************************!*\
-  !*** /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/assertThisInitialized.js ***!
-  \******************************************************************************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports) {
-
-function _assertThisInitialized(self) {
-  if (self === void 0) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-
-  return self;
-}
-
-module.exports = _assertThisInitialized;
-
-/***/ }),
-
-/***/ "../../node_modules/@babel/runtime/helpers/asyncToGenerator.js":
-/*!*************************************************************************************************!*\
-  !*** /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/asyncToGenerator.js ***!
-  \*************************************************************************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports) {
-
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
-  try {
-    var info = gen[key](arg);
-    var value = info.value;
-  } catch (error) {
-    reject(error);
-    return;
-  }
-
-  if (info.done) {
-    resolve(value);
-  } else {
-    Promise.resolve(value).then(_next, _throw);
-  }
-}
-
-function _asyncToGenerator(fn) {
-  return function () {
-    var self = this,
-        args = arguments;
-    return new Promise(function (resolve, reject) {
-      var gen = fn.apply(self, args);
-
-      function _next(value) {
-        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
-      }
-
-      function _throw(err) {
-        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
-      }
-
-      _next(undefined);
-    });
-  };
-}
-
-module.exports = _asyncToGenerator;
-
-/***/ }),
-
-/***/ "../../node_modules/@babel/runtime/helpers/classCallCheck.js":
-/*!***********************************************************************************************!*\
-  !*** /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/classCallCheck.js ***!
-  \***********************************************************************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports) {
-
-function _classCallCheck(instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-}
-
-module.exports = _classCallCheck;
-
-/***/ }),
-
-/***/ "../../node_modules/@babel/runtime/helpers/createClass.js":
-/*!********************************************************************************************!*\
-  !*** /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/createClass.js ***!
-  \********************************************************************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports) {
-
-function _defineProperties(target, props) {
-  for (var i = 0; i < props.length; i++) {
-    var descriptor = props[i];
-    descriptor.enumerable = descriptor.enumerable || false;
-    descriptor.configurable = true;
-    if ("value" in descriptor) descriptor.writable = true;
-    Object.defineProperty(target, descriptor.key, descriptor);
-  }
-}
-
-function _createClass(Constructor, protoProps, staticProps) {
-  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-  if (staticProps) _defineProperties(Constructor, staticProps);
-  return Constructor;
-}
-
-module.exports = _createClass;
-
-/***/ }),
-
-/***/ "../../node_modules/@babel/runtime/helpers/defineProperty.js":
-/*!***********************************************************************************************!*\
-  !*** /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/defineProperty.js ***!
-  \***********************************************************************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports) {
-
-function _defineProperty(obj, key, value) {
-  if (key in obj) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-
-  return obj;
-}
-
-module.exports = _defineProperty;
-
-/***/ }),
-
-/***/ "../../node_modules/@babel/runtime/helpers/getPrototypeOf.js":
-/*!***********************************************************************************************!*\
-  !*** /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/getPrototypeOf.js ***!
-  \***********************************************************************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports) {
-
-function _getPrototypeOf(o) {
-  module.exports = _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
-    return o.__proto__ || Object.getPrototypeOf(o);
-  };
-  return _getPrototypeOf(o);
-}
-
-module.exports = _getPrototypeOf;
-
-/***/ }),
-
-/***/ "../../node_modules/@babel/runtime/helpers/inherits.js":
-/*!*****************************************************************************************!*\
-  !*** /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/inherits.js ***!
-  \*****************************************************************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports, __webpack_require__) {
-
-var setPrototypeOf = __webpack_require__(/*! ./setPrototypeOf */ "../../node_modules/@babel/runtime/helpers/setPrototypeOf.js");
-
-function _inherits(subClass, superClass) {
-  if (typeof superClass !== "function" && superClass !== null) {
-    throw new TypeError("Super expression must either be null or a function");
-  }
-
-  subClass.prototype = Object.create(superClass && superClass.prototype, {
-    constructor: {
-      value: subClass,
-      writable: true,
-      configurable: true
-    }
-  });
-  if (superClass) setPrototypeOf(subClass, superClass);
-}
-
-module.exports = _inherits;
-
-/***/ }),
-
-/***/ "../../node_modules/@babel/runtime/helpers/iterableToArray.js":
-/*!************************************************************************************************!*\
-  !*** /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/iterableToArray.js ***!
-  \************************************************************************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports) {
-
-function _iterableToArray(iter) {
-  if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
-}
-
-module.exports = _iterableToArray;
-
-/***/ }),
-
-/***/ "../../node_modules/@babel/runtime/helpers/nonIterableSpread.js":
-/*!**************************************************************************************************!*\
-  !*** /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/nonIterableSpread.js ***!
-  \**************************************************************************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports) {
-
-function _nonIterableSpread() {
-  throw new TypeError("Invalid attempt to spread non-iterable instance");
-}
-
-module.exports = _nonIterableSpread;
-
-/***/ }),
-
-/***/ "../../node_modules/@babel/runtime/helpers/possibleConstructorReturn.js":
-/*!**********************************************************************************************************!*\
-  !*** /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/possibleConstructorReturn.js ***!
-  \**********************************************************************************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports, __webpack_require__) {
-
-var _typeof = __webpack_require__(/*! ../helpers/typeof */ "../../node_modules/@babel/runtime/helpers/typeof.js");
-
-var assertThisInitialized = __webpack_require__(/*! ./assertThisInitialized */ "../../node_modules/@babel/runtime/helpers/assertThisInitialized.js");
-
-function _possibleConstructorReturn(self, call) {
-  if (call && (_typeof(call) === "object" || typeof call === "function")) {
-    return call;
-  }
-
-  return assertThisInitialized(self);
-}
-
-module.exports = _possibleConstructorReturn;
-
-/***/ }),
-
-/***/ "../../node_modules/@babel/runtime/helpers/setPrototypeOf.js":
-/*!***********************************************************************************************!*\
-  !*** /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/setPrototypeOf.js ***!
-  \***********************************************************************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports) {
-
-function _setPrototypeOf(o, p) {
-  module.exports = _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
-    o.__proto__ = p;
-    return o;
-  };
-
-  return _setPrototypeOf(o, p);
-}
-
-module.exports = _setPrototypeOf;
-
-/***/ }),
-
-/***/ "../../node_modules/@babel/runtime/helpers/toConsumableArray.js":
-/*!**************************************************************************************************!*\
-  !*** /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/toConsumableArray.js ***!
-  \**************************************************************************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports, __webpack_require__) {
-
-var arrayWithoutHoles = __webpack_require__(/*! ./arrayWithoutHoles */ "../../node_modules/@babel/runtime/helpers/arrayWithoutHoles.js");
-
-var iterableToArray = __webpack_require__(/*! ./iterableToArray */ "../../node_modules/@babel/runtime/helpers/iterableToArray.js");
-
-var nonIterableSpread = __webpack_require__(/*! ./nonIterableSpread */ "../../node_modules/@babel/runtime/helpers/nonIterableSpread.js");
-
-function _toConsumableArray(arr) {
-  return arrayWithoutHoles(arr) || iterableToArray(arr) || nonIterableSpread();
-}
-
-module.exports = _toConsumableArray;
-
-/***/ }),
-
-/***/ "../../node_modules/@babel/runtime/helpers/typeof.js":
-/*!***************************************************************************************!*\
-  !*** /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/typeof.js ***!
-  \***************************************************************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports) {
-
-function _typeof2(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof2 = function _typeof2(obj) { return typeof obj; }; } else { _typeof2 = function _typeof2(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof2(obj); }
-
-function _typeof(obj) {
-  if (typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol") {
-    module.exports = _typeof = function _typeof(obj) {
-      return _typeof2(obj);
-    };
-  } else {
-    module.exports = _typeof = function _typeof(obj) {
-      return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : _typeof2(obj);
-    };
-  }
-
-  return _typeof(obj);
-}
-
-module.exports = _typeof;
-
-/***/ }),
-
-/***/ "../../node_modules/@babel/runtime/regenerator/index.js":
-/*!******************************************************************************************!*\
-  !*** /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/regenerator/index.js ***!
-  \******************************************************************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(/*! regenerator-runtime */ "../../node_modules/regenerator-runtime/runtime.js");
-
-
-/***/ }),
-
 /***/ "../../node_modules/base64-js/index.js":
 /*!*************************************************************************!*\
   !*** /home/dev/ezpay-browser-extension/node_modules/base64-js/index.js ***!
@@ -9271,744 +8920,6 @@ module.exports = __webpack_require__(/*! ./lib/_stream_writable.js */ "../../nod
 
 /***/ }),
 
-/***/ "../../node_modules/regenerator-runtime/runtime.js":
-/*!*************************************************************************************!*\
-  !*** /home/dev/ezpay-browser-extension/node_modules/regenerator-runtime/runtime.js ***!
-  \*************************************************************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports, __webpack_require__) {
-
-/**
- * Copyright (c) 2014-present, Facebook, Inc.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
-
-var runtime = (function (exports) {
-  "use strict";
-
-  var Op = Object.prototype;
-  var hasOwn = Op.hasOwnProperty;
-  var undefined; // More compressible than void 0.
-  var $Symbol = typeof Symbol === "function" ? Symbol : {};
-  var iteratorSymbol = $Symbol.iterator || "@@iterator";
-  var asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator";
-  var toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag";
-
-  function wrap(innerFn, outerFn, self, tryLocsList) {
-    // If outerFn provided and outerFn.prototype is a Generator, then outerFn.prototype instanceof Generator.
-    var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator;
-    var generator = Object.create(protoGenerator.prototype);
-    var context = new Context(tryLocsList || []);
-
-    // The ._invoke method unifies the implementations of the .next,
-    // .throw, and .return methods.
-    generator._invoke = makeInvokeMethod(innerFn, self, context);
-
-    return generator;
-  }
-  exports.wrap = wrap;
-
-  // Try/catch helper to minimize deoptimizations. Returns a completion
-  // record like context.tryEntries[i].completion. This interface could
-  // have been (and was previously) designed to take a closure to be
-  // invoked without arguments, but in all the cases we care about we
-  // already have an existing method we want to call, so there's no need
-  // to create a new function object. We can even get away with assuming
-  // the method takes exactly one argument, since that happens to be true
-  // in every case, so we don't have to touch the arguments object. The
-  // only additional allocation required is the completion record, which
-  // has a stable shape and so hopefully should be cheap to allocate.
-  function tryCatch(fn, obj, arg) {
-    try {
-      return { type: "normal", arg: fn.call(obj, arg) };
-    } catch (err) {
-      return { type: "throw", arg: err };
-    }
-  }
-
-  var GenStateSuspendedStart = "suspendedStart";
-  var GenStateSuspendedYield = "suspendedYield";
-  var GenStateExecuting = "executing";
-  var GenStateCompleted = "completed";
-
-  // Returning this object from the innerFn has the same effect as
-  // breaking out of the dispatch switch statement.
-  var ContinueSentinel = {};
-
-  // Dummy constructor functions that we use as the .constructor and
-  // .constructor.prototype properties for functions that return Generator
-  // objects. For full spec compliance, you may wish to configure your
-  // minifier not to mangle the names of these two functions.
-  function Generator() {}
-  function GeneratorFunction() {}
-  function GeneratorFunctionPrototype() {}
-
-  // This is a polyfill for %IteratorPrototype% for environments that
-  // don't natively support it.
-  var IteratorPrototype = {};
-  IteratorPrototype[iteratorSymbol] = function () {
-    return this;
-  };
-
-  var getProto = Object.getPrototypeOf;
-  var NativeIteratorPrototype = getProto && getProto(getProto(values([])));
-  if (NativeIteratorPrototype &&
-      NativeIteratorPrototype !== Op &&
-      hasOwn.call(NativeIteratorPrototype, iteratorSymbol)) {
-    // This environment has a native %IteratorPrototype%; use it instead
-    // of the polyfill.
-    IteratorPrototype = NativeIteratorPrototype;
-  }
-
-  var Gp = GeneratorFunctionPrototype.prototype =
-    Generator.prototype = Object.create(IteratorPrototype);
-  GeneratorFunction.prototype = Gp.constructor = GeneratorFunctionPrototype;
-  GeneratorFunctionPrototype.constructor = GeneratorFunction;
-  GeneratorFunctionPrototype[toStringTagSymbol] =
-    GeneratorFunction.displayName = "GeneratorFunction";
-
-  // Helper for defining the .next, .throw, and .return methods of the
-  // Iterator interface in terms of a single ._invoke method.
-  function defineIteratorMethods(prototype) {
-    ["next", "throw", "return"].forEach(function(method) {
-      prototype[method] = function(arg) {
-        return this._invoke(method, arg);
-      };
-    });
-  }
-
-  exports.isGeneratorFunction = function(genFun) {
-    var ctor = typeof genFun === "function" && genFun.constructor;
-    return ctor
-      ? ctor === GeneratorFunction ||
-        // For the native GeneratorFunction constructor, the best we can
-        // do is to check its .name property.
-        (ctor.displayName || ctor.name) === "GeneratorFunction"
-      : false;
-  };
-
-  exports.mark = function(genFun) {
-    if (Object.setPrototypeOf) {
-      Object.setPrototypeOf(genFun, GeneratorFunctionPrototype);
-    } else {
-      genFun.__proto__ = GeneratorFunctionPrototype;
-      if (!(toStringTagSymbol in genFun)) {
-        genFun[toStringTagSymbol] = "GeneratorFunction";
-      }
-    }
-    genFun.prototype = Object.create(Gp);
-    return genFun;
-  };
-
-  // Within the body of any async function, `await x` is transformed to
-  // `yield regeneratorRuntime.awrap(x)`, so that the runtime can test
-  // `hasOwn.call(value, "__await")` to determine if the yielded value is
-  // meant to be awaited.
-  exports.awrap = function(arg) {
-    return { __await: arg };
-  };
-
-  function AsyncIterator(generator) {
-    function invoke(method, arg, resolve, reject) {
-      var record = tryCatch(generator[method], generator, arg);
-      if (record.type === "throw") {
-        reject(record.arg);
-      } else {
-        var result = record.arg;
-        var value = result.value;
-        if (value &&
-            typeof value === "object" &&
-            hasOwn.call(value, "__await")) {
-          return Promise.resolve(value.__await).then(function(value) {
-            invoke("next", value, resolve, reject);
-          }, function(err) {
-            invoke("throw", err, resolve, reject);
-          });
-        }
-
-        return Promise.resolve(value).then(function(unwrapped) {
-          // When a yielded Promise is resolved, its final value becomes
-          // the .value of the Promise<{value,done}> result for the
-          // current iteration.
-          result.value = unwrapped;
-          resolve(result);
-        }, function(error) {
-          // If a rejected Promise was yielded, throw the rejection back
-          // into the async generator function so it can be handled there.
-          return invoke("throw", error, resolve, reject);
-        });
-      }
-    }
-
-    var previousPromise;
-
-    function enqueue(method, arg) {
-      function callInvokeWithMethodAndArg() {
-        return new Promise(function(resolve, reject) {
-          invoke(method, arg, resolve, reject);
-        });
-      }
-
-      return previousPromise =
-        // If enqueue has been called before, then we want to wait until
-        // all previous Promises have been resolved before calling invoke,
-        // so that results are always delivered in the correct order. If
-        // enqueue has not been called before, then it is important to
-        // call invoke immediately, without waiting on a callback to fire,
-        // so that the async generator function has the opportunity to do
-        // any necessary setup in a predictable way. This predictability
-        // is why the Promise constructor synchronously invokes its
-        // executor callback, and why async functions synchronously
-        // execute code before the first await. Since we implement simple
-        // async functions in terms of async generators, it is especially
-        // important to get this right, even though it requires care.
-        previousPromise ? previousPromise.then(
-          callInvokeWithMethodAndArg,
-          // Avoid propagating failures to Promises returned by later
-          // invocations of the iterator.
-          callInvokeWithMethodAndArg
-        ) : callInvokeWithMethodAndArg();
-    }
-
-    // Define the unified helper method that is used to implement .next,
-    // .throw, and .return (see defineIteratorMethods).
-    this._invoke = enqueue;
-  }
-
-  defineIteratorMethods(AsyncIterator.prototype);
-  AsyncIterator.prototype[asyncIteratorSymbol] = function () {
-    return this;
-  };
-  exports.AsyncIterator = AsyncIterator;
-
-  // Note that simple async functions are implemented on top of
-  // AsyncIterator objects; they just return a Promise for the value of
-  // the final result produced by the iterator.
-  exports.async = function(innerFn, outerFn, self, tryLocsList) {
-    var iter = new AsyncIterator(
-      wrap(innerFn, outerFn, self, tryLocsList)
-    );
-
-    return exports.isGeneratorFunction(outerFn)
-      ? iter // If outerFn is a generator, return the full iterator.
-      : iter.next().then(function(result) {
-          return result.done ? result.value : iter.next();
-        });
-  };
-
-  function makeInvokeMethod(innerFn, self, context) {
-    var state = GenStateSuspendedStart;
-
-    return function invoke(method, arg) {
-      if (state === GenStateExecuting) {
-        throw new Error("Generator is already running");
-      }
-
-      if (state === GenStateCompleted) {
-        if (method === "throw") {
-          throw arg;
-        }
-
-        // Be forgiving, per 25.3.3.3.3 of the spec:
-        // https://people.mozilla.org/~jorendorff/es6-draft.html#sec-generatorresume
-        return doneResult();
-      }
-
-      context.method = method;
-      context.arg = arg;
-
-      while (true) {
-        var delegate = context.delegate;
-        if (delegate) {
-          var delegateResult = maybeInvokeDelegate(delegate, context);
-          if (delegateResult) {
-            if (delegateResult === ContinueSentinel) continue;
-            return delegateResult;
-          }
-        }
-
-        if (context.method === "next") {
-          // Setting context._sent for legacy support of Babel's
-          // function.sent implementation.
-          context.sent = context._sent = context.arg;
-
-        } else if (context.method === "throw") {
-          if (state === GenStateSuspendedStart) {
-            state = GenStateCompleted;
-            throw context.arg;
-          }
-
-          context.dispatchException(context.arg);
-
-        } else if (context.method === "return") {
-          context.abrupt("return", context.arg);
-        }
-
-        state = GenStateExecuting;
-
-        var record = tryCatch(innerFn, self, context);
-        if (record.type === "normal") {
-          // If an exception is thrown from innerFn, we leave state ===
-          // GenStateExecuting and loop back for another invocation.
-          state = context.done
-            ? GenStateCompleted
-            : GenStateSuspendedYield;
-
-          if (record.arg === ContinueSentinel) {
-            continue;
-          }
-
-          return {
-            value: record.arg,
-            done: context.done
-          };
-
-        } else if (record.type === "throw") {
-          state = GenStateCompleted;
-          // Dispatch the exception by looping back around to the
-          // context.dispatchException(context.arg) call above.
-          context.method = "throw";
-          context.arg = record.arg;
-        }
-      }
-    };
-  }
-
-  // Call delegate.iterator[context.method](context.arg) and handle the
-  // result, either by returning a { value, done } result from the
-  // delegate iterator, or by modifying context.method and context.arg,
-  // setting context.delegate to null, and returning the ContinueSentinel.
-  function maybeInvokeDelegate(delegate, context) {
-    var method = delegate.iterator[context.method];
-    if (method === undefined) {
-      // A .throw or .return when the delegate iterator has no .throw
-      // method always terminates the yield* loop.
-      context.delegate = null;
-
-      if (context.method === "throw") {
-        // Note: ["return"] must be used for ES3 parsing compatibility.
-        if (delegate.iterator["return"]) {
-          // If the delegate iterator has a return method, give it a
-          // chance to clean up.
-          context.method = "return";
-          context.arg = undefined;
-          maybeInvokeDelegate(delegate, context);
-
-          if (context.method === "throw") {
-            // If maybeInvokeDelegate(context) changed context.method from
-            // "return" to "throw", let that override the TypeError below.
-            return ContinueSentinel;
-          }
-        }
-
-        context.method = "throw";
-        context.arg = new TypeError(
-          "The iterator does not provide a 'throw' method");
-      }
-
-      return ContinueSentinel;
-    }
-
-    var record = tryCatch(method, delegate.iterator, context.arg);
-
-    if (record.type === "throw") {
-      context.method = "throw";
-      context.arg = record.arg;
-      context.delegate = null;
-      return ContinueSentinel;
-    }
-
-    var info = record.arg;
-
-    if (! info) {
-      context.method = "throw";
-      context.arg = new TypeError("iterator result is not an object");
-      context.delegate = null;
-      return ContinueSentinel;
-    }
-
-    if (info.done) {
-      // Assign the result of the finished delegate to the temporary
-      // variable specified by delegate.resultName (see delegateYield).
-      context[delegate.resultName] = info.value;
-
-      // Resume execution at the desired location (see delegateYield).
-      context.next = delegate.nextLoc;
-
-      // If context.method was "throw" but the delegate handled the
-      // exception, let the outer generator proceed normally. If
-      // context.method was "next", forget context.arg since it has been
-      // "consumed" by the delegate iterator. If context.method was
-      // "return", allow the original .return call to continue in the
-      // outer generator.
-      if (context.method !== "return") {
-        context.method = "next";
-        context.arg = undefined;
-      }
-
-    } else {
-      // Re-yield the result returned by the delegate method.
-      return info;
-    }
-
-    // The delegate iterator is finished, so forget it and continue with
-    // the outer generator.
-    context.delegate = null;
-    return ContinueSentinel;
-  }
-
-  // Define Generator.prototype.{next,throw,return} in terms of the
-  // unified ._invoke helper method.
-  defineIteratorMethods(Gp);
-
-  Gp[toStringTagSymbol] = "Generator";
-
-  // A Generator should always return itself as the iterator object when the
-  // @@iterator function is called on it. Some browsers' implementations of the
-  // iterator prototype chain incorrectly implement this, causing the Generator
-  // object to not be returned from this call. This ensures that doesn't happen.
-  // See https://github.com/facebook/regenerator/issues/274 for more details.
-  Gp[iteratorSymbol] = function() {
-    return this;
-  };
-
-  Gp.toString = function() {
-    return "[object Generator]";
-  };
-
-  function pushTryEntry(locs) {
-    var entry = { tryLoc: locs[0] };
-
-    if (1 in locs) {
-      entry.catchLoc = locs[1];
-    }
-
-    if (2 in locs) {
-      entry.finallyLoc = locs[2];
-      entry.afterLoc = locs[3];
-    }
-
-    this.tryEntries.push(entry);
-  }
-
-  function resetTryEntry(entry) {
-    var record = entry.completion || {};
-    record.type = "normal";
-    delete record.arg;
-    entry.completion = record;
-  }
-
-  function Context(tryLocsList) {
-    // The root entry object (effectively a try statement without a catch
-    // or a finally block) gives us a place to store values thrown from
-    // locations where there is no enclosing try statement.
-    this.tryEntries = [{ tryLoc: "root" }];
-    tryLocsList.forEach(pushTryEntry, this);
-    this.reset(true);
-  }
-
-  exports.keys = function(object) {
-    var keys = [];
-    for (var key in object) {
-      keys.push(key);
-    }
-    keys.reverse();
-
-    // Rather than returning an object with a next method, we keep
-    // things simple and return the next function itself.
-    return function next() {
-      while (keys.length) {
-        var key = keys.pop();
-        if (key in object) {
-          next.value = key;
-          next.done = false;
-          return next;
-        }
-      }
-
-      // To avoid creating an additional object, we just hang the .value
-      // and .done properties off the next function object itself. This
-      // also ensures that the minifier will not anonymize the function.
-      next.done = true;
-      return next;
-    };
-  };
-
-  function values(iterable) {
-    if (iterable) {
-      var iteratorMethod = iterable[iteratorSymbol];
-      if (iteratorMethod) {
-        return iteratorMethod.call(iterable);
-      }
-
-      if (typeof iterable.next === "function") {
-        return iterable;
-      }
-
-      if (!isNaN(iterable.length)) {
-        var i = -1, next = function next() {
-          while (++i < iterable.length) {
-            if (hasOwn.call(iterable, i)) {
-              next.value = iterable[i];
-              next.done = false;
-              return next;
-            }
-          }
-
-          next.value = undefined;
-          next.done = true;
-
-          return next;
-        };
-
-        return next.next = next;
-      }
-    }
-
-    // Return an iterator with no values.
-    return { next: doneResult };
-  }
-  exports.values = values;
-
-  function doneResult() {
-    return { value: undefined, done: true };
-  }
-
-  Context.prototype = {
-    constructor: Context,
-
-    reset: function(skipTempReset) {
-      this.prev = 0;
-      this.next = 0;
-      // Resetting context._sent for legacy support of Babel's
-      // function.sent implementation.
-      this.sent = this._sent = undefined;
-      this.done = false;
-      this.delegate = null;
-
-      this.method = "next";
-      this.arg = undefined;
-
-      this.tryEntries.forEach(resetTryEntry);
-
-      if (!skipTempReset) {
-        for (var name in this) {
-          // Not sure about the optimal order of these conditions:
-          if (name.charAt(0) === "t" &&
-              hasOwn.call(this, name) &&
-              !isNaN(+name.slice(1))) {
-            this[name] = undefined;
-          }
-        }
-      }
-    },
-
-    stop: function() {
-      this.done = true;
-
-      var rootEntry = this.tryEntries[0];
-      var rootRecord = rootEntry.completion;
-      if (rootRecord.type === "throw") {
-        throw rootRecord.arg;
-      }
-
-      return this.rval;
-    },
-
-    dispatchException: function(exception) {
-      if (this.done) {
-        throw exception;
-      }
-
-      var context = this;
-      function handle(loc, caught) {
-        record.type = "throw";
-        record.arg = exception;
-        context.next = loc;
-
-        if (caught) {
-          // If the dispatched exception was caught by a catch block,
-          // then let that catch block handle the exception normally.
-          context.method = "next";
-          context.arg = undefined;
-        }
-
-        return !! caught;
-      }
-
-      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
-        var entry = this.tryEntries[i];
-        var record = entry.completion;
-
-        if (entry.tryLoc === "root") {
-          // Exception thrown outside of any try block that could handle
-          // it, so set the completion value of the entire function to
-          // throw the exception.
-          return handle("end");
-        }
-
-        if (entry.tryLoc <= this.prev) {
-          var hasCatch = hasOwn.call(entry, "catchLoc");
-          var hasFinally = hasOwn.call(entry, "finallyLoc");
-
-          if (hasCatch && hasFinally) {
-            if (this.prev < entry.catchLoc) {
-              return handle(entry.catchLoc, true);
-            } else if (this.prev < entry.finallyLoc) {
-              return handle(entry.finallyLoc);
-            }
-
-          } else if (hasCatch) {
-            if (this.prev < entry.catchLoc) {
-              return handle(entry.catchLoc, true);
-            }
-
-          } else if (hasFinally) {
-            if (this.prev < entry.finallyLoc) {
-              return handle(entry.finallyLoc);
-            }
-
-          } else {
-            throw new Error("try statement without catch or finally");
-          }
-        }
-      }
-    },
-
-    abrupt: function(type, arg) {
-      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
-        var entry = this.tryEntries[i];
-        if (entry.tryLoc <= this.prev &&
-            hasOwn.call(entry, "finallyLoc") &&
-            this.prev < entry.finallyLoc) {
-          var finallyEntry = entry;
-          break;
-        }
-      }
-
-      if (finallyEntry &&
-          (type === "break" ||
-           type === "continue") &&
-          finallyEntry.tryLoc <= arg &&
-          arg <= finallyEntry.finallyLoc) {
-        // Ignore the finally entry if control is not jumping to a
-        // location outside the try/catch block.
-        finallyEntry = null;
-      }
-
-      var record = finallyEntry ? finallyEntry.completion : {};
-      record.type = type;
-      record.arg = arg;
-
-      if (finallyEntry) {
-        this.method = "next";
-        this.next = finallyEntry.finallyLoc;
-        return ContinueSentinel;
-      }
-
-      return this.complete(record);
-    },
-
-    complete: function(record, afterLoc) {
-      if (record.type === "throw") {
-        throw record.arg;
-      }
-
-      if (record.type === "break" ||
-          record.type === "continue") {
-        this.next = record.arg;
-      } else if (record.type === "return") {
-        this.rval = this.arg = record.arg;
-        this.method = "return";
-        this.next = "end";
-      } else if (record.type === "normal" && afterLoc) {
-        this.next = afterLoc;
-      }
-
-      return ContinueSentinel;
-    },
-
-    finish: function(finallyLoc) {
-      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
-        var entry = this.tryEntries[i];
-        if (entry.finallyLoc === finallyLoc) {
-          this.complete(entry.completion, entry.afterLoc);
-          resetTryEntry(entry);
-          return ContinueSentinel;
-        }
-      }
-    },
-
-    "catch": function(tryLoc) {
-      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
-        var entry = this.tryEntries[i];
-        if (entry.tryLoc === tryLoc) {
-          var record = entry.completion;
-          if (record.type === "throw") {
-            var thrown = record.arg;
-            resetTryEntry(entry);
-          }
-          return thrown;
-        }
-      }
-
-      // The context.catch method must only be called with a location
-      // argument that corresponds to a known catch block.
-      throw new Error("illegal catch attempt");
-    },
-
-    delegateYield: function(iterable, resultName, nextLoc) {
-      this.delegate = {
-        iterator: values(iterable),
-        resultName: resultName,
-        nextLoc: nextLoc
-      };
-
-      if (this.method === "next") {
-        // Deliberately forget the last sent value so that we don't
-        // accidentally pass it on to the delegate.
-        this.arg = undefined;
-      }
-
-      return ContinueSentinel;
-    }
-  };
-
-  // Regardless of whether this script is executing as a CommonJS module
-  // or not, return the runtime object so that we can declare the variable
-  // regeneratorRuntime in the outer scope, which allows this module to be
-  // injected easily by `bin/regenerator --include-runtime script.js`.
-  return exports;
-
-}(
-  // If this script is executing as a CommonJS module, use module.exports
-  // as the regeneratorRuntime namespace. Otherwise create a new empty
-  // object. Either way, the resulting object will be used to initialize
-  // the regeneratorRuntime variable at the top of this file.
-   true ? module.exports : undefined
-));
-
-try {
-  regeneratorRuntime = runtime;
-} catch (accidentalStrictMode) {
-  // This module should not be running in strict mode, so the above
-  // assignment should always work unless something is misconfigured. Just
-  // in case runtime.js accidentally runs in strict mode, we can escape
-  // strict mode using a global Function call. This could conceivably fail
-  // if a Content Security Policy forbids using Function, but in that case
-  // the proper solution is to fix the accidental strict mode problem. If
-  // you've misconfigured your bundler to force strict mode and applied a
-  // CSP to forbid Function, and you're not willing to fix either of those
-  // problems, please detail your unique predicament in a GitHub issue.
-  Function("r", "regeneratorRuntime = r")(runtime);
-}
-
-
-/***/ }),
-
 /***/ "../../node_modules/safe-buffer/index.js":
 /*!***************************************************************************!*\
   !*** /home/dev/ezpay-browser-extension/node_modules/safe-buffer/index.js ***!
@@ -11954,15 +10865,6 @@ function wrappy (fn, cb) {
   !*** ./index.js + 5 modules ***!
   \******************************/
 /*! no exports provided */
-/*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/asyncToGenerator.js (<- Module is not an ECMAScript module) */
-/*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/classCallCheck.js (<- Module is not an ECMAScript module) */
-/*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/createClass.js (<- Module is not an ECMAScript module) */
-/*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/defineProperty.js (<- Module is not an ECMAScript module) */
-/*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/getPrototypeOf.js (<- Module is not an ECMAScript module) */
-/*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/inherits.js (<- Module is not an ECMAScript module) */
-/*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/possibleConstructorReturn.js (<- Module is not an ECMAScript module) */
-/*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/toConsumableArray.js (<- Module is not an ECMAScript module) */
-/*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/regenerator/index.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/dateformat/lib/dateformat.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/eventemitter3/index.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/extensionizer/index.js (<- Module is not an ECMAScript module) */
@@ -11970,42 +10872,6 @@ function wrappy (fn, cb) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-
-// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/regenerator/index.js
-var regenerator = __webpack_require__("../../node_modules/@babel/runtime/regenerator/index.js");
-var regenerator_default = /*#__PURE__*/__webpack_require__.n(regenerator);
-
-// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/asyncToGenerator.js
-var asyncToGenerator = __webpack_require__("../../node_modules/@babel/runtime/helpers/asyncToGenerator.js");
-var asyncToGenerator_default = /*#__PURE__*/__webpack_require__.n(asyncToGenerator);
-
-// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/toConsumableArray.js
-var toConsumableArray = __webpack_require__("../../node_modules/@babel/runtime/helpers/toConsumableArray.js");
-var toConsumableArray_default = /*#__PURE__*/__webpack_require__.n(toConsumableArray);
-
-// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/defineProperty.js
-var defineProperty = __webpack_require__("../../node_modules/@babel/runtime/helpers/defineProperty.js");
-var defineProperty_default = /*#__PURE__*/__webpack_require__.n(defineProperty);
-
-// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/classCallCheck.js
-var classCallCheck = __webpack_require__("../../node_modules/@babel/runtime/helpers/classCallCheck.js");
-var classCallCheck_default = /*#__PURE__*/__webpack_require__.n(classCallCheck);
-
-// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/createClass.js
-var createClass = __webpack_require__("../../node_modules/@babel/runtime/helpers/createClass.js");
-var createClass_default = /*#__PURE__*/__webpack_require__.n(createClass);
-
-// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/possibleConstructorReturn.js
-var possibleConstructorReturn = __webpack_require__("../../node_modules/@babel/runtime/helpers/possibleConstructorReturn.js");
-var possibleConstructorReturn_default = /*#__PURE__*/__webpack_require__.n(possibleConstructorReturn);
-
-// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/getPrototypeOf.js
-var getPrototypeOf = __webpack_require__("../../node_modules/@babel/runtime/helpers/getPrototypeOf.js");
-var getPrototypeOf_default = /*#__PURE__*/__webpack_require__.n(getPrototypeOf);
-
-// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/inherits.js
-var inherits = __webpack_require__("../../node_modules/@babel/runtime/helpers/inherits.js");
-var inherits_default = /*#__PURE__*/__webpack_require__.n(inherits);
 
 // EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/eventemitter3/index.js
 var eventemitter3 = __webpack_require__("../../node_modules/eventemitter3/index.js");
@@ -12021,59 +10887,37 @@ var dateformat_default = /*#__PURE__*/__webpack_require__.n(dateformat);
 
 // CONCATENATED MODULE: ../lib/logger.js
 
-
-
-
-
-var logger_Logger =
-/*#__PURE__*/
-function () {
-  function Logger(source) {
-    classCallCheck_default()(this, Logger);
-
+class logger_Logger {
+  constructor(source) {
     this._source = source;
     return new Proxy(this, {
-      get: function get(target, name) {
+      get(target, name) {
         return target._handleInput.bind(target, name);
       }
+
     });
   }
 
-  createClass_default()(Logger, [{
-    key: "_handleInput",
-    value: function _handleInput(logType) {
-      var _console;
+  _handleInput(logType, ...data) {
+    const formatted = this._formatMessage(logType, data);
 
-      for (var _len = arguments.length, data = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-        data[_key - 1] = arguments[_key];
-      }
+    console.log(...formatted);
+  }
 
-      var formatted = this._formatMessage(logType, data);
+  _formatMessage(logType = 'info', data) {
+    let level = logType;
+    const colours = {
+      info: '7f8c8d',
+      warn: 'f39c12',
+      error: 'c0392b'
+    };
+    if (!colours.hasOwnProperty(logType)) level = 'info';
+    const colour = colours[level];
+    const timestamp = dateformat_default()(Date.now(), 'mmm d, hh:MM:ss tt');
+    return [`[${timestamp}] %c[${this._source}]: %c[${level.toUpperCase()}]:`, 'font-weight: bold;', `color: #${colour};`, ...data];
+  }
 
-      (_console = console).log.apply(_console, toConsumableArray_default()(formatted));
-    }
-  }, {
-    key: "_formatMessage",
-    value: function _formatMessage() {
-      var logType = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'info';
-      var data = arguments.length > 1 ? arguments[1] : undefined;
-      var level = logType;
-      var colours = {
-        info: '7f8c8d',
-        warn: 'f39c12',
-        error: 'c0392b'
-      };
-      if (!colours.hasOwnProperty(logType)) level = 'info';
-      var colour = colours[level];
-      var timestamp = dateformat_default()(Date.now(), 'mmm d, hh:MM:ss tt');
-      return ["[".concat(timestamp, "] %c[").concat(this._source, "]: %c[").concat(level.toUpperCase(), "]:"), 'font-weight: bold;', "color: #".concat(colour, ";")].concat(toConsumableArray_default()(data));
-    }
-  }]);
-
-  return Logger;
-}();
-
-
+}
 // EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/extensionizer/index.js
 var extensionizer = __webpack_require__("../../node_modules/extensionizer/index.js");
 var extensionizer_default = /*#__PURE__*/__webpack_require__.n(extensionizer);
@@ -12083,195 +10927,142 @@ var extensionizer_default = /*#__PURE__*/__webpack_require__.n(extensionizer);
 
 
 
+const logger = new logger_Logger('MessageDuplex.Host');
 
+class host_MessageDuplexHost extends eventemitter3_default.a {
+  constructor() {
+    super();
+    this.channels = new Map();
+    this.incoming = new Map(); // Incoming message replies
 
+    this.outgoing = new Map(); // Outgoing message replies
 
-
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { keys.push.apply(keys, Object.getOwnPropertySymbols(object)); } if (enumerableOnly) keys = keys.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(source, true).forEach(function (key) { defineProperty_default()(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-
-
-
-
-var logger = new logger_Logger('MessageDuplex.Host');
-
-var host_MessageDuplexHost =
-/*#__PURE__*/
-function (_EventEmitter) {
-  inherits_default()(MessageDuplexHost, _EventEmitter);
-
-  function MessageDuplexHost() {
-    var _this;
-
-    classCallCheck_default()(this, MessageDuplexHost);
-
-    _this = possibleConstructorReturn_default()(this, getPrototypeOf_default()(MessageDuplexHost).call(this));
-    _this.channels = new Map();
-    _this.incoming = new Map(); // Incoming message replies
-
-    _this.outgoing = new Map(); // Outgoing message replies
-
-    extensionizer_default.a.runtime.onConnect.addListener(function (channel) {
-      return _this.handleNewConnection(channel);
-    });
-    return _this;
+    extensionizer_default.a.runtime.onConnect.addListener(channel => this.handleNewConnection(channel));
   }
 
-  createClass_default()(MessageDuplexHost, [{
-    key: "handleNewConnection",
-    value: function handleNewConnection(channel) {
-      var _this2 = this;
+  handleNewConnection(channel) {
+    const extensionID = channel.sender.id;
+    const uuid = v4_default()();
 
-      var extensionID = channel.sender.id;
-      var uuid = v4_default()();
+    if (extensionID !== extensionizer_default.a.runtime.id) {
+      channel.disconnect();
+      return logger.warn(`Dropped unsolicited connection from ${extensionID}`);
+    }
 
-      if (extensionID !== extensionizer_default.a.runtime.id) {
-        channel.disconnect();
-        return logger.warn("Dropped unsolicited connection from ".concat(extensionID));
+    const {
+      name,
+      sender: {
+        url
       }
+    } = channel; // logger.info(`New connection ${ name }:${ uuid } acquired`, channel);
 
-      var name = channel.name,
-          url = channel.sender.url; // logger.info(`New connection ${ name }:${ uuid } acquired`, channel);
+    if (!this.channels.has(name)) this.emit(`${name}:connect`);
+    const channelList = this.channels.get(name) || new Map();
+    const hostname = new URL(url).hostname;
+    this.channels.set(name, channelList.set(uuid, {
+      channel,
+      url
+    }));
+    channel.onMessage.addListener(message => this.handleMessage(name, { ...message,
+      hostname
+    }));
+    channel.onDisconnect.addListener(() => {
+      // logger.info(`Connection ${ name }:${ uuid } disconnected`);
+      // Delete any pending requests that match this name + id
+      const channelList = this.channels.get(name);
+      if (!channelList) return;
+      channelList.delete(uuid);
 
-      if (!this.channels.has(name)) this.emit("".concat(name, ":connect"));
-      var channelList = this.channels.get(name) || new Map();
-      var hostname = new URL(url).hostname;
-      this.channels.set(name, channelList.set(uuid, {
-        channel: channel,
-        url: url
-      }));
-      channel.onMessage.addListener(function (message) {
-        return _this2.handleMessage(name, _objectSpread({}, message, {
-          hostname: hostname
-        }));
-      });
-      channel.onDisconnect.addListener(function () {
-        // logger.info(`Connection ${ name }:${ uuid } disconnected`);
-        // Delete any pending requests that match this name + id
-        var channelList = _this2.channels.get(name);
+      if (!channelList.size) {
+        this.channels.delete(name);
+        this.emit(`${name}:disconnect`);
+      }
+    });
+  }
 
-        if (!channelList) return;
-        channelList["delete"](uuid);
+  handleMessage(source, message) {
+    // logger.info(`Received message from ${ source }:`, message);
+    const {
+      noAck = false,
+      hostname,
+      messageID,
+      action,
+      data
+    } = message;
+    if (action == 'messageReply') return this.handleReply(data);
+    if (source == 'tab' && !['tabRequest'].includes(action)) return logger.error(`Droping unauthorized tab request: ${action}`, data);
+    if (noAck) return this.emit(action, {
+      hostname,
+      data
+    });
+    this.incoming.set(messageID, res => this.send(source, 'messageReply', {
+      messageID,
+      ...res
+    }, false));
+    this.emit(action, {
+      resolve: res => {
+        if (!this.incoming.get(messageID)) return logger.warn(`Message ${messageID} expired`);
+        this.incoming.get(messageID)({
+          error: false,
+          res
+        });
+        this.incoming.delete(messageID);
+      },
+      reject: res => {
+        if (!this.incoming.get(messageID)) return logger.warn(`Message ${messageID} expired`);
+        this.incoming.get(messageID)({
+          error: true,
+          res
+        });
+        this.incoming.delete(messageID);
+      },
+      data,
+      hostname
+    });
+  }
 
-        if (!channelList.size) {
-          _this2.channels["delete"](name);
+  handleReply({
+    messageID,
+    error,
+    res
+  }) {
+    if (!this.outgoing.has(messageID)) return;
+    if (error) this.outgoing.get(messageID)(Promise.reject(res));else this.outgoing.get(messageID)(res);
+    this.outgoing.delete(messageID);
+  }
 
-          _this2.emit("".concat(name, ":disconnect"));
-        }
-      });
-    }
-  }, {
-    key: "handleMessage",
-    value: function handleMessage(source, message) {
-      var _this3 = this;
+  broadcast(action, data, requiresAck = true) {
+    return Promise.all([...this.channels.keys()].map(channelGroup => this.send(channelGroup, action, data, requiresAck)));
+  }
 
-      // logger.info(`Received message from ${ source }:`, message);
-      var _message$noAck = message.noAck,
-          noAck = _message$noAck === void 0 ? false : _message$noAck,
-          hostname = message.hostname,
-          messageID = message.messageID,
-          action = message.action,
-          data = message.data;
-      if (action == 'messageReply') return this.handleReply(data);
-      if (source == 'tab' && !['tabRequest'].includes(action)) return logger.error("Droping unauthorized tab request: ".concat(action), data);
-      if (noAck) return this.emit(action, {
-        hostname: hostname,
-        data: data
-      });
-      this.incoming.set(messageID, function (res) {
-        return _this3.send(source, 'messageReply', _objectSpread({
-          messageID: messageID
-        }, res), false);
-      });
-      this.emit(action, {
-        resolve: function resolve(res) {
-          if (!_this3.incoming.get(messageID)) return logger.warn("Message ".concat(messageID, " expired"));
+  send(target = false, action, data, requiresAck = true) {
+    if (!this.channels.has(target)) return; // return Promise.reject('Target channel does not exist');
 
-          _this3.incoming.get(messageID)({
-            error: false,
-            res: res
-          });
-
-          _this3.incoming["delete"](messageID);
-        },
-        reject: function reject(res) {
-          if (!_this3.incoming.get(messageID)) return logger.warn("Message ".concat(messageID, " expired"));
-
-          _this3.incoming.get(messageID)({
-            error: true,
-            res: res
-          });
-
-          _this3.incoming["delete"](messageID);
-        },
-        data: data,
-        hostname: hostname
-      });
-    }
-  }, {
-    key: "handleReply",
-    value: function handleReply(_ref) {
-      var messageID = _ref.messageID,
-          error = _ref.error,
-          res = _ref.res;
-      if (!this.outgoing.has(messageID)) return;
-      if (error) this.outgoing.get(messageID)(Promise.reject(res));else this.outgoing.get(messageID)(res);
-      this.outgoing["delete"](messageID);
-    }
-  }, {
-    key: "broadcast",
-    value: function broadcast(action, data) {
-      var _this4 = this;
-
-      var requiresAck = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
-      return Promise.all(toConsumableArray_default()(this.channels.keys()).map(function (channelGroup) {
-        return _this4.send(channelGroup, action, data, requiresAck);
+    if (!requiresAck) {
+      return this.channels.get(target).forEach(({
+        channel
+      }) => channel.postMessage({
+        action,
+        data,
+        noAck: true
       }));
     }
-  }, {
-    key: "send",
-    value: function send() {
-      var _this5 = this;
 
-      var target = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-      var action = arguments.length > 1 ? arguments[1] : undefined;
-      var data = arguments.length > 2 ? arguments[2] : undefined;
-      var requiresAck = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
-      if (!this.channels.has(target)) return; // return Promise.reject('Target channel does not exist');
+    return new Promise((resolve, reject) => {
+      const messageID = v4_default()();
+      this.outgoing.set(messageID, resolve);
+      this.channels.get(target).forEach(({
+        channel
+      }) => channel.postMessage({
+        action,
+        data,
+        messageID,
+        noAck: false
+      }));
+    });
+  }
 
-      if (!requiresAck) {
-        return this.channels.get(target).forEach(function (_ref2) {
-          var channel = _ref2.channel;
-          return channel.postMessage({
-            action: action,
-            data: data,
-            noAck: true
-          });
-        });
-      }
-
-      return new Promise(function (resolve, reject) {
-        var messageID = v4_default()();
-
-        _this5.outgoing.set(messageID, resolve);
-
-        _this5.channels.get(target).forEach(function (_ref3) {
-          var channel = _ref3.channel;
-          return channel.postMessage({
-            action: action,
-            data: data,
-            messageID: messageID,
-            noAck: false
-          });
-        });
-      });
-    }
-  }]);
-
-  return MessageDuplexHost;
-}(eventemitter3_default.a);
+}
 
 /* harmony default export */ var host = (host_MessageDuplexHost);
 // CONCATENATED MODULE: ../lib/MessageDuplex/handlers/child.js
@@ -12279,272 +11070,199 @@ function (_EventEmitter) {
 
 
 
+const child_logger = new logger_Logger('MessageDuplex.Child');
 
+class child_MessageDuplexChild extends eventemitter3_default.a {
+  constructor(type = false) {
+    super();
+    if (!['tab', 'popup'].includes(type)) throw new Error(`MessageDuplexChild expects a source type of either tab or popup, instead "${type}" was provided`);
+    this.type = type;
+    this.incoming = new Map(); // Incoming message replies
 
+    this.outgoing = new Map(); // Outgoing message replies
 
-function child_ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { keys.push.apply(keys, Object.getOwnPropertySymbols(object)); } if (enumerableOnly) keys = keys.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); return keys; }
-
-function child_objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { child_ownKeys(source, true).forEach(function (key) { defineProperty_default()(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { child_ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-
-
-
-
-var child_logger = new logger_Logger('MessageDuplex.Child');
-
-var child_MessageDuplexChild =
-/*#__PURE__*/
-function (_EventEmitter) {
-  inherits_default()(MessageDuplexChild, _EventEmitter);
-
-  function MessageDuplexChild() {
-    var _this;
-
-    var type = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-
-    classCallCheck_default()(this, MessageDuplexChild);
-
-    _this = possibleConstructorReturn_default()(this, getPrototypeOf_default()(MessageDuplexChild).call(this));
-    if (!['tab', 'popup'].includes(type)) throw new Error("MessageDuplexChild expects a source type of either tab or popup, instead \"".concat(type, "\" was provided"));
-    _this.type = type;
-    _this.incoming = new Map(); // Incoming message replies
-
-    _this.outgoing = new Map(); // Outgoing message replies
-
-    _this.messageListener = false;
-    _this.disconnectListener = false;
-    _this.extensionID = extensionizer_default.a.runtime.id;
-
-    _this.resetGovernor();
-
-    _this.connectToHost();
-
-    _this.connectionGovernor();
-
-    return _this;
+    this.messageListener = false;
+    this.disconnectListener = false;
+    this.extensionID = extensionizer_default.a.runtime.id;
+    this.resetGovernor();
+    this.connectToHost();
+    this.connectionGovernor();
   }
 
-  createClass_default()(MessageDuplexChild, [{
-    key: "connectToHost",
-    value: function connectToHost() {
-      var _this2 = this;
+  connectToHost() {
+    this.channel = extensionizer_default.a.runtime.connect(
+    /*this.extensionID, */
+    {
+      name: this.type
+    });
+    this.governor.isConnected = true;
+    this.messageListener = this.channel.onMessage.addListener(message => {
+      this.handleMessage(message);
+    });
+    this.disconnectListener = this.channel.onDisconnect.addListener(() => {
+      const error = this.channel.error || extensionizer_default.a.lastError || 'Unknown disconnect';
+      child_logger.error('Lost connection to MessageDuplexHost:', error);
+      this.governor.isConnected = false;
+      this.governor.reconnect();
+    });
+  }
 
-      this.channel = extensionizer_default.a.runtime.connect(
-      /*this.extensionID, */
-      {
-        name: this.type
-      });
-      this.governor.isConnected = true;
-      this.messageListener = this.channel.onMessage.addListener(function (message) {
-        _this2.handleMessage(message);
-      });
-      this.disconnectListener = this.channel.onDisconnect.addListener(function () {
-        var error = _this2.channel.error || extensionizer_default.a.lastError || 'Unknown disconnect';
-        child_logger.error('Lost connection to MessageDuplexHost:', error);
-        _this2.governor.isConnected = false;
+  resetGovernor() {
+    if (this.governor && this.governor.connectionEstablisher.func) clearInterval(this.connectionGovernor.connectionEstablisher.func);
+    this.governor = {
+      isConnected: false,
+      hasTimedOut: false,
+      // after connectionEstablisher.remaining = 0
+      connectionEstablisher: {
+        func: false,
+        remaining: 5 // try 5 times, 1 second span
 
-        _this2.governor.reconnect();
-      });
-    }
-  }, {
-    key: "resetGovernor",
-    value: function resetGovernor() {
-      if (this.governor && this.governor.connectionEstablisher.func) clearInterval(this.connectionGovernor.connectionEstablisher.func);
-      this.governor = {
-        isConnected: false,
-        hasTimedOut: false,
-        // after connectionEstablisher.remaining = 0
-        connectionEstablisher: {
-          func: false,
-          remaining: 5 // try 5 times, 1 second span
-
-        },
-        queue: [],
-        reconnect: function reconnect() {
-          child_logger.warn('MessageDuplexChild requested reconnect');
-        }
-      };
-    }
-  }, {
-    key: "connectionGovernor",
-    value: function connectionGovernor() {
-      if (this.isHost) throw new Error('Host port cannot establish governor status');
-    }
-  }, {
-    key: "handleMessage",
-    value: function handleMessage(_ref) {
-      var _this3 = this;
-
-      var action = _ref.action,
-          data = _ref.data,
-          messageID = _ref.messageID,
-          _ref$noAck = _ref.noAck,
-          noAck = _ref$noAck === void 0 ? false : _ref$noAck;
-      if (action == 'messageReply') return this.handleReply(data);
-      if (noAck) return this.emit(action, data);
-      this.incoming.set(messageID, function (res) {
-        return _this3.send('messageReply', child_objectSpread({
-          messageID: messageID
-        }, res), false);
-      });
-      this.emit(action, {
-        resolve: function resolve(res) {
-          if (!_this3.incoming.get(messageID)) return child_logger.warn("Message ".concat(messageID, " expired"));
-
-          _this3.incoming.get(messageID)({
-            error: false,
-            res: res
-          });
-
-          _this3.incoming["delete"](messageID);
-        },
-        reject: function reject(res) {
-          if (!_this3.incoming.get(messageID)) return child_logger.warn("Message ".concat(messageID, " expired"));
-
-          _this3.incoming.get(messageID)({
-            error: true,
-            res: res
-          });
-
-          _this3.incoming["delete"](messageID);
-        },
-        data: data
-      });
-    }
-  }, {
-    key: "handleReply",
-    value: function handleReply(_ref2) {
-      var messageID = _ref2.messageID,
-          error = _ref2.error,
-          res = _ref2.res;
-      if (!this.outgoing.has(messageID)) return;
-      if (error) this.outgoing.get(messageID)(Promise.reject(res));else this.outgoing.get(messageID)(res);
-      this.outgoing["delete"](messageID);
-    }
-  }, {
-    key: "send",
-    value: function send(action, data) {
-      var _this4 = this;
-
-      var requiresAck = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
-      var governor = this.governor;
-
-      if (!governor.isConnected && !governor.hasTimedOut) {
-        return new Promise(function (resolve, reject) {
-          return governor.queue.push({
-            action: action,
-            data: data,
-            resolve: resolve,
-            reject: reject
-          });
-        });
+      },
+      queue: [],
+      reconnect: () => {
+        child_logger.warn('MessageDuplexChild requested reconnect');
       }
+    };
+  }
 
-      if (!governor.isConnected && governor.hasTimedOut) return Promise.reject('Failed to establish connection to extension');
-      if (!requiresAck) return this.channel.postMessage({
-        action: action,
-        data: data,
-        noAck: true
-      });
-      return new Promise(function (resolve, reject) {
-        var messageID = v4_default()();
+  connectionGovernor() {
+    if (this.isHost) throw new Error('Host port cannot establish governor status');
+  }
 
-        _this4.outgoing.set(messageID, resolve);
-
-        _this4.channel.postMessage({
-          action: action,
-          data: data,
-          messageID: messageID,
-          noAck: false
+  handleMessage({
+    action,
+    data,
+    messageID,
+    noAck = false
+  }) {
+    if (action == 'messageReply') return this.handleReply(data);
+    if (noAck) return this.emit(action, data);
+    this.incoming.set(messageID, res => this.send('messageReply', {
+      messageID,
+      ...res
+    }, false));
+    this.emit(action, {
+      resolve: res => {
+        if (!this.incoming.get(messageID)) return child_logger.warn(`Message ${messageID} expired`);
+        this.incoming.get(messageID)({
+          error: false,
+          res
         });
-      });
-    }
-  }]);
+        this.incoming.delete(messageID);
+      },
+      reject: res => {
+        if (!this.incoming.get(messageID)) return child_logger.warn(`Message ${messageID} expired`);
+        this.incoming.get(messageID)({
+          error: true,
+          res
+        });
+        this.incoming.delete(messageID);
+      },
+      data
+    });
+  }
 
-  return MessageDuplexChild;
-}(eventemitter3_default.a);
+  handleReply({
+    messageID,
+    error,
+    res
+  }) {
+    if (!this.outgoing.has(messageID)) return;
+    if (error) this.outgoing.get(messageID)(Promise.reject(res));else this.outgoing.get(messageID)(res);
+    this.outgoing.delete(messageID);
+  }
+
+  send(action, data, requiresAck = true) {
+    const {
+      governor
+    } = this;
+
+    if (!governor.isConnected && !governor.hasTimedOut) {
+      return new Promise((resolve, reject) => governor.queue.push({
+        action,
+        data,
+        resolve,
+        reject
+      }));
+    }
+
+    if (!governor.isConnected && governor.hasTimedOut) return Promise.reject('Failed to establish connection to extension');
+    if (!requiresAck) return this.channel.postMessage({
+      action,
+      data,
+      noAck: true
+    });
+    return new Promise((resolve, reject) => {
+      const messageID = v4_default()();
+      this.outgoing.set(messageID, resolve);
+      this.channel.postMessage({
+        action,
+        data,
+        messageID,
+        noAck: false
+      });
+    });
+  }
+
+}
 
 /* harmony default export */ var child = (child_MessageDuplexChild);
 // CONCATENATED MODULE: ../lib/MessageDuplex/index.js
 
 
-var Tab = child.bind(null, 'tab');
-var Popup = child.bind(null, 'popup');
+const Tab = child.bind(null, 'tab');
+const Popup = child.bind(null, 'popup');
 /* harmony default export */ var MessageDuplex = ({
   Host: host,
-  Tab: Tab,
-  Popup: Popup
+  Tab,
+  Popup
 });
 // CONCATENATED MODULE: ../lib/EventChannel.js
 
 
-
-
-
-
-
-var EventChannel_EventChannel =
-/*#__PURE__*/
-function (_EventEmitter) {
-  inherits_default()(EventChannel, _EventEmitter);
-
-  function EventChannel() {
-    var _this;
-
-    var channelKey = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-
-    classCallCheck_default()(this, EventChannel);
-
-    _this = possibleConstructorReturn_default()(this, getPrototypeOf_default()(EventChannel).call(this));
+class EventChannel_EventChannel extends eventemitter3_default.a {
+  constructor(channelKey = false) {
+    super();
     if (!channelKey) throw 'No channel scope provided';
-    _this._channelKey = channelKey;
+    this._channelKey = channelKey;
 
-    _this._registerEventListener();
-
-    return _this;
+    this._registerEventListener();
   }
 
-  createClass_default()(EventChannel, [{
-    key: "_registerEventListener",
-    value: function _registerEventListener() {
-      var _this2 = this;
+  _registerEventListener() {
+    window.addEventListener('message', ({
+      data: {
+        isTronLink = false,
+        message,
+        source
+      }
+    }) => {
+      if (!isTronLink || !message && !source) return;
+      if (source === this._channelKey) return;
+      const {
+        action,
+        data
+      } = message;
+      this.emit(action, data);
+    });
+  }
 
-      window.addEventListener('message', function (_ref) {
-        var _ref$data = _ref.data,
-            _ref$data$isTronLink = _ref$data.isTronLink,
-            isTronLink = _ref$data$isTronLink === void 0 ? false : _ref$data$isTronLink,
-            message = _ref$data.message,
-            source = _ref$data.source;
-        if (!isTronLink || !message && !source) return;
-        if (source === _this2._channelKey) return;
-        var action = message.action,
-            data = message.data;
+  send(action = false, data = {}) {
+    if (!action) return {
+      success: false,
+      error: 'Function requires action {string} parameter'
+    };
+    window.postMessage({
+      message: {
+        action,
+        data
+      },
+      source: this._channelKey,
+      isTronLink: true
+    }, '*');
+  }
 
-        _this2.emit(action, data);
-      });
-    }
-  }, {
-    key: "send",
-    value: function send() {
-      var action = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-      var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-      if (!action) return {
-        success: false,
-        error: 'Function requires action {string} parameter'
-      };
-      window.postMessage({
-        message: {
-          action: action,
-          data: data
-        },
-        source: this._channelKey,
-        isTronLink: true
-      }, '*');
-    }
-  }]);
-
-  return EventChannel;
-}(eventemitter3_default.a);
+}
 
 /* harmony default export */ var lib_EventChannel = (EventChannel_EventChannel);
 // CONCATENATED MODULE: ./index.js
@@ -12553,25 +11271,24 @@ function (_EventEmitter) {
 
 
 
+const LocalMessageDuplexStream = __webpack_require__(/*! post-message-stream */ "../../node_modules/post-message-stream/index.js");
 
+const extension = __webpack_require__(/*! extensionizer */ "../../node_modules/extensionizer/index.js");
 
-var LocalMessageDuplexStream = __webpack_require__(/*! post-message-stream */ "../../node_modules/post-message-stream/index.js");
+const PortStream = __webpack_require__(/*! extension-port-stream */ "../../node_modules/extension-port-stream/index.js");
 
-var extension = __webpack_require__(/*! extensionizer */ "../../node_modules/extensionizer/index.js");
+const ObjectMultiplex = __webpack_require__(/*! obj-multiplex */ "../../node_modules/obj-multiplex/index.js");
 
-var PortStream = __webpack_require__(/*! extension-port-stream */ "../../node_modules/extension-port-stream/index.js");
+const pump = __webpack_require__(/*! pump */ "../../node_modules/pump/index.js");
 
-var ObjectMultiplex = __webpack_require__(/*! obj-multiplex */ "../../node_modules/obj-multiplex/index.js");
+const Dnode = __webpack_require__(/*! dnode */ "../../node_modules/dnode/index.js");
 
-var pump = __webpack_require__(/*! pump */ "../../node_modules/pump/index.js");
-
-var Dnode = __webpack_require__(/*! dnode */ "../../node_modules/dnode/index.js");
-
-var index_logger = new logger_Logger('content');
-var content = {
+const index_logger = new logger_Logger('content');
+const content = {
   duplex: new MessageDuplex.Tab(),
   eventChannel: new lib_EventChannel('contentScript'),
-  init: function init() {
+
+  init() {
     index_logger.info('Initialising ezPay');
     this.registerListeners();
 
@@ -12580,112 +11297,55 @@ var content = {
       this.start();
     }
   },
-  start: function () {
-    var _start = asyncToGenerator_default()(
-    /*#__PURE__*/
-    regenerator_default.a.mark(function _callee() {
-      var pageStream, extensionPort, extensionStream, pageMux, extensionMux, phishingStream, publicApiStream;
-      return regenerator_default.a.wrap(function _callee$(_context) {
-        while (1) {
-          switch (_context.prev = _context.next) {
-            case 0:
-              pageStream = new LocalMessageDuplexStream({
-                name: 'contentscript',
-                target: 'inpage'
-              });
-              extensionPort = extension.runtime.connect({
-                name: 'contentscript'
-              });
-              extensionStream = new PortStream(extensionPort);
-              pageMux = new ObjectMultiplex();
-              pageMux.setMaxListeners(25);
-              extensionMux = new ObjectMultiplex();
-              extensionMux.setMaxListeners(25);
-              pump(pageMux, pageStream, pageMux, function (err) {
-                return logStreamDisconnectWarning('MetaMask Inpage Multiplex', err);
-              });
-              pump(extensionMux, extensionStream, extensionMux, function (err) {
-                return logStreamDisconnectWarning('MetaMask Background Multiplex', err);
-              }); // forward communication across inpage-background for these channels only
 
-              forwardTrafficBetweenMuxers('provider', pageMux, extensionMux);
-              forwardTrafficBetweenMuxers('publicConfig', pageMux, extensionMux); // connect "phishing" channel to warning system
+  async start() {
+    const pageStream = new LocalMessageDuplexStream({
+      name: 'contentscript',
+      target: 'inpage'
+    });
+    const extensionPort = extension.runtime.connect({
+      name: 'contentscript'
+    });
+    const extensionStream = new PortStream(extensionPort);
+    const pageMux = new ObjectMultiplex();
+    pageMux.setMaxListeners(25);
+    const extensionMux = new ObjectMultiplex();
+    extensionMux.setMaxListeners(25);
+    pump(pageMux, pageStream, pageMux, err => logStreamDisconnectWarning('MetaMask Inpage Multiplex', err));
+    pump(extensionMux, extensionStream, extensionMux, err => logStreamDisconnectWarning('MetaMask Background Multiplex', err)); // forward communication across inpage-background for these channels only
 
-              phishingStream = extensionMux.createStream('phishing');
-              phishingStream.once('data', redirectToPhishingWarning); // connect "publicApi" channel to submit page metadata
+    forwardTrafficBetweenMuxers('provider', pageMux, extensionMux);
+    forwardTrafficBetweenMuxers('publicConfig', pageMux, extensionMux); // connect "phishing" channel to warning system
 
-              publicApiStream = extensionMux.createStream('publicApi'); // const background = await setupPublicApi(publicApiStream)
+    const phishingStream = extensionMux.createStream('phishing');
+    phishingStream.once('data', redirectToPhishingWarning); // connect "publicApi" channel to submit page metadata
 
-            case 14:
-            case "end":
-              return _context.stop();
-          }
-        }
-      }, _callee);
-    }));
+    const publicApiStream = extensionMux.createStream('publicApi'); // const background = await setupPublicApi(publicApiStream)
+  },
 
-    function start() {
-      return _start.apply(this, arguments);
-    }
-
-    return start;
-  }(),
-  shouldInjectWeb3: function shouldInjectWeb3() {
+  shouldInjectWeb3() {
     return true;
   },
-  registerListeners: function registerListeners() {
-    var _this = this;
 
-    this.eventChannel.on('tunnel',
-    /*#__PURE__*/
-    function () {
-      var _ref = asyncToGenerator_default()(
-      /*#__PURE__*/
-      regenerator_default.a.mark(function _callee2(data) {
-        return regenerator_default.a.wrap(function _callee2$(_context2) {
-          while (1) {
-            switch (_context2.prev = _context2.next) {
-              case 0:
-                _context2.prev = 0;
-                _context2.t0 = _this.eventChannel;
-                _context2.next = 4;
-                return _this.duplex.send('tabRequest', data);
-
-              case 4:
-                _context2.t1 = _context2.sent;
-
-                _context2.t0.send.call(_context2.t0, 'tabReply', _context2.t1);
-
-                _context2.next = 11;
-                break;
-
-              case 8:
-                _context2.prev = 8;
-                _context2.t2 = _context2["catch"](0);
-                index_logger.info('Tab request failed:', _context2.t2);
-
-              case 11:
-              case "end":
-                return _context2.stop();
-            }
-          }
-        }, _callee2, null, [[0, 8]]);
-      }));
-
-      return function (_x) {
-        return _ref.apply(this, arguments);
-      };
-    }());
-    this.duplex.on('tunnel', function (_ref2) {
-      var action = _ref2.action,
-          data = _ref2.data;
-
-      _this.eventChannel.send(action, data);
+  registerListeners() {
+    this.eventChannel.on('tunnel', async data => {
+      try {
+        this.eventChannel.send('tabReply', (await this.duplex.send('tabRequest', data)));
+      } catch (ex) {
+        index_logger.info('Tab request failed:', ex);
+      }
+    });
+    this.duplex.on('tunnel', ({
+      action,
+      data
+    }) => {
+      this.eventChannel.send(action, data);
     });
   },
-  inject: function inject() {
-    var injectionSite = document.head || document.documentElement;
-    var container = document.createElement('script');
+
+  inject() {
+    const injectionSite = document.head || document.documentElement;
+    const container = document.createElement('script');
     container.src = extensionizer_default.a.extension.getURL('dist/pageHook.js');
 
     container.onload = function () {
@@ -12694,6 +11354,7 @@ var content = {
 
     injectionSite.insertBefore(container, injectionSite.children[0]);
   }
+
 };
 /**
  * Error handler for page to extension stream disconnections
@@ -12703,7 +11364,7 @@ var content = {
  */
 
 function logStreamDisconnectWarning(remoteLabel, err) {
-  var warningMsg = "MetamaskContentscript - lost connection to ".concat(remoteLabel);
+  let warningMsg = `MetamaskContentscript - lost connection to ${remoteLabel}`;
   if (err) warningMsg += '\n' + err.stack;
   console.warn(warningMsg);
 }
@@ -12714,66 +11375,35 @@ function logStreamDisconnectWarning(remoteLabel, err) {
 
 function redirectToPhishingWarning() {
   console.log('MetaMask - routing to Phishing Warning component');
-  var extensionURL = extension.runtime.getURL('phishing.html');
-  window.location.href = "".concat(extensionURL, "#").concat(querystring.stringify({
+  const extensionURL = extension.runtime.getURL('phishing.html');
+  window.location.href = `${extensionURL}#${querystring.stringify({
     hostname: window.location.hostname,
     href: window.location.href
-  }));
+  })}`;
 }
 
 function forwardTrafficBetweenMuxers(channelName, muxA, muxB) {
-  var channelA = muxA.createStream(channelName);
-  var channelB = muxB.createStream(channelName);
-  pump(channelA, channelB, channelA, function (err) {
-    return logStreamDisconnectWarning("MetaMask muxed traffic for channel \"".concat(channelName, "\" failed."), err);
+  const channelA = muxA.createStream(channelName);
+  const channelB = muxB.createStream(channelName);
+  pump(channelA, channelB, channelA, err => logStreamDisconnectWarning(`MetaMask muxed traffic for channel "${channelName}" failed.`, err));
+}
+
+async function setupPublicApi(outStream) {
+  const api = {
+    getSiteMetadata: cb => cb(null, getSiteMetadata())
+  };
+  const dnode = Dnode(api);
+  pump(outStream, dnode, outStream, err => {
+    // report any error
+    if (err) log.error(err);
   });
+  const background = await new Promise(resolve => dnode.once('remote', resolve));
+  return background;
 }
 
-function setupPublicApi(_x2) {
-  return _setupPublicApi.apply(this, arguments);
-}
-
-function _setupPublicApi() {
-  _setupPublicApi = asyncToGenerator_default()(
-  /*#__PURE__*/
-  regenerator_default.a.mark(function _callee3(outStream) {
-    var api, dnode, background;
-    return regenerator_default.a.wrap(function _callee3$(_context3) {
-      while (1) {
-        switch (_context3.prev = _context3.next) {
-          case 0:
-            api = {
-              getSiteMetadata: function getSiteMetadata(cb) {
-                return cb(null, _getSiteMetadata());
-              }
-            };
-            dnode = Dnode(api);
-            pump(outStream, dnode, outStream, function (err) {
-              // report any error
-              if (err) log.error(err);
-            });
-            _context3.next = 5;
-            return new Promise(function (resolve) {
-              return dnode.once('remote', resolve);
-            });
-
-          case 5:
-            background = _context3.sent;
-            return _context3.abrupt("return", background);
-
-          case 7:
-          case "end":
-            return _context3.stop();
-        }
-      }
-    }, _callee3);
-  }));
-  return _setupPublicApi.apply(this, arguments);
-}
-
-function _getSiteMetadata() {
+function getSiteMetadata() {
   // get metadata
-  var metadata = {
+  const metadata = {
     name: getSiteName(window),
     icon: getSiteIcon(window)
   };
@@ -12781,14 +11411,14 @@ function _getSiteMetadata() {
 }
 
 function getSiteName(window) {
-  var document = window.document;
-  var siteName = document.querySelector('head > meta[property="og:site_name"]');
+  const document = window.document;
+  const siteName = document.querySelector('head > meta[property="og:site_name"]');
 
   if (siteName) {
     return siteName.content;
   }
 
-  var metaTitle = document.querySelector('head > meta[name="title"]');
+  const metaTitle = document.querySelector('head > meta[name="title"]');
 
   if (metaTitle) {
     return metaTitle.content;
@@ -12802,18 +11432,16 @@ function getSiteName(window) {
 
 
 function getSiteIcon(window) {
-  var document = window.document; // Use the site's favicon if it exists
+  const document = window.document; // Use the site's favicon if it exists
 
-  var shortcutIcon = document.querySelector('head > link[rel="shortcut icon"]');
+  const shortcutIcon = document.querySelector('head > link[rel="shortcut icon"]');
 
   if (shortcutIcon) {
     return shortcutIcon.href;
   } // Search through available icons in no particular order
 
 
-  var icon = Array.from(document.querySelectorAll('head > link[rel="icon"]')).find(function (icon) {
-    return Boolean(icon.href);
-  });
+  const icon = Array.from(document.querySelectorAll('head > link[rel="icon"]')).find(icon => Boolean(icon.href));
 
   if (icon) {
     return icon.href;

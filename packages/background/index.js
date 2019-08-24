@@ -10,6 +10,8 @@ import transactionBuilder from '@ezpay/lib/transactionBuilder';
 import { BackgroundAPI } from '@ezpay/lib/api';
 import { version } from './package.json';
 import { CONFIRMATION_TYPE } from '@ezpay/lib/constants';
+
+const ComposableObservableStore = require('./lib/ComposableObservableStore')
 const NetworkController = require('./controllers/network');
 const TransactionController = require('./controllers/transactions');
 const extension = require('extensionizer');
@@ -46,7 +48,6 @@ const MessageManager = require('./lib/message-manager')
 const PersonalMessageManager = require('./lib/personal-message-manager')
 const TypedMessageManager = require('./lib/typed-message-manager')
 const ProviderApprovalController = require('./controllers/provider-approval')
-const ComposableObservableStore = require('./lib/ComposableObservableStore');
 
 const {
   AddressBookController,
@@ -171,7 +172,7 @@ const background = {
         this.activeControllerConnections = 0
 
         // observable state store
-        // this.store = new ComposableObservableStore(initState)
+        this.store = new ComposableObservableStore(initState)
 
         // lock to ensure only one vault created at once
         this.createVaultMutex = new Mutex()
@@ -316,9 +317,6 @@ const background = {
           OnboardingController: this.onboardingController.store,
         })
 
-
-
-
         extension.runtime.onConnect.addListener(connectRemote)
         extension.runtime.onConnectExternal.addListener(connectExternal)
 
@@ -415,6 +413,7 @@ const background = {
 
         // setup memStore subscription hooks
         // this.on('update', updatePublicConfigStore)
+
         updatePublicConfigStore(this.getState())
 
         publicConfigStore.destroy = () => {
@@ -432,10 +431,11 @@ const background = {
             const result = {
                 isUnlocked,
                 isEnabled,
-                selectedAddress: isReady ? selectedAddress : undefined,
+                selectedAddress,
                 networkVersion: network,
                 onboardingcomplete: completedOnboarding,
             }
+
             return result
         }
 
@@ -451,43 +451,12 @@ const background = {
     },
 
     getState() {
+        const vault = this.keyringController.store.getState().vault
+        const isInitialized = !!vault
+
         return {
-            isUnlocked: true,
-            isEnabled: true,
-            selectedAddress: '0x76535c6995faa57e38c61ad7cbcb3bd8219c66ce',
-            network: 1,
-            completedOnboarding: true,
-            conversionDate: 1566462382.819,
-            conversionRate: 185.36,
-            currentAccountTab: "history",
-            currentBlockGasLimit: "0x7a211d",
-            currentCurrency: "usd",
-            currentLocale: "en",
-            infuraNetworkStatus: {
-                kovan: "ok",
-                mainnet: "ok",
-                rinkeby: "ok",
-                ropsten: "ok"
-            },
-            keyringTypes: [
-                "Simple Key Pair",
-                "HD Key Tree",
-                "Trezor Hardware",
-                "Ledger Hardware"
-            ],
-            metaMetricsSendCount: 0,
-            migratedPrivacyMode: false,
-            nativeCurrency: "ETH",
-            network: "1",
-            provider: {
-                nickname: "",
-                rpcTarget: "",
-                ticker: "ETH",
-                type: "mainnet"
-            },
-            settings: {
-                ticker: 'ETH'
-            }
+          ...{ isInitialized },
+          ...this.memStore.getFlatState(),
         }
     },
 

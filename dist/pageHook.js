@@ -265,42 +265,6 @@ module.exports = _defineProperty;
 
 /***/ }),
 
-/***/ "../../node_modules/@babel/runtime/helpers/get.js":
-/*!************************************************************************************!*\
-  !*** /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/get.js ***!
-  \************************************************************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports, __webpack_require__) {
-
-var getPrototypeOf = __webpack_require__(/*! ./getPrototypeOf */ "../../node_modules/@babel/runtime/helpers/getPrototypeOf.js");
-
-var superPropBase = __webpack_require__(/*! ./superPropBase */ "../../node_modules/@babel/runtime/helpers/superPropBase.js");
-
-function _get(target, property, receiver) {
-  if (typeof Reflect !== "undefined" && Reflect.get) {
-    module.exports = _get = Reflect.get;
-  } else {
-    module.exports = _get = function _get(target, property, receiver) {
-      var base = superPropBase(target, property);
-      if (!base) return;
-      var desc = Object.getOwnPropertyDescriptor(base, property);
-
-      if (desc.get) {
-        return desc.get.call(receiver);
-      }
-
-      return desc.value;
-    };
-  }
-
-  return _get(target, property, receiver || target);
-}
-
-module.exports = _get;
-
-/***/ }),
-
 /***/ "../../node_modules/@babel/runtime/helpers/getPrototypeOf.js":
 /*!***********************************************************************************************!*\
   !*** /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/getPrototypeOf.js ***!
@@ -499,29 +463,6 @@ function _slicedToArray(arr, i) {
 }
 
 module.exports = _slicedToArray;
-
-/***/ }),
-
-/***/ "../../node_modules/@babel/runtime/helpers/superPropBase.js":
-/*!**********************************************************************************************!*\
-  !*** /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/superPropBase.js ***!
-  \**********************************************************************************************/
-/*! no static exports found */
-/*! ModuleConcatenation bailout: Module is not an ECMAScript module */
-/***/ (function(module, exports, __webpack_require__) {
-
-var getPrototypeOf = __webpack_require__(/*! ./getPrototypeOf */ "../../node_modules/@babel/runtime/helpers/getPrototypeOf.js");
-
-function _superPropBase(object, property) {
-  while (!Object.prototype.hasOwnProperty.call(object, property)) {
-    object = getPrototypeOf(object);
-    if (object === null) break;
-  }
-
-  return object;
-}
-
-module.exports = _superPropBase;
 
 /***/ }),
 
@@ -71205,17 +71146,17 @@ function extend() {
 
 function setupDappAutoReload(web3, observable) {
   // export web3 as a global, checking for usage
-  var reloadInProgress = false;
-  var lastTimeUsed;
-  var lastSeenNetwork;
+  let reloadInProgress = false;
+  let lastTimeUsed;
+  let lastSeenNetwork;
   global.web3 = new Proxy(web3, {
-    get: function get(_web3, key) {
+    get: (_web3, key) => {
       // get the time of use
       lastTimeUsed = Date.now(); // return value normally
 
       return _web3[key];
     },
-    set: function set(_web3, key, value) {
+    set: (_web3, key, value) => {
       // set value normally
       _web3[key] = value;
     }
@@ -71226,7 +71167,7 @@ function setupDappAutoReload(web3, observable) {
     if (!window.ethereum.autoRefreshOnNetworkChange) return; // if reload in progress, no need to check reload logic
 
     if (reloadInProgress) return;
-    var currentNetwork = state.networkVersion; // set the initial network
+    const currentNetwork = state.networkVersion; // set the initial network
 
     if (!lastSeenNetwork) {
       lastSeenNetwork = currentNetwork;
@@ -71239,7 +71180,7 @@ function setupDappAutoReload(web3, observable) {
     if (currentNetwork === lastSeenNetwork) return; // initiate page reload
 
     reloadInProgress = true;
-    var timeSinceUse = Date.now() - lastTimeUsed; // if web3 was recently used then delay the reloading of the page
+    const timeSinceUse = Date.now() - lastTimeUsed; // if web3 was recently used then delay the reloading of the page
 
     if (timeSinceUse > 500) {
       triggerReset();
@@ -71268,97 +71209,72 @@ function triggerReset() {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return createStandardProvider; });
-/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/classCallCheck */ "../../node_modules/@babel/runtime/helpers/classCallCheck.js");
-/* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "../../node_modules/@babel/runtime/helpers/createClass.js");
-/* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1__);
-
-
-
-var StandardProvider =
-/*#__PURE__*/
-function () {
-  function StandardProvider(provider) {
-    var _this = this;
-
-    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_0___default()(this, StandardProvider);
-
+class StandardProvider {
+  constructor(provider) {
     this._provider = provider;
 
     this._subscribe(); // indicate that we've connected, mostly just for standard compliance
 
 
-    setTimeout(function () {
-      _this._onConnect();
+    setTimeout(() => {
+      this._onConnect();
     });
   }
 
-  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_1___default()(StandardProvider, [{
-    key: "_onClose",
-    value: function _onClose() {
-      if (this._isConnected === undefined || this._isConnected) {
-        this._provider.emit('close', {
-          code: 1011,
-          reason: 'Network connection error'
-        });
+  _onClose() {
+    if (this._isConnected === undefined || this._isConnected) {
+      this._provider.emit('close', {
+        code: 1011,
+        reason: 'Network connection error'
+      });
+    }
+
+    this._isConnected = false;
+  }
+
+  _onConnect() {
+    !this._isConnected && this._provider.emit('connect');
+    this._isConnected = true;
+  }
+
+  _subscribe() {
+    this._provider.on('data', (error, {
+      method,
+      params
+    }) => {
+      if (!error && method === 'eth_subscription') {
+        this._provider.emit('notification', params.result);
       }
+    });
+  }
+  /**
+   * Initiate an RPC method call
+   *
+   * @param {string} method - RPC method name to call
+   * @param {string[]} params - Array of RPC method parameters
+   * @returns {Promise<*>} Promise resolving to the result if successful
+   */
 
-      this._isConnected = false;
-    }
-  }, {
-    key: "_onConnect",
-    value: function _onConnect() {
-      !this._isConnected && this._provider.emit('connect');
-      this._isConnected = true;
-    }
-  }, {
-    key: "_subscribe",
-    value: function _subscribe() {
-      var _this2 = this;
 
-      this._provider.on('data', function (error, _ref) {
-        var method = _ref.method,
-            params = _ref.params;
+  send(method, params = []) {
+    return new Promise((resolve, reject) => {
+      try {
+        this._provider.sendAsync({
+          id: 1,
+          jsonrpc: '2.0',
+          method,
+          params
+        }, (error, response) => {
+          error = error || response.error;
+          error ? reject(error) : resolve(response);
+        });
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
 
-        if (!error && method === 'eth_subscription') {
-          _this2._provider.emit('notification', params.result);
-        }
-      });
-    }
-    /**
-     * Initiate an RPC method call
-     *
-     * @param {string} method - RPC method name to call
-     * @param {string[]} params - Array of RPC method parameters
-     * @returns {Promise<*>} Promise resolving to the result if successful
-     */
-
-  }, {
-    key: "send",
-    value: function send(method) {
-      var _this3 = this;
-
-      var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-      return new Promise(function (resolve, reject) {
-        try {
-          _this3._provider.sendAsync({
-            id: 1,
-            jsonrpc: '2.0',
-            method: method,
-            params: params
-          }, function (error, response) {
-            error = error || response.error;
-            error ? reject(error) : resolve(response);
-          });
-        } catch (error) {
-          reject(error);
-        }
-      });
-    }
-  }]);
-
-  return StandardProvider;
-}();
+}
 /**
  * Converts a legacy provider into an EIP-1193-compliant standard provider
  * @param {Object} provider - Legacy provider to convert
@@ -71367,10 +71283,10 @@ function () {
 
 
 function createStandardProvider(provider) {
-  var standardProvider = new StandardProvider(provider);
-  var sendLegacy = provider.send;
+  const standardProvider = new StandardProvider(provider);
+  const sendLegacy = provider.send;
 
-  provider.send = function (methodOrPayload, callbackOrArgs) {
+  provider.send = (methodOrPayload, callbackOrArgs) => {
     if (methodOrPayload.method !== 'net_version') {}
 
     if (typeof methodOrPayload === 'string' && !callbackOrArgs || Array.isArray(callbackOrArgs)) {
@@ -71390,16 +71306,6 @@ function createStandardProvider(provider) {
   !*** ./index.js + 5 modules ***!
   \******************************/
 /*! no exports provided */
-/*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/asyncToGenerator.js (<- Module is not an ECMAScript module) */
-/*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/classCallCheck.js (<- Module is not an ECMAScript module) */
-/*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/createClass.js (<- Module is not an ECMAScript module) */
-/*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/get.js (<- Module is not an ECMAScript module) */
-/*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/getPrototypeOf.js (<- Module is not an ECMAScript module) */
-/*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/inherits.js (<- Module is not an ECMAScript module) */
-/*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/possibleConstructorReturn.js (<- Module is not an ECMAScript module) */
-/*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/toConsumableArray.js (<- Module is not an ECMAScript module) */
-/*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/typeof.js (<- Module is not an ECMAScript module) */
-/*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/regenerator/index.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/@tronscan/client/src/utils/crypto.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/aes-js/index.js (<- Module is not an ECMAScript module) */
 /*! ModuleConcatenation bailout: Cannot concat with /home/dev/ezpay-browser-extension/node_modules/axios/index.js (<- Module is not an ECMAScript module) */
@@ -71417,34 +71323,6 @@ function createStandardProvider(provider) {
 
 "use strict";
 
-// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/regenerator/index.js
-var regenerator = __webpack_require__("../../node_modules/@babel/runtime/regenerator/index.js");
-var regenerator_default = /*#__PURE__*/__webpack_require__.n(regenerator);
-
-// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/asyncToGenerator.js
-var asyncToGenerator = __webpack_require__("../../node_modules/@babel/runtime/helpers/asyncToGenerator.js");
-var asyncToGenerator_default = /*#__PURE__*/__webpack_require__.n(asyncToGenerator);
-
-// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/classCallCheck.js
-var classCallCheck = __webpack_require__("../../node_modules/@babel/runtime/helpers/classCallCheck.js");
-var classCallCheck_default = /*#__PURE__*/__webpack_require__.n(classCallCheck);
-
-// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/createClass.js
-var createClass = __webpack_require__("../../node_modules/@babel/runtime/helpers/createClass.js");
-var createClass_default = /*#__PURE__*/__webpack_require__.n(createClass);
-
-// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/possibleConstructorReturn.js
-var possibleConstructorReturn = __webpack_require__("../../node_modules/@babel/runtime/helpers/possibleConstructorReturn.js");
-var possibleConstructorReturn_default = /*#__PURE__*/__webpack_require__.n(possibleConstructorReturn);
-
-// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/getPrototypeOf.js
-var getPrototypeOf = __webpack_require__("../../node_modules/@babel/runtime/helpers/getPrototypeOf.js");
-var getPrototypeOf_default = /*#__PURE__*/__webpack_require__.n(getPrototypeOf);
-
-// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/inherits.js
-var inherits = __webpack_require__("../../node_modules/@babel/runtime/helpers/inherits.js");
-var inherits_default = /*#__PURE__*/__webpack_require__.n(inherits);
-
 // EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/eventemitter3/index.js
 var eventemitter3 = __webpack_require__("../../node_modules/eventemitter3/index.js");
 var eventemitter3_default = /*#__PURE__*/__webpack_require__.n(eventemitter3);
@@ -71452,142 +71330,88 @@ var eventemitter3_default = /*#__PURE__*/__webpack_require__.n(eventemitter3);
 // CONCATENATED MODULE: ../lib/EventChannel.js
 
 
-
-
-
-
-
-var EventChannel_EventChannel =
-/*#__PURE__*/
-function (_EventEmitter) {
-  inherits_default()(EventChannel, _EventEmitter);
-
-  function EventChannel() {
-    var _this;
-
-    var channelKey = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-
-    classCallCheck_default()(this, EventChannel);
-
-    _this = possibleConstructorReturn_default()(this, getPrototypeOf_default()(EventChannel).call(this));
+class EventChannel_EventChannel extends eventemitter3_default.a {
+  constructor(channelKey = false) {
+    super();
     if (!channelKey) throw 'No channel scope provided';
-    _this._channelKey = channelKey;
+    this._channelKey = channelKey;
 
-    _this._registerEventListener();
-
-    return _this;
+    this._registerEventListener();
   }
 
-  createClass_default()(EventChannel, [{
-    key: "_registerEventListener",
-    value: function _registerEventListener() {
-      var _this2 = this;
+  _registerEventListener() {
+    window.addEventListener('message', ({
+      data: {
+        isTronLink = false,
+        message,
+        source
+      }
+    }) => {
+      if (!isTronLink || !message && !source) return;
+      if (source === this._channelKey) return;
+      const {
+        action,
+        data
+      } = message;
+      this.emit(action, data);
+    });
+  }
 
-      window.addEventListener('message', function (_ref) {
-        var _ref$data = _ref.data,
-            _ref$data$isTronLink = _ref$data.isTronLink,
-            isTronLink = _ref$data$isTronLink === void 0 ? false : _ref$data$isTronLink,
-            message = _ref$data.message,
-            source = _ref$data.source;
-        if (!isTronLink || !message && !source) return;
-        if (source === _this2._channelKey) return;
-        var action = message.action,
-            data = message.data;
+  send(action = false, data = {}) {
+    if (!action) return {
+      success: false,
+      error: 'Function requires action {string} parameter'
+    };
+    window.postMessage({
+      message: {
+        action,
+        data
+      },
+      source: this._channelKey,
+      isTronLink: true
+    }, '*');
+  }
 
-        _this2.emit(action, data);
-      });
-    }
-  }, {
-    key: "send",
-    value: function send() {
-      var action = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-      var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-      if (!action) return {
-        success: false,
-        error: 'Function requires action {string} parameter'
-      };
-      window.postMessage({
-        message: {
-          action: action,
-          data: data
-        },
-        source: this._channelKey,
-        isTronLink: true
-      }, '*');
-    }
-  }]);
-
-  return EventChannel;
-}(eventemitter3_default.a);
+}
 
 /* harmony default export */ var lib_EventChannel = (EventChannel_EventChannel);
-// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/toConsumableArray.js
-var toConsumableArray = __webpack_require__("../../node_modules/@babel/runtime/helpers/toConsumableArray.js");
-var toConsumableArray_default = /*#__PURE__*/__webpack_require__.n(toConsumableArray);
-
 // EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/dateformat/lib/dateformat.js
 var dateformat = __webpack_require__("../../node_modules/dateformat/lib/dateformat.js");
 var dateformat_default = /*#__PURE__*/__webpack_require__.n(dateformat);
 
 // CONCATENATED MODULE: ../lib/logger.js
 
-
-
-
-
-var logger_Logger =
-/*#__PURE__*/
-function () {
-  function Logger(source) {
-    classCallCheck_default()(this, Logger);
-
+class logger_Logger {
+  constructor(source) {
     this._source = source;
     return new Proxy(this, {
-      get: function get(target, name) {
+      get(target, name) {
         return target._handleInput.bind(target, name);
       }
+
     });
   }
 
-  createClass_default()(Logger, [{
-    key: "_handleInput",
-    value: function _handleInput(logType) {
-      var _console;
+  _handleInput(logType, ...data) {
+    const formatted = this._formatMessage(logType, data);
 
-      for (var _len = arguments.length, data = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-        data[_key - 1] = arguments[_key];
-      }
+    console.log(...formatted);
+  }
 
-      var formatted = this._formatMessage(logType, data);
+  _formatMessage(logType = 'info', data) {
+    let level = logType;
+    const colours = {
+      info: '7f8c8d',
+      warn: 'f39c12',
+      error: 'c0392b'
+    };
+    if (!colours.hasOwnProperty(logType)) level = 'info';
+    const colour = colours[level];
+    const timestamp = dateformat_default()(Date.now(), 'mmm d, hh:MM:ss tt');
+    return [`[${timestamp}] %c[${this._source}]: %c[${level.toUpperCase()}]:`, 'font-weight: bold;', `color: #${colour};`, ...data];
+  }
 
-      (_console = console).log.apply(_console, toConsumableArray_default()(formatted));
-    }
-  }, {
-    key: "_formatMessage",
-    value: function _formatMessage() {
-      var logType = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'info';
-      var data = arguments.length > 1 ? arguments[1] : undefined;
-      var level = logType;
-      var colours = {
-        info: '7f8c8d',
-        warn: 'f39c12',
-        error: 'c0392b'
-      };
-      if (!colours.hasOwnProperty(logType)) level = 'info';
-      var colour = colours[level];
-      var timestamp = dateformat_default()(Date.now(), 'mmm d, hh:MM:ss tt');
-      return ["[".concat(timestamp, "] %c[").concat(this._source, "]: %c[").concat(level.toUpperCase(), "]:"), 'font-weight: bold;', "color: #".concat(colour, ";")].concat(toConsumableArray_default()(data));
-    }
-  }]);
-
-  return Logger;
-}();
-
-
-// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/typeof.js
-var helpers_typeof = __webpack_require__("../../node_modules/@babel/runtime/helpers/typeof.js");
-var typeof_default = /*#__PURE__*/__webpack_require__.n(helpers_typeof);
-
+}
 // EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/crypto-browserify/index.js
 var crypto_browserify = __webpack_require__("../../node_modules/crypto-browserify/index.js");
 var crypto_browserify_default = /*#__PURE__*/__webpack_require__.n(crypto_browserify);
@@ -71629,16 +71453,16 @@ var utils_crypto = __webpack_require__("../../node_modules/@tronscan/client/src/
 
 
 
-
-var utils_encryptKey = function encryptKey(password, salt) {
+const encryptKey = (password, salt) => {
   return browser_default.a.pbkdf2Sync(password, salt, 1, 256 / 8, 'sha512');
 };
 
-var utils_web3 = new web3_default.a();
-var Utils = {
+const utils_web3 = new web3_default.a();
+const Utils = {
   encryptionAlgorithm: 'aes-256-ctr',
   hashAlgorithm: 'sha256',
-  stringToByte: function stringToByte(str) {
+
+  stringToByte(str) {
     var bytes = new Array();
     var len, c;
     len = str.length;
@@ -71665,7 +71489,8 @@ var Utils = {
 
     return bytes;
   },
-  byteToString: function byteToString(arr) {
+
+  byteToString(arr) {
     if (typeof arr === 'string') {
       return arr;
     }
@@ -71695,121 +71520,116 @@ var Utils = {
 
     return str;
   },
-  hash: function hash(string) {
+
+  hash(string) {
     return crypto_browserify_default.a.createHash(this.hashAlgorithm).update(string).digest('hex');
   },
-  encrypt: function encrypt(data, key) {
-    var encoded = JSON.stringify(data);
-    var cipher = crypto_browserify_default.a.createCipher(this.encryptionAlgorithm, key);
-    var crypted = cipher.update(encoded, 'utf8', 'hex');
-    crypted += cipher["final"]('hex');
+
+  encrypt(data, key) {
+    const encoded = JSON.stringify(data);
+    const cipher = crypto_browserify_default.a.createCipher(this.encryptionAlgorithm, key);
+    let crypted = cipher.update(encoded, 'utf8', 'hex');
+    crypted += cipher.final('hex');
     return crypted;
   },
-  decrypt: function decrypt(data, key) {
-    var decipher = crypto_browserify_default.a.createDecipher(this.encryptionAlgorithm, key);
-    var decrypted = decipher.update(data, 'hex', 'utf8');
-    decrypted += decipher["final"]('utf8');
+
+  decrypt(data, key) {
+    const decipher = crypto_browserify_default.a.createDecipher(this.encryptionAlgorithm, key);
+    let decrypted = decipher.update(data, 'hex', 'utf8');
+    decrypted += decipher.final('utf8');
     return JSON.parse(decrypted);
   },
-  miniAddressSummary: function miniAddressSummary(address) {
+
+  miniAddressSummary(address) {
     if (!address) return '';
     return address ? address.slice(0, 4) + '...' + address.slice(-4) : '...';
   },
-  addressSummary: function addressSummary(address) {
-    var firstSegLength = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 10;
-    var lastSegLength = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 4;
-    var includeHex = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
+
+  addressSummary(address, firstSegLength = 10, lastSegLength = 4, includeHex = true) {
     if (!address) return '';
     return address ? address.slice(0, firstSegLength) + '...' + address.slice(address.length - lastSegLength) : '...';
   },
-  requestHandler: function requestHandler(target) {
+
+  requestHandler(target) {
     return new Proxy(target, {
-      get: function get(target, prop) {
+      get(target, prop) {
         // First, check if the property exists on the target
         // If it doesn't, throw an error
-        if (!Reflect.has(target, prop)) throw new Error("Object does not have property '".concat(prop, "'")); // If the target is a variable or the internal 'on'
+        if (!Reflect.has(target, prop)) throw new Error(`Object does not have property '${prop}'`); // If the target is a variable or the internal 'on'
         // method, simply return the standard function call
 
         if (typeof target[prop] !== 'function' || prop === 'on') return Reflect.get(target, prop); // The 'req' object can be destructured into three components -
         // { resolve, reject and data }. Call the function (and resolve it)
         // so the result can then be passed back to the request.
 
-        return function () {
-          var _target$prop;
-
-          for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-            args[_key] = arguments[_key];
-          }
-
+        return (...args) => {
           if (!args.length) args[0] = {};
-          var firstArg = args[0];
-          var _firstArg$resolve = firstArg.resolve,
-              resolve = _firstArg$resolve === void 0 ? function () {} : _firstArg$resolve,
-              _firstArg$reject = firstArg.reject,
-              reject = _firstArg$reject === void 0 ? function (ex) {
-            return console.error(ex);
-          } : _firstArg$reject,
-              data = firstArg.data;
-          if (typeof_default()(firstArg) !== 'object' || !('data' in firstArg)) return (_target$prop = target[prop]).call.apply(_target$prop, [target].concat(args));
-          Promise.resolve(target[prop].call(target, data)).then(resolve)["catch"](reject);
+          const [firstArg] = args;
+          const {
+            resolve = () => {},
+            reject = ex => console.error(ex),
+            data
+          } = firstArg;
+          if (typeof firstArg !== 'object' || !('data' in firstArg)) return target[prop].call(target, ...args);
+          Promise.resolve(target[prop].call(target, data)).then(resolve).catch(reject);
         };
       }
+
     });
   },
-  generateMnemonic: function generateMnemonic() {
+
+  generateMnemonic() {
     return bip39_default.a.generateMnemonic(128);
   },
-  getTronAccountAtIndex: function getTronAccountAtIndex(mnemonic) {
-    var index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-    var seed = bip39_default.a.mnemonicToSeed(mnemonic);
-    var node = bip32_default.a.fromSeed(seed);
-    var child = node.derivePath("m/44'/195'/".concat(index, "'/0/0"));
-    var privateKey = child.privateKey.toString('hex');
-    var address = TronWeb_node_default.a.address.fromPrivateKey(privateKey);
+
+  getTronAccountAtIndex(mnemonic, index = 0) {
+    const seed = bip39_default.a.mnemonicToSeed(mnemonic);
+    const node = bip32_default.a.fromSeed(seed);
+    const child = node.derivePath(`m/44'/195'/${index}'/0/0`);
+    const privateKey = child.privateKey.toString('hex');
+    const address = TronWeb_node_default.a.address.fromPrivateKey(privateKey);
     return {
-      privateKey: privateKey,
-      address: address
+      privateKey,
+      address
     };
   },
-  getEthereumAccountAtIndex: function getEthereumAccountAtIndex(mnemonic) {
-    var index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-    var seed = bip39_default.a.mnemonicToSeed(mnemonic);
-    var node = bip32_default.a.fromSeed(seed);
-    var child = node.derivePath("m/44'/195'/".concat(index, "'/0/0"));
-    var privateKey = child.privateKey.toString('hex');
-    var account = utils_web3.eth.accounts.privateKeyToAccount(privateKey);
+
+  getEthereumAccountAtIndex(mnemonic, index = 0) {
+    const seed = bip39_default.a.mnemonicToSeed(mnemonic);
+    const node = bip32_default.a.fromSeed(seed);
+    const child = node.derivePath(`m/44'/195'/${index}'/0/0`);
+    const privateKey = child.privateKey.toString('hex');
+    const account = utils_web3.eth.accounts.privateKeyToAccount(privateKey);
     return {
       privateKey: account.privateKey,
       address: account.address
     };
   },
-  validateMnemonic: function validateMnemonic(mnemonic) {
+
+  validateMnemonic(mnemonic) {
     return bip39_default.a.validateMnemonic(mnemonic);
   },
-  injectPromise: function injectPromise(func) {
-    for (var _len2 = arguments.length, args = new Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-      args[_key2 - 1] = arguments[_key2];
-    }
 
-    return new Promise(function (resolve, reject) {
-      func.apply(void 0, args.concat([function (err, res) {
+  injectPromise(func, ...args) {
+    return new Promise((resolve, reject) => {
+      func(...args, (err, res) => {
         if (err) reject(err);else resolve(res);
-      }]));
+      });
     });
   },
-  isFunction: function isFunction(obj) {
+
+  isFunction(obj) {
     return typeof obj === 'function';
   },
-  dataLetterSort: function dataLetterSort(data, field, field2) {
-    var needArray = [];
-    var list = {};
-    var LetterArray = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
-    for (var i = 0; i < data.length; i++) {
-      var d = data[i][field] || data[i][field2] || data[i]['name'];
-      var letter = d.split('').filter(function (v) {
-        return v.match(/[a-zA-Z0-9]/);
-      }).join('').substr(0, 1).toUpperCase();
+  dataLetterSort(data, field, field2) {
+    let needArray = [];
+    let list = {};
+    let LetterArray = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+
+    for (let i = 0; i < data.length; i++) {
+      const d = data[i][field] || data[i][field2] || data[i]['name'];
+      let letter = d.split('').filter(v => v.match(/[a-zA-Z0-9]/)).join('').substr(0, 1).toUpperCase();
 
       if (!list[letter]) {
         list[letter] = [];
@@ -71818,24 +71638,26 @@ var Utils = {
       list[letter].push(data[i]);
     }
 
-    LetterArray.forEach(function (v) {
+    LetterArray.forEach(v => {
       if (list[v]) {
         needArray = needArray.concat(list[v]);
       }
     });
     return needArray;
   },
-  validatInteger: function validatInteger(str) {
+
+  validatInteger(str) {
     // integer
-    var reg = /^\+?[1-9][0-9]*$/;
+    const reg = /^\+?[1-9][0-9]*$/;
     return reg.test(str);
   },
-  requestUrl: function requestUrl() {
-    // request url
-    var curHost = location.hostname;
-    var curApiHost; // const defaultUrl = 'http://52.14.133.221:8990'; //test
 
-    var defaultUrl = 'https://manger.tronlending.org'; //online
+  requestUrl() {
+    // request url
+    const curHost = location.hostname;
+    let curApiHost; // const defaultUrl = 'http://52.14.133.221:8990'; //test
+
+    const defaultUrl = 'https://manger.tronlending.org'; //online
 
     switch (curHost) {
       case 'nnceancbokoldkjjbpopcffaoekebnnb':
@@ -71853,69 +71675,74 @@ var Utils = {
 
     return curApiHost;
   },
-  timetransTime: function timetransTime(date) {
-    var newDate = new Date(date * 1000);
-    var timeY = newDate.getFullYear();
-    var timeM = newDate.getMonth() + 1 < 10 ? "0".concat(newDate.getMonth() + 1) : newDate.getMonth() + 1;
-    var timeD = newDate.getDate() < 10 ? "0".concat(newDate.getDate()) : newDate.getDate();
-    var timeh = newDate.getHours() < 10 ? "0".concat(newDate.getHours()) : newDate.getHours();
-    var timem = newDate.getMinutes() < 10 ? "0".concat(newDate.getMinutes()) : newDate.getMinutes();
-    return "".concat(timeY, ".").concat(timeM, ".").concat(timeD, " ").concat(timeh, ":").concat(timem);
+
+  timetransTime(date) {
+    const newDate = new Date(date * 1000);
+    const timeY = newDate.getFullYear();
+    const timeM = newDate.getMonth() + 1 < 10 ? `0${newDate.getMonth() + 1}` : newDate.getMonth() + 1;
+    const timeD = newDate.getDate() < 10 ? `0${newDate.getDate()}` : newDate.getDate();
+    const timeh = newDate.getHours() < 10 ? `0${newDate.getHours()}` : newDate.getHours();
+    const timem = newDate.getMinutes() < 10 ? `0${newDate.getMinutes()}` : newDate.getMinutes();
+    return `${timeY}.${timeM}.${timeD} ${timeh}:${timem}`;
   },
-  timeFormatTime: function timeFormatTime(date) {
-    var newDate = new Date(date * 1000);
-    var timeY = newDate.getFullYear();
-    var timeM = newDate.getMonth() + 1 < 10 ? "0".concat(newDate.getMonth() + 1) : newDate.getMonth() + 1;
-    var timeD = newDate.getDate() < 10 ? "0".concat(newDate.getDate()) : newDate.getDate();
-    var timeh = newDate.getHours() < 10 ? "0".concat(newDate.getHours()) : newDate.getHours();
-    var timem = newDate.getMinutes() < 10 ? "0".concat(newDate.getMinutes()) : newDate.getMinutes();
-    return "".concat(timeY, "/").concat(timeM, "/").concat(timeD, " ").concat(timeh, ":").concat(timem);
+
+  timeFormatTime(date) {
+    const newDate = new Date(date * 1000);
+    const timeY = newDate.getFullYear();
+    const timeM = newDate.getMonth() + 1 < 10 ? `0${newDate.getMonth() + 1}` : newDate.getMonth() + 1;
+    const timeD = newDate.getDate() < 10 ? `0${newDate.getDate()}` : newDate.getDate();
+    const timeh = newDate.getHours() < 10 ? `0${newDate.getHours()}` : newDate.getHours();
+    const timem = newDate.getMinutes() < 10 ? `0${newDate.getMinutes()}` : newDate.getMinutes();
+    return `${timeY}/${timeM}/${timeD} ${timeh}:${timem}`;
   },
-  getSelect: function getSelect(targetNode) {
+
+  getSelect(targetNode) {
     if (window.getSelection) {
       //chrome等主流浏览器
-      var selection = window.getSelection();
-      var range = document.createRange();
+      const selection = window.getSelection();
+      const range = document.createRange();
       range.selectNode(targetNode);
       selection.removeAllRanges();
       selection.addRange(range);
     } else if (document.body.createTextRange) {
       //ie
-      var _range = document.body.createTextRange();
-
-      _range.moveToElementText(targetNode);
-
-      _range.select();
+      const range = document.body.createTextRange();
+      range.moveToElementText(targetNode);
+      range.select();
     }
   },
-  readFileContentsFromEvent: function readFileContentsFromEvent(ev) {
-    return new Promise(function (resolve) {
-      var files = ev.target.files;
-      var reader = new FileReader();
 
-      reader.onload = function (file) {
-        var contents = file.target.result;
+  readFileContentsFromEvent(ev) {
+    return new Promise(resolve => {
+      const files = ev.target.files;
+      const reader = new FileReader();
+
+      reader.onload = file => {
+        const contents = file.target.result;
         resolve(contents);
       };
 
       reader.readAsText(files[0]);
     });
   },
-  decryptString: function decryptString(password, salt, hexString) {
-    var key = utils_encryptKey(password, salt);
-    var encryptedBytes = aes_js_default.a.utils.hex.toBytes(hexString);
-    var aesCtr = new aes_js_default.a.ModeOfOperation.ctr(key);
-    var decryptedBytes = aesCtr.decrypt(encryptedBytes);
+
+  decryptString(password, salt, hexString) {
+    const key = encryptKey(password, salt);
+    const encryptedBytes = aes_js_default.a.utils.hex.toBytes(hexString);
+    const aesCtr = new aes_js_default.a.ModeOfOperation.ctr(key);
+    const decryptedBytes = aesCtr.decrypt(encryptedBytes);
     return aes_js_default.a.utils.utf8.fromBytes(decryptedBytes);
   },
-  validatePrivateKey: function validatePrivateKey(privateKey) {
+
+  validatePrivateKey(privateKey) {
     try {
-      var address = Object(utils_crypto["pkToAddress"])(privateKey);
+      let address = Object(utils_crypto["pkToAddress"])(privateKey);
       return Object(utils_crypto["isAddressValid"])(address);
     } catch (e) {
       return false;
     }
   }
+
 };
 /* harmony default export */ var utils = (Utils);
 // EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/uuid/v4.js
@@ -71924,47 +71751,42 @@ var v4_default = /*#__PURE__*/__webpack_require__.n(v4);
 
 // CONCATENATED MODULE: ./handlers/RequestHandler.js
 
-var RequestHandler = {
-  init: function init(eventChannel) {
+const RequestHandler = {
+  init(eventChannel) {
     this.eventChannel = eventChannel;
     this.calls = {};
     this.bindListener();
     return this.handler.bind(this);
   },
-  bindListener: function bindListener() {
-    var _this = this;
 
-    this.eventChannel.on('tabReply', function (_ref) {
-      var success = _ref.success,
-          data = _ref.data,
-          uuid = _ref.uuid;
-      if (success) _this.calls[uuid].resolve(data);else _this.calls[uuid].reject(data);
-      delete _this.calls[uuid];
+  bindListener() {
+    this.eventChannel.on('tabReply', ({
+      success,
+      data,
+      uuid
+    }) => {
+      if (success) this.calls[uuid].resolve(data);else this.calls[uuid].reject(data);
+      delete this.calls[uuid];
     });
   },
-  handler: function handler(action) {
-    var _this2 = this;
 
-    var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-    var uuid = v4_default()();
+  handler(action, data = {}) {
+    const uuid = v4_default()();
     this.eventChannel.send('tunnel', {
-      action: action,
-      data: data,
-      uuid: uuid
+      action,
+      data,
+      uuid
     });
-    return new Promise(function (resolve, reject) {
-      _this2.calls[uuid] = {
-        resolve: resolve,
-        reject: reject
+    return new Promise((resolve, reject) => {
+      this.calls[uuid] = {
+        resolve,
+        reject
       };
     });
   }
+
 };
 /* harmony default export */ var handlers_RequestHandler = (RequestHandler);
-// EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/@babel/runtime/helpers/get.js
-var helpers_get = __webpack_require__("../../node_modules/@babel/runtime/helpers/get.js");
-var get_default = /*#__PURE__*/__webpack_require__.n(helpers_get);
-
 // EXTERNAL MODULE: /home/dev/ezpay-browser-extension/node_modules/axios/index.js
 var axios = __webpack_require__("../../node_modules/axios/index.js");
 var axios_default = /*#__PURE__*/__webpack_require__.n(axios);
@@ -71973,95 +71795,63 @@ var axios_default = /*#__PURE__*/__webpack_require__.n(axios);
 
 
 
+const {
+  HttpProvider
+} = TronWeb_node_default.a.providers;
+const logger = new logger_Logger('ProxiedProvider');
 
-
-
-
-
-
-
-var HttpProvider = TronWeb_node_default.a.providers.HttpProvider;
-var logger = new logger_Logger('ProxiedProvider');
-
-var ProxiedProvider_ProxiedProvider =
-/*#__PURE__*/
-function (_HttpProvider) {
-  inherits_default()(ProxiedProvider, _HttpProvider);
-
-  function ProxiedProvider() {
-    var _this;
-
-    classCallCheck_default()(this, ProxiedProvider);
-
-    _this = possibleConstructorReturn_default()(this, getPrototypeOf_default()(ProxiedProvider).call(this, 'http://127.0.0.1'));
+class ProxiedProvider_ProxiedProvider extends HttpProvider {
+  constructor() {
+    super('http://127.0.0.1');
     logger.info('Provider initialised');
-    _this.ready = false;
-    _this.queue = [];
-    return _this;
+    this.ready = false;
+    this.queue = [];
   }
 
-  createClass_default()(ProxiedProvider, [{
-    key: "configure",
-    value: function configure(url) {
-      var _this2 = this;
+  configure(url) {
+    logger.info('Received new node:', url);
+    this.host = url;
+    this.instance = axios_default.a.create({
+      baseURL: url,
+      timeout: 30000
+    });
+    this.ready = true;
 
-      logger.info('Received new node:', url);
-      this.host = url;
-      this.instance = axios_default.a.create({
-        baseURL: url,
-        timeout: 30000
-      });
-      this.ready = true;
-
-      var _loop = function _loop() {
-        var _this2$queue$shift = _this2.queue.shift(),
-            args = _this2$queue$shift.args,
-            resolve = _this2$queue$shift.resolve,
-            reject = _this2$queue$shift.reject;
-
-        _this2.request.apply(_this2, toConsumableArray_default()(args)).then(resolve)["catch"](reject).then(function () {
-          return logger.info("Completed the queued request to ".concat(args[0]));
-        });
-      };
-
-      while (this.queue.length) {
-        _loop();
-      }
+    while (this.queue.length) {
+      const {
+        args,
+        resolve,
+        reject
+      } = this.queue.shift();
+      this.request(...args).then(resolve).catch(reject).then(() => logger.info(`Completed the queued request to ${args[0]}`));
     }
-  }, {
-    key: "request",
-    value: function request(endpoint) {
-      var _this3 = this;
+  }
 
-      var payload = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-      var method = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'get';
-
-      if (!this.ready) {
-        logger.info("Request to ".concat(endpoint, " has been queued"));
-        return new Promise(function (resolve, reject) {
-          _this3.queue.push({
-            args: [endpoint, payload, method],
-            resolve: resolve,
-            reject: reject
-          });
+  request(endpoint, payload = {}, method = 'get') {
+    if (!this.ready) {
+      logger.info(`Request to ${endpoint} has been queued`);
+      return new Promise((resolve, reject) => {
+        this.queue.push({
+          args: [endpoint, payload, method],
+          resolve,
+          reject
         });
-      }
-
-      return get_default()(getPrototypeOf_default()(ProxiedProvider.prototype), "request", this).call(this, endpoint, payload, method).then(function (res) {
-        var response = res.transaction || res;
-        Object.defineProperty(response, '__payload__', {
-          writable: false,
-          enumerable: false,
-          configurable: false,
-          value: payload
-        });
-        return res;
       });
     }
-  }]);
 
-  return ProxiedProvider;
-}(HttpProvider);
+    return super.request(endpoint, payload, method).then(res => {
+      const response = res.transaction || res;
+      Object.defineProperty(response, '__payload__', {
+        writable: false,
+        enumerable: false,
+        configurable: false,
+        value: payload
+      });
+      return res;
+    });
+  }
+
+}
 
 /* harmony default export */ var handlers_ProxiedProvider = (ProxiedProvider_ProxiedProvider);
 // EXTERNAL MODULE: ./web3/index.js
@@ -72077,25 +71867,22 @@ var web3_default_0 = /*#__PURE__*/__webpack_require__.n(web3_0);
 
 
 
+const LocalMessageDuplexStream = __webpack_require__(/*! post-message-stream */ "../../node_modules/post-message-stream/index.js");
 
+const setupDappAutoReload = __webpack_require__(/*! ./auto-reload.js */ "./auto-reload.js");
 
-var LocalMessageDuplexStream = __webpack_require__(/*! post-message-stream */ "../../node_modules/post-message-stream/index.js");
+const MetamaskInpageProvider = __webpack_require__(/*! metamask-inpage-provider */ "../../node_modules/metamask-inpage-provider/index.js");
 
-var setupDappAutoReload = __webpack_require__(/*! ./auto-reload.js */ "./auto-reload.js");
+const createStandardProvider = __webpack_require__(/*! ./createStandardProvider */ "./createStandardProvider.js").default;
 
-var MetamaskInpageProvider = __webpack_require__(/*! metamask-inpage-provider */ "../../node_modules/metamask-inpage-provider/index.js");
-
-var createStandardProvider = __webpack_require__(/*! ./createStandardProvider */ "./createStandardProvider.js")["default"];
-
-var index_logger = new logger_Logger('pageHook');
-var pageHook = {
+const index_logger = new logger_Logger('pageHook');
+const pageHook = {
   proxiedMethods: {
     setAddress: false,
     sign: false
   },
-  init: function init() {
-    var _this = this;
 
+  init() {
     this._bindTronWeb();
 
     this._binWeb3();
@@ -72104,39 +71891,38 @@ var pageHook = {
 
     this._bindEvents();
 
-    this.request('init').then(function (_ref) {
-      var tron = _ref.tron,
-          eth = _ref.eth;
-
+    this.request('init').then(({
+      tron,
+      eth
+    }) => {
       if (eth) {
-        _this.setProviderWeb3(eth.node.endPoint);
-
-        _this.setAddressWeb3(eth.address);
+        this.setProviderWeb3(eth.node.endPoint);
+        this.setAddressWeb3(eth.address);
       }
 
-      if (tron.address) _this.setAddress(tron.address);
-      if (tron.node && tron.node.fullNode) _this.setNode(tron.node);
+      if (tron.address) this.setAddress(tron.address);
+      if (tron.node && tron.node.fullNode) this.setNode(tron.node);
       index_logger.info('ezPay initiated');
-    })["catch"](function (err) {
+    }).catch(err => {
       index_logger.info('Failed to initialise TronWeb', err);
     });
   },
-  _binWeb3: function _binWeb3() {
+
+  _binWeb3() {
     // setup background connection
-    var metamaskStream = new LocalMessageDuplexStream({
+    const metamaskStream = new LocalMessageDuplexStream({
       name: 'inpage',
       target: 'contentscript'
     });
     console.log('metamaskStream', metamaskStream);
-    var inpageProvider = new MetamaskInpageProvider(metamaskStream);
+    const inpageProvider = new MetamaskInpageProvider(metamaskStream);
     inpageProvider.setMaxListeners(100); // augment the provider with its enable method
     // inpageProvider.enable = '0x76535c6995faa57e38c61ad7cbcb3bd8219c66ce'
 
-    inpageProvider.enable = function () {
-      var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-          force = _ref2.force;
-
-      return new Promise(function (resolve, reject) {
+    inpageProvider.enable = function ({
+      force
+    } = {}) {
+      return new Promise((resolve, reject) => {
         // inpageProvider.sendAsync({ method: 'eth_requestAccounts', params: [force] }, (error, response) => {
         //   if (error || response.error) {
         //     reject(error || response.error)
@@ -72153,49 +71939,17 @@ var pageHook = {
     inpageProvider.autoRefreshOnNetworkChange = true; // publicConfig isn't populated until we get a message from background.
     // Using this getter will ensure the state is available
 
-    var getPublicConfigWhenReady =
-    /*#__PURE__*/
-    function () {
-      var _ref3 = asyncToGenerator_default()(
-      /*#__PURE__*/
-      regenerator_default.a.mark(function _callee() {
-        var store, state;
-        return regenerator_default.a.wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                store = inpageProvider.publicConfigStore;
-                state = store.getState(); // if state is missing, wait for first update
+    const getPublicConfigWhenReady = async () => {
+      const store = inpageProvider.publicConfigStore;
+      let state = store.getState(); // if state is missing, wait for first update
 
-                if (state.networkVersion) {
-                  _context.next = 7;
-                  break;
-                }
+      if (!state.networkVersion) {
+        state = await new Promise(resolve => store.once('update', resolve));
+        console.log('new state', state);
+      }
 
-                _context.next = 5;
-                return new Promise(function (resolve) {
-                  return store.once('update', resolve);
-                });
-
-              case 5:
-                state = _context.sent;
-                console.log('new state', state);
-
-              case 7:
-                return _context.abrupt("return", state);
-
-              case 8:
-              case "end":
-                return _context.stop();
-            }
-          }
-        }, _callee);
-      }));
-
-      return function getPublicConfigWhenReady() {
-        return _ref3.apply(this, arguments);
-      };
-    }(); // add metamask-specific convenience methods
+      return state;
+    }; // add metamask-specific convenience methods
 
 
     inpageProvider._metamask = new Proxy({
@@ -72204,10 +71958,10 @@ var pageHook = {
        *
        * @returns {boolean} - returns true if this domain is currently enabled
        */
-      isEnabled: function isEnabled() {
-        var _inpageProvider$publi = inpageProvider.publicConfigStore.getState(),
-            isEnabled = _inpageProvider$publi.isEnabled;
-
+      isEnabled: function () {
+        const {
+          isEnabled
+        } = inpageProvider.publicConfigStore.getState();
         return Boolean(isEnabled);
       },
 
@@ -72216,78 +71970,26 @@ var pageHook = {
        *
        * @returns {Promise<boolean>} - Promise resolving to true if this domain is currently enabled
        */
-      isApproved: function () {
-        var _isApproved = asyncToGenerator_default()(
-        /*#__PURE__*/
-        regenerator_default.a.mark(function _callee2() {
-          var _ref4, isEnabled;
-
-          return regenerator_default.a.wrap(function _callee2$(_context2) {
-            while (1) {
-              switch (_context2.prev = _context2.next) {
-                case 0:
-                  _context2.next = 2;
-                  return getPublicConfigWhenReady();
-
-                case 2:
-                  _ref4 = _context2.sent;
-                  isEnabled = _ref4.isEnabled;
-                  return _context2.abrupt("return", Boolean(isEnabled));
-
-                case 5:
-                case "end":
-                  return _context2.stop();
-              }
-            }
-          }, _callee2);
-        }));
-
-        function isApproved() {
-          return _isApproved.apply(this, arguments);
-        }
-
-        return isApproved;
-      }(),
+      isApproved: async function () {
+        const {
+          isEnabled
+        } = await getPublicConfigWhenReady();
+        return Boolean(isEnabled);
+      },
 
       /**
        * Determines if MetaMask is unlocked by the user
        *
        * @returns {Promise<boolean>} - Promise resolving to true if MetaMask is currently unlocked
        */
-      isUnlocked: function () {
-        var _isUnlocked = asyncToGenerator_default()(
-        /*#__PURE__*/
-        regenerator_default.a.mark(function _callee3() {
-          var _ref5, isUnlocked;
-
-          return regenerator_default.a.wrap(function _callee3$(_context3) {
-            while (1) {
-              switch (_context3.prev = _context3.next) {
-                case 0:
-                  _context3.next = 2;
-                  return getPublicConfigWhenReady();
-
-                case 2:
-                  _ref5 = _context3.sent;
-                  isUnlocked = _ref5.isUnlocked;
-                  return _context3.abrupt("return", Boolean(isUnlocked));
-
-                case 5:
-                case "end":
-                  return _context3.stop();
-              }
-            }
-          }, _callee3);
-        }));
-
-        function isUnlocked() {
-          return _isUnlocked.apply(this, arguments);
-        }
-
-        return isUnlocked;
-      }()
+      isUnlocked: async function () {
+        const {
+          isUnlocked
+        } = await getPublicConfigWhenReady();
+        return Boolean(isUnlocked);
+      }
     }, {
-      get: function get(obj, prop) {
+      get: function (obj, prop) {
         !warned && console.warn('Heads up! ethereum._metamask exposes methods that have ' + 'not been standardized yet. This means that these methods may not be implemented ' + 'in other dapp browsers and may be removed from MetaMask in the future.');
         warned = true;
         return obj[prop];
@@ -72296,22 +71998,24 @@ var pageHook = {
     console.log('inpageProvider', inpageProvider); // Work around for web3@1.0 deleting the bound `sendAsync` but not the unbound
     // `sendAsync` method on the prototype, causing `this` reference issues
 
-    var proxiedInpageProvider = new Proxy(inpageProvider, {
+    const proxiedInpageProvider = new Proxy(inpageProvider, {
       // straight up lie that we deleted the property so that it doesnt
       // throw an error in strict mode
-      deleteProperty: function deleteProperty() {
-        return true;
-      }
+      deleteProperty: () => true
     });
     window.ethereum = createStandardProvider(proxiedInpageProvider); //
     // setup web3
     //
 
     if (typeof window.web3 !== 'undefined') {
-      throw new Error("MetaMask detected another web3.\n             MetaMask will not work reliably with another web3 extension.\n             This usually happens if you have two MetaMasks installed,\n             or MetaMask and another web3 extension. Please remove one\n             and try again.");
+      throw new Error(`MetaMask detected another web3.
+             MetaMask will not work reliably with another web3 extension.
+             This usually happens if you have two MetaMasks installed,
+             or MetaMask and another web3 extension. Please remove one
+             and try again.`);
     }
 
-    var web3 = new web3_default_0.a(proxiedInpageProvider);
+    const web3 = new web3_default_0.a(proxiedInpageProvider);
 
     web3.setProvider = function () {
       console.log('MetaMask - overrode web3.setProvider');
@@ -72329,73 +72033,67 @@ var pageHook = {
       }
     });
   },
-  _bindTronWeb: function _bindTronWeb() {
-    var _this2 = this;
 
+  _bindTronWeb() {
     if (window.tronWeb !== undefined) index_logger.warn('TronWeb is already initiated. TronLink will overwrite the current instance');
-    var tronWeb = new TronWeb_node_default.a(new handlers_ProxiedProvider(), new handlers_ProxiedProvider(), new handlers_ProxiedProvider());
+    const tronWeb = new TronWeb_node_default.a(new handlers_ProxiedProvider(), new handlers_ProxiedProvider(), new handlers_ProxiedProvider());
     this.proxiedMethods = {
       setAddress: tronWeb.setAddress.bind(tronWeb),
       sign: tronWeb.trx.sign.bind(tronWeb)
     };
-    ['setPrivateKey', 'setAddress', 'setFullNode', 'setSolidityNode', 'setEventServer'].forEach(function (method) {
-      return tronWeb[method] = function () {
-        return new Error('TronLink has disabled this method');
-      };
-    });
+    ['setPrivateKey', 'setAddress', 'setFullNode', 'setSolidityNode', 'setEventServer'].forEach(method => tronWeb[method] = () => new Error('TronLink has disabled this method'));
 
-    tronWeb.trx.sign = function () {
-      return _this2.sign.apply(_this2, arguments);
-    };
+    tronWeb.trx.sign = (...args) => this.sign(...args);
 
     window.tronWeb = tronWeb;
   },
-  _bindEventChannel: function _bindEventChannel() {
+
+  _bindEventChannel() {
     this.eventChannel = new lib_EventChannel('pageHook');
     this.request = handlers_RequestHandler.init(this.eventChannel);
   },
-  _bindEvents: function _bindEvents() {
-    var _this3 = this;
 
-    this.eventChannel.on('setAccountTron', function (address) {
-      _this3.setAddress(address);
+  _bindEvents() {
+    this.eventChannel.on('setAccountTron', address => {
+      this.setAddress(address);
     });
-    this.eventChannel.on('setNodeTron', function (node) {
-      _this3.setNode({
+    this.eventChannel.on('setNodeTron', node => {
+      this.setNode({
         fullNode: node,
         solidityNode: node,
         eventServer: node
       });
     });
-    this.eventChannel.on('setAccountEthereum', function (address) {
+    this.eventChannel.on('setAccountEthereum', address => {
       console.log('setAccountEthereum', address); // this.setAddressWeb3(address);
     });
-    this.eventChannel.on('setNodeEthereum', function (node) {
+    this.eventChannel.on('setNodeEthereum', node => {
       console.log('setNodeEthereum', node); // this.setProviderWeb3(node);
     });
   },
-  setAddressWeb3: function setAddressWeb3(address) {
+
+  setAddressWeb3(address) {
     console.log('address', address); // web3.eth.defaultAccount = address;
   },
-  setProviderWeb3: function setProviderWeb3(endPoint) {
+
+  setProviderWeb3(endPoint) {
     console.log('endPoint', endPoint); // web3.setProvider(new web3.providers.HttpProvider(endPoint));
   },
-  setAddress: function setAddress(address) {
+
+  setAddress(address) {
     index_logger.info('TronLink: New address configured');
     this.proxiedMethods.setAddress(address);
     tronWeb.ready = true;
   },
-  setNode: function setNode(node) {
+
+  setNode(node) {
     index_logger.info('TronLink: New node configured');
     tronWeb.fullNode.configure(node.fullNode);
     tronWeb.solidityNode.configure(node.solidityNode);
     tronWeb.eventServer.configure(node.eventServer);
   },
-  sign: function sign(transaction) {
-    var privateKey = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-    var useTronHeader = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
-    var callback = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
 
+  sign(transaction, privateKey = false, useTronHeader = true, callback = false) {
     if (utils.isFunction(privateKey)) {
       callback = privateKey;
       privateKey = false;
@@ -72411,16 +72109,15 @@ var pageHook = {
     if (!transaction) return callback('Invalid transaction provided');
     if (!tronWeb.ready) return callback('User has not unlocked wallet');
     this.request('sign', {
-      transaction: transaction,
-      useTronHeader: useTronHeader,
+      transaction,
+      useTronHeader,
       input: typeof transaction === 'string' ? transaction : transaction.__payload__ || transaction.raw_data.contract[0].parameter.value
-    }).then(function (transaction) {
-      return callback(null, transaction);
-    })["catch"](function (err) {
+    }).then(transaction => callback(null, transaction)).catch(err => {
       index_logger.warn('Failed to sign transaction:', err);
       callback(err);
     });
   }
+
 };
 pageHook.init();
 
@@ -72504,7 +72201,7 @@ var SolidityType = __webpack_require__(/*! ./type */ "./web3/lib/solidity/type.j
  */
 
 
-var SolidityTypeAddress = function SolidityTypeAddress() {
+var SolidityTypeAddress = function () {
   this._inputFormatter = f.formatInputInt;
   this._outputFormatter = f.formatOutputAddress;
 };
@@ -72543,7 +72240,7 @@ var SolidityType = __webpack_require__(/*! ./type */ "./web3/lib/solidity/type.j
  */
 
 
-var SolidityTypeBool = function SolidityTypeBool() {
+var SolidityTypeBool = function () {
   this._inputFormatter = f.formatInputBool;
   this._outputFormatter = f.formatOutputBool;
 };
@@ -72585,7 +72282,7 @@ var SolidityType = __webpack_require__(/*! ./type */ "./web3/lib/solidity/type.j
  */
 
 
-var SolidityTypeBytes = function SolidityTypeBytes() {
+var SolidityTypeBytes = function () {
   this._inputFormatter = f.formatInputBytes;
   this._outputFormatter = f.formatOutputBytes;
 };
@@ -72651,7 +72348,7 @@ var SolidityTypeUReal = __webpack_require__(/*! ./ureal */ "./web3/lib/solidity/
 
 var SolidityTypeBytes = __webpack_require__(/*! ./bytes */ "./web3/lib/solidity/bytes.js");
 
-var isDynamic = function isDynamic(solidityType, type) {
+var isDynamic = function (solidityType, type) {
   return solidityType.isDynamicType(type) || solidityType.isDynamicArray(type);
 };
 /**
@@ -72659,7 +72356,7 @@ var isDynamic = function isDynamic(solidityType, type) {
  */
 
 
-var SolidityCoder = function SolidityCoder(types) {
+var SolidityCoder = function (types) {
   this._types = types;
 };
 /**
@@ -72751,10 +72448,10 @@ SolidityCoder.prototype.encodeWithOffset = function (type, solidityType, encoded
   var self = this;
   var encodingMode = {
     dynamic: 1,
-    "static": 2,
+    static: 2,
     other: 3
   };
-  var mode = solidityType.isDynamicArray(type) ? encodingMode.dynamic : solidityType.isStaticArray(type) ? encodingMode["static"] : encodingMode.other;
+  var mode = solidityType.isDynamicArray(type) ? encodingMode.dynamic : solidityType.isStaticArray(type) ? encodingMode.static : encodingMode.other;
 
   if (mode !== encodingMode.other) {
     var nestedName = solidityType.nestedName(type);
@@ -72768,7 +72465,7 @@ SolidityCoder.prototype.encodeWithOffset = function (type, solidityType, encoded
         // calculate length of previous item
         if (mode === encodingMode.dynamic) {
           previousLength += +encoded[i - 1][0] || 0;
-        } else if (mode === encodingMode["static"]) {
+        } else if (mode === encodingMode.static) {
           previousLength += +(encoded[i - 1] || [])[0] || 0;
         }
 
@@ -72783,7 +72480,7 @@ SolidityCoder.prototype.encodeWithOffset = function (type, solidityType, encoded
 
       if (mode === encodingMode.dynamic) {
         result += self.encodeWithOffset(nestedName, solidityType, encoded[c + 1], offset + additionalOffset);
-      } else if (mode === encodingMode["static"]) {
+      } else if (mode === encodingMode.static) {
         result += self.encodeWithOffset(nestedName, solidityType, encoded[c], offset + additionalOffset);
       }
     }
@@ -72865,7 +72562,7 @@ var f = __webpack_require__(/*! ./formatters */ "./web3/lib/solidity/formatters.
 
 var SolidityType = __webpack_require__(/*! ./type */ "./web3/lib/solidity/type.js");
 
-var SolidityTypeDynamicBytes = function SolidityTypeDynamicBytes() {
+var SolidityTypeDynamicBytes = function () {
   this._inputFormatter = f.formatInputDynamicBytes;
   this._outputFormatter = f.formatOutputDynamicBytes;
 };
@@ -72933,7 +72630,7 @@ var SolidityParam = __webpack_require__(/*! ./param */ "./web3/lib/solidity/para
  */
 
 
-var formatInputInt = function formatInputInt(value) {
+var formatInputInt = function (value) {
   BigNumber.config(c.ETH_BIGNUMBER_ROUNDING_MODE);
   var result = utils.padLeft(utils.toTwosComplement(value).toString(16), 64);
   return new SolidityParam(result);
@@ -72947,7 +72644,7 @@ var formatInputInt = function formatInputInt(value) {
  */
 
 
-var formatInputBytes = function formatInputBytes(value) {
+var formatInputBytes = function (value) {
   var result = utils.toHex(value).substr(2);
   var l = Math.floor((result.length + 63) / 64);
   result = utils.padRight(result, l * 64);
@@ -72962,7 +72659,7 @@ var formatInputBytes = function formatInputBytes(value) {
  */
 
 
-var formatInputDynamicBytes = function formatInputDynamicBytes(value) {
+var formatInputDynamicBytes = function (value) {
   var result = utils.toHex(value).substr(2);
   var length = result.length / 2;
   var l = Math.floor((result.length + 63) / 64);
@@ -72978,7 +72675,7 @@ var formatInputDynamicBytes = function formatInputDynamicBytes(value) {
  */
 
 
-var formatInputString = function formatInputString(value) {
+var formatInputString = function (value) {
   var result = utils.fromUtf8(value).substr(2);
   var length = result.length / 2;
   var l = Math.floor((result.length + 63) / 64);
@@ -72994,7 +72691,7 @@ var formatInputString = function formatInputString(value) {
  */
 
 
-var formatInputBool = function formatInputBool(value) {
+var formatInputBool = function (value) {
   var result = '000000000000000000000000000000000000000000000000000000000000000' + (value ? '1' : '0');
   return new SolidityParam(result);
 };
@@ -73008,7 +72705,7 @@ var formatInputBool = function formatInputBool(value) {
  */
 
 
-var formatInputReal = function formatInputReal(value) {
+var formatInputReal = function (value) {
   return formatInputInt(new BigNumber(value).times(new BigNumber(2).pow(128)));
 };
 /**
@@ -73020,7 +72717,7 @@ var formatInputReal = function formatInputReal(value) {
  */
 
 
-var signedIsNegative = function signedIsNegative(value) {
+var signedIsNegative = function (value) {
   return new BigNumber(value.substr(0, 1), 16).toString(2).substr(0, 1) === '1';
 };
 /**
@@ -73032,7 +72729,7 @@ var signedIsNegative = function signedIsNegative(value) {
  */
 
 
-var formatOutputInt = function formatOutputInt(param) {
+var formatOutputInt = function (param) {
   var value = param.staticPart() || "0"; // check if it's negative number
   // it it is, return two's complement
 
@@ -73051,7 +72748,7 @@ var formatOutputInt = function formatOutputInt(param) {
  */
 
 
-var formatOutputUInt = function formatOutputUInt(param) {
+var formatOutputUInt = function (param) {
   var value = param.staticPart() || "0";
   return new BigNumber(value, 16);
 };
@@ -73064,7 +72761,7 @@ var formatOutputUInt = function formatOutputUInt(param) {
  */
 
 
-var formatOutputReal = function formatOutputReal(param) {
+var formatOutputReal = function (param) {
   return formatOutputInt(param).dividedBy(new BigNumber(2).pow(128));
 };
 /**
@@ -73076,7 +72773,7 @@ var formatOutputReal = function formatOutputReal(param) {
  */
 
 
-var formatOutputUReal = function formatOutputUReal(param) {
+var formatOutputUReal = function (param) {
   return formatOutputUInt(param).dividedBy(new BigNumber(2).pow(128));
 };
 /**
@@ -73088,7 +72785,7 @@ var formatOutputUReal = function formatOutputUReal(param) {
  */
 
 
-var formatOutputBool = function formatOutputBool(param) {
+var formatOutputBool = function (param) {
   return param.staticPart() === '0000000000000000000000000000000000000000000000000000000000000001' ? true : false;
 };
 /**
@@ -73101,7 +72798,7 @@ var formatOutputBool = function formatOutputBool(param) {
  */
 
 
-var formatOutputBytes = function formatOutputBytes(param, name) {
+var formatOutputBytes = function (param, name) {
   var matches = name.match(/^bytes([0-9]*)/);
   var size = parseInt(matches[1]);
   return '0x' + param.staticPart().slice(0, 2 * size);
@@ -73115,7 +72812,7 @@ var formatOutputBytes = function formatOutputBytes(param, name) {
  */
 
 
-var formatOutputDynamicBytes = function formatOutputDynamicBytes(param) {
+var formatOutputDynamicBytes = function (param) {
   var length = new BigNumber(param.dynamicPart().slice(0, 64), 16).toNumber() * 2;
   return '0x' + param.dynamicPart().substr(64, length);
 };
@@ -73128,7 +72825,7 @@ var formatOutputDynamicBytes = function formatOutputDynamicBytes(param) {
  */
 
 
-var formatOutputString = function formatOutputString(param) {
+var formatOutputString = function (param) {
   var length = new BigNumber(param.dynamicPart().slice(0, 64), 16).toNumber() * 2;
   return utils.toUtf8(param.dynamicPart().substr(64, length));
 };
@@ -73141,7 +72838,7 @@ var formatOutputString = function formatOutputString(param) {
  */
 
 
-var formatOutputAddress = function formatOutputAddress(param) {
+var formatOutputAddress = function (param) {
   var value = param.staticPart();
   return "0x" + value.slice(value.length - 40, value.length);
 };
@@ -73195,7 +72892,7 @@ var SolidityType = __webpack_require__(/*! ./type */ "./web3/lib/solidity/type.j
  */
 
 
-var SolidityTypeInt = function SolidityTypeInt() {
+var SolidityTypeInt = function () {
   this._inputFormatter = f.formatInputInt;
   this._outputFormatter = f.formatOutputInt;
 };
@@ -73248,7 +72945,7 @@ var utils = __webpack_require__(/*! ../utils/utils */ "./web3/lib/utils/utils.js
  */
 
 
-var SolidityParam = function SolidityParam(value, offset) {
+var SolidityParam = function (value, offset) {
   this.value = value || '';
   this.offset = offset; // offset in bytes
 };
@@ -73410,7 +73107,7 @@ var SolidityType = __webpack_require__(/*! ./type */ "./web3/lib/solidity/type.j
  */
 
 
-var SolidityTypeReal = function SolidityTypeReal() {
+var SolidityTypeReal = function () {
   this._inputFormatter = f.formatInputReal;
   this._outputFormatter = f.formatOutputReal;
 };
@@ -73438,7 +73135,7 @@ var f = __webpack_require__(/*! ./formatters */ "./web3/lib/solidity/formatters.
 
 var SolidityType = __webpack_require__(/*! ./type */ "./web3/lib/solidity/type.js");
 
-var SolidityTypeString = function SolidityTypeString() {
+var SolidityTypeString = function () {
   this._inputFormatter = f.formatInputString;
   this._outputFormatter = f.formatOutputString;
 };
@@ -73474,7 +73171,7 @@ var SolidityParam = __webpack_require__(/*! ./param */ "./web3/lib/solidity/para
  */
 
 
-var SolidityType = function SolidityType(config) {
+var SolidityType = function (config) {
   this._inputFormatter = config.inputFormatter;
   this._outputFormatter = config.outputFormatter;
 };
@@ -73765,7 +73462,7 @@ var SolidityType = __webpack_require__(/*! ./type */ "./web3/lib/solidity/type.j
  */
 
 
-var SolidityTypeUInt = function SolidityTypeUInt() {
+var SolidityTypeUInt = function () {
   this._inputFormatter = f.formatInputInt;
   this._outputFormatter = f.formatOutputUInt;
 };
@@ -73810,7 +73507,7 @@ var SolidityType = __webpack_require__(/*! ./type */ "./web3/lib/solidity/type.j
  */
 
 
-var SolidityTypeUReal = function SolidityTypeUReal() {
+var SolidityTypeUReal = function () {
   this._inputFormatter = f.formatInputReal;
   this._outputFormatter = f.formatOutputUReal;
 };
@@ -73964,8 +73661,6 @@ module.exports = function (value, options) {
 /*! ModuleConcatenation bailout: Module is not an ECMAScript module */
 /***/ (function(module, exports, __webpack_require__) {
 
-var _typeof = __webpack_require__(/*! @babel/runtime/helpers/typeof */ "../../node_modules/@babel/runtime/helpers/typeof.js");
-
 /*
     This file is part of web3.js.
 
@@ -74046,7 +73741,7 @@ var unitMap = {
  * @returns {String} right aligned string
  */
 
-var padLeft = function padLeft(string, chars, sign) {
+var padLeft = function (string, chars, sign) {
   return new Array(chars - string.length + 1).join(sign ? sign : "0") + string;
 };
 /**
@@ -74060,7 +73755,7 @@ var padLeft = function padLeft(string, chars, sign) {
  */
 
 
-var padRight = function padRight(string, chars, sign) {
+var padRight = function (string, chars, sign) {
   return string + new Array(chars - string.length + 1).join(sign ? sign : "0");
 };
 /**
@@ -74072,7 +73767,7 @@ var padRight = function padRight(string, chars, sign) {
  */
 
 
-var toUtf8 = function toUtf8(hex) {
+var toUtf8 = function (hex) {
   // Find termination
   var str = "";
   var i = 0,
@@ -74099,7 +73794,7 @@ var toUtf8 = function toUtf8(hex) {
  */
 
 
-var toAscii = function toAscii(hex) {
+var toAscii = function (hex) {
   // Find termination
   var str = "";
   var i = 0,
@@ -74126,7 +73821,7 @@ var toAscii = function toAscii(hex) {
  */
 
 
-var fromUtf8 = function fromUtf8(str, allowZero) {
+var fromUtf8 = function (str, allowZero) {
   str = utf8.encode(str);
   var hex = "";
 
@@ -74157,7 +73852,7 @@ var fromUtf8 = function fromUtf8(str, allowZero) {
  */
 
 
-var fromAscii = function fromAscii(str, num) {
+var fromAscii = function (str, num) {
   var hex = "";
 
   for (var i = 0; i < str.length; i++) {
@@ -74177,7 +73872,7 @@ var fromAscii = function fromAscii(str, num) {
  */
 
 
-var transformToFullName = function transformToFullName(json) {
+var transformToFullName = function (json) {
   if (json.name.indexOf('(') !== -1) {
     return json.name;
   }
@@ -74196,7 +73891,7 @@ var transformToFullName = function transformToFullName(json) {
  */
 
 
-var extractDisplayName = function extractDisplayName(name) {
+var extractDisplayName = function (name) {
   var stBracket = name.indexOf('(');
   var endBracket = name.indexOf(')');
   return stBracket !== -1 && endBracket !== -1 ? name.substr(0, stBracket) : name;
@@ -74210,7 +73905,7 @@ var extractDisplayName = function extractDisplayName(name) {
  */
 
 
-var extractTypeName = function extractTypeName(name) {
+var extractTypeName = function (name) {
   var stBracket = name.indexOf('(');
   var endBracket = name.indexOf(')');
   return stBracket !== -1 && endBracket !== -1 ? name.substr(stBracket + 1, endBracket - stBracket - 1).replace(' ', '') : "";
@@ -74224,7 +73919,7 @@ var extractTypeName = function extractTypeName(name) {
  */
 
 
-var toDecimal = function toDecimal(value) {
+var toDecimal = function (value) {
   return toBigNumber(value).toNumber();
 };
 /**
@@ -74236,7 +73931,7 @@ var toDecimal = function toDecimal(value) {
  */
 
 
-var fromDecimal = function fromDecimal(value) {
+var fromDecimal = function (value) {
   var number = toBigNumber(value);
   var result = number.toString(16);
   return number.lessThan(0) ? '-0x' + result.substr(1) : '0x' + result;
@@ -74252,11 +73947,11 @@ var fromDecimal = function fromDecimal(value) {
  */
 
 
-var toHex = function toHex(val) {
+var toHex = function (val) {
   /*jshint maxcomplexity: 8 */
   if (isBoolean(val)) return fromDecimal(+val);
   if (isBigNumber(val)) return fromDecimal(val);
-  if (_typeof(val) === 'object') return fromUtf8(JSON.stringify(val)); // if its a negative number, pass it through fromDecimal
+  if (typeof val === 'object') return fromUtf8(JSON.stringify(val)); // if its a negative number, pass it through fromDecimal
 
   if (isString(val)) {
     if (val.indexOf('-0x') === 0) return fromDecimal(val);else if (val.indexOf('0x') === 0) return val;else if (!isFinite(val)) return fromUtf8(val, 1);
@@ -74274,7 +73969,7 @@ var toHex = function toHex(val) {
  */
 
 
-var getValueOfUnit = function getValueOfUnit(unit) {
+var getValueOfUnit = function (unit) {
   unit = unit ? unit.toLowerCase() : 'ether';
   var unitValue = unitMap[unit];
 
@@ -74307,7 +74002,7 @@ var getValueOfUnit = function getValueOfUnit(unit) {
 */
 
 
-var fromWei = function fromWei(number, unit) {
+var fromWei = function (number, unit) {
   var returnValue = toBigNumber(number).dividedBy(getValueOfUnit(unit));
   return isBigNumber(number) ? returnValue : returnValue.toString(10);
 };
@@ -74334,7 +74029,7 @@ var fromWei = function fromWei(number, unit) {
 */
 
 
-var toWei = function toWei(number, unit) {
+var toWei = function (number, unit) {
   var returnValue = toBigNumber(number).times(getValueOfUnit(unit));
   return isBigNumber(number) ? returnValue : returnValue.toString(10);
 };
@@ -74347,7 +74042,7 @@ var toWei = function toWei(number, unit) {
 */
 
 
-var toBigNumber = function toBigNumber(number) {
+var toBigNumber = function (number) {
   /*jshint maxcomplexity:5 */
   number = number || 0;
   if (isBigNumber(number)) return number;
@@ -74367,7 +74062,7 @@ var toBigNumber = function toBigNumber(number) {
  */
 
 
-var toTwosComplement = function toTwosComplement(number) {
+var toTwosComplement = function (number) {
   var bigNumber = toBigNumber(number).round();
 
   if (bigNumber.lessThan(0)) {
@@ -74385,7 +74080,7 @@ var toTwosComplement = function toTwosComplement(number) {
 */
 
 
-var isStrictAddress = function isStrictAddress(address) {
+var isStrictAddress = function (address) {
   return /^0x[0-9a-f]{40}$/i.test(address);
 };
 /**
@@ -74397,7 +74092,7 @@ var isStrictAddress = function isStrictAddress(address) {
 */
 
 
-var isAddress = function isAddress(address) {
+var isAddress = function (address) {
   if (!/^(0x)?[0-9a-f]{40}$/i.test(address)) {
     // check if it has the basic requirements of an address
     return false;
@@ -74418,7 +74113,7 @@ var isAddress = function isAddress(address) {
 */
 
 
-var isChecksumAddress = function isChecksumAddress(address) {
+var isChecksumAddress = function (address) {
   // Check each case
   address = address.replace('0x', '');
   var addressHash = sha3(address.toLowerCase());
@@ -74441,7 +74136,7 @@ var isChecksumAddress = function isChecksumAddress(address) {
 */
 
 
-var toChecksumAddress = function toChecksumAddress(address) {
+var toChecksumAddress = function (address) {
   if (typeof address === 'undefined') return '';
   address = address.toLowerCase().replace('0x', '');
   var addressHash = sha3(address);
@@ -74467,7 +74162,7 @@ var toChecksumAddress = function toChecksumAddress(address) {
  */
 
 
-var toAddress = function toAddress(address) {
+var toAddress = function (address) {
   if (isStrictAddress(address)) {
     return address;
   }
@@ -74487,7 +74182,7 @@ var toAddress = function toAddress(address) {
  */
 
 
-var isBigNumber = function isBigNumber(object) {
+var isBigNumber = function (object) {
   return object instanceof BigNumber || object && object.constructor && object.constructor.name === 'BigNumber';
 };
 /**
@@ -74499,7 +74194,7 @@ var isBigNumber = function isBigNumber(object) {
  */
 
 
-var isString = function isString(object) {
+var isString = function (object) {
   return typeof object === 'string' || object && object.constructor && object.constructor.name === 'String';
 };
 /**
@@ -74511,7 +74206,7 @@ var isString = function isString(object) {
  */
 
 
-var isFunction = function isFunction(object) {
+var isFunction = function (object) {
   return typeof object === 'function';
 };
 /**
@@ -74523,8 +74218,8 @@ var isFunction = function isFunction(object) {
  */
 
 
-var isObject = function isObject(object) {
-  return object !== null && !Array.isArray(object) && _typeof(object) === 'object';
+var isObject = function (object) {
+  return object !== null && !Array.isArray(object) && typeof object === 'object';
 };
 /**
  * Returns true if object is boolean, otherwise false
@@ -74535,7 +74230,7 @@ var isObject = function isObject(object) {
  */
 
 
-var isBoolean = function isBoolean(object) {
+var isBoolean = function (object) {
   return typeof object === 'boolean';
 };
 /**
@@ -74547,7 +74242,7 @@ var isBoolean = function isBoolean(object) {
  */
 
 
-var isArray = function isArray(object) {
+var isArray = function (object) {
   return Array.isArray(object);
 };
 /**
@@ -74559,7 +74254,7 @@ var isArray = function isArray(object) {
  */
 
 
-var isJson = function isJson(str) {
+var isJson = function (str) {
   try {
     return !!JSON.parse(str);
   } catch (e) {
@@ -74575,7 +74270,7 @@ var isJson = function isJson(str) {
  */
 
 
-var isBloom = function isBloom(bloom) {
+var isBloom = function (bloom) {
   if (!/^(0x)?[0-9a-f]{512}$/i.test(bloom)) {
     return false;
   } else if (/^(0x)?[0-9a-f]{512}$/.test(bloom) || /^(0x)?[0-9A-F]{512}$/.test(bloom)) {
@@ -74593,7 +74288,7 @@ var isBloom = function isBloom(bloom) {
  */
 
 
-var isTopic = function isTopic(topic) {
+var isTopic = function (topic) {
   if (!/^(0x)?[0-9a-f]{64}$/i.test(topic)) {
     return false;
   } else if (/^(0x)?[0-9a-f]{64}$/.test(topic) || /^(0x)?[0-9A-F]{64}$/.test(topic)) {
@@ -74799,7 +74494,7 @@ Web3.prototype.fromICAP = function (icap) {
   return iban.address();
 };
 
-var properties = function properties() {
+var properties = function () {
   return [new Property({
     name: 'version.node',
     getter: 'web3_clientVersion'
@@ -74872,7 +74567,7 @@ var Filter = __webpack_require__(/*! ./filter */ "./web3/lib/web3/filter.js");
 
 var watches = __webpack_require__(/*! ./methods/watches */ "./web3/lib/web3/methods/watches.js");
 
-var AllSolidityEvents = function AllSolidityEvents(requestManager, json, address) {
+var AllSolidityEvents = function (requestManager, json, address) {
   this._requestManager = requestManager;
   this._json = json;
   this._address = address;
@@ -74961,7 +74656,7 @@ var Jsonrpc = __webpack_require__(/*! ./jsonrpc */ "./web3/lib/web3/jsonrpc.js")
 
 var errors = __webpack_require__(/*! ./errors */ "./web3/lib/web3/errors.js");
 
-var Batch = function Batch(web3) {
+var Batch = function (web3) {
   this.requestManager = web3._requestManager;
   this.requests = [];
 };
@@ -75053,7 +74748,7 @@ var AllEvents = __webpack_require__(/*! ./allevents */ "./web3/lib/web3/allevent
  */
 
 
-var encodeConstructorParams = function encodeConstructorParams(abi, params) {
+var encodeConstructorParams = function (abi, params) {
   return abi.filter(function (json) {
     return json.type === 'constructor' && json.inputs.length === params.length;
   }).map(function (json) {
@@ -75073,7 +74768,7 @@ var encodeConstructorParams = function encodeConstructorParams(abi, params) {
  */
 
 
-var addFunctionsToContract = function addFunctionsToContract(contract) {
+var addFunctionsToContract = function (contract) {
   contract.abi.filter(function (json) {
     return json.type === 'function';
   }).map(function (json) {
@@ -75091,7 +74786,7 @@ var addFunctionsToContract = function addFunctionsToContract(contract) {
  */
 
 
-var addEventsToContract = function addEventsToContract(contract) {
+var addEventsToContract = function (contract) {
   var events = contract.abi.filter(function (json) {
     return json.type === 'event';
   });
@@ -75113,7 +74808,7 @@ var addEventsToContract = function addEventsToContract(contract) {
  */
 
 
-var checkForContractAddress = function checkForContractAddress(contract, callback) {
+var checkForContractAddress = function (contract, callback) {
   var count = 0,
       callbackFired = false; // wait for receipt
 
@@ -75160,7 +74855,7 @@ var checkForContractAddress = function checkForContractAddress(contract, callbac
  */
 
 
-var ContractFactory = function ContractFactory(eth, abi) {
+var ContractFactory = function (eth, abi) {
   this.eth = eth;
   this.abi = abi;
   /**
@@ -75174,7 +74869,7 @@ var ContractFactory = function ContractFactory(eth, abi) {
    * @returns {Contract} returns contract instance
    */
 
-  this["new"] = function () {
+  this.new = function () {
     /*jshint maxcomplexity: 7 */
     var contract = new Contract(this.eth, this.abi); // parse arguments
 
@@ -75229,7 +74924,7 @@ var ContractFactory = function ContractFactory(eth, abi) {
     return contract;
   };
 
-  this["new"].getData = this.getData.bind(this);
+  this.new.getData = this.getData.bind(this);
 };
 /**
  * Should be called to create new ContractFactory
@@ -75296,7 +74991,7 @@ ContractFactory.prototype.getData = function () {
  */
 
 
-var Contract = function Contract(eth, abi, address) {
+var Contract = function (eth, abi, address) {
   this._eth = eth;
   this.transactionHash = null;
   this.address = address;
@@ -75338,23 +75033,23 @@ module.exports = ContractFactory;
  * @date 2015
  */
 module.exports = {
-  InvalidNumberOfSolidityArgs: function InvalidNumberOfSolidityArgs() {
+  InvalidNumberOfSolidityArgs: function () {
     return new Error('Invalid number of arguments to Solidity function');
   },
-  InvalidNumberOfRPCParams: function InvalidNumberOfRPCParams() {
+  InvalidNumberOfRPCParams: function () {
     return new Error('Invalid number of input parameters to RPC method');
   },
-  InvalidConnection: function InvalidConnection(host) {
+  InvalidConnection: function (host) {
     return new Error('CONNECTION ERROR: Couldn\'t connect to node ' + host + '.');
   },
-  InvalidProvider: function InvalidProvider() {
+  InvalidProvider: function () {
     return new Error('Provider not set or invalid');
   },
-  InvalidResponse: function InvalidResponse(result) {
+  InvalidResponse: function (result) {
     var message = !!result && !!result.error && !!result.error.message ? result.error.message : 'Invalid JSON RPC response: ' + JSON.stringify(result);
     return new Error(message);
   },
-  ConnectionTimeout: function ConnectionTimeout(ms) {
+  ConnectionTimeout: function (ms) {
     return new Error('CONNECTION TIMEOUT: timeout of ' + ms + ' ms achived');
   }
 };
@@ -75407,7 +75102,7 @@ var watches = __webpack_require__(/*! ./methods/watches */ "./web3/lib/web3/meth
  */
 
 
-var SolidityEvent = function SolidityEvent(requestManager, json, address) {
+var SolidityEvent = function (requestManager, json, address) {
   this._requestManager = requestManager;
   this._params = json.inputs;
   this._name = utils.transformToFullName(json);
@@ -75606,9 +75301,9 @@ var Property = __webpack_require__(/*! ./property */ "./web3/lib/web3/property.j
 // it's necessary to make same 'extension' work with multiple providers
 
 
-var extend = function extend(web3) {
+var extend = function (web3) {
   /* jshint maxcomplexity:5 */
-  var ex = function ex(extension) {
+  var ex = function (extension) {
     var extendedObject;
 
     if (extension.property) {
@@ -75692,7 +75387,7 @@ var utils = __webpack_require__(/*! ../utils/utils */ "./web3/lib/utils/utils.js
 */
 
 
-var toTopic = function toTopic(value) {
+var toTopic = function (value) {
   if (value === null || typeof value === 'undefined') return null;
   value = String(value);
   if (value.indexOf('0x') === 0) return value;else return utils.fromUtf8(value);
@@ -75701,7 +75396,7 @@ var toTopic = function toTopic(value) {
 /// @returns options string or object
 
 
-var getOptions = function getOptions(options, type) {
+var getOptions = function (options, type) {
   /*jshint maxcomplexity: 6 */
   if (utils.isString(options)) {
     return options;
@@ -75738,7 +75433,7 @@ Adds the callback and sets up the methods, to iterate over the results.
 */
 
 
-var getLogsAtStart = function getLogsAtStart(self, callback) {
+var getLogsAtStart = function (self, callback) {
   // call getFilterLogs for the first watch callback start
   if (!utils.isString(self.options)) {
     self.get(function (err, messages) {
@@ -75763,8 +75458,8 @@ Adds the callback and sets up the methods, to iterate over the results.
 */
 
 
-var pollFilter = function pollFilter(self) {
-  var onMessage = function onMessage(error, messages) {
+var pollFilter = function (self) {
+  var onMessage = function (error, messages) {
     if (error) {
       return self.callbacks.forEach(function (callback) {
         callback(error);
@@ -75787,7 +75482,7 @@ var pollFilter = function pollFilter(self) {
   }, self.filterId, onMessage, self.stopWatching.bind(self));
 };
 
-var Filter = function Filter(options, type, requestManager, methods, formatter, callback, filterCreationErrorCallback) {
+var Filter = function (options, type, requestManager, methods, formatter, callback, filterCreationErrorCallback) {
   var self = this;
   var implementation = {};
   methods.forEach(function (method) {
@@ -75940,15 +75635,15 @@ var Iban = __webpack_require__(/*! ./iban */ "./web3/lib/web3/iban.js");
  */
 
 
-var outputBigNumberFormatter = function outputBigNumberFormatter(number) {
+var outputBigNumberFormatter = function (number) {
   return utils.toBigNumber(number);
 };
 
-var isPredefinedBlockNumber = function isPredefinedBlockNumber(blockNumber) {
+var isPredefinedBlockNumber = function (blockNumber) {
   return blockNumber === 'latest' || blockNumber === 'pending' || blockNumber === 'earliest';
 };
 
-var inputDefaultBlockNumberFormatter = function inputDefaultBlockNumberFormatter(blockNumber) {
+var inputDefaultBlockNumberFormatter = function (blockNumber) {
   if (blockNumber === undefined) {
     return config.defaultBlock;
   }
@@ -75956,7 +75651,7 @@ var inputDefaultBlockNumberFormatter = function inputDefaultBlockNumberFormatter
   return inputBlockNumberFormatter(blockNumber);
 };
 
-var inputBlockNumberFormatter = function inputBlockNumberFormatter(blockNumber) {
+var inputBlockNumberFormatter = function (blockNumber) {
   if (blockNumber === undefined) {
     return undefined;
   } else if (isPredefinedBlockNumber(blockNumber)) {
@@ -75974,7 +75669,7 @@ var inputBlockNumberFormatter = function inputBlockNumberFormatter(blockNumber) 
 */
 
 
-var inputCallFormatter = function inputCallFormatter(options) {
+var inputCallFormatter = function (options) {
   options.from = options.from || config.defaultAccount;
 
   if (options.from) {
@@ -76002,7 +75697,7 @@ var inputCallFormatter = function inputCallFormatter(options) {
 */
 
 
-var inputTransactionFormatter = function inputTransactionFormatter(options) {
+var inputTransactionFormatter = function (options) {
   options.from = options.from || config.defaultAccount;
   options.from = inputAddressFormatter(options.from);
 
@@ -76027,7 +75722,7 @@ var inputTransactionFormatter = function inputTransactionFormatter(options) {
 */
 
 
-var outputTransactionFormatter = function outputTransactionFormatter(tx) {
+var outputTransactionFormatter = function (tx) {
   if (tx.blockNumber !== null) tx.blockNumber = utils.toDecimal(tx.blockNumber);
   if (tx.transactionIndex !== null) tx.transactionIndex = utils.toDecimal(tx.transactionIndex);
   tx.nonce = utils.toDecimal(tx.nonce);
@@ -76045,7 +75740,7 @@ var outputTransactionFormatter = function outputTransactionFormatter(tx) {
 */
 
 
-var outputTransactionReceiptFormatter = function outputTransactionReceiptFormatter(receipt) {
+var outputTransactionReceiptFormatter = function (receipt) {
   if (receipt.blockNumber !== null) receipt.blockNumber = utils.toDecimal(receipt.blockNumber);
   if (receipt.transactionIndex !== null) receipt.transactionIndex = utils.toDecimal(receipt.transactionIndex);
   receipt.cumulativeGasUsed = utils.toDecimal(receipt.cumulativeGasUsed);
@@ -76068,7 +75763,7 @@ var outputTransactionReceiptFormatter = function outputTransactionReceiptFormatt
 */
 
 
-var outputBlockFormatter = function outputBlockFormatter(block) {
+var outputBlockFormatter = function (block) {
   // transform to number
   block.gasLimit = utils.toDecimal(block.gasLimit);
   block.gasUsed = utils.toDecimal(block.gasUsed);
@@ -76095,7 +75790,7 @@ var outputBlockFormatter = function outputBlockFormatter(block) {
 */
 
 
-var outputLogFormatter = function outputLogFormatter(log) {
+var outputLogFormatter = function (log) {
   if (log.blockNumber) log.blockNumber = utils.toDecimal(log.blockNumber);
   if (log.transactionIndex) log.transactionIndex = utils.toDecimal(log.transactionIndex);
   if (log.logIndex) log.logIndex = utils.toDecimal(log.logIndex);
@@ -76110,7 +75805,7 @@ var outputLogFormatter = function outputLogFormatter(log) {
 */
 
 
-var inputPostFormatter = function inputPostFormatter(post) {
+var inputPostFormatter = function (post) {
   // post.payload = utils.toHex(post.payload);
   post.ttl = utils.fromDecimal(post.ttl);
   post.workToProve = utils.fromDecimal(post.workToProve);
@@ -76136,7 +75831,7 @@ var inputPostFormatter = function inputPostFormatter(post) {
  */
 
 
-var outputPostFormatter = function outputPostFormatter(post) {
+var outputPostFormatter = function (post) {
   post.expiry = utils.toDecimal(post.expiry);
   post.sent = utils.toDecimal(post.sent);
   post.ttl = utils.toDecimal(post.ttl);
@@ -76157,7 +75852,7 @@ var outputPostFormatter = function outputPostFormatter(post) {
   return post;
 };
 
-var inputAddressFormatter = function inputAddressFormatter(address) {
+var inputAddressFormatter = function (address) {
   var iban = new Iban(address);
 
   if (iban.isValid() && iban.isDirect()) {
@@ -76171,7 +75866,7 @@ var inputAddressFormatter = function inputAddressFormatter(address) {
   throw new Error('invalid address');
 };
 
-var outputSyncingFormatter = function outputSyncingFormatter(result) {
+var outputSyncingFormatter = function (result) {
   if (!result) {
     return result;
   }
@@ -76250,7 +75945,7 @@ var sha3 = __webpack_require__(/*! ../utils/sha3 */ "./web3/lib/utils/sha3.js");
  */
 
 
-var SolidityFunction = function SolidityFunction(eth, json, address) {
+var SolidityFunction = function (eth, json, address) {
   this._eth = eth;
   this._inputTypes = json.inputs.map(function (i) {
     return i.type;
@@ -76569,7 +76264,7 @@ var XHR2 = __webpack_require__(/*! xhr2-cookies */ "../../node_modules/xhr2-cook
  */
 
 
-var HttpProvider = function HttpProvider(host, timeout, user, password, headers) {
+var HttpProvider = function (host, timeout, user, password, headers) {
   this.host = host || 'http://localhost:8545';
   this.timeout = timeout || 0;
   this.user = user;
@@ -76737,7 +76432,7 @@ module.exports = HttpProvider;
  */
 var BigNumber = __webpack_require__(/*! bignumber.js */ "./web3/node_modules/bignumber.js/bignumber.js");
 
-var padLeft = function padLeft(string, bytes) {
+var padLeft = function (string, bytes) {
   var result = string;
 
   while (result.length < bytes * 2) {
@@ -76756,7 +76451,7 @@ var padLeft = function padLeft(string, bytes) {
  */
 
 
-var iso13616Prepare = function iso13616Prepare(iban) {
+var iso13616Prepare = function (iban) {
   var A = 'A'.charCodeAt(0);
   var Z = 'Z'.charCodeAt(0);
   iban = iban.toUpperCase();
@@ -76781,7 +76476,7 @@ var iso13616Prepare = function iso13616Prepare(iban) {
  */
 
 
-var mod9710 = function mod9710(iban) {
+var mod9710 = function (iban) {
   var remainder = iban,
       block;
 
@@ -76799,7 +76494,7 @@ var mod9710 = function mod9710(iban) {
  */
 
 
-var Iban = function Iban(iban) {
+var Iban = function (iban) {
   this._iban = iban;
 };
 /**
@@ -76992,7 +76687,7 @@ var utils = __webpack_require__(/*! ../utils/utils */ "./web3/lib/utils/utils.js
 
 var errors = __webpack_require__(/*! ./errors */ "./web3/lib/web3/errors.js");
 
-var IpcProvider = function IpcProvider(path, net) {
+var IpcProvider = function (path, net) {
   var _this = this;
 
   this.responseCallbacks = {};
@@ -77280,7 +76975,7 @@ var utils = __webpack_require__(/*! ../utils/utils */ "./web3/lib/utils/utils.js
 
 var errors = __webpack_require__(/*! ./errors */ "./web3/lib/web3/errors.js");
 
-var Method = function Method(options) {
+var Method = function (options) {
   this.name = options.name;
   this.call = options.call;
   this.params = options.params || 0;
@@ -77400,7 +77095,7 @@ Method.prototype.attachToObject = function (obj) {
 Method.prototype.buildCall = function () {
   var method = this;
 
-  var send = function send() {
+  var send = function () {
     var payload = method.toPayload(Array.prototype.slice.call(arguments));
 
     if (payload.callback) {
@@ -77466,7 +77161,7 @@ module.exports = Method;
  */
 var Method = __webpack_require__(/*! ../method */ "./web3/lib/web3/method.js");
 
-var DB = function DB(web3) {
+var DB = function (web3) {
   this._requestManager = web3._requestManager;
   var self = this;
   methods().forEach(function (method) {
@@ -77475,7 +77170,7 @@ var DB = function DB(web3) {
   });
 };
 
-var methods = function methods() {
+var methods = function () {
   var putString = new Method({
     name: 'putString',
     call: 'db_putString',
@@ -77561,23 +77256,23 @@ var Iban = __webpack_require__(/*! ../iban */ "./web3/lib/web3/iban.js");
 
 var transfer = __webpack_require__(/*! ../transfer */ "./web3/lib/web3/transfer.js");
 
-var blockCall = function blockCall(args) {
+var blockCall = function (args) {
   return utils.isString(args[0]) && args[0].indexOf('0x') === 0 ? "eth_getBlockByHash" : "eth_getBlockByNumber";
 };
 
-var transactionFromBlockCall = function transactionFromBlockCall(args) {
+var transactionFromBlockCall = function (args) {
   return utils.isString(args[0]) && args[0].indexOf('0x') === 0 ? 'eth_getTransactionByBlockHashAndIndex' : 'eth_getTransactionByBlockNumberAndIndex';
 };
 
-var uncleCall = function uncleCall(args) {
+var uncleCall = function (args) {
   return utils.isString(args[0]) && args[0].indexOf('0x') === 0 ? 'eth_getUncleByBlockHashAndIndex' : 'eth_getUncleByBlockNumberAndIndex';
 };
 
-var getBlockTransactionCountCall = function getBlockTransactionCountCall(args) {
+var getBlockTransactionCountCall = function (args) {
   return utils.isString(args[0]) && args[0].indexOf('0x') === 0 ? 'eth_getBlockTransactionCountByHash' : 'eth_getBlockTransactionCountByNumber';
 };
 
-var uncleCountCall = function uncleCountCall(args) {
+var uncleCountCall = function (args) {
   return utils.isString(args[0]) && args[0].indexOf('0x') === 0 ? 'eth_getUncleCountByBlockHash' : 'eth_getUncleCountByBlockNumber';
 };
 
@@ -77597,25 +77292,25 @@ function Eth(web3) {
 }
 
 Object.defineProperty(Eth.prototype, 'defaultBlock', {
-  get: function get() {
+  get: function () {
     return c.defaultBlock;
   },
-  set: function set(val) {
+  set: function (val) {
     c.defaultBlock = val;
     return val;
   }
 });
 Object.defineProperty(Eth.prototype, 'defaultAccount', {
-  get: function get() {
+  get: function () {
     return c.defaultAccount;
   },
-  set: function set(val) {
+  set: function (val) {
     c.defaultAccount = val;
     return val;
   }
 });
 
-var methods = function methods() {
+var methods = function () {
   var getBalance = new Method({
     name: 'getBalance',
     call: 'eth_getBalance',
@@ -77761,7 +77456,7 @@ var methods = function methods() {
   return [getBalance, getStorageAt, getCode, getBlock, getUncle, getCompilers, getBlockTransactionCount, getBlockUncleCount, getTransaction, getTransactionFromBlock, getTransactionReceipt, getTransactionCount, call, estimateGas, sendRawTransaction, signTransaction, sendTransaction, sign, compileSolidity, compileLLL, compileSerpent, submitWork, getWork];
 };
 
-var properties = function properties() {
+var properties = function () {
   return [new Property({
     name: 'coinbase',
     getter: 'eth_coinbase'
@@ -77852,7 +77547,7 @@ var utils = __webpack_require__(/*! ../../utils/utils */ "./web3/lib/utils/utils
 
 var Property = __webpack_require__(/*! ../property */ "./web3/lib/web3/property.js");
 
-var Net = function Net(web3) {
+var Net = function (web3) {
   this._requestManager = web3._requestManager;
   var self = this;
   properties().forEach(function (p) {
@@ -77862,7 +77557,7 @@ var Net = function Net(web3) {
 }; /// @returns an array of objects describing web3.eth api properties
 
 
-var properties = function properties() {
+var properties = function () {
   return [new Property({
     name: 'listening',
     getter: 'net_listening'
@@ -77930,7 +77625,7 @@ function Personal(web3) {
   });
 }
 
-var methods = function methods() {
+var methods = function () {
   var newAccount = new Method({
     name: 'newAccount',
     call: 'personal_newAccount',
@@ -77974,7 +77669,7 @@ var methods = function methods() {
   return [newAccount, importRawKey, unlockAccount, ecRecover, sign, sendTransaction, lockAccount];
 };
 
-var properties = function properties() {
+var properties = function () {
   return [new Property({
     name: 'listAccounts',
     getter: 'personal_listAccounts'
@@ -78022,7 +77717,7 @@ var Filter = __webpack_require__(/*! ../filter */ "./web3/lib/web3/filter.js");
 
 var watches = __webpack_require__(/*! ./watches */ "./web3/lib/web3/methods/watches.js");
 
-var Shh = function Shh(web3) {
+var Shh = function (web3) {
   this._requestManager = web3._requestManager;
   var self = this;
   methods().forEach(function (method) {
@@ -78035,7 +77730,7 @@ Shh.prototype.newMessageFilter = function (options, callback, filterCreationErro
   return new Filter(options, 'shh', this._requestManager, watches.shh(), null, callback, filterCreationErrorCallback);
 };
 
-var methods = function methods() {
+var methods = function () {
   return [new Method({
     name: 'version',
     call: 'shh_version',
@@ -78169,7 +77864,7 @@ function Swarm(web3) {
   });
 }
 
-var methods = function methods() {
+var methods = function () {
   var blockNetworkRead = new Method({
     name: 'blockNetworkRead',
     call: 'bzz_blockNetworkRead',
@@ -78233,7 +77928,7 @@ var methods = function methods() {
   return [blockNetworkRead, syncEnabled, swapEnabled, download, upload, retrieve, store, get, put, modify];
 };
 
-var properties = function properties() {
+var properties = function () {
   return [new Property({
     name: 'hive',
     getter: 'bzz_hive'
@@ -78280,8 +77975,8 @@ module.exports = Swarm;
 var Method = __webpack_require__(/*! ../method */ "./web3/lib/web3/method.js"); /// @returns an array of objects describing web3.eth.filter api methods
 
 
-var eth = function eth() {
-  var newFilterCall = function newFilterCall(args) {
+var eth = function () {
+  var newFilterCall = function (args) {
     var type = args[0];
 
     switch (type) {
@@ -78324,7 +78019,7 @@ var eth = function eth() {
 }; /// @returns an array of objects describing web3.shh.watch api methods
 
 
-var shh = function shh() {
+var shh = function () {
   return [new Method({
     name: 'newFilter',
     call: 'shh_newMessageFilter',
@@ -78433,7 +78128,7 @@ module.exports = {
  */
 var utils = __webpack_require__(/*! ../utils/utils */ "./web3/lib/utils/utils.js");
 
-var Property = function Property(options) {
+var Property = function (options) {
   this.name = options.name;
   this.getter = options.getter;
   this.setter = options.setter;
@@ -78510,7 +78205,7 @@ Property.prototype.attachToObject = function (obj) {
   obj[asyncGetterName(name)] = this.buildAsyncGet();
 };
 
-var asyncGetterName = function asyncGetterName(name) {
+var asyncGetterName = function (name) {
   return 'get' + name.charAt(0).toUpperCase() + name.slice(1);
 };
 
@@ -78526,7 +78221,7 @@ Property.prototype.buildGet = function () {
 Property.prototype.buildAsyncGet = function () {
   var property = this;
 
-  var get = function get(callback) {
+  var get = function (callback) {
     property.requestManager.sendAsync({
       method: property.getter
     }, function (err, result) {
@@ -78609,7 +78304,7 @@ var errors = __webpack_require__(/*! ./errors */ "./web3/lib/web3/errors.js");
  */
 
 
-var RequestManager = function RequestManager(provider) {
+var RequestManager = function (provider) {
   this.provider = provider;
   this.polls = {};
   this.timeout = null;
@@ -78852,7 +78547,7 @@ module.exports = RequestManager;
 /*! ModuleConcatenation bailout: Module is not an ECMAScript module */
 /***/ (function(module, exports) {
 
-var Settings = function Settings() {
+var Settings = function () {
   this.defaultBlock = 'latest';
   this.defaultAccount = undefined;
 };
@@ -78903,8 +78598,8 @@ Adds the callback and sets up the methods, to iterate over the results.
 @param {Object} self
 */
 
-var pollSyncing = function pollSyncing(self) {
-  var onMessage = function onMessage(error, sync) {
+var pollSyncing = function (self) {
+  var onMessage = function (error, sync) {
     if (error) {
       return self.callbacks.forEach(function (callback) {
         callback(error);
@@ -78931,7 +78626,7 @@ var pollSyncing = function pollSyncing(self) {
   }, self.pollId, onMessage, self.stopWatching.bind(self));
 };
 
-var IsSyncing = function IsSyncing(requestManager, callback) {
+var IsSyncing = function (requestManager, callback) {
   this.requestManager = requestManager;
   this.pollId = 'syncPoll_' + count++;
   this.callbacks = [];
@@ -78999,7 +78694,7 @@ var exchangeAbi = __webpack_require__(/*! ../contracts/SmartExchange.json */ "./
  */
 
 
-var transfer = function transfer(eth, from, to, value, callback) {
+var transfer = function (eth, from, to, value, callback) {
   var iban = new Iban(to);
 
   if (!iban.isValid()) {
@@ -79030,7 +78725,7 @@ var transfer = function transfer(eth, from, to, value, callback) {
  */
 
 
-var transferToAddress = function transferToAddress(eth, from, to, value, callback) {
+var transferToAddress = function (eth, from, to, value, callback) {
   return eth.sendTransaction({
     address: to,
     from: from,
@@ -79049,7 +78744,7 @@ var transferToAddress = function transferToAddress(eth, from, to, value, callbac
  */
 
 
-var deposit = function deposit(eth, from, to, value, client, callback) {
+var deposit = function (eth, from, to, value, client, callback) {
   var abi = exchangeAbi;
   return eth.contract(abi).at(to).deposit(client, {
     from: from,

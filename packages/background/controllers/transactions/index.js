@@ -199,6 +199,7 @@ class TransactionController extends EventEmitter {
       transactionCategory,
     })
     this.addTx(txMeta)
+    console.log('txMeta', txMeta)
     this.emit('newUnapprovedTx', txMeta)
 
     try {
