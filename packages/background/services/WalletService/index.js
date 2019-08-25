@@ -49,6 +49,7 @@ const PersonalMessageManager = require('../../lib/personal-message-manager')
 const TypedMessageManager = require('../../lib/typed-message-manager')
 const ProviderApprovalController = require('../../controllers/provider-approval')
 const nodeify = require('../../lib/nodeify')
+const debounce = require('debounce')
 
 const {
   AddressBookController,
@@ -190,6 +191,7 @@ class Wallet extends EventEmitter {
         this.currentAccountTronWeb = false;
 
         this.activeControllerConnections = 0
+        this.sendUpdate = debounce(this.privateSendUpdate.bind(this), 200)
 
         // observable state store
         this.store = new ComposableObservableStore(initState)
@@ -336,6 +338,7 @@ class Wallet extends EventEmitter {
           ProviderApprovalController: this.providerApprovalController.store,
           OnboardingController: this.onboardingController.store,
         })
+        this.memStore.subscribe(this.sendUpdate.bind(this))
 
         extension.runtime.onConnect.addListener(connectRemote)
         extension.runtime.onConnectExternal.addListener(connectExternal)
@@ -379,6 +382,10 @@ class Wallet extends EventEmitter {
 
             this._setCurrentDappConfig()
         }
+    }
+
+    privateSendUpdate () {
+      this.emit('update', this.getState())
     }
 
     async _onKeyringControllerUpdate (state) {
@@ -425,6 +432,7 @@ class Wallet extends EventEmitter {
     setupUntrustedCommunication(connectionStream, originDomain) {
         // setup multiplexing
         const mux = setupMultiplex(connectionStream)
+
         // connect features
         const publicApi = this.setupPublicApi(mux.createStream('publicApi'), originDomain)
         this.setupProviderConnection(mux.createStream('provider'), originDomain, publicApi)
@@ -456,7 +464,7 @@ class Wallet extends EventEmitter {
 
         // setup memStore subscription hooks
         this.on('update', (memState) => {
-            console.log('memState', memState)
+            updatePublicConfigStore(memState)
         })
 
         updatePublicConfigStore(this.getState())
@@ -627,18 +635,19 @@ class Wallet extends EventEmitter {
             getAccounts: async ({ origin }) => {
                 // Expose no accounts if this origin has not been approved, preventing
                 // account-requring RPC methods from completing successfully
-                const exposeAccounts = this.providerApprovalController.shouldExposeAccounts(origin)
-                console.log('yyyyyyyy', origin, exposeAccounts)
-                if (origin !== 'MetaMask' && !exposeAccounts) { return [] }
-                const isUnlocked = this.keyringController.memStore.getState().isUnlocked
-                const selectedAddress = this.preferencesController.getSelectedAddress()
+                // const exposeAccounts = this.providerApprovalController.shouldExposeAccounts(origin)
+
+                // if (origin !== 'MetaMask' && !exposeAccounts) { return [] }
+                // const isUnlocked = await this.keyringController.memStore.getState().isUnlocked
+                const selectedAddress = await this.preferencesController.getSelectedAddress()
+                return [selectedAddress]
                 // only show address if account is unlocked
-                console.log('xxx', isUnlocked, selectedAccount)
-                if (isUnlocked && selectedAddress) {
-                    return [selectedAddress]
-                } else {
-                    return []
-                }
+                // console.log('selectedAccount', selectedAccount)
+                // if (isUnlocked && selectedAddress) {
+                //     return [selectedAddress]
+                // } else {
+                //     return []
+                // }
               },
               // tx signing
               processTransaction: this.newUnapprovedTransaction.bind(this),
