@@ -155,12 +155,25 @@ class Wallet extends EventEmitter {
         if (isInfura) {
             networkDefault.network = INFURA_PROVIDER[defaultNode.rpc].code
             networkDefault.provider = {
-                nickname: "",
+                nickname: selectedAccount.name,
                 rpcTarget: "",
-                ticker: "ETH",
+                ticker: selectedAccount.symbol,
                 type: INFURA_PROVIDER[defaultNode.rpc].type
             }
-            networkDefault.ticker = 'ETH'
+            networkDefault.settings = {
+                ticker: selectedAccount.symbol
+            }
+        } else {
+            networkDefault.network = '';
+            networkDefault.provider = {
+                nickname: selectedAccount.name,
+                rpcTarget: defaultNode.endPoint,
+                ticker: selectedAccount.symbol,
+                type: 'rpc'
+            }
+            networkDefault.settings = {
+                ticker: selectedAccount.symbol
+            }
         }
 
         initState.PreferencesController.selectedAddress = selectedAccount.address
