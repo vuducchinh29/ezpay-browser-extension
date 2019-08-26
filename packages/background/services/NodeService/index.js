@@ -19,10 +19,12 @@ const NodeService = {
         },
         '6739be94-ee43-46af-9a62-690cf0947280': {
             type: 'ETH',
+            rpc: 'mainnet',
             endPoint: 'https://mainnet.infura.io/v3/f2ffee3e3500452fad9b02f935fe0032'
         },
         '6739be94-ee43-46af-9a62-690cf0947281': {
             type: 'ETH_RINKEBY',
+            rpc: 'rinkeby',
             endPoint: 'https://rinkeby.infura.io/v3/f2ffee3e3500452fad9b02f935fe0032'
         },
         '6739be94-ee43-46af-9a62-690cf0947282': {

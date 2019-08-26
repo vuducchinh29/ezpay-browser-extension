@@ -31,6 +31,39 @@ export const SECURITY_MODE = {
     SECURE: 'secure'
 };
 
+export const ROPSTEN = {
+    type: 'ropsten',
+    code: 3
+};
+
+export const KOVAN = {
+    type: 'kovan',
+    code: 42
+};
+
+export const MAINNET = {
+    type: 'mainnet',
+    code: 1
+};
+
+export const GOERLI = {
+    type: 'goerli',
+    code: 5
+};
+
+export const RINKEBY = {
+    type: 'rinkeby',
+    code: 4
+};
+
+export const INFURA_PROVIDER = {
+    mainnet: MAINNET,
+    ropsten: ROPSTEN,
+    kovan: KOVAN,
+    goerli: GOERLI,
+    rinkeby: RINKEBY
+}
+
 export const PASSWORD_EASY_MODE = '123456';
 
 export const LAYOUT_MODE = {
@@ -163,3 +196,68 @@ export const USDT_ACTIVITY_STAGE = {
     }
 
 }
+
+export const initState = {
+    AppStateController: {},
+    CachedBalancesController: {
+        cachedBalances: {}
+    },
+    CurrencyController: {
+        conversionDate: 1566547524.878,
+        conversionRate: 193.33,
+        currentCurrency: "usd",
+        nativeCurrency: "ETH",
+    },
+    InfuraController: {
+        infuraNetworkStatus: {
+            kovan: "ok",
+            mainnet: "ok",
+            rinkeby: "ok",
+            ropsten: "ok"
+        }
+    },
+    KeyringController: {
+        vault: '{"data":"dVdAi3XqcqObmb7i18AY2yCCPQaeyRX4NloGEFWzOmJ9DALVGS/b2Taqvgu2n+09GPt7L1oka77ce04Dxro9Py2E3Yq+SCaeI/IiHkEt9EF21llOXMHTy3lBlBH1Iqe/GJZ0G2RUIr4QqpRslZ+LZat0Y3bbZxUxU/0p8i4d8ZE36Mez1wfEHORJSv3CWc1J2Xg3YkVK9kKBPqeOkDlezbu3hMm1SNOaZOW9qFJYK8d63W13vg==","iv":"KYN+/dN7y9SF+NokZajBxg==","salt":"QppMHgzY1cflMuwCSvlJ1sNDWoZQsNDImi9vq1MnNfs="}'
+    },
+    NetworkController: {
+        network: "1",
+        provider: {nickname: "", rpcTarget: "", ticker: "ETH", type: "mainnet"},
+        settings: {ticker: "ETH"}
+    },
+    OnboardingController: {
+        seedPhraseBackedUp: true
+    },
+    PreferencesController: {
+        accountTokens: {},
+        assetImages: {},
+        completedOnboarding: true,
+        currentAccountTab: "history",
+        currentLocale: "en",
+        featureFlags: {privacyMode: true},
+        firstTimeFlowType: "create",
+        forgottenPassword: false,
+        frequentRpcListDetail: [],
+        identities: {},
+        knownMethodData: {},
+        lostIdentities: {},
+        metaMetricsId: "0xba359264d53d48454f26f2f80d1eea26ca4d95ed166e806093482e743ef4d361",
+        metaMetricsSendCount: 0,
+        migratedPrivacyMode: false,
+        participateInMetaMetrics: true,
+        preferences: {
+            useNativeCurrencyAsPrimaryCurrency: true
+        },
+        selectedAddress: "0xa6c600d08f882392312acb0a2c1455e209bb558a",
+        suggestedTokens: {},
+        tokens: [],
+        useBlockie: false
+    },
+    TransactionController: {
+        transactions: []
+    },
+    config: {},
+    firstTimeInfo: {
+        date: 1566527505376,
+        version: "7.0.1"
+    }
+};

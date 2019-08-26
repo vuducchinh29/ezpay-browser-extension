@@ -70,89 +70,6 @@ const metamaskInternalProcessHash = {
     [ENVIRONMENT_TYPE_FULLSCREEN]: true,
 }
 
-const initState = {
-    AppStateController: {},
-    CachedBalancesController: {
-        cachedBalances: {}
-    },
-    CurrencyController: {
-        conversionDate: 1566547524.878,
-        conversionRate: 193.33,
-        currentCurrency: "usd",
-        nativeCurrency: "ETH",
-    },
-    InfuraController: {
-        infuraNetworkStatus: {
-            kovan: "ok",
-            mainnet: "ok",
-            rinkeby: "ok",
-            ropsten: "ok"
-        }
-    },
-    KeyringController: {
-        vault: '{"data":"dVdAi3XqcqObmb7i18AY2yCCPQaeyRX4NloGEFWzOmJ9DALVGS/b2Taqvgu2n+09GPt7L1oka77ce04Dxro9Py2E3Yq+SCaeI/IiHkEt9EF21llOXMHTy3lBlBH1Iqe/GJZ0G2RUIr4QqpRslZ+LZat0Y3bbZxUxU/0p8i4d8ZE36Mez1wfEHORJSv3CWc1J2Xg3YkVK9kKBPqeOkDlezbu3hMm1SNOaZOW9qFJYK8d63W13vg==","iv":"KYN+/dN7y9SF+NokZajBxg==","salt":"QppMHgzY1cflMuwCSvlJ1sNDWoZQsNDImi9vq1MnNfs="}'
-    },
-    NetworkController: {
-        network: "1",
-        provider: {nickname: "", rpcTarget: "", ticker: "ETH", type: "mainnet"},
-        settings: {ticker: "ETH"}
-    },
-    OnboardingController: {
-        seedPhraseBackedUp: true
-    },
-    PreferencesController: {
-        accountTokens: {
-            '0xa6c600d08f882392312acb0a2c1455e209bb558a': {
-                mainnet: [],
-                rinkeby: []
-            },
-            '0x89abefd605e171cc5b6eb4aa9b9b7b4983f30a87': {
-                mainnet: [],
-                rinkeby: []
-            }
-        },
-        assetImages: {},
-        completedOnboarding: true,
-        currentAccountTab: "history",
-        currentLocale: "en",
-        featureFlags: {privacyMode: true},
-        firstTimeFlowType: "create",
-        forgottenPassword: false,
-        frequentRpcListDetail: [],
-        identities: {
-            '0xa6c600d08f882392312acb0a2c1455e209bb558a': {
-                address: "0xa6c600d08f882392312acb0a2c1455e209bb558a",
-                name: "Account 1"
-            },
-            '0x89abefd605e171cc5b6eb4aa9b9b7b4983f30a87': {
-                address: "0x89abefd605e171cc5b6eb4aa9b9b7b4983f30a87",
-                name: "Account 2"
-            }
-        },
-        knownMethodData: {},
-        lostIdentities: {},
-        metaMetricsId: "0xba359264d53d48454f26f2f80d1eea26ca4d95ed166e806093482e743ef4d361",
-        metaMetricsSendCount: 0,
-        migratedPrivacyMode: false,
-        participateInMetaMetrics: true,
-        preferences: {
-            useNativeCurrencyAsPrimaryCurrency: true
-        },
-        selectedAddress: "0x89abefd605e171cc5b6eb4aa9b9b7b4983f30a87",
-        suggestedTokens: {},
-        tokens: [],
-        useBlockie: false
-    },
-    TransactionController: {
-        transactions: []
-    },
-    config: {},
-    firstTimeInfo: {
-        date: 1566527505376,
-        version: "7.0.1"
-    }
-};
-
 import {
     APP_STATE,
     ACCOUNT_TYPE,
@@ -160,8 +77,18 @@ import {
     CONTRACT_ADDRESS,
     SECURITY_MODE,
     LAYOUT_MODE,
-    PASSWORD_EASY_MODE
+    PASSWORD_EASY_MODE,
+    initState,
+    ROPSTEN,
+    RINKEBY,
+    KOVAN,
+    MAINNET,
+    LOCALHOST,
+    GOERLI,
+    INFURA_PROVIDER
 } from '@ezpay/lib/constants';
+
+const INFURA_PROVIDER_TYPES = [ROPSTEN.type, RINKEBY.type, KOVAN.type, MAINNET.type, GOERLI.type]
 
 const logger = new Logger('WalletService');
 
@@ -191,15 +118,61 @@ class Wallet extends EventEmitter {
         this.currentAccountTronWeb = false;
 
         this.activeControllerConnections = 0
-        this.sendUpdate = debounce(this.privateSendUpdate.bind(this), 200)
 
+        this._start()
+    }
+
+    async _start() {
+        await this._checkStorage();
+        await this._saveTokens();
+        await this._loadData();
+        await this._loadAccounts();
+
+        const securityMode = await StorageService.getSecurityMode()
+        if (securityMode === SECURITY_MODE.EASY) {
+            if(this.state === APP_STATE.UNINITIALISED) {
+                await this.setPassword(PASSWORD_EASY_MODE)
+            }
+
+            if (this.state === APP_STATE.PASSWORD_SET) {
+                await this.unlockWallet(PASSWORD_EASY_MODE)
+            }
+
+            this._setCurrentDappConfig()
+        }
+
+        this.setupProvider()
+    }
+
+    setupProvider() {
+        const nodes = NodeService.getNodes().nodes;
+        const selectedAccount = this.accounts[ StorageService.ethereumDappSetting ];
+        const defaultNode = nodes[selectedAccount.chain]
+
+        const isInfura = INFURA_PROVIDER_TYPES.includes(defaultNode.rpc)
+
+        const networkDefault = {}
+        if (isInfura) {
+            networkDefault.network = INFURA_PROVIDER[defaultNode.rpc].code
+            networkDefault.provider = {
+                nickname: "",
+                rpcTarget: "",
+                ticker: "ETH",
+                type: INFURA_PROVIDER[defaultNode.rpc].type
+            }
+            networkDefault.ticker = 'ETH'
+        }
+
+        initState.PreferencesController.selectedAddress = selectedAccount.address
+
+        this.sendUpdate = debounce(this.privateSendUpdate.bind(this), 200)
         // observable state store
         this.store = new ComposableObservableStore(initState)
 
         // lock to ensure only one vault created at once
         this.createVaultMutex = new Mutex()
 
-        this.networkController = new NetworkController(initState.NetworkController);
+        this.networkController = new NetworkController(networkDefault);
 
          // preferences controller
         this.preferencesController = new PreferencesController({
@@ -361,27 +334,7 @@ class Wallet extends EventEmitter {
             self.setupUntrustedCommunication(portStream, originDomain)
         }
 
-        this._start()
-    }
-
-    async _start() {
-        await this._checkStorage();
-        await this._saveTokens();
-        await this._loadData();
-        await this._loadAccounts();
-
-        const securityMode = await StorageService.getSecurityMode()
-        if (securityMode === SECURITY_MODE.EASY) {
-            if(this.state === APP_STATE.UNINITIALISED) {
-                await this.setPassword(PASSWORD_EASY_MODE)
-            }
-
-            if (this.state === APP_STATE.PASSWORD_SET) {
-                await this.unlockWallet(PASSWORD_EASY_MODE)
-            }
-
-            this._setCurrentDappConfig()
-        }
+        this.preferencesController.setSelectedAddress(selectedAccount.address)
     }
 
     privateSendUpdate () {
@@ -1274,8 +1227,7 @@ class Wallet extends EventEmitter {
         const nodes = NodeService.getNodes().nodes;
         account.node = nodes[ account.chain ]
 
-        const setSelectedAddress = nodeify(this.preferencesController.setSelectedAddress, this.preferencesController)
-        await setSelectedAddress(account.address)
+        this.preferencesController.setSelectedAddress(account.address)
 
         this.emit('setEthereumDappSetting', account);
     }
