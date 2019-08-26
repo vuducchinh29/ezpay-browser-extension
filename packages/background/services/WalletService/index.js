@@ -155,7 +155,7 @@ class Wallet extends EventEmitter {
         if (isInfura) {
             networkDefault.network = INFURA_PROVIDER[defaultNode.rpc].code
             networkDefault.provider = {
-                nickname: selectedAccount.name,
+                nickname: '',
                 rpcTarget: "",
                 ticker: selectedAccount.symbol,
                 type: INFURA_PROVIDER[defaultNode.rpc].type
@@ -166,7 +166,7 @@ class Wallet extends EventEmitter {
         } else {
             networkDefault.network = '';
             networkDefault.provider = {
-                nickname: selectedAccount.name,
+                nickname: '',
                 rpcTarget: defaultNode.endPoint,
                 ticker: selectedAccount.symbol,
                 type: 'rpc'
@@ -1241,8 +1241,33 @@ class Wallet extends EventEmitter {
         account.node = nodes[ account.chain ]
 
         this.preferencesController.setSelectedAddress(account.address)
+        this.setProviderType(account)
 
         this.emit('setEthereumDappSetting', account);
+    }
+
+    setProviderType(account) {
+        const node = account.node;
+        const isInfura = INFURA_PROVIDER_TYPES.includes(node.rpc)
+
+        if (isInfura) {
+            this.networkController.setProviderType(node.rpc, null, null, null)
+        } else {
+            this.setCustomRpc(node.endPoint, null, account.symbol, null)
+        }
+    }
+
+    async setCustomRpc (rpcTarget, chainId, ticker, nickname = '', rpcPrefs = {}) {
+        const frequentRpcListDetail = this.preferencesController.getFrequentRpcListDetail()
+        const rpcSettings = frequentRpcListDetail.find((rpc) => rpcTarget === rpc.rpcUrl)
+
+        if (rpcSettings) {
+            this.networkController.setRpcTarget(rpcSettings.rpcUrl, rpcSettings.chainId, rpcSettings.ticker, rpcSettings.nickname, rpcPrefs)
+        } else {
+            this.networkController.setRpcTarget(rpcTarget, chainId, ticker, nickname, rpcPrefs)
+            await this.preferencesController.addToFrequentRpcList(rpcTarget, chainId, ticker, nickname, rpcPrefs)
+        }
+        return rpcTarget
     }
 
     getAccountDetails(id) {
