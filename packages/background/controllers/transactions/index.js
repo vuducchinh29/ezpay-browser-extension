@@ -199,7 +199,7 @@ class TransactionController extends EventEmitter {
       transactionCategory,
     })
     this.addTx(txMeta)
-    console.log('txMeta', txMeta)
+
     this.emit('newUnapprovedTx', txMeta)
 
     try {
@@ -384,6 +384,7 @@ class TransactionController extends EventEmitter {
       this.txStateManager.updateTx(txMeta, 'transactions#approveTransaction')
       // sign transaction
       const rawTx = await this.signTransaction(txId)
+      console.log('signTransaction', rawTx)
       await this.publishTransaction(txId, rawTx)
       // must set transaction to submitted/failed before releasing lock
       nonceLock.releaseLock()
@@ -416,6 +417,7 @@ class TransactionController extends EventEmitter {
     const fromAddress = txParams.from
     const ethTx = new Transaction(txParams)
     await this.signEthTx(ethTx, fromAddress)
+
     // set state to signed
     this.txStateManager.setTxStatusSigned(txMeta.id)
     const rawTx = ethUtil.bufferToHex(ethTx.serialize())

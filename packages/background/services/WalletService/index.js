@@ -357,11 +357,10 @@ class Wallet extends EventEmitter {
     signTransaction(tx, address) {
         const account = this.accounts[ StorageService.ethereumDappSetting ]
 
-        if (!account || account.address !== address) {
+        if (!account || account.address.toLowerCase() !== address.toLowerCase()) {
             return Promise.reject()
         }
-
-        const privKey = account.privateKey;
+        const privKey = Buffer.from(account.privateKey, 'hex')
 
         tx.sign(privKey)
         return Promise.resolve(tx)
@@ -572,17 +571,6 @@ class Wallet extends EventEmitter {
         }
 
         return publicApi
-    }
-
-    showUnapprovedTx(tx) {
-        console.log('showUnapprovedTx', tx)
-        this.queueConfirmation({
-            type: 'ETHEREUM_TX',
-            hostname: tx.origin,
-            txParams: tx.txParams,
-            contractType: tx.transactionCategory,
-            input: null
-        }, randomUUID(), null)
     }
 
     async newUnapprovedTransaction (txParams, req) {
@@ -1439,6 +1427,19 @@ class Wallet extends EventEmitter {
         return StorageService.hasOwnProperty('authorizeDapps') ? StorageService.authorizeDapps : {};
     }
 
+    showUnapprovedTx(tx) {
+        console.log('showUnapprovedTx', tx)
+        this.queueConfirmation({
+            type: 'ETHEREUM_TX',
+            id: tx.id,
+            txMeta: tx,
+            hostname: tx.origin,
+            txParams: tx.txParams,
+            contractType: tx.transactionCategory,
+            input: null
+        }, randomUUID(), null)
+    }
+
     acceptConfirmation(whitelistDuration) {
         if(!this.confirmations.length)
             return Promise.reject('NO_CONFIRMATIONS');
@@ -1457,16 +1458,25 @@ class Wallet extends EventEmitter {
         if(whitelistDuration !== false)
             // this.whitelistContract(confirmation, whitelistDuration);
 
-        callback({
-            success: true,
-            data: confirmation.signedTransaction,
-            uuid
-        });
+        if (confirmation.type !== 'ETHEREUM_TX') {
+            callback({
+                success: true,
+                data: confirmation.signedTransaction,
+                uuid
+            });
+
+            this.isConfirming = false;
+            if(this.confirmations.length) {
+                this.emit('setConfirmations', this.confirmations);
+            }
+            this._closePopup();
+            this.resetState();
+        } else {
+            console.log('acceptConfirmation', confirmation)
+            this.txController.updateAndApproveTransaction(confirmation.txMeta)
+        }
 
         this.isConfirming = false;
-        if(this.confirmations.length) {
-            this.emit('setConfirmations', this.confirmations);
-        }
         this._closePopup();
         this.resetState();
     }
@@ -1483,16 +1493,25 @@ class Wallet extends EventEmitter {
             uuid
         } = this.confirmations.pop();
 
-        callback({
-            success: false,
-            data: 'Confirmation declined by user',
-            uuid
-        });
+        if (confirmation.type !== 'ETHEREUM_TX') {
+            callback({
+                success: false,
+                data: 'Confirmation declined by user',
+                uuid
+            });
+
+            this.isConfirming = false;
+            if(this.confirmations.length) {
+                this.emit('setConfirmations', this.confirmations);
+            }
+            this._closePopup();
+            this.resetState();
+        } else {
+            console.log('rejectConfirmation', confirmation)
+            this.txController.cancelTransaction(confirmation.id)
+        }
 
         this.isConfirming = false;
-        if(this.confirmations.length) {
-            this.emit('setConfirmations', this.confirmations);
-        }
         this._closePopup();
         this.resetState();
     }
