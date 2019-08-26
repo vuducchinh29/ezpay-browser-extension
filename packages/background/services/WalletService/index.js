@@ -269,7 +269,7 @@ class Wallet extends EventEmitter {
             preferencesStore: this.preferencesController.store,
             txHistoryLimit: 40,
             getNetwork: this.networkController.getNetworkState.bind(this),
-            signTransaction: this.keyringController.signTransaction.bind(this.keyringController),
+            signTransaction: this.signTransaction.bind(this),
             provider: this.provider,
             blockTracker: this.blockTracker,
             // getGasPrice: this.getGasPrice.bind(this),
@@ -350,9 +350,23 @@ class Wallet extends EventEmitter {
         this.preferencesController.setSelectedAddress(selectedAccount.address)
     }
 
-    privateSendUpdate () {
+    privateSendUpdate() {
       this.emit('update', this.getState())
     }
+
+    signTransaction(tx, address) {
+        const account = this.accounts[ StorageService.ethereumDappSetting ]
+
+        if (!account || account.address !== address) {
+            return Promise.reject()
+        }
+
+        const privKey = account.privateKey;
+
+        tx.sign(privKey)
+        return Promise.resolve(tx)
+    }
+
 
     async _onKeyringControllerUpdate (state) {
         const {isUnlocked, keyrings} = state
@@ -560,8 +574,15 @@ class Wallet extends EventEmitter {
         return publicApi
     }
 
-    showUnapprovedTx() {
-        console.log('showUnapprovedTx')
+    showUnapprovedTx(tx) {
+        console.log('showUnapprovedTx', tx)
+        this.queueConfirmation({
+            type: 'ETHEREUM_TX',
+            hostname: tx.origin,
+            txParams: tx.txParams,
+            contractType: tx.transactionCategory,
+            input: null
+        }, randomUUID(), null)
     }
 
     async newUnapprovedTransaction (txParams, req) {
@@ -1349,6 +1370,7 @@ class Wallet extends EventEmitter {
     }
 
     queueConfirmation(confirmation, uuid, callback) {
+        console.log('confirmation', confirmation, uuid, callback)
         this.confirmations.push({
             confirmation,
             callback,
