@@ -1409,6 +1409,20 @@ class Wallet extends EventEmitter {
         return this.confirmations;
     }
 
+    async _updateWindow() {
+        return new Promise(resolve => {
+            if(typeof chrome !== 'undefined') {
+                return extensionizer.windows.update(this.popup.id, { focused: true }, window => {
+                    resolve(!!window);
+                });
+            }
+
+            extensionizer.windows.update(this.popup.id, {
+                focused: true
+            }).then(resolve).catch(() => resolve(false));
+        });
+    }
+
     async _openPopup() {
         if(this.popup && this.popup.closed)
             this.popup = false;
