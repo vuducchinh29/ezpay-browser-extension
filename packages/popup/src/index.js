@@ -29,7 +29,8 @@ import {
     setSecurityMode,
     setLayoutMode,
     setTronDappSetting,
-    setEthereumDappSetting
+    setEthereumDappSetting,
+    setPrices
 } from 'reducers/appReducer';
 
 import {
@@ -182,6 +183,10 @@ export const app = {
 
         this.duplex.on('setTronDappSetting', tronDappSetting => this.store.dispatch(
             setTronDappSetting(tronDappSetting)
+        ));
+
+        this.duplex.on('setPrices', prices => this.store.dispatch(
+            setPrices(prices)
         ));
     },
 

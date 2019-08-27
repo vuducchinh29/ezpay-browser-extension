@@ -85,6 +85,7 @@ class EthereumAccount extends Account {
     async update() {
          this.balance = await this.web3.eth.getBalance(this.address)
          this.save();
+         return true
     }
 
     loadCache() {

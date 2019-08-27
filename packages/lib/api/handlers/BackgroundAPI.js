@@ -76,6 +76,10 @@ export default {
         this.duplex.send('popup', 'setSecurityMode', mode ,false);
     },
 
+    setPrices(prices) {
+        this.duplex.send('popup', 'setPrices', prices ,false);
+    },
+
     setLayoutMode(mode) {
         this.duplex.send('popup', 'setLayoutMode', mode ,false);
     },

@@ -50,6 +50,7 @@ const TypedMessageManager = require('../../lib/typed-message-manager')
 const ProviderApprovalController = require('../../controllers/provider-approval')
 const nodeify = require('../../lib/nodeify')
 const debounce = require('debounce')
+const {requestPriceCMC, requestPriceCoinGecko} = require('../../lib/util.js');
 
 const {
   AddressBookController,
@@ -85,7 +86,8 @@ import {
     MAINNET,
     LOCALHOST,
     GOERLI,
-    INFURA_PROVIDER
+    INFURA_PROVIDER,
+    PRICE_LIST
 } from '@ezpay/lib/constants';
 
 const INFURA_PROVIDER_TYPES = [ROPSTEN.type, RINKEBY.type, KOVAN.type, MAINNET.type, GOERLI.type]
@@ -117,7 +119,8 @@ class Wallet extends EventEmitter {
         this.currentNodeTronWeb = false;
         this.currentAccountTronWeb = false;
 
-        this.activeControllerConnections = 0
+        this.activeControllerConnections = 0;
+        this.prices = {};
 
         this._start()
     }
@@ -718,7 +721,25 @@ class Wallet extends EventEmitter {
         }
     }
 
+    async updatePrice() {
+        for (let item of PRICE_LIST) {
+            let res = await requestPriceCoinGecko(item.name)
+            if (!res) {
+              return
+            }
+
+            this.prices[item.symbol] = {
+                value: res[0].current_price || 0,
+                symbol: item.symbol
+            }
+        }
+
+        this.emit('setPrices', this.prices)
+    }
+
     startPolling() {
+        this.updatePrice()
+
         if(this.isPolling && this.shouldPoll)
             return;
 
@@ -737,6 +758,7 @@ class Wallet extends EventEmitter {
 
     async _pollAccounts() {
         clearTimeout(this.timer);
+
         if(!this.shouldPoll) {
             logger.info('Stopped polling');
             return this.isPolling = false;

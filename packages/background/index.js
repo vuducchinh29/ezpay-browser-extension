@@ -129,6 +129,10 @@ const background = {
         this.walletService.on('setTronDappSetting', tronDappSetting => (
             BackgroundAPI.setTronDappSetting(tronDappSetting)
         ));
+
+        this.walletService.on('setPrices', prices => (
+            BackgroundAPI.setPrices(prices)
+        ));
     },
 
     bindTabDuplex() {

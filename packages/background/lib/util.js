@@ -1,6 +1,7 @@
 const ethUtil = require('ethereumjs-util')
 const assert = require('assert')
 const BN = require('bn.js')
+const rp = require('request-promise');
 const {
   ENVIRONMENT_TYPE_POPUP,
   ENVIRONMENT_TYPE_NOTIFICATION,
@@ -144,6 +145,42 @@ function removeListeners (listeners, emitter) {
   })
 }
 
+function requestPriceCMC(id, currency) {
+  const requestOptions = {
+    method: 'GET',
+    uri: 'https://pro-api.coinmarketcap.com/v1/tools/price-conversion',
+    qs: {
+      'id': id,
+      'amount': '1',
+      'convert': currency
+    },
+    headers: {
+      'X-CMC_PRO_API_KEY': 'df2e9010-8180-47f3-85c5-7984bd3f194d'
+    },
+    json: true,
+    gzip: true
+  };
+
+  return rp(requestOptions)
+}
+
+function requestPriceCoinGecko(currency) {
+  const requestOptions = {
+    method: 'GET',
+    uri: 'https://api.coingecko.com/api/v3/coins/markets',
+    qs: {
+      vs_currency: 'usd',
+      ids: currency
+    },
+    headers: {
+    },
+    json: true,
+    gzip: true
+  };
+
+  return rp(requestOptions)
+}
+
 module.exports = {
   removeListeners,
   applyListeners,
@@ -154,4 +191,6 @@ module.exports = {
   hexToBn,
   bnToHex,
   BnMultiplyByFraction,
+  requestPriceCMC,
+  requestPriceCoinGecko
 }

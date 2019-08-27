@@ -21,6 +21,29 @@ export const APP_STATE = {
     ACCOUNTS_DAPP: 15
 };
 
+export const PRICE_LIST = [
+    {
+        symbol: 'TRX',
+        cmcId: 1958,
+        name: 'tron'
+    },
+    {
+        symbol: 'ETH',
+        cmcId: 1027,
+        name: 'ethereum'
+    },
+    {
+        symbol: 'NTY',
+        cmcId: 2714,
+        name: 'nexty'
+    },
+    {
+        symbol: 'BTC',
+        cmcId: 1,
+        name: 'bitcoin'
+    }
+]
+
 export const ACCOUNT_TYPE = {
     MNEMONIC: 0,
     PRIVATE_KEY: 1

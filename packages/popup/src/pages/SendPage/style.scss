@@ -18,10 +18,30 @@
         background: #fff;
         border-radius: 10px;
         padding: 20px 15px;
+        position: relative;
         box-shadow: 0px 2px 7px rgba(0, 0, 0, 0.05);
 
         .label {
             color: #EF6245;
+        }
+
+        .token-symbol {
+            position: absolute;
+            right: 16px;
+            color: #979797;
+            top: 50px;
+        }
+
+        .price-symbol {
+            position: absolute;
+            right: 16px;
+            color: #979797;
+            top: 82px;
+        }
+
+        .price {
+            color: #979797;
+            margin-top: 8px;
         }
 
         .text-fee {

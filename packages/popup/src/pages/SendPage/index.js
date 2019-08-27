@@ -95,7 +95,7 @@ class Controller extends React.Component {
     }
 
     render() {
-        const { onCancel, account, modeCssName } = this.props;
+        const { onCancel, account, modeCssName, prices } = this.props;
         const {
             recipient,
             amount,
@@ -137,6 +137,9 @@ class Controller extends React.Component {
                                 placeholder='SEND.AMOUNT.PLACEHOLDER'
                                 noMargin={ true }
                             />
+                            <div className="token-symbol">{account.symbol}</div>
+                            {prices[account.symbol] && <div className="price">~{this.state.amount.value * prices[account.symbol].value}</div>}
+                            <div className="price-symbol">USD</div>
                         </div>
                         {account.symbol === 'ETH' && <span>
                             <div className="text-fee">Transaction fee</div>
@@ -173,6 +176,7 @@ class Controller extends React.Component {
 }
 
 export default connect(state => ({
+    prices: state.app.prices,
     account: state.accounts.selected,
     selectedToken: state.app.selectedToken,
 }))(Controller);

@@ -30,7 +30,7 @@ module.exports = {
             }
         ]
     },
-    node: { crypto: true, stream: true, fs: 'empty', net: 'empty' },
+    node: { crypto: true, stream: true, fs: 'empty', net: 'empty', tls: 'empty' },
     resolve: {
         modules: [ '../../node_modules' ]
     },
