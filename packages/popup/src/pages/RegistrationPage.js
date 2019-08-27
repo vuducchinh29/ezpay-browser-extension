@@ -125,7 +125,8 @@ class RegistrationController extends React.Component {
                 </div>
                 <div className='pageHeader hasBottomMargin'>
                     <div className="pageHeaderLogoWrap">
-                        <div className="logo1"></div>
+                        {modeCssName !== 'secure-light' && <div className='logo1'></div>}
+                        {modeCssName === 'secure-light' && <div className='logo3'></div>}
                         <div className="logo2"></div>
                     </div>
                 </div>

@@ -40,11 +40,11 @@ class Controller extends React.Component {
     }
 
     render() {
-        const { accounts, tokens, modeCssName } = this.props;
+        const { accounts, tokens, modeCssName, layoutMode } = this.props;
 
         return (
             <div className={`container ${modeCssName}`}>
-                <Header showAction={true} modeCssName={modeCssName} />
+                <Header showAction={true} modeCssName={modeCssName} layoutMode={layoutMode} />
                 <div className="tokens scroll">
                     {
                         Object.entries(tokens).map(([ tokenId, token ]) => {
@@ -78,4 +78,5 @@ class Controller extends React.Component {
 export default connect(state => ({
     accounts: state.accounts.accounts,
     tokens: state.app.tokens,
+    layoutMode: state.app.layoutMode
 }))(Controller);

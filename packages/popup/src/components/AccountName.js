@@ -80,7 +80,8 @@ class AccountName extends React.Component {
             <div className='insetContainer logoWrap'>
                 <div className='pageHeader'>
                     <div className="pageHeaderLogoWrap hasBottomMargin">
-                        <div className="logo1"></div>
+                        {cssMode !== 'secure-light' && <div className='logo1'></div>}
+                        {cssMode === 'secure-light' && <div className='logo3'></div>}
                     </div>
                 </div>
                 <div className='greyModal registrationModel'>

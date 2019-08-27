@@ -872,13 +872,16 @@ class Wallet extends EventEmitter {
     setSecurityMode(mode) {
         StorageService.setSecurityMode(mode);
 
-        if (mode === SECURITY_MODE.SECURE) {
-            this._setState(APP_STATE.UNINITIALISED)
-        } else if (mode === SECURITY_MODE.EASY) {
-            this.setPassword(PASSWORD_EASY_MODE)
+        if (mode === SECURITY_MODE.EASY) {
+            this.setPassword(PASSWORD_EASY_MODE);
+            this.emit('setSecurityMode', mode);
+            return;
+        } else if (mode === SECURITY_MODE.SECURE) {
+            this._setState(APP_STATE.UNINITIALISED);
+            this.emit('setSecurityMode', mode);
+            return;
         }
 
-        this.emit('setSecurityMode', mode);
     }
 
     async getSecurityMode() {

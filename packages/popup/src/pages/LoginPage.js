@@ -61,7 +61,8 @@ class LoginController extends React.Component {
             <div className={`insetContainer logoWrap ${modeCssName}`}>
                 <div className='pageHeader'>
                     <div className='pageHeaderLogoWrap'>
-                        <div className='logo1'></div>
+                        {modeCssName !== 'secure-light' && <div className='logo1'></div>}
+                        {modeCssName === 'secure-light' && <div className='logo3'></div>}
                         <div className='logo2'></div>
                     </div>
                     <div className='pageHeaderText'>
