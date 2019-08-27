@@ -11,6 +11,65 @@ import NodeService from '../NodeService';
 import TronWeb from 'tronweb';
 import randomUUID from 'uuid/v4';
 
+const ComposableObservableStore = require('../../lib/ComposableObservableStore')
+const NetworkController = require('../../controllers/network');
+const TransactionController = require('../../controllers/transactions');
+const extension = require('extensionizer');
+const {setupMultiplex} = require('../../lib/stream-utils.js');
+const pump = require('pump');
+const createDnodeRemoteGetter = require('../../lib/createDnodeRemoteGetter');
+const pify = require('pify');
+const Dnode = require('dnode');
+const urlUtil = require('url');
+const PortStream = require('extension-port-stream');
+const RpcEngine = require('json-rpc-engine');
+const createFilterMiddleware = require('eth-json-rpc-filters');
+const createSubscriptionManager = require('eth-json-rpc-filters/subscriptionManager');
+const createOriginMiddleware = require('../../lib/createOriginMiddleware');
+const createLoggerMiddleware = require('../../lib/createLoggerMiddleware');
+const providerAsMiddleware = require('eth-json-rpc-middleware/providerAsMiddleware');
+const createEngineStream = require('json-rpc-middleware-stream/engineStream');
+const ObservableStore = require('obs-store');
+const asStream = require('obs-store/lib/asStream');
+const PreferencesController = require('../../controllers/preferences');
+const AppStateController = require('../../controllers/app-state');
+const InfuraController = require('../../controllers/infura');
+const RecentBlocksController = require('../../controllers/recent-blocks');
+const AccountTracker = require('../../lib/account-tracker');
+const OnboardingController = require('../../controllers/onboarding');
+const TrezorKeyring = require('eth-trezor-keyring')
+const LedgerBridgeKeyring = require('eth-ledger-bridge-keyring')
+const HW_WALLETS_KEYRINGS = [TrezorKeyring.type, LedgerBridgeKeyring.type]
+const KeyringController = require('eth-keyring-controller')
+const TokenRatesController = require('../../controllers/token-rates');
+const {Mutex} = require('await-semaphore');
+const BalancesController = require('../../controllers/computed-balances');
+const MessageManager = require('../../lib/message-manager')
+const PersonalMessageManager = require('../../lib/personal-message-manager')
+const TypedMessageManager = require('../../lib/typed-message-manager')
+const ProviderApprovalController = require('../../controllers/provider-approval')
+const nodeify = require('../../lib/nodeify')
+const debounce = require('debounce')
+
+const {
+  AddressBookController,
+  CurrencyRateController,
+  ShapeShiftController,
+  PhishingController,
+} = require('gaba')
+
+const {
+    ENVIRONMENT_TYPE_POPUP,
+    ENVIRONMENT_TYPE_NOTIFICATION,
+    ENVIRONMENT_TYPE_FULLSCREEN,
+} = require('../../lib/enums')
+
+const metamaskInternalProcessHash = {
+    [ENVIRONMENT_TYPE_POPUP]: true,
+    [ENVIRONMENT_TYPE_NOTIFICATION]: true,
+    [ENVIRONMENT_TYPE_FULLSCREEN]: true,
+}
+
 import {
     APP_STATE,
     ACCOUNT_TYPE,
@@ -18,8 +77,18 @@ import {
     CONTRACT_ADDRESS,
     SECURITY_MODE,
     LAYOUT_MODE,
-    PASSWORD_EASY_MODE
+    PASSWORD_EASY_MODE,
+    initState,
+    ROPSTEN,
+    RINKEBY,
+    KOVAN,
+    MAINNET,
+    LOCALHOST,
+    GOERLI,
+    INFURA_PROVIDER
 } from '@ezpay/lib/constants';
+
+const INFURA_PROVIDER_TYPES = [ROPSTEN.type, RINKEBY.type, KOVAN.type, MAINNET.type, GOERLI.type]
 
 const logger = new Logger('WalletService');
 
@@ -48,6 +117,8 @@ class Wallet extends EventEmitter {
         this.currentNodeTronWeb = false;
         this.currentAccountTronWeb = false;
 
+        this.activeControllerConnections = 0
+
         this._start()
     }
 
@@ -69,6 +140,501 @@ class Wallet extends EventEmitter {
 
             this._setCurrentDappConfig()
         }
+
+        this.setupProvider()
+    }
+
+    setupProvider() {
+        const nodes = NodeService.getNodes().nodes;
+        const selectedAccount = this.accounts[ StorageService.ethereumDappSetting ];
+        const defaultNode = nodes[selectedAccount.chain]
+
+        const isInfura = INFURA_PROVIDER_TYPES.includes(defaultNode.rpc)
+
+        const networkDefault = {}
+        if (isInfura) {
+            networkDefault.network = INFURA_PROVIDER[defaultNode.rpc].code
+            networkDefault.provider = {
+                nickname: '',
+                rpcTarget: "",
+                ticker: selectedAccount.symbol,
+                type: INFURA_PROVIDER[defaultNode.rpc].type
+            }
+            networkDefault.settings = {
+                ticker: selectedAccount.symbol
+            }
+        } else {
+            networkDefault.network = '';
+            networkDefault.provider = {
+                nickname: '',
+                rpcTarget: defaultNode.endPoint,
+                ticker: selectedAccount.symbol,
+                type: 'rpc'
+            }
+            networkDefault.settings = {
+                ticker: selectedAccount.symbol
+            }
+        }
+
+        initState.PreferencesController.selectedAddress = selectedAccount.address
+
+        this.sendUpdate = debounce(this.privateSendUpdate.bind(this), 200)
+        // observable state store
+        this.store = new ComposableObservableStore(initState)
+
+        // lock to ensure only one vault created at once
+        this.createVaultMutex = new Mutex()
+
+        this.networkController = new NetworkController(networkDefault);
+
+         // preferences controller
+        this.preferencesController = new PreferencesController({
+          initState: initState.PreferencesController,
+          initLangCode: 'en',
+          openPopup: this.newUnapprovedTransaction.bind(this),
+          network: this.networkController,
+        })
+
+        // app-state controller
+        this.appStateController = new AppStateController({
+            preferencesStore: this.preferencesController.store,
+            onInactiveTimeout: () => this.setLocked(),
+        })
+
+        this.currencyRateController = new CurrencyRateController(undefined, initState.CurrencyController)
+
+        // infura controller
+        this.infuraController = new InfuraController({
+            initState: initState.InfuraController,
+        })
+        this.infuraController.scheduleInfuraNetworkCheck()
+
+        this.phishingController = new PhishingController()
+
+        this.initializeProvider()
+        this.provider = this.networkController.getProviderAndBlockTracker().provider
+        this.blockTracker = this.networkController.getProviderAndBlockTracker().blockTracker
+
+        // token exchange rate tracker
+        this.tokenRatesController = new TokenRatesController({
+          currency: this.currencyRateController,
+          preferences: this.preferencesController.store,
+        })
+
+        this.recentBlocksController = new RecentBlocksController({
+          blockTracker: this.blockTracker,
+          provider: this.provider,
+          networkController: this.networkController,
+        })
+
+        // account tracker watches balances, nonces, and any code at their address.
+        this.accountTracker = new AccountTracker({
+          provider: this.provider,
+          blockTracker: this.blockTracker,
+          network: this.networkController,
+        })
+
+        // start and stop polling for balances based on activeControllerConnections
+        this.on('controllerConnectionChanged', (activeControllerConnections) => {
+          if (activeControllerConnections > 0) {
+            this.accountTracker.start()
+          } else {
+            this.accountTracker.stop()
+          }
+        })
+
+        this.onboardingController = new OnboardingController({
+          initState: initState.OnboardingController,
+        })
+
+        // ensure accountTracker updates balances after network change
+        this.networkController.on('networkDidChange', () => {
+          this.accountTracker._updateAccounts()
+        })
+
+        // key mgmt
+        const additionalKeyrings = [TrezorKeyring, LedgerBridgeKeyring]
+        this.keyringController = new KeyringController({
+          keyringTypes: additionalKeyrings,
+          initState: initState.KeyringController,
+          getNetwork: this.networkController.getNetworkState.bind(this.networkController),
+          encryptor: undefined,
+        })
+
+        this.keyringController.memStore.subscribe((s) => this._onKeyringControllerUpdate(s))
+
+        this.txController = new TransactionController({
+            initState: initState.TransactionController || initState.TransactionManager,
+            networkStore: this.networkController.networkStore,
+            preferencesStore: this.preferencesController.store,
+            txHistoryLimit: 40,
+            getNetwork: this.networkController.getNetworkState.bind(this),
+            signTransaction: this.signTransaction.bind(this),
+            provider: this.provider,
+            blockTracker: this.blockTracker,
+            // getGasPrice: this.getGasPrice.bind(this),
+        })
+        this.txController.on('newUnapprovedTx', this.showUnapprovedTx.bind(this))
+
+        // computed balances (accounting for pending transactions)
+        this.balancesController = new BalancesController({
+          accountTracker: this.accountTracker,
+          txController: this.txController,
+          blockTracker: this.blockTracker,
+        })
+
+        this.networkController.on('networkDidChange', () => {
+          this.balancesController.updateAllBalances()
+          this.setCurrentCurrency(this.currencyRateController.state.currentCurrency, function () {})
+        })
+        this.balancesController.updateAllBalances()
+
+        this.shapeshiftController = new ShapeShiftController(undefined, initState.ShapeShiftController)
+
+        this.networkController.lookupNetwork()
+        this.messageManager = new MessageManager()
+        this.personalMessageManager = new PersonalMessageManager()
+        this.typedMessageManager = new TypedMessageManager({ networkController: this.networkController })
+
+        this.providerApprovalController = new ProviderApprovalController({
+          closePopup: this.closePopup.bind(this),
+          keyringController: this.keyringController,
+          openPopup: this.openPopup.bind(this),
+          preferencesController: this.preferencesController,
+        })
+
+        this.memStore = new ComposableObservableStore(null, {
+          AppStateController: this.appStateController.store,
+          NetworkController: this.networkController.store,
+          AccountTracker: this.accountTracker.store,
+          TxController: this.txController.memStore,
+          BalancesController: this.balancesController.store,
+          // CachedBalancesController: this.cachedBalancesController.store,
+          TokenRatesController: this.tokenRatesController.store,
+          MessageManager: this.messageManager.memStore,
+          PersonalMessageManager: this.personalMessageManager.memStore,
+          TypesMessageManager: this.typedMessageManager.memStore,
+          KeyringController: this.keyringController.memStore,
+          PreferencesController: this.preferencesController.store,
+          RecentBlocksController: this.recentBlocksController.store,
+          AddressBookController: this.addressBookController,
+          CurrencyController: this.currencyRateController,
+          ShapeshiftController: this.shapeshiftController,
+          InfuraController: this.infuraController.store,
+          ProviderApprovalController: this.providerApprovalController.store,
+          OnboardingController: this.onboardingController.store,
+        })
+        this.memStore.subscribe(this.sendUpdate.bind(this))
+
+        extension.runtime.onConnect.addListener(connectRemote)
+        extension.runtime.onConnectExternal.addListener(connectExternal)
+        const self = this;
+
+        function connectRemote (remotePort) {
+            const processName = remotePort.name
+            const isMetaMaskInternalProcess = metamaskInternalProcessHash[processName]
+
+            if (!isMetaMaskInternalProcess) {
+              connectExternal(remotePort)
+            }
+        }
+
+        // communication with page or other extension
+        function connectExternal (remotePort) {
+            const originDomain = urlUtil.parse(remotePort.sender.url).hostname
+            const portStream = new PortStream(remotePort)
+
+            self.setupUntrustedCommunication(portStream, originDomain)
+        }
+
+        this.preferencesController.setSelectedAddress(selectedAccount.address)
+    }
+
+    privateSendUpdate() {
+      this.emit('update', this.getState())
+    }
+
+    signTransaction(tx, address) {
+        const account = this.accounts[ StorageService.ethereumDappSetting ]
+
+        if (!account || account.address.toLowerCase() !== address.toLowerCase()) {
+            return Promise.reject()
+        }
+        const privKey = Buffer.from(account.privateKey, 'hex')
+
+        tx.sign(privKey)
+        return Promise.resolve(tx)
+    }
+
+
+    async _onKeyringControllerUpdate (state) {
+        const {isUnlocked, keyrings} = state
+        const addresses = keyrings.reduce((acc, {accounts}) => acc.concat(accounts), [])
+
+        if (!addresses.length) {
+          return
+        }
+
+        // Ensure preferences + identities controller know about all addresses
+        this.preferencesController.addAddresses(addresses)
+        this.accountTracker.syncWithAddresses(addresses)
+
+        const wasLocked = !isUnlocked
+        if (wasLocked) {
+          const oldSelectedAddress = this.preferencesController.getSelectedAddress()
+          if (!addresses.includes(oldSelectedAddress)) {
+            const address = addresses[0]
+            await this.preferencesController.setSelectedAddress(address)
+          }
+        }
+    }
+
+    setCurrentCurrency (currencyCode, cb) {
+        const { ticker } = this.networkController.getNetworkConfig()
+        try {
+          const currencyState = {
+            nativeCurrency: ticker,
+            currentCurrency: currencyCode,
+          }
+          this.currencyRateController.update(currencyState)
+          this.currencyRateController.configure(currencyState)
+          cb(null, this.currencyRateController.state)
+        } catch (err) {
+          cb(err)
+        }
+    }
+
+    setLocked () {
+        return this.keyringController.setLocked()
+    }
+
+    setupUntrustedCommunication(connectionStream, originDomain) {
+        // setup multiplexing
+        const mux = setupMultiplex(connectionStream)
+
+        // connect features
+        const publicApi = this.setupPublicApi(mux.createStream('publicApi'), originDomain)
+        this.setupProviderConnection(mux.createStream('provider'), originDomain, publicApi)
+        this.setupPublicConfig(mux.createStream('publicConfig'), originDomain)
+    }
+
+    setupPublicConfig (outStream, originDomain) {
+        const configStore = this.createPublicConfigStore({
+            // check the providerApprovalController's approvedOrigins
+            checkIsEnabled: () => {return true},
+        })
+
+        const configStream = asStream(configStore)
+
+        pump(
+            configStream,
+            outStream,
+            (err) => {
+                configStore.destroy()
+                configStream.destroy()
+                if (err) log.error(err)
+            }
+        )
+    }
+
+    createPublicConfigStore ({ checkIsEnabled }) {
+        // subset of state for metamask inpage provider
+        const publicConfigStore = new ObservableStore()
+
+        // setup memStore subscription hooks
+        this.on('update', (memState) => {
+            updatePublicConfigStore(memState)
+        })
+
+        updatePublicConfigStore(this.getState())
+
+        publicConfigStore.destroy = () => {
+            this.removeEventListener && this.removeEventListener('update', updatePublicConfigStore)
+        }
+
+        function updatePublicConfigStore(memState) {
+            const publicState = selectPublicState(memState)
+            publicConfigStore.putState(publicState)
+        }
+
+        function selectPublicState({ isUnlocked, selectedAddress, network, completedOnboarding }) {
+            const result = {
+                isUnlocked,
+                selectedAddress,
+                isEnabled: true,
+                networkVersion: network,
+                onboardingcomplete: completedOnboarding,
+            }
+            return result
+        }
+
+        return publicConfigStore
+    }
+
+    closePopup() {
+
+    }
+
+    openPopup() {
+
+    }
+
+    getState() {
+        const vault = this.keyringController.store.getState().vault
+        const isInitialized = !!vault
+
+        return {
+          ...{ isInitialized },
+          ...this.memStore.getFlatState(),
+        }
+    }
+
+    setupProviderConnection(outStream, origin, publicApi) {
+        const getSiteMetadata = publicApi && publicApi.getSiteMetadata
+        const engine = this.setupProviderEngine(origin, getSiteMetadata)
+
+        // setup connection
+        const providerStream = createEngineStream({ engine })
+
+        pump(
+            outStream,
+            providerStream,
+            outStream,
+            (err) => {
+            // cleanup filter polyfill middleware
+                engine._middleware.forEach((mid) => {
+                    if (mid.destroy && typeof mid.destroy === 'function') {
+                        mid.destroy()
+                    }
+                })
+                if (err) log.error(err)
+            }
+        )
+    }
+
+    /**
+    * A method for creating a provider that is safely restricted for the requesting domain.
+    **/
+    setupProviderEngine(origin, getSiteMetadata) {
+        // setup json rpc engine stack
+        const engine = new RpcEngine()
+        const provider = this.provider
+        const blockTracker = this.blockTracker
+
+        // create filter polyfill middleware
+        const filterMiddleware = createFilterMiddleware({ provider, blockTracker })
+
+        // create subscription polyfill middleware
+        const subscriptionManager = createSubscriptionManager({ provider, blockTracker })
+        subscriptionManager.events.on('notification', (message) => engine.emit('notification', message))
+
+        // metadata
+        engine.push(createOriginMiddleware({ origin }))
+        engine.push(createLoggerMiddleware({ origin }))
+        // filter and subscription polyfills
+        engine.push(filterMiddleware)
+        engine.push(subscriptionManager.middleware)
+        // watch asset
+        engine.push(this.preferencesController.requestWatchAsset.bind(this.preferencesController))
+        // requestAccounts
+        engine.push(this.providerApprovalController.createMiddleware({
+            origin,
+            getSiteMetadata,
+        }))
+        // forward to metamask primary provider
+        engine.push(providerAsMiddleware(provider))
+
+        return engine
+    }
+
+    setupPublicApi (outStream) {
+        const dnode = Dnode()
+        // connect dnode api to remote connection
+        pump(
+            outStream,
+            dnode,
+            outStream,
+            (err) => {
+                // report any error
+                if (err) log.error(err)
+            }
+        )
+
+        const getRemote = createDnodeRemoteGetter(dnode)
+
+        const publicApi = {
+            // wrap with an await remote
+            getSiteMetadata: async () => {
+                const remote = await getRemote()
+                return await pify(remote.getSiteMetadata)()
+            },
+        }
+
+        return publicApi
+    }
+
+    async newUnapprovedTransaction (txParams, req) {
+        return await this.txController.newUnapprovedTransaction(txParams, req)
+    }
+
+    newUnsignedMessage (msgParams, req) {
+
+    }
+
+    newUnsignedTypedMessage (msgParams, req, version) {
+
+    }
+
+    async newUnsignedPersonalMessage (msgParams, req) {
+
+    }
+
+    async getPendingNonce (address) {
+        const { nonceDetails, releaseLock} = await this.txController.nonceTracker.getNonceLock(address)
+        const pendingNonce = nonceDetails.params.highestSuggested
+
+        releaseLock()
+        return pendingNonce
+    }
+
+    initializeProvider () {
+        const version = '1.0';
+
+        const providerOpts = {
+            static: {
+                eth_syncing: false,
+                web3_clientVersion: `MetaMask/v${version}`,
+            },
+            version,
+            // account mgmt
+            getAccounts: async ({ origin }) => {
+                // Expose no accounts if this origin has not been approved, preventing
+                // account-requring RPC methods from completing successfully
+                // const exposeAccounts = this.providerApprovalController.shouldExposeAccounts(origin)
+
+                // if (origin !== 'MetaMask' && !exposeAccounts) { return [] }
+                // const isUnlocked = await this.keyringController.memStore.getState().isUnlocked
+                const selectedAddress = await this.preferencesController.getSelectedAddress()
+                return [selectedAddress]
+                // only show address if account is unlocked
+                // console.log('selectedAccount', selectedAccount)
+                // if (isUnlocked && selectedAddress) {
+                //     return [selectedAddress]
+                // } else {
+                //     return []
+                // }
+              },
+              // tx signing
+              processTransaction: this.newUnapprovedTransaction.bind(this),
+              // msg signing
+              processEthSignMessage: this.newUnsignedMessage.bind(this),
+              processTypedMessage: this.newUnsignedTypedMessage.bind(this),
+              processTypedMessageV3: this.newUnsignedTypedMessage.bind(this),
+              processPersonalMessage: this.newUnsignedPersonalMessage.bind(this),
+              getPendingNonce: this.getPendingNonce.bind(this),
+        }
+        const providerProxy = this.networkController.initializeProvider(providerOpts)
+        return providerProxy
     }
 
     async unlockWallet(password) {
@@ -683,7 +1249,34 @@ class Wallet extends EventEmitter {
         const nodes = NodeService.getNodes().nodes;
         account.node = nodes[ account.chain ]
 
+        this.preferencesController.setSelectedAddress(account.address)
+        this.setProviderType(account)
+
         this.emit('setEthereumDappSetting', account);
+    }
+
+    setProviderType(account) {
+        const node = account.node;
+        const isInfura = INFURA_PROVIDER_TYPES.includes(node.rpc)
+
+        if (isInfura) {
+            this.networkController.setProviderType(node.rpc, null, null, null)
+        } else {
+            this.setCustomRpc(node.endPoint, null, account.symbol, null)
+        }
+    }
+
+    async setCustomRpc (rpcTarget, chainId, ticker, nickname = '', rpcPrefs = {}) {
+        const frequentRpcListDetail = this.preferencesController.getFrequentRpcListDetail()
+        const rpcSettings = frequentRpcListDetail.find((rpc) => rpcTarget === rpc.rpcUrl)
+
+        if (rpcSettings) {
+            this.networkController.setRpcTarget(rpcSettings.rpcUrl, rpcSettings.chainId, rpcSettings.ticker, rpcSettings.nickname, rpcPrefs)
+        } else {
+            this.networkController.setRpcTarget(rpcTarget, chainId, ticker, nickname, rpcPrefs)
+            await this.preferencesController.addToFrequentRpcList(rpcTarget, chainId, ticker, nickname, rpcPrefs)
+        }
+        return rpcTarget
     }
 
     getAccountDetails(id) {
@@ -765,6 +1358,7 @@ class Wallet extends EventEmitter {
     }
 
     queueConfirmation(confirmation, uuid, callback) {
+        console.log('confirmation', confirmation, uuid, callback)
         this.confirmations.push({
             confirmation,
             callback,
@@ -833,6 +1427,19 @@ class Wallet extends EventEmitter {
         return StorageService.hasOwnProperty('authorizeDapps') ? StorageService.authorizeDapps : {};
     }
 
+    showUnapprovedTx(tx) {
+        console.log('showUnapprovedTx', tx)
+        this.queueConfirmation({
+            type: 'ETHEREUM_TX',
+            id: tx.id,
+            txMeta: tx,
+            hostname: tx.origin,
+            txParams: tx.txParams,
+            contractType: tx.transactionCategory,
+            input: null
+        }, randomUUID(), null)
+    }
+
     acceptConfirmation(whitelistDuration) {
         if(!this.confirmations.length)
             return Promise.reject('NO_CONFIRMATIONS');
@@ -851,16 +1458,25 @@ class Wallet extends EventEmitter {
         if(whitelistDuration !== false)
             // this.whitelistContract(confirmation, whitelistDuration);
 
-        callback({
-            success: true,
-            data: confirmation.signedTransaction,
-            uuid
-        });
+        if (confirmation.type !== 'ETHEREUM_TX') {
+            callback({
+                success: true,
+                data: confirmation.signedTransaction,
+                uuid
+            });
+
+            this.isConfirming = false;
+            if(this.confirmations.length) {
+                this.emit('setConfirmations', this.confirmations);
+            }
+            this._closePopup();
+            this.resetState();
+        } else {
+            console.log('acceptConfirmation', confirmation)
+            this.txController.updateAndApproveTransaction(confirmation.txMeta)
+        }
 
         this.isConfirming = false;
-        if(this.confirmations.length) {
-            this.emit('setConfirmations', this.confirmations);
-        }
         this._closePopup();
         this.resetState();
     }
@@ -877,16 +1493,25 @@ class Wallet extends EventEmitter {
             uuid
         } = this.confirmations.pop();
 
-        callback({
-            success: false,
-            data: 'Confirmation declined by user',
-            uuid
-        });
+        if (confirmation.type !== 'ETHEREUM_TX') {
+            callback({
+                success: false,
+                data: 'Confirmation declined by user',
+                uuid
+            });
+
+            this.isConfirming = false;
+            if(this.confirmations.length) {
+                this.emit('setConfirmations', this.confirmations);
+            }
+            this._closePopup();
+            this.resetState();
+        } else {
+            console.log('rejectConfirmation', confirmation)
+            this.txController.cancelTransaction(confirmation.id)
+        }
 
         this.isConfirming = false;
-        if(this.confirmations.length) {
-            this.emit('setConfirmations', this.confirmations);
-        }
         this._closePopup();
         this.resetState();
     }
