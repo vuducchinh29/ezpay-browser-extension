@@ -29,11 +29,11 @@ class Controller extends React.Component {
         isLoading: false,
         gasPrice: 50,
         gasLimit: 21000,
-        feeSlow: 0.00008,
-        feeAverage: 0.00021,
-        feeFast: 0.00042,
+        feeSlow: 4,
+        feeAverage: 10,
+        feeFast: 20,
         selectedFee: 'average',
-        fee: 0.00021
+        fee: 10
     };
 
     constructor() {
@@ -70,7 +70,7 @@ class Controller extends React.Component {
         PopupAPI.sendToken({
             recipient,
             amount: BigNumber(amount).shiftedBy(selectedToken.decimal).toString(),
-            gasPrice: this.state.gasPrice,
+            gasPrice: this.state.fee,
             gasLimit: this.state.gasLimit
         }).then(() => {
             Toast.success('Successfully', 2, () => {
@@ -143,15 +143,15 @@ class Controller extends React.Component {
                             <div className="fee">
                                 <button onClick={this.onClickFee.bind(this, 'slow', this.state.feeSlow)} className={this.state.selectedFee === 'slow' ? 'selected' : ''} >
                                     <span>Slow</span>
-                                    <span>{this.state.feeSlow} {account.symbol}</span>
+                                    <span>{'0.00008'} {account.symbol}</span>
                                 </button>
                                 <button onClick={this.onClickFee.bind(this, 'average', this.state.feeAverage)} className={this.state.selectedFee === 'average' ? 'selected' : ''} >
                                     <span>Average</span>
-                                    <span>{this.state.feeAverage} {account.symbol}</span>
+                                    <span>{'0.00021'} {account.symbol}</span>
                                 </button>
                                 <button onClick={this.onClickFee.bind(this, 'fast', this.state.feeFast)} className={this.state.selectedFee === 'fast' ? 'selected' : ''}>
                                     <span>Fast</span>
-                                    <span>{this.state.feeFast} {account.symbol}</span>
+                                    <span>{'0.00042'} {account.symbol}</span>
                                 </button>
                             </div>
                         </span>}
