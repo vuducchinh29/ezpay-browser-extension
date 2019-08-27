@@ -60,7 +60,7 @@ class Controller extends React.Component {
                                     <div onClick={ this.setEthereumDappSetting.bind(this, account.id) } className={`item ${modeCssName}-item`}>
                                         <div className='content'>
                                             <div className={'title'}>{account.name} <span className="chain-name">({account.token.name})</span></div>
-                                            <div className='desc'>{new BigNumber(account.balance).shiftedBy(-`${account.decimal}`).toString() || 0} {account.symbol} {ethereumDappSetting === account.id && <img className="icon-tick" src={'../src/assets/images/tick.png'} />}</div>
+                                            <div className='desc'>{new BigNumber(account.balance).shiftedBy(-`${account.decimal}`).precision(10).toString() || 0} {account.symbol} {ethereumDappSetting === account.id && <img className="icon-tick" src={'../src/assets/images/tick.png'} />}</div>
                                         </div>
                                     </div>
                                 )

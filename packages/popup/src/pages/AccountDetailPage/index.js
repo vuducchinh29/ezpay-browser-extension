@@ -72,7 +72,7 @@ class Controller extends React.Component {
                     </div>
                     <div className="row">
                         <div className="title">Balance:</div>
-                        <div className="content">{new BigNumber(account.balance).shiftedBy(-`${account.decimal}`).toString() || 0} {account.symbol}</div>
+                        <div className="content">{new BigNumber(account.balance).shiftedBy(-`${account.decimal}`).precision(10).toString() || 0} {account.symbol}</div>
                     </div>
                     <div className="row-btn">
                         <div className="button">

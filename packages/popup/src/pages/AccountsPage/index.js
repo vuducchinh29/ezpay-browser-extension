@@ -67,7 +67,7 @@ class Controller extends React.Component {
                                 <div className={`item ${modeCssName}-item`}>
                                     <div className='content'>
                                         <div onClick={ this.goToDetail.bind(this, id) } className={'title'}>{account.name}</div>
-                                        <div onClick={ this.goToDetail.bind(this, id) } className='desc'>{new BigNumber(account.balance).shiftedBy(-`${account.decimal}`).toString() || 0} {account.symbol}</div>
+                                        <div onClick={ this.goToDetail.bind(this, id) } className='desc'>{new BigNumber(account.balance).shiftedBy(-`${account.decimal}`).precision(10).toString() || 0} {account.symbol}</div>
                                     </div>
                                     <div className="action">
                                         <button onClick={ this.goToReceive.bind(this, id) } className={`button ${modeCssName}-button`}>Receive <img src={'../src/assets/images/receive.png'} /></button>

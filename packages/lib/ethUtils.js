@@ -1,7 +1,8 @@
 import crypto from 'crypto';
 import bip39 from 'bip39';
 import bip32 from 'bip32';
-import Web3 from 'web3'
+import Web3 from 'web3';
+import { ethers } from 'ethers';
 
 const web3 = new Web3()
 
@@ -9,10 +10,9 @@ const ethUtils = {
     getEthereumAccountAtIndex(mnemonic, index = 0) {
         const seed = bip39.mnemonicToSeed(mnemonic);
         const node = bip32.fromSeed(seed);
-        const child = node.derivePath(`m/44'/195'/${ index }'/0/0`);
-        const privateKey = child.privateKey.toString('hex');
+        const child = node.derivePath(`m/44'/60'/0'/0/0`);
 
-        const account = web3.eth.accounts.privateKeyToAccount('0x' + privateKey);
+        const account = new ethers.Wallet(child.privateKey)
 
         return {
             privateKey: account.privateKey,

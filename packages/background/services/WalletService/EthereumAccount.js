@@ -133,6 +133,16 @@ class EthereumAccount extends Account {
         this.tokens = tokens;
     }
 
+    getPrivateKey() {
+        let privateKeyStr = String(this.privateKey);
+
+        if (privateKeyStr.indexOf('0x') > -1) {
+            privateKeyStr = privateKeyStr.substring(2)
+        }
+
+        return Buffer.from(privateKeyStr, 'hex')
+    }
+
     async sendToken({recipient, amount, gasLimit, gasPrice}) {
         return new Promise(async (resolve, reject) => {
             const rawTx  = {};
@@ -147,10 +157,8 @@ class EthereumAccount extends Account {
                 const nonce = await this.web3.eth.getTransactionCount(rawTx.from)
                 rawTx.nonce = await this.web3.utils.toHex(nonce);
 
-                const privateKey = Buffer.from(String(this.privateKey).substring(2), 'hex')
-
                 const tx = new Tx(rawTx);
-                tx.sign(privateKey);
+                tx.sign(this.getPrivateKey());
                 const serializedTx = tx.serialize();
 
                 this.web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'), (error, hash) => {

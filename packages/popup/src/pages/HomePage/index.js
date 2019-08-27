@@ -57,7 +57,7 @@ class Controller extends React.Component {
                                     <img src={token.logo} />
                                     <div className='content'>
                                         <div className={'title'}>{token.name}</div>
-                                        <div className='desc'>{new BigNumber(this.getTotalBalance(tokenId)).shiftedBy(-`${token.decimal}`).toString() || 0} {token.symbol}</div>
+                                        <div className='desc'>{new BigNumber(this.getTotalBalance(tokenId)).shiftedBy(-`${token.decimal}`).precision(10).toString() || 0} {token.symbol}</div>
                                     </div>
                                 </div>
                             )

@@ -360,7 +360,8 @@ class Wallet extends EventEmitter {
         if (!account || account.address.toLowerCase() !== address.toLowerCase()) {
             return Promise.reject()
         }
-        const privKey = Buffer.from(account.privateKey, 'hex')
+
+        const privKey = account.getPrivateKey()
 
         tx.sign(privKey)
         return Promise.resolve(tx)
@@ -1358,7 +1359,6 @@ class Wallet extends EventEmitter {
     }
 
     queueConfirmation(confirmation, uuid, callback) {
-        console.log('confirmation', confirmation, uuid, callback)
         this.confirmations.push({
             confirmation,
             callback,
@@ -1428,7 +1428,6 @@ class Wallet extends EventEmitter {
     }
 
     showUnapprovedTx(tx) {
-        console.log('showUnapprovedTx', tx)
         this.queueConfirmation({
             type: 'ETHEREUM_TX',
             id: tx.id,
@@ -1472,7 +1471,6 @@ class Wallet extends EventEmitter {
             this._closePopup();
             this.resetState();
         } else {
-            console.log('acceptConfirmation', confirmation)
             this.txController.updateAndApproveTransaction(confirmation.txMeta)
         }
 
@@ -1507,7 +1505,6 @@ class Wallet extends EventEmitter {
             this._closePopup();
             this.resetState();
         } else {
-            console.log('rejectConfirmation', confirmation)
             this.txController.cancelTransaction(confirmation.id)
         }
 
