@@ -18,7 +18,8 @@ export const APP_STATE = {
     ACCOUNTS: 12,
     CREATING_ACCOUNT: 13,
     ACCOUNT_DETAIL: 14,
-    ACCOUNTS_DAPP: 15
+    ACCOUNTS_DAPP: 15,
+    HISTORY: 16
 };
 
 export const PRICE_LIST = [

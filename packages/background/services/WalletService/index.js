@@ -1204,7 +1204,8 @@ class Wallet extends EventEmitter {
             APP_STATE.ACCOUNTS,
             APP_STATE.CREATING_ACCOUNT,
             APP_STATE.ACCOUNT_DETAIL,
-            APP_STATE.ACCOUNTS_DAPP
+            APP_STATE.ACCOUNTS_DAPP,
+            APP_STATE.HISTORY
         ];
         if(!stateAry.includes(appState))
             return logger.error(`Attempted to change app state to ${ appState }. Only 'restoring' and 'creating' is permitted`);
@@ -1238,6 +1239,22 @@ class Wallet extends EventEmitter {
         // NodeService.setAddress();
         this.selectedAccount = id;
         this.emit('setAccount', id);
+    }
+
+    async getHistory(accountId) {
+        const id = accountId || this.selectedAccount.id;
+        this.emit('setHistory', []);
+
+        const account = this.accounts[ id ];
+        const nodes = NodeService.getNodes().nodes;
+        const node = nodes[ account.chain ];
+
+        if (node.txUlr) {
+            const histories = await account.getHistory(node.txUlr);
+            this.emit('setHistory', histories);
+        } else {
+            this.emit('setHistory', 'nodata');
+        }
     }
 
     getTronDappSetting() {

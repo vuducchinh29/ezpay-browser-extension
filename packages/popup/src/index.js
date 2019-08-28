@@ -30,7 +30,8 @@ import {
     setLayoutMode,
     setTronDappSetting,
     setEthereumDappSetting,
-    setPrices
+    setPrices,
+    setHistory
 } from 'reducers/appReducer';
 
 import {
@@ -187,6 +188,10 @@ export const app = {
 
         this.duplex.on('setPrices', prices => this.store.dispatch(
             setPrices(prices)
+        ));
+
+        this.duplex.on('setHistory', histories => this.store.dispatch(
+            setHistory(histories)
         ));
     },
 

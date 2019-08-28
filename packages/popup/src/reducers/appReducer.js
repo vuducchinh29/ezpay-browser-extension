@@ -25,6 +25,7 @@ export const setAuthorizeDapps = createAction('setAuthorizeDapps');
 export const setEthereumDappSetting = createAction('setEthereumDappSetting');
 export const setTronDappSetting = createAction('setTronDappSetting');
 export const setPrices = createAction('setPrices');
+export const setHistory = createAction('setHistory');
 
 export const appReducer = createReducer({
     appState: APP_STATE.UNINITIALISED,
@@ -107,5 +108,8 @@ export const appReducer = createReducer({
     },
     [ setPrices ]: (state, { payload }) => {
         state.prices = payload;
+    },
+    [ setHistory ]: (state, { payload }) => {
+        state.histories = payload;
     }
 });

@@ -40,8 +40,8 @@ class Controller extends React.Component {
         PopupAPI.acceptConfirmation();
     }
 
-    async omponentDidMount() {
-        const accounts = await PopupAPI.getAccounts();
+    async componentDidMount() {
+
     }
 
     renderMessage() {

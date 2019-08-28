@@ -25,8 +25,7 @@ class Controller extends React.Component {
         super();
     }
 
-    async omponentDidMount() {
-        const accounts = await PopupAPI.getAccounts();
+    async componentDidMount() {
     }
 
     async onDelete() {

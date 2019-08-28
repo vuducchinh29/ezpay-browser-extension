@@ -64,6 +64,10 @@ export default {
         this.duplex.send('selectAccount', address, false);
     },
 
+    getHistory(address) {
+        this.duplex.send('getHistory', address, false);
+    },
+
     selectToken(tokenId) {
         this.duplex.send('selectToken', tokenId, false);
     },

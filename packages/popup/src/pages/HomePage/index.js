@@ -18,7 +18,7 @@ class Controller extends React.Component {
         super();
     }
 
-    async omponentDidMount() {
+    async componentDidMount() {
         const accounts = await PopupAPI.getAccounts();
     }
 

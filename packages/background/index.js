@@ -83,6 +83,7 @@ const background = {
         duplex.on('getTronDappSetting', this.walletService.getTronDappSetting);
 
         duplex.on('importAccount', this.walletService.importAccount);
+        duplex.on('getHistory', this.walletService.getHistory);
     },
 
     bindWalletEvents() {
@@ -132,6 +133,10 @@ const background = {
 
         this.walletService.on('setPrices', prices => (
             BackgroundAPI.setPrices(prices)
+        ));
+
+        this.walletService.on('setHistory', histories => (
+            BackgroundAPI.setHistory(histories)
         ));
     },
 

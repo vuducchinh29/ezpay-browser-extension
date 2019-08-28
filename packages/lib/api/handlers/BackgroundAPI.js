@@ -80,6 +80,10 @@ export default {
         this.duplex.send('popup', 'setPrices', prices ,false);
     },
 
+    setHistory(histories) {
+        this.duplex.send('popup', 'setHistory', histories ,false);
+    },
+
     setLayoutMode(mode) {
         this.duplex.send('popup', 'setLayoutMode', mode ,false);
     },

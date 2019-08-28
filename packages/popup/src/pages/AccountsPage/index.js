@@ -19,7 +19,7 @@ class Controller extends React.Component {
         super();
     }
 
-    async omponentDidMount() {
+    async componentDidMount() {
         const accounts = await PopupAPI.getAccounts();
     }
 
@@ -36,6 +36,11 @@ class Controller extends React.Component {
     goToSend(id) {
         PopupAPI.selectAccount(id)
         PopupAPI.changeState(APP_STATE.SEND)
+    }
+
+    goToHistory(id) {
+        PopupAPI.selectAccount(id)
+        PopupAPI.changeState(APP_STATE.HISTORY)
     }
 
     getCssClassName() {
@@ -71,7 +76,7 @@ class Controller extends React.Component {
                                     </div>
                                     <div className="action">
                                         <button onClick={ this.goToReceive.bind(this, id) } className={`button ${modeCssName}-button`}>Receive <img src={'../src/assets/images/receive.png'} /></button>
-                                        <button className={`button ${modeCssName}-button`}>History <img src={'../src/assets/images/history.png'} /></button>
+                                        <button onClick={ this.goToHistory.bind(this, id) } className={`button ${modeCssName}-button`}>History <img src={'../src/assets/images/history.png'} /></button>
                                         <button onClick={ this.goToSend.bind(this, id) } className={`button ${modeCssName}-button`}>Send <img src={'../src/assets/images/send.png'} /></button>
                                     </div>
                                 </div>

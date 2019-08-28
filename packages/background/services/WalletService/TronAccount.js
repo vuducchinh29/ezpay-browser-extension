@@ -4,6 +4,7 @@ import Logger from '@ezpay/lib/logger';
 import Utils from '@ezpay/lib/utils';
 import NodeService from '../NodeService';
 import Account from './Account';
+const rp = require('request-promise');
 
 import { BigNumber } from 'bignumber.js';
 
@@ -625,6 +626,44 @@ class TronAccount extends Account {
             logger.error('Failed to send smart token:', ex);
             return Promise.reject(ex);
         }
+    }
+
+    async getHistory(url) {
+        const requestOptions = {
+            method: 'GET',
+            uri: `${url}/api/transaction`,
+            qs: {
+              sort: '-timestamp',
+              count: true,
+              limit: 30,
+              start: 0,
+              address: this.address
+            },
+            headers: {
+            },
+            json: true,
+            gzip: true
+        };
+
+        const res = await rp(requestOptions);
+        const histories = [];
+
+        res && res.data.forEach(tx => {
+            let item = {
+                hash: tx.hash,
+                confirmed: tx.confirmed,
+                blockNumber: tx.block,
+                from: tx.ownerAddress,
+                to: tx.toAddress,
+                value: tx.contractData.amount,
+                timeStamp: tx.timestamp,
+                cost: tx.cost
+            }
+
+            histories.push(item)
+        })
+
+        return histories
     }
 }
 

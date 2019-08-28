@@ -8,6 +8,7 @@ import Account from './Account';
 import Web3 from 'web3';
 import NodeService from '../NodeService';
 import Tx from 'ethereumjs-tx';
+const rp = require('request-promise');
 
 const logger = new Logger('WalletService/EthereumAccount');
 import {
@@ -179,6 +180,47 @@ class EthereumAccount extends Account {
 
     save() {
         StorageService.saveAccount(this);
+    }
+
+    async getHistory(url) {
+        const requestOptions = {
+            method: 'GET',
+            uri: `${url}/api?module=account&action=txlist&address=' + address + '`,
+            qs: {
+              module: 'account',
+              action: 'txlist',
+              offset: 30,
+              page: 0,
+              sort: 'desc',
+              address: this.address
+            },
+            headers: {
+            },
+            json: true,
+            gzip: true
+        };
+
+        const res = await rp(requestOptions);
+        const histories = [];
+
+        res && res.result.forEach(tx => {
+            let item = {
+                hash: tx.hash,
+                confirmations: tx.confirmations,
+                blockNumber: tx.blockNumber,
+                from: tx.from,
+                to: tx.to,
+                value: tx.value / `1e${this.decimal}`,
+                timeStamp: tx.timeStamp,
+                gas: tx.gas,
+                nonce: tx.nonce,
+                gasPrice: tx.gasPrice
+            }
+
+            histories.push(item)
+        })
+
+        return histories
     }
 }
 

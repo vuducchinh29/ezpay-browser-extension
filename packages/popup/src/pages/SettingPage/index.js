@@ -34,8 +34,8 @@ class Controller extends React.Component {
         };
     }
 
-    async omponentDidMount() {
-        const accounts = await PopupAPI.getAccounts();
+    async componentDidMount() {
+
     }
 
     setting(index) {
