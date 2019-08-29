@@ -12,33 +12,33 @@ const NodeService = {
         'f0b1e38e-7bee-485e-9d3f-69410bf30681': {
             type: 'TRON',
             endPoint: 'https://api.trongrid.io',
-            exploreUlr: 'https://tronscan.org',
+            exploreUlr: 'https://tronscan.org/#/transaction/',
             txUlr: 'https://apilist.tronscan.org'
         },
         '0f22e40f-a004-4c5a-99ef-004c8e6769bf': {
             type: 'TRON_SHASTA',
             endPoint: 'https://api.shasta.trongrid.io',
-            exploreUlr: 'https://shasta.tronscan.org',
+            exploreUlr: 'https://shasta.tronscan.org/#/transaction/',
             txUlr: ''
         },
         '6739be94-ee43-46af-9a62-690cf0947280': {
             type: 'ETH',
             rpc: 'mainnet',
             endPoint: 'https://mainnet.infura.io/v3/f2ffee3e3500452fad9b02f935fe0032',
-            exploreUlr: 'https://etherscan.io',
+            exploreUlr: 'https://etherscan.io/tx/',
             txUlr: 'https://blockscout.com/eth/mainnet'
         },
         '6739be94-ee43-46af-9a62-690cf0947281': {
             type: 'ETH_RINKEBY',
             rpc: 'rinkeby',
             endPoint: 'https://rinkeby.infura.io/v3/f2ffee3e3500452fad9b02f935fe0032',
-            exploreUlr: 'https://rinkeby.etherscan.io',
+            exploreUlr: 'https://rinkeby.etherscan.io/tx/',
             txUlr: 'https://blockscout.com/eth/rinkeby'
         },
         '6739be94-ee43-46af-9a62-690cf0947282': {
             type: 'NTY',
             endPoint: 'https://rpc.nexty.io',
-            exploreUlr: 'https://explorer.nexty.io',
+            exploreUlr: 'https://explorer.nexty.io/tx/',
             txUlr: 'https://explorer.nexty.io'
         },
         '6739be94-ee43-46af-9a62-690cf0947283': {

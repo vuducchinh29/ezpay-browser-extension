@@ -1056,7 +1056,10 @@ class Wallet extends EventEmitter {
     }
 
     getAccount(id) {
-        return this.accounts[ id ];
+        const nodes = NodeService.getNodes().nodes;
+        const account = this.accounts[ id ];
+        account.chain = nodes[ account.chain ];
+        return account;
     }
 
     async addTronAccount(params) {
@@ -1243,7 +1246,7 @@ class Wallet extends EventEmitter {
 
     async getHistory(accountId) {
         const id = accountId || this.selectedAccount.id;
-        this.emit('setHistory', []);
+        this.emit('setHistory', 'loading');
 
         const account = this.accounts[ id ];
         const nodes = NodeService.getNodes().nodes;
@@ -1339,10 +1342,14 @@ class Wallet extends EventEmitter {
             };
         }
 
-        return this.accounts[ id ].getDetails();
+        const account = this.accounts[ id ].getDetails();
+        const nodes = NodeService.getNodes().nodes;
+        account.chain = nodes[ account.chain ];
+
+        return account;
     }
 
-     getSelectedAccount() {
+    getSelectedAccount() {
         if(!this.selectedAccount)
             return false;
 
