@@ -799,68 +799,72 @@ class Wallet extends EventEmitter {
     _loadAccounts() {
         const accounts = StorageService.getAccounts();
         const nodes = NodeService.getNodes().nodes;
+        const tokens = NodeService.getTokens();
 
         Object.entries(accounts).forEach(([ id, account ]) => {
-            let node = nodes[account.chain]
+            let token = tokens[ account.token ]
+            let node = nodes[ token.node ]
             let accountObj
 
-            if (node.type === CHAIN_TYPE.TRON || node.type === CHAIN_TYPE.TRON_SHASTA) {
-                accountObj = new TronAccount(
-                    account.id,
-                    account.chain,
-                    account.token,
-                    account.type,
-                    account.mnemonic || account.privateKey,
-                    account.name,
-                    account.symbol,
-                    account.decimal,
-                    account.logo,
-                    account.accountIndex
-                );
+            if (node) {
+                if (node.type === CHAIN_TYPE.TRON || node.type === CHAIN_TYPE.TRON_SHASTA) {
+                    accountObj = new TronAccount(
+                        account.id,
+                        token.node,
+                        account.token,
+                        account.type,
+                        account.mnemonic || account.privateKey,
+                        account.name,
+                        account.symbol,
+                        account.decimal,
+                        account.logo,
+                        account.accountIndex
+                    );
 
-                accountObj.loadCache();
-                accountObj.update();
+                    accountObj.loadCache();
+                    accountObj.update();
 
-                if (node.type === CHAIN_TYPE.TRON && !this.tronAccoutDapp) {
-                    this.tronAccoutDapp = account.id;
+                    if (node.type === CHAIN_TYPE.TRON && !this.tronAccoutDapp) {
+                        this.tronAccoutDapp = account.id;
+                    }
+                } else if (node.type === CHAIN_TYPE.NTY || node.type === CHAIN_TYPE.ETH || node.type === CHAIN_TYPE.ETH_RINKEBY) {
+                    accountObj = new EthereumAccount(
+                        account.id,
+                        token.node,
+                        account.token,
+                        account.type,
+                        account.mnemonic || account.privateKey,
+                        account.name,
+                        account.symbol,
+                        account.decimal,
+                        account.logo,
+                        account.accountIndex
+                    );
+
+                    accountObj.loadCache();
+                    accountObj.update();
+
+                    if (node.type === CHAIN_TYPE.ETH && !this.ethereumAccoutDapp) {
+                        this.ethereumAccoutDapp = account.id;
+                    }
+                } else if (node.type === CHAIN_TYPE.BTC) {
+                    accountObj = new BitcoinAccount(
+                        account.id,
+                        token.node,
+                        account.token,
+                        account.type,
+                        account.mnemonic || account.privateKey,
+                        account.name,
+                        account.symbol,
+                        account.decimal,
+                        account.logo,
+                        account.typeCoinInfo,
+                        account.accountIndex
+                    );
                 }
-            } else if (node.type === CHAIN_TYPE.NTY || node.type === CHAIN_TYPE.ETH || node.type === CHAIN_TYPE.ETH_RINKEBY) {
-                accountObj = new EthereumAccount(
-                    account.id,
-                    account.chain,
-                    account.token,
-                    account.type,
-                    account.mnemonic || account.privateKey,
-                    account.name,
-                    account.symbol,
-                    account.decimal,
-                    account.logo,
-                    account.accountIndex
-                );
 
-                accountObj.loadCache();
-                accountObj.update();
-
-                if (node.type === CHAIN_TYPE.ETH && !this.ethereumAccoutDapp) {
-                    this.ethereumAccoutDapp = account.id;
-                }
-            } else if (node.type === CHAIN_TYPE.BTC) {
-                accountObj = new BitcoinAccount(
-                    account.id,
-                    account.chain,
-                    account.token,
-                    account.type,
-                    account.mnemonic || account.privateKey,
-                    account.name,
-                    account.symbol,
-                    account.decimal,
-                    account.logo,
-                    account.typeCoinInfo,
-                    account.accountIndex
-                );
+                this.accounts[ id ] = accountObj;
             }
-
-            this.accounts[ id ] = accountObj;
         });
     }
 
@@ -1408,6 +1412,7 @@ class Wallet extends EventEmitter {
     }
 
     queueConfirmation(confirmation, uuid, callback) {
+        console.log('xxx', confirmation)
         this.confirmations.push({
             confirmation,
             callback,

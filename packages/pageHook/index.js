@@ -49,8 +49,6 @@ const pageHook = {
             target: 'contentscript',
         })
 
-        console.log('metamaskStream', metamaskStream)
-
         const inpageProvider = new MetamaskInpageProvider(metamaskStream)
         inpageProvider.setMaxListeners(100)
 
@@ -160,7 +158,6 @@ const pageHook = {
 
         // set web3 defaultAccount
         inpageProvider.publicConfigStore.subscribe(function (state) {
-            console.log('selectedAddressxxx', state.selectedAddress)
           web3.eth.defaultAccount = state.selectedAddress
         })
 
@@ -216,25 +213,18 @@ const pageHook = {
         });
 
         this.eventChannel.on('setAccountEthereum', address => {
-            console.log('setAccountEthereum', address)
             web3.eth.defaultAccount = address
-            // this.setAddressWeb3(address);
         });
 
         this.eventChannel.on('setNodeEthereum', node => {
-            console.log('setNodeEthereum', node)
-            // this.setProviderWeb3(node);
         });
     },
 
     setAddressWeb3(address) {
-      console.log('address', address)
-        // web3.eth.defaultAccount = address;
     },
 
     setProviderWeb3(endPoint) {
-      console.log('endPoint', endPoint)
-        // web3.setProvider(new web3.providers.HttpProvider(endPoint));
+
     },
 
     setAddress(address) {
