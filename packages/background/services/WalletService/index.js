@@ -1061,8 +1061,11 @@ class Wallet extends EventEmitter {
 
     getAccount(id) {
         const nodes = NodeService.getNodes().nodes;
+        const tokens = NodeService.getTokens();
         const account = this.accounts[ id ];
-        account.chain = nodes[ account.chain ];
+        const token = tokens[ account.token ]
+        account.chain = nodes[ token.node ];
+
         return account;
     }
 
@@ -1251,13 +1254,10 @@ class Wallet extends EventEmitter {
     async getHistory(accountId) {
         const id = accountId || this.selectedAccount.id;
         this.emit('setHistory', 'loading');
+        const account = this.getAccount(id);
 
-        const account = this.accounts[ id ];
-        const nodes = NodeService.getNodes().nodes;
-        const node = nodes[ account.chain ];
-
-        if (node.txUlr) {
-            const histories = await account.getHistory(node.txUlr);
+        if (account.chain.txUlr) {
+            const histories = await account.getHistory(account.chain.txUlr);
             this.emit('setHistory', histories);
         } else {
             this.emit('setHistory', 'nodata');
@@ -1273,7 +1273,7 @@ class Wallet extends EventEmitter {
     }
 
     async setTronDappSetting(id) {
-        const account = this.accounts[ id ];
+        const account = this.getAccount(id);
 
         if (!account) {
             return
@@ -1281,14 +1281,12 @@ class Wallet extends EventEmitter {
 
         await StorageService.setTronDappSetting(account.id);
         this.tronAccoutDapp = account.id;
-        const nodes = NodeService.getNodes().nodes;
-        account.node = nodes[ account.chain ]
 
         this.emit('setTronDappSetting', account);
     }
 
     async setEthereumDappSetting(id) {
-        const account = this.accounts[ id ];
+        const account = this.getAccount(id);
 
         if (!account) {
             return
@@ -1296,8 +1294,6 @@ class Wallet extends EventEmitter {
 
         await StorageService.setEthereumDappSetting(account.id);
         this.ethereumAccoutDapp = account.id;
-        const nodes = NodeService.getNodes().nodes;
-        account.node = nodes[ account.chain ]
 
         this.preferencesController.setSelectedAddress(account.address)
         this.setProviderType(account)
@@ -1306,7 +1302,7 @@ class Wallet extends EventEmitter {
     }
 
     setProviderType(account) {
-        const node = account.node;
+        const node = account.chain;
         const isInfura = INFURA_PROVIDER_TYPES.includes(node.rpc)
 
         if (isInfura) {
@@ -1348,7 +1344,9 @@ class Wallet extends EventEmitter {
 
         const account = this.accounts[ id ].getDetails();
         const nodes = NodeService.getNodes().nodes;
-        account.chain = nodes[ account.chain ];
+        const tokens = NodeService.getTokens();
+        const token = tokens[ account.token ];
+        account.chain = nodes[ token.node ];
 
         return account;
     }
@@ -1582,18 +1580,12 @@ class Wallet extends EventEmitter {
     }
 
     getConfigDapp() {
-        const ethereumAccount = this.accounts[ StorageService.ethereumDappSetting ]
-        const tronAccount = this.accounts[ StorageService.tronDappSetting ]
-        const nodes = NodeService.getNodes().nodes;
+        const tronAccount = this.getAccount(StorageService.tronDappSetting)
 
         return {
-            ethereumAccount: {
-                address: ethereumAccount.address,
-                endPoint: nodes[ethereumAccount.chain].endPoint
-            },
             tronAccount: {
-                address: tronAccount.address,
-                endPoint: nodes[tronAccount.chain].endPoint
+                address: tronAccount && tronAccount.address,
+                endPoint: tronAccount.chain && tronAccount.chain.endPoint
             }
         }
     }

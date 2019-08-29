@@ -155,12 +155,6 @@ const background = {
                                 solidityNode: false,
                                 eventServer: false
                             }
-                        },
-                        eth: {
-                            address: false,
-                            node: {
-                                endPoint: null
-                            }
                         }
                     };
 
@@ -173,9 +167,6 @@ const background = {
                             solidityNode: config.tronAccount.endPoint,
                             eventServer: config.tronAccount.endPoint
                         };
-
-                        response.eth.address = config.ethereumAccount.address;
-                        response.eth.node.endPoint = config.ethereumAccount.endPoint;
                     }
 
                     resolve({

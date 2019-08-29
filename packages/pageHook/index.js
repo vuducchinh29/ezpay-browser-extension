@@ -25,11 +25,6 @@ const pageHook = {
         this._bindEventChannel();
         this._bindEvents();
         this.request('init').then(({ tron, eth }) => {
-            if (eth) {
-                this.setProviderWeb3(eth.node.endPoint)
-                this.setAddressWeb3(eth.address)
-            }
-
             if(tron.address)
                 this.setAddress(tron.address);
 
@@ -211,20 +206,6 @@ const pageHook = {
                 eventServer: node
             })
         });
-
-        this.eventChannel.on('setAccountEthereum', address => {
-            web3.eth.defaultAccount = address
-        });
-
-        this.eventChannel.on('setNodeEthereum', node => {
-        });
-    },
-
-    setAddressWeb3(address) {
-    },
-
-    setProviderWeb3(endPoint) {
-
     },
 
     setAddress(address) {

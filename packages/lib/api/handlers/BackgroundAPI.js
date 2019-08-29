@@ -93,7 +93,7 @@ export default {
 
         this.duplex.send('tab', 'tunnel', {
             action: 'setNodeTron',
-            data: tronDappSetting.node.endPoint
+            data: tronDappSetting.chain.endPoint
         }, false);
 
         this.duplex.send('tab', 'tunnel', {
@@ -104,15 +104,5 @@ export default {
 
     setEthereumDappSetting(ethereumDappSetting) {
         this.duplex.send('popup', 'setEthereumDappSetting', ethereumDappSetting.id ,false);
-
-        this.duplex.send('tab', 'tunnel', {
-            action: 'setNodeEthereum',
-            data: ethereumDappSetting.node.endPoint
-        }, false);
-
-        this.duplex.send('tab', 'tunnel', {
-            action: 'setAccountEthereum',
-            data: ethereumDappSetting.address
-        }, false);
     }
 };
