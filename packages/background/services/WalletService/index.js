@@ -143,14 +143,12 @@ class Wallet extends EventEmitter {
 
             this._setCurrentDappConfig()
         }
-
-        this.setupProvider()
     }
 
     setupProvider() {
         const nodes = NodeService.getNodes().nodes;
-        const selectedAccount = this.accounts[ StorageService.ethereumDappSetting ];
-        const defaultNode = nodes[selectedAccount.chain]
+        const selectedAccount = this.getAccount(StorageService.ethereumDappSetting);
+        const defaultNode = selectedAccount.chain
 
         const isInfura = INFURA_PROVIDER_TYPES.includes(defaultNode.rpc)
 
@@ -680,6 +678,7 @@ class Wallet extends EventEmitter {
         await this._saveTokens();
         this._loadData();
         this._setState(APP_STATE.READY);
+        this.setupProvider();
         this.emit('setAccount', this.selectedAccount);
         this._setCurrentDappConfig()
     }
