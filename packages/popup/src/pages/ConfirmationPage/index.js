@@ -9,6 +9,8 @@ import Button from '@ezpay/popup/src/components/Button';
 import Dropdown from 'react-dropdown';
 import _ from 'lodash'
 import TronWeb from 'tronweb';
+import Utils from '@ezpay/lib/utils';
+import Web3 from 'web3';
 import {
     FormattedMessage,
     FormattedHTMLMessage,
@@ -17,6 +19,8 @@ import {
 
 import 'react-dropdown/style.css';
 import './style.scss';
+
+const web3 = new Web3();
 
 class Controller extends React.Component {
     state = {
@@ -68,12 +72,20 @@ class Controller extends React.Component {
         );
     }
 
+    getAccount(id) {
+        const { accounts } = this.props
+
+        return accounts[ id ];
+    }
+
     renderTransaction() {
         const {
             hostname,
             contractType,
             input
         } = this.props.confirmation;
+
+        const accountDapp = this.getAccount(this.props.tronDappSetting);
 
         const meta = [];
         const showWhitelist = contractType === 'TriggerSmartContract';
@@ -165,18 +177,32 @@ class Controller extends React.Component {
                         }}
                     />
                 </div>
-                { meta.length ? (
-                    <div className='meta'>
-                        { meta.map(({ key, value }) => (
-                            <div className='metaLine' key={ key }>
-                                <FormattedMessage id={ key } />
-                                <span className='value'>
-                                    { value }
-                                </span>
-                            </div>
-                        )) }
+                <div className='meta'>
+                    <div className='metaLine'>
+                        <span>Account</span>
+                        <span className='value'>
+                            {accountDapp.name} ({Utils.addressSummary(accountDapp.address)})
+                        </span>
                     </div>
-                ) : '' }
+                    <div className='metaLine'>
+                        <span>Balance</span>
+                        <span className='value'>
+                            {accountDapp.balance / `1e${accountDapp.decimal}`} {accountDapp.symbol}
+                        </span>
+                    </div>
+                    { meta.length ? (
+                        <div>
+                            { meta.map(({ key, value }) => (
+                                <div className='metaLine' key={ key }>
+                                    <FormattedMessage id={ key } />
+                                    <span className='value'>
+                                        { value }
+                                    </span>
+                                </div>
+                            )) }
+                        </div>
+                    ) : '' }
+                </div>
                 { showParameters ? (
                     <div className='parameters mono'>
                         { JSON.stringify(input, null, 2 ) }
@@ -213,13 +239,35 @@ class Controller extends React.Component {
     }
 
     renderTransactionEthereum() {
+        const { ethereumDappSetting, confirmation } = this.props;
+        const accountDapp = this.getAccount(ethereumDappSetting);
+        const requestAmount =  web3.utils.hexToNumber(confirmation.txParams.value);
+
         return (<div className='meta'>
             <div className='metaLine'>
-                <span>AAAAAAA</span>
+                <span>Account</span>
                 <span className='value'>
-                    BBBBBBBBBBBB
+                    {accountDapp.name} ({Utils.addressSummary(accountDapp.address)})
                 </span>
             </div>
+            <div className='metaLine'>
+                <span>Balance</span>
+                <span className='value'>
+                    {accountDapp.balance / `1e${accountDapp.decimal}`} {accountDapp.symbol}
+                </span>
+            </div>
+            <div className='metaLine'>
+                <span>Request amount</span>
+                <span className='value'>
+                    {requestAmount} {accountDapp.symbol}
+                </span>
+            </div>
+            {confirmation.txParams.to && <div className='metaLine'>
+                <span>To</span>
+                <span className='value'>
+                    {confirmation.txParams.to}
+                </span>
+            </div>}
         </div>)
     }
 

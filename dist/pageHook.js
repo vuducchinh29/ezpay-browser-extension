@@ -84227,11 +84227,6 @@ const pageHook = {
       tron,
       eth
     }) => {
-      if (eth) {
-        this.setProviderWeb3(eth.node.endPoint);
-        this.setAddressWeb3(eth.address);
-      }
-
       if (tron.address) this.setAddress(tron.address);
       if (tron.node && tron.node.fullNode) this.setNode(tron.node);
       index_logger.info('ezPay initiated');
@@ -84246,7 +84241,6 @@ const pageHook = {
       name: 'inpage',
       target: 'contentscript'
     });
-    console.log('metamaskStream', metamaskStream);
     const inpageProvider = new MetamaskInpageProvider(metamaskStream);
     inpageProvider.setMaxListeners(100); // augment the provider with its enable method
     // inpageProvider.enable = '0x76535c6995faa57e38c61ad7cbcb3bd8219c66ce'
@@ -84358,7 +84352,6 @@ const pageHook = {
     setupDappAutoReload(web3, inpageProvider.publicConfigStore); // set web3 defaultAccount
 
     inpageProvider.publicConfigStore.subscribe(function (state) {
-      console.log('selectedAddressxxx', state.selectedAddress);
       web3.eth.defaultAccount = state.selectedAddress;
     });
     inpageProvider.publicConfigStore.subscribe(function (state) {
@@ -84398,21 +84391,6 @@ const pageHook = {
         eventServer: node
       });
     });
-    this.eventChannel.on('setAccountEthereum', address => {
-      console.log('setAccountEthereum', address);
-      web3.eth.defaultAccount = address; // this.setAddressWeb3(address);
-    });
-    this.eventChannel.on('setNodeEthereum', node => {
-      console.log('setNodeEthereum', node); // this.setProviderWeb3(node);
-    });
-  },
-
-  setAddressWeb3(address) {
-    console.log('address', address); // web3.eth.defaultAccount = address;
-  },
-
-  setProviderWeb3(endPoint) {
-    console.log('endPoint', endPoint); // web3.setProvider(new web3.providers.HttpProvider(endPoint));
   },
 
   setAddress(address) {
