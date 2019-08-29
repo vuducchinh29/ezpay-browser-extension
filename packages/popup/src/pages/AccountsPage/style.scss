@@ -7,7 +7,6 @@
     }
 
     .item-create {
-        cursor: pointer;
         height: 68px;
         display: flex;
         width: 100%;
@@ -22,10 +21,12 @@
 
         .create-account {
             text-align: center;
+            cursor: pointer;
         }
 
         .import-account {
             text-align: center;
+            cursor: pointer;
         }
 
         img {
@@ -56,7 +57,6 @@
     }
 
     .item {
-        cursor: pointer;
         width: 100%;
         padding-left: 15px;
         padding-right: 15px;
@@ -78,6 +78,7 @@
             flex-direction: row;
             overflow: hidden;
             justify-content: space-between;
+            position: relative;
 
             .title.isHot {
                 justify-content: flex-start;
@@ -99,6 +100,19 @@
                 white-space: nowrap;
                 text-align: right;
                 font-weight: bold;
+                margin-right: 32px;
+            }
+        }
+
+        .detail {
+            cursor: pointer;
+            position: absolute;
+            top: 13px;
+            right: 0px;
+
+            img {
+                width: 20px;
+                height: 20px;
             }
         }
 
