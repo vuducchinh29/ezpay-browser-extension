@@ -42,4 +42,4 @@ $ yarn lint
 
 ## Architecture
 
-[![Architecture Diagram](./architecture.png)][1]
+![Architecture Diagram](./architecture.png)
