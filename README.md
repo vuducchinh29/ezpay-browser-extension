@@ -39,3 +39,7 @@ $ yarn lint
 
 ## Links
 + [Website](https://nexty.io/)
+
+## Architecture
+
+[![Architecture Diagram](./architecture.png)][1]
