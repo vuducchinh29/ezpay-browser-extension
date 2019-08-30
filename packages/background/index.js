@@ -95,10 +95,6 @@ const background = {
             this.walletService.getAccountDetails(address)
         ));
 
-        this.walletService.on('setNode', node => (
-            BackgroundAPI.setNode(node)
-        ));
-
         this.walletService.on('setAccounts', accounts => (
             BackgroundAPI.setAccounts(accounts)
         ));

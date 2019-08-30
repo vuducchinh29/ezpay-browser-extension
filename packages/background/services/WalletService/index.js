@@ -127,9 +127,6 @@ class Wallet extends EventEmitter {
 
     async _start() {
         await this._checkStorage();
-        await this._saveTokens();
-        await this._loadData();
-        await this._loadAccounts();
 
         const securityMode = await StorageService.getSecurityMode()
         if (securityMode === SECURITY_MODE.EASY) {
@@ -142,6 +139,10 @@ class Wallet extends EventEmitter {
             }
 
             this._setCurrentDappConfig()
+        }
+
+        if (this.state === APP_STATE.READY && StorageService.ethereumDappSetting) {
+            this.setupProvider();
         }
     }
 
@@ -661,26 +662,21 @@ class Wallet extends EventEmitter {
         }
 
         if(!StorageService.hasAccounts) {
-            this._createDefaultAccount()
+            await this._createDefaultAccount()
             logger.info('Wallet does not have any accounts');
             return this._setState(APP_STATE.READY);
         }
-
-        const node = 'https://api.shasta.trongrid.io';
-
-        this.emit('setNode', {
-            fullNode: node,
-            solidityNode: node,
-            eventServer: node
-        });
 
         this._loadAccounts();
         await this._saveTokens();
         this._loadData();
         this._setState(APP_STATE.READY);
-        this.setupProvider();
         this.emit('setAccount', this.selectedAccount);
-        this._setCurrentDappConfig()
+        await this._setCurrentDappConfig()
+
+        if (this.state === APP_STATE.READY && StorageService.ethereumDappSetting) {
+            this.setupProvider();
+        }
     }
 
     async _checkStorage() {
@@ -1004,7 +1000,7 @@ class Wallet extends EventEmitter {
         })
     }
 
-    _createDefaultAccount() {
+    async _createDefaultAccount() {
         const tokens = NodeService.getTokens()
         const id = 'f0b1e38e-7bee-485e-9d3f-69410bf30686'
         const id1 = 'f0b1e38e-7bee-485e-9d3f-69410bf30683'
@@ -1016,13 +1012,13 @@ class Wallet extends EventEmitter {
         const token2 = tokens[id2]
         const token3 = tokens[id3]
 
-        this._addAccount({
+        await this._addAccount({
             ...token,
             token: id,
             mnemonic: Utils.generateMnemonic(),
             accountName: 'Nexty Account 1'
         })
-        this._addAccount({
+        await this._addAccount({
             ...token1,
             token: id1,
             mnemonic: Utils.generateMnemonic(),
@@ -1036,12 +1032,22 @@ class Wallet extends EventEmitter {
         //     accountName: 'Bitcoin Account 1'
         // })
 
-        this._addAccount({
+        await this._addAccount({
             ...token3,
             token: id3,
             mnemonic: Utils.generateMnemonic(),
             accountName: 'Ethereum Account 1'
         })
+
+        await this._loadAccounts();
+        await this._saveTokens();
+        this._loadData();
+        this.emit('setAccount', this.selectedAccount);
+        this._setCurrentDappConfig();
+
+        if (this.state === APP_STATE.READY && StorageService.ethereumDappSetting) {
+            this.setupProvider();
+        }
     }
 
     async _addAccount(params) {
@@ -1059,6 +1065,10 @@ class Wallet extends EventEmitter {
     }
 
     getAccount(id) {
+        if (!id) {
+            return
+        }
+
         const nodes = NodeService.getNodes().nodes;
         const tokens = NodeService.getTokens();
         const account = this.accounts[ id ];
@@ -1409,7 +1419,6 @@ class Wallet extends EventEmitter {
     }
 
     queueConfirmation(confirmation, uuid, callback) {
-        console.log('xxx', confirmation)
         this.confirmations.push({
             confirmation,
             callback,

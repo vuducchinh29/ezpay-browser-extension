@@ -1,5 +1,5 @@
 {
-  "name": "ezpay",
+  "name": "ezPay",
   "private": true,
   "workspaces": [
     "packages/*"

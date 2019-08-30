@@ -13,10 +13,6 @@ export default {
         this.duplex.send('popup', 'setAccount', account, false);
     },
 
-    setNode(node) {
-
-    },
-
     setAccounts(accounts) {
         this.duplex.send('popup', 'setAccounts', accounts, false);
     },
